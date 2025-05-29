@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="CercleSport SaaS Application">
+    <title>CercleSport SaaS - League Management Platform</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --secondary: #1e40af;
+            --accent: #10b981;
+            --light: #f8fafc;
+            --dark: #0f172a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            line-height: 1.6;
+            color: var(--dark);
+            background-color: #f1f5f9;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 4rem 2rem;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        header h2 {
+            font-size: 1.5rem;
+            font-weight: 400;
+            opacity: 0.9;
+        }
+
+        .section {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        h3 {
+            color: var(--primary);
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--accent);
+        }
+
+        .feature-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2rem 0;
+        }
+
+        .feature-table th,
+        .feature-table td {
+            padding: 1rem;
+            border: 1px solid #e2e8f0;
+            vertical-align: top;
+        }
+
+        .feature-table thead {
+            background-color: var(--light);
+            border-bottom: 2px solid var(--primary);
+        }
+
+        .feature-table th {
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .moscow-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .must { background-color: #dcfce7; color: #166534; }
+        .should { background-color: #fef9c3; color: #854d0e; }
+        .could { background-color: #dbeafe; color: #1e40af; }
+        .wont { background-color: #fee2e2; color: #991b1b; }
+
+        ul {
+            list-style: none;
+            padding-left: 1rem;
+        }
+
+        ul li {
+            margin-bottom: 0.5rem;
+            position: relative;
+            padding-left: 1.5rem;
+        }
+
+        ul li:before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: var(--accent);
+        }
+
+        .cta-section {
+            text-align: center;
+            background-color: var(--primary);
+            color: white;
+            padding: 3rem;
+            border-radius: 12px;
+            margin: 2rem 0;
+        }
+
+        footer {
+            background-color: var(--dark);
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 4rem;
+        }
+
+        .contact-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .contact-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .contact-card a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .content-section {
+            margin-bottom: 2.5rem;
+        }
+
+        .content-section h3 {
+            margin-top: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>CercleSport SaaS</h1>
+        <h2>The Ultimate Multi-Tenant League Management Platform</h2>
+    </header>
+
+    <main class="container">
+        <section class="section">
+            <div class="content-section">
+                <h3>About CercleSport</h3>
+                <p>CercleSport is a multi-tenant SaaS platform designed to empower leagues to independently manage their operations, including games, teams, players, and events. Our robust permissions system ensures secure and efficient management for all user levels.</p>
+            </div>
+
+            <div class="content-section">
+                <h3>Key Features</h3>
+                <table class="feature-table">
+                    <thead>
+                        <tr>
+                            <th>Category</th>
+                            <th>Feature</th>
+                            <th>Subfeatures</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Must Have -->
+                        <tr>
+                            <td><span class="moscow-badge must">Must Have</span></td>
+                            <td>Multi-Tenant Architecture</td>
+                            <td>
+                                <ul>
+                                    <li>Independent league management</li>
+                                    <li>Data isolation between leagues</li>
+                                    <li>Customizable league settings</li>
+                                </ul>
+                            </td>
+                            <td>Each league operates independently with its own data and settings.</td>
+                        </tr>
+                        <tr>
+                            <td><span class="moscow-badge must">Must Have</span></td>
+                            <td>Role-Based Access Control</td>
+                            <td>
+                                <ul>
+                                    <li>Super users: Platform-wide management</li>
+                                    <li>League admins: Manage league-specific content</li>
+                                    <li>Team admins: Manage team-specific content</li>
+                                    <li>Normal users: View and participate</li>
+                                </ul>
+                            </td>
+                            <td>Granular permissions for secure management at all levels.</td>
+                        </tr>
+                        <tr>
+                            <td><span class="moscow-badge must">Must Have</span></td>
+                            <td>League Management</td>
+                            <td>
+                                <ul>
+                                    <li>Create/manage leagues</li>
+                                    <li>Define league rules</li>
+                                    <li>Track standings & statistics</li>
+                                </ul>
+                            </td>
+                            <td>Comprehensive tools for league operations and analytics.</td>
+                        </tr>
+                        <tr>
+                            <td><span class="moscow-badge must">Must Have</span></td>
+                            <td>Game Scheduling</td>
+                            <td>
+                                <ul>
+                                    <li>Schedule games/tournaments</li>
+                                    <li>Set locations & times</li>
+                                    <li>Participant notifications</li>
+                                </ul>
+                            </td>
+                            <td>Efficient scheduling system with automated notifications.</td>
+                        </tr>
+
+                        <!-- Should Have -->
+                        <tr>
+                            <td><span class="moscow-badge should">Should Have</span></td>
+                            <td>Player Management</td>
+                            <td>
+                                <ul>
+                                    <li>Player profiles</li>
+                                    <li>Performance tracking</li>
+                                    <li>Team assignments</li>
+                                </ul>
+                            </td>
+                            <td>Comprehensive player tracking and organization system.</td>
+                        </tr>
+                        <tr>
+                            <td><span class="moscow-badge should">Should Have</span></td>
+                            <td>Event Management</td>
+                            <td>
+                                <ul>
+                                    <li>Event creation</li>
+                                    <li>Invitations</li>
+                                    <li>Attendance tracking</li>
+                                </ul>
+                            </td>
+                            <td>Complete event management solution for leagues.</td>
+                        </tr>
+
+                        <!-- Could Have -->
+                        <tr>
+                            <td><span class="moscow-badge could">Could Have</span></td>
+                            <td>Mobile App</td>
+                            <td>
+                                <ul>
+                                    <li>Mobile access</li>
+                                    <li>Push notifications</li>
+                                </ul>
+                            </td>
+                            <td>Native mobile experience for league management.</td>
+                        </tr>
+                        <tr>
+                            <td><span class="moscow-badge could">Could Have</span></td>
+                            <td>Social Media Integration</td>
+                            <td>
+                                <ul>
+                                    <li>Result sharing</li>
+                                    <li>Event updates</li>
+                                </ul>
+                            </td>
+                            <td>Social platform integration for increased engagement.</td>
+                        </tr>
+
+                        <!-- Won't Have -->
+                        <tr>
+                            <td><span class="moscow-badge wont">Won't Have</span></td>
+                            <td>AI-Powered Insights</td>
+                            <td>
+                                <ul>
+                                    <li>Predictive analytics</li>
+                                    <li>Strategy suggestions</li>
+                                </ul>
+                            </td>
+                            <td>Advanced AI features for future consideration.</td>
+                        </tr>
+                        <tr>
+                            <td><span class="moscow-badge wont">Won't Have</span></td>
+                            <td>Custom Branding</td>
+                            <td>
+                                <ul>
+                                    <li>Custom logos</li>
+                                    <li>Personalized URLs</li>
+                                </ul>
+                            </td>
+                            <td>Brand customization options for future releases.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="contact-info">
+                <div class="contact-card">
+                    <h4>Email</h4>
+                    <a href="mailto:rajjysrachid@gmail.com">rajjysrachid@gmail.com</a>
+                </div>
+                <div class="contact-card">
+                    <h4>Phone</h4>
+                    <a href="tel:+212612345678">+212 6 12 34 56 78</a>
+                </div>
+                <div class="contact-card">
+                    <h4>Website</h4>
+                    <a href="https://cerclesport.com">www.cerclesport.com</a>
+                </div>
+            </div>
+
+            <div class="content-section">
+                <h3>Our Solution</h3>
+                <p>We provide sports organizations with modern tools for scheduling, team management, and event organization through an intuitive SaaS platform.</p>
+            </div>
+
+            <div class="content-section">
+                <h3>Business Model</h3>
+                <p>Subscription-based service with tiered pricing plans based on features and usage requirements.</p>
+            </div>
+        </section>
+
+        <section class="cta-section">
+            <h3>Transform Your Sports Management</h3>
+            <p>Join hundreds of organizations using CercleSport</p>
+            <div style="margin-top: 1.5rem;">
+                <a href="#contact" style="background: white; color: var(--primary); padding: 0.75rem 2rem; border-radius: 8px; text-decoration: none; font-weight: 500;">
+                    Start Free Trial
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2023 CercleSport. All rights reserved.</p>
+        <div style="margin-top: 1rem;">
+            <a href="#" style="color: white; margin: 0 0.5rem;">Twitter</a>
+            <a href="#" style="color: white; margin: 0 0.5rem;">LinkedIn</a>
+            <a href="#" style="color: white; margin: 0 0.5rem;">Facebook</a>
+        </div>
+    </footer>
+</body>
+</html>
