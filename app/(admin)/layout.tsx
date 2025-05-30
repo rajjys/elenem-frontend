@@ -27,16 +27,6 @@ function Sidebar() {
   );
 }
 
-function Navbar() {
-    const user = useAuthStore(state => state.user);
-  return (
-    <nav className="bg-white shadow p-4 flex justify-between items-center">
-      <h1 className="text-lg font-semibold">League Management</h1>
-      {user && <p>Welcome, {user.firstName} ({user.role})</p>}
-    </nav>
-  );
-}
-
 export default function AdminLayout({ children }: { children: ReactNode }) {
   const { user, tokens, fetchUser } = useAuthStore();
   const router = useRouter();
@@ -81,7 +71,6 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
     <div className="flex h-screen bg-gray-100">
       <Sidebar />
       <main className="flex-1 flex flex-col overflow-hidden">
-        <Navbar />
         <div className="flex-1 p-6 overflow-y-auto">
           {children}
         </div>

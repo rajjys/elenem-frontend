@@ -3,17 +3,7 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { api, setAuthToken } from '@/services/api'; // Your API service
 import Cookies from 'js-cookie'; // <-- Add this import
-
-interface User {
-  id: string;
-  username: string;
-  email: string;
-  role: string;
-  leagueId?: string;
-  firstName?: string;
-  lastName?: string;
-  // ... other user fields from /auth/me
-}
+import { User } from '@/prisma';
 
 interface AuthTokens {
   accessToken: string;
@@ -63,7 +53,8 @@ export const useAuthStore = create<AuthState>()(
       },
       logout: async () => {
         try {
-          await api.post('/auth/logout');
+          ///await api.post('/auth/logout');
+          
         } catch (error) {
           console.error("Logout failed on backend:", error);
         } finally {
@@ -71,6 +62,8 @@ export const useAuthStore = create<AuthState>()(
           set({ user: null });
           setAuthToken(null);
           // Cookies are cleared by setTokens(null) call
+          Cookies.remove('accessToken');
+          Cookies.remove('userRole');
         }
       },
       fetchUser: async () => {

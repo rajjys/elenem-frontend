@@ -5,12 +5,13 @@ import { api } from '@/services/api';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button'; // Assuming you have a Button component
 import { League } from '@/prisma';
+import { useRouter } from 'next/navigation';
 
 export default function LeaguesPage() {
   const [leagues, setLeagues] = useState<League[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
+   
   useEffect(() => {
     const fetchLeagues = async () => {
       try {
@@ -28,7 +29,15 @@ export default function LeaguesPage() {
   }, []);
 
   if (loading) return <p>Loading leagues...</p>;
-  if (error) return <p className="text-red-500">Error: {error}</p>;
+  if (error) {
+    ///If Unauthorized, redirect to login
+    if (error === "Unauthorized"){
+      // Logout user and redirect to login
+
+      ///return null; //prevent further rendering
+    }
+    return <p className="text-red-500">Error: {error}</p>;
+  }
 
   return (
     <div>

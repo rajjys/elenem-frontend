@@ -1,6 +1,7 @@
 // app/(auth)/login/page.tsx
 "use client";
 import { LoginForm } from "@/components/forms/loginForm";
+import { Role } from "@/prisma";
 import { useAuthStore } from "@/store/auth.store";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
@@ -16,12 +17,20 @@ export default function LoginPage() {
     if (tokens?.accessToken && user) {
       // Middleware should have already redirected them away from /login if authenticated.
       // This is a client-side fallback just in case, or for subsequent navigation.
-      if (user.role === "SYSTEM_ADMIN") {
-        router.push("/dashboard");
-      } else {
-        // For other roles, perhaps to a general user dashboard or just back home.
-        router.push("/"); // Or `/user/dashboard`
-      }
+      ///Redirect to the appropriate page based on user role
+            const userRole = user?.role;
+            if (userRole === Role.SYSTEM_ADMIN) {
+              router.push("/dashboard");
+            } 
+            else if (userRole === Role.LEAGUE_ADMIN){
+              router.push("/user-dashboard/league");
+            }
+            else if (userRole === Role.TEAM_ADMIN) {
+              router.push("/user-dashboard/team");
+            } 
+            else {
+              router.push("/user-dashboard/");
+            }
     }
   }, [user, tokens, router]);
 

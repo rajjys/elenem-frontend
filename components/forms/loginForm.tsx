@@ -8,6 +8,7 @@ import { Input } from "../ui/input";
 import { useAuthStore } from "@/store/auth.store";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { Role } from "@/prisma";
 
 const loginSchema = z.object({
   usernameOrEmail: z.string().min(1, "Username or Email is required"),
@@ -36,7 +37,21 @@ export function LoginForm() {
         ? { usernameOrEmail: data.usernameOrEmail, password: data.password }
         : data;
       await login(payload.usernameOrEmail, payload.password, payload.leagueCode);
-      router.push("/dashboard"); // Or role-based redirect
+      ///router.push("/dashboard"); // Or role-based redirect
+      ///Redirect to the appropriate page based on user role
+      const userRole = useAuthStore.getState().user?.role;
+      if (userRole === Role.SYSTEM_ADMIN) {
+        router.push("/dashboard");
+      } 
+      else if (userRole === Role.LEAGUE_ADMIN){
+        router.push("/user-dashboard/league");
+      }
+      else if (userRole === Role.TEAM_ADMIN) {
+        router.push("/user-dashboard/team");
+      } 
+      else {
+        router.push("/user-dashboard/");
+      }
     } catch (err: any) {
       setError(err.response?.data?.message || "Login failed. Please check your credentials.");
     }
