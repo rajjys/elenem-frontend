@@ -20,16 +20,16 @@ export default function LoginPage() {
       ///Redirect to the appropriate page based on user role
             const userRole = user?.role;
             if (userRole === Role.SYSTEM_ADMIN) {
-              router.push("/dashboard");
+              router.push("admin/dashboard");
             } 
             else if (userRole === Role.LEAGUE_ADMIN){
-              router.push("/user-dashboard/league");
+              router.push("/dashboard/league");
             }
             else if (userRole === Role.TEAM_ADMIN) {
-              router.push("/user-dashboard/team");
+              router.push("/dashboard/team");
             } 
             else {
-              router.push("/user-dashboard/");
+              router.push("/dashboard/user");
             }
     }
   }, [user, tokens, router]);

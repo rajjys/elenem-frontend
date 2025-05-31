@@ -19,14 +19,14 @@ export function AppLayout({ children }: AppLayoutProps) {
     if (!user) return "/login"; // Should not happen if layout is protected
     switch (user.role as Role) { // Cast user.role to Role
       case Role.SYSTEM_ADMIN:
-        return "/dashboard"; // System Admins have their own specific dashboard
+        return "/admin/dashboard"; // System Admins have their own specific dashboard
       case Role.LEAGUE_ADMIN:
-        return "/user-dashboard/league"; // Example path
+        return "/dashboard/league"; // Example path
       case Role.TEAM_ADMIN:
-        return "/user-dashboard/team";   // Example path
+        return "/dashboard/team";   // Example path
       // Add cases for PLAYER, REFEREE if they have dashboards
       default:
-        return "/user-dashboard";   // Fallback for GENERAL_USER or simple dashboard
+        return "/dashboard/user";   // Fallback for GENERAL_USER or simple dashboard
     }
   };
 
@@ -42,7 +42,7 @@ export function AppLayout({ children }: AppLayoutProps) {
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center">
               <Link href="/" className="font-bold text-xl text-indigo-600">
-                LeaguePlatform
+                ELENEM
               </Link>
               {/* Navigation for authenticated users */}
               {user && (<div className="hidden md:block">

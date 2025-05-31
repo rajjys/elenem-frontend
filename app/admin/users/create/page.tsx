@@ -84,7 +84,7 @@ export default function CreateUserPage() {
 
     try {
       await api.post("/system-admin/users", payload);
-      router.push("/users");
+      router.push("admin/users");
     } catch (error: any) {
       setApiError(error.response?.data?.message || "Failed to create user.");
       setIsLoading(false);

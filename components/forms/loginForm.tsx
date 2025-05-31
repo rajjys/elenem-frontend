@@ -37,20 +37,20 @@ export function LoginForm() {
         ? { usernameOrEmail: data.usernameOrEmail, password: data.password }
         : data;
       await login(payload.usernameOrEmail, payload.password, payload.leagueCode);
-      ///router.push("/dashboard"); // Or role-based redirect
+      
       ///Redirect to the appropriate page based on user role
       const userRole = useAuthStore.getState().user?.role;
       if (userRole === Role.SYSTEM_ADMIN) {
-        router.push("/dashboard");
+        router.push("admin/dashboard");
       } 
       else if (userRole === Role.LEAGUE_ADMIN){
-        router.push("/user-dashboard/league");
+        router.push("/dashboard/league");
       }
       else if (userRole === Role.TEAM_ADMIN) {
-        router.push("/user-dashboard/team");
+        router.push("/dashboard/team");
       } 
       else {
-        router.push("/user-dashboard/");
+        router.push("/dashboard/user");
       }
     } catch (err: any) {
       setError(err.response?.data?.message || "Login failed. Please check your credentials.");

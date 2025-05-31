@@ -1,4 +1,4 @@
-// app/(admin)/dashboard/page.tsx
+///admin/dashboard/page.tsx
 "use client";
 import { useAuthStore } from '@/store/auth.store';
 import Link from 'next/link';
@@ -8,10 +8,10 @@ export default function AdminDashboardPage() {
 
   // These would ideally come from API calls
   const stats = [
-    { name: 'Total Leagues', stat: '12', href: '/leagues' },
-    { name: 'Total Users', stat: '150', href: '/users' },
-    { name: 'Active Seasons', stat: '3', href: '#' }, // Placeholder
-    { name: 'Platform Settings', stat: 'Manage', href: '/settings' },
+    { name: 'Total Leagues', stat: '12', href: 'admin/leagues' },
+    { name: 'Total Users', stat: '150', href: 'admin/users' },
+    { name: 'Active Seasons', stat: '3', href: 'admin/seasons' }, // Placeholder
+    { name: 'Platform Settings', stat: 'Manage', href: 'admin/settings' },
   ];
 
   return (
@@ -59,10 +59,10 @@ export default function AdminDashboardPage() {
         <div className="bg-white shadow rounded-lg p-6">
           <h2 className="text-xl font-semibold mb-4">Quick Actions</h2>
           <div className="space-y-3">
-            <Link href="/leagues/create" className="block text-indigo-600 hover:text-indigo-800">
+            <Link href="admin/leagues/create" className="block text-indigo-600 hover:text-indigo-800">
               + Create New League
             </Link>
-            <Link href="/users/create" className="block text-indigo-600 hover:text-indigo-800">
+            <Link href="admin/users/create" className="block text-indigo-600 hover:text-indigo-800">
               + Add New User
             </Link>
             {/* More actions */}

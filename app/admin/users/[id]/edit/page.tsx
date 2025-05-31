@@ -134,7 +134,7 @@ export default function EditUserPage() {
       //   await api.put(`/system-admin/users/${id}`, payload);
       // }
       await api.put(`/system-admin/users/${id}`, payload);
-      router.push(`/users/${id}`);
+      router.push(`admin/users/${id}`);
     } catch (error: any) {
       setApiError(error.response?.data?.message || "Failed to update user.");
     } finally {

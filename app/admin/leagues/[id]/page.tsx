@@ -64,7 +64,7 @@ export default function ViewLeaguePage() {
       await api.delete(`/system-admin/leagues/${id}`);
       setShowDeleteModal(false);
       // Add success toast/notification
-      router.push('/leagues');
+      router.push('admin/leagues');
     } catch (err: any) {
       setError(err.response?.data?.message || "Failed to delete league.");
       setIsDeleting(false);
@@ -84,7 +84,7 @@ export default function ViewLeaguePage() {
           <p className="text-sm text-gray-500">League Code: {league.leagueCode}</p>
         </div>
         <div className="flex space-x-2">
-          <Link href={`/leagues/${id}/edit`}>
+          <Link href={`admin/leagues/${id}/edit`}>
             <Button variant="secondary">Edit League</Button>
           </Link>
            <Button variant="danger" onClick={() => setShowDeleteModal(true)}>Delete League</Button>

@@ -18,10 +18,10 @@ function Sidebar() {
   return (
     <aside className="w-64 bg-gray-800 text-white p-4 space-y-2">
       <h2 className="text-xl font-semibold mb-4">Admin Panel</h2>
-      <Link href="/dashboard" className="block hover:bg-gray-700 p-2 rounded">Dashboard</Link>
-      <Link href="/leagues" className="block hover:bg-gray-700 p-2 rounded">Leagues</Link>
-      <Link href="/users" className="block hover:bg-gray-700 p-2 rounded">Users</Link>
-      <Link href="/settings" className="block hover:bg-gray-700 p-2 rounded">Settings</Link>
+      <Link href="/admin/dashboard" className="block hover:bg-gray-700 p-2 rounded">Dashboard</Link>
+      <Link href="/admin/leagues" className="block hover:bg-gray-700 p-2 rounded">Leagues</Link>
+      <Link href="/admin/users" className="block hover:bg-gray-700 p-2 rounded">Users</Link>
+      <Link href="/admin/settings" className="block hover:bg-gray-700 p-2 rounded">Settings</Link>
       <button onClick={handleLogout} className="w-full text-left hover:bg-gray-700 p-2 rounded mt-auto">Logout</button>
     </aside>
   );

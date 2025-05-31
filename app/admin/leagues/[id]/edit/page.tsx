@@ -107,7 +107,7 @@ export default function EditLeaguePage() {
       }
 
       await api.put(`/system-admin/leagues/${id}`, changedData);
-      router.push(`/leagues/${id}`); // Go to view page or list
+      router.push(`admin/leagues/${id}`); // Go to view page or list
     } catch (error: any) {
       setApiError(error.response?.data?.message || "Failed to update league.");
     } finally {

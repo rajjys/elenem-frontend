@@ -73,7 +73,7 @@ export default function CreateLeaguePage() {
       // Could show a success toast/message here
       setIsLoading(false);
       // Redirect to leagues page after successful creation
-      router.push("/leagues");
+      router.push("admin/leagues");
     } catch (error: any) {
       setApiError(error.response?.data?.message || "Failed to create league.");
       setIsLoading(false);

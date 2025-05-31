@@ -7,9 +7,10 @@ import { Role } from './prisma';
 const publicPaths = ['/login', '/register', '/', ]; // Add any other public routes
 
 // Paths that require SYSTEM_ADMIN role
-const adminPaths = ['/dashboard', '/leagues', '/users', '/settings']; // Adjust as per your admin routes
+//Everything under /admin/* is protected and requires SYSTEM_ADMIN role
+const adminPaths = ['/admin/*']; // Adjust as per your admin routes
 //Paths that require authentication but not necessarily admin role
-const appPaths = ['/profile', '/security', '/user-dashboard/league', '/user-dashboard/team', '/user-dashboard/user'];
+const appPaths = ['/profile', '/security', '/dashboard/league', '/dashboard/team', '/dashboard/user'];
 
 export async function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl;
@@ -50,6 +51,7 @@ export async function middleware(request: NextRequest) {
             return NextResponse.redirect(url);
         }
     }
+    // 
     // Check general authenticated app paths (any logged-in user can access these)
     // No specific role check needed here beyond having an accessToken,
     // unless some appPaths are role-specific (e.g., only PLAYER can see /app/player-dashboard)
