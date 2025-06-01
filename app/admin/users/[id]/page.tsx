@@ -76,7 +76,7 @@ export default function ViewUserPage() {
           <p className="text-sm text-gray-500">@{user.username} - {user.email}</p>
         </div>
         <div className="flex space-x-2">
-          <Link href={`admin/users/${id}/edit`}>
+          <Link href={`/admin/users/${id}/edit`}>
             <Button variant="secondary">Edit User</Button>
           </Link>
           {!user.deletedAt && (

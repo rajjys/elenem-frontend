@@ -1,17 +1,25 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { Role } from './prisma';
+import { verifyJWT } from './utils';
 
 // Define your roles (ensure this matches your enum in auth.store)
 // Paths that do NOT require authentication
-const publicPaths = ['/login', '/register', '/', ]; // Add any other public routes
+const publicPaths = ['/login', '/register', '/access_denied', ]; // Add any other public routes
 
 // Paths that require SYSTEM_ADMIN role
 //Everything under /admin/* is protected and requires SYSTEM_ADMIN role
-const adminPaths = ['/admin/*']; // Adjust as per your admin routes
-//Paths that require authentication but not necessarily admin role
-const appPaths = ['/profile', '/security', '/dashboard/league', '/dashboard/team', '/dashboard/user'];
+const systemAdminPaths = ['/admin']; // Adjust as per your admin routes
 
+//Paths that require authentication but not necessarily admin role
+const appPaths = [
+    '/account/profile', '/account/security',
+    '/dashboard', // Generic user dashboard
+    '/dashboard/league', // League Admin dashboard (if you create this)
+    '/dashboard/team',   // Team Admin dashboard (if you create this)
+    '/league/manage',    // New: Manage own league
+    '/league/admins'     // New: Manage league admins
+];
 export async function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl;
 
@@ -25,28 +33,32 @@ export async function middleware(request: NextRequest) {
     // For this example, we'll simulate fetching from a cookie.
     // You'd typically store your access token in a secure, httpOnly cookie.
     const accessToken = request.cookies.get('accessToken')?.value;
-    const userRole = request.cookies.get('userRole')?.value as Role; // Assuming you store role in a cookie too
-
     // If no access token, redirect to login
     if (!accessToken) {
-        // If trying to access an admin path directly without login, redirect to login page.
-        // If trying to access a general authenticated path without login, redirect to login page.
-        if (adminPaths.some(path => pathname.startsWith(path)) || appPaths.some(path => pathname.startsWith(path)) || !publicPaths.includes(pathname)) {
-            const url = request.nextUrl.clone();
-            url.pathname = '/login';
-            // You might want to add a redirect param so login knows where to go after success
-            url.searchParams.set('redirect', pathname);
-            return NextResponse.redirect(url);
-        }
-        return NextResponse.next(); // For other public paths, just proceed
+        const url = request.nextUrl.clone();
+        url.pathname = '/login';
+        url.searchParams.set('redirect', pathname);
+        return NextResponse.redirect(url);
+    }
+    // Verify JWT (replace 'your-secret' with your actual secret)
+    const user = await verifyJWT(accessToken, process.env.JWT_SECRET || 'your-secret');
+    if (!user || (user.exp && user.exp * 1000 < Date.now())) {
+        const url = request.nextUrl.clone();
+        url.pathname = '/login';
+        url.searchParams.set('redirect', pathname);
+        const response = NextResponse.redirect(url);
+        response.cookies.set('accessToken', '', { maxAge: 0 });
+        return response;
     }
 
+    // const userRole = request.cookies.get('userRole')?.value as Role; // Assuming you store role in a cookie too
+    const userRole = user.role;
     // If access token exists, but it's an admin path, check role
-    if (adminPaths.some(path => pathname.startsWith(path))) {
+    if (systemAdminPaths.some(path => pathname.startsWith(path))) {
         if (userRole !== Role.SYSTEM_ADMIN) { // Only SYSTEM_ADMIN for /admin/*
             // Redirect to a specific "access denied" page or back to login
             const url = request.nextUrl.clone();
-            url.pathname = '/'; // Or '/access-denied'
+            url.pathname = '/access-denied'; // Or '/access-denied'
             console.warn(`Middleware: Access denied for role ${userRole} trying to access ${pathname}`);
             return NextResponse.redirect(url);
         }
@@ -62,6 +74,7 @@ export async function middleware(request: NextRequest) {
     }
 
     // If authenticated and authorized, proceed
+ 
     return NextResponse.next();
 }
 

@@ -15,6 +15,7 @@ export function AppLayout({ children }: AppLayoutProps) {
   const router = useRouter();
   const pathname = usePathname();
 
+  
   const getDashboardLink = () => {
     if (!user) return "/login"; // Should not happen if layout is protected
     switch (user.role as Role) { // Cast user.role to Role
@@ -26,9 +27,20 @@ export function AppLayout({ children }: AppLayoutProps) {
         return "/dashboard/team";   // Example path
       // Add cases for PLAYER, REFEREE if they have dashboards
       default:
-        return "/dashboard/user";   // Fallback for GENERAL_USER or simple dashboard
+        return "/dashboard/";   // Fallback for GENERAL_USER or simple dashboard
     }
   };
+
+  const navLinks = [
+    { href: getDashboardLink(), label: "Dashboard" },
+    { href: "/account/profile", label: "Profile" },
+    { href: "/account/security", label: "Security" },
+  ];
+
+  if (user?.role === Role.LEAGUE_ADMIN && user.leagueId) {
+    navLinks.push({ href: "/league/manage", label: "Manage League" });
+     navLinks.push({ href: "/league/admins", label: "Admins Page" });
+  }
 
   const handleLogout = () => {
     logout();
@@ -45,18 +57,16 @@ export function AppLayout({ children }: AppLayoutProps) {
                 ELENEM
               </Link>
               {/* Navigation for authenticated users */}
-              {user && (<div className="hidden md:block">
-                <div className="ml-10 flex items-baseline space-x-4">
-                  <Link href={getDashboardLink()} className="text-gray-700 hover:bg-gray-200 hover:text-black px-3 py-2 rounded-md text-sm font-medium">
-                    My Dashboard
-                  </Link>
-                  <Link href="/account/profile" className="text-gray-700 hover:bg-gray-200 hover:text-black px-3 py-2 rounded-md text-sm font-medium">
-                    My Profile
-                  </Link>
-                  <Link href="/account/security" className="text-gray-700 hover:bg-gray-200 hover:text-black px-3 py-2 rounded-md text-sm font-medium">
-                    Security
-                  </Link>
-                  {/* Add other links for general users if applicable */}
+              {user && (
+              <div className="hidden md:block">
+                <div>
+                  {
+                    navLinks.map((navLink, index) => {
+                      return <Link href={navLink.href} key={index} className="text-gray-700 hover:bg-gray-200 hover:text-black px-3 py-2 rounded-md text-sm font-medium">
+                                  {navLink.label}
+                            </Link>
+                    })
+                  }
                 </div>
               </div>)}
             </div>

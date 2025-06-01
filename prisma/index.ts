@@ -76,3 +76,31 @@ export interface User {
   // Add any other fields you need
   phone?: string;
 }
+
+// For MyLeagueDetailsDto used in frontend state and forms
+// This should mirror the structure returned by your backend '/leagues/my-league' endpoint.
+interface LeagueAdminUserDto {
+  id: string;
+  username: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+}
+
+export interface MyLeagueDetailsDto {
+  id: string;
+  name: string;
+  leagueCode: string;
+  description?: string | null;
+  logoUrl?: string | null;
+  bannerImageUrl?: string | null;
+  sportType: SportType; // Make sure SportType is available or define it
+  status: boolean;
+  leagueProfile?: any;
+  owner?: LeagueAdminUserDto | null;
+  pointsSystem?: any;
+  tiebreakerRules?: any; // string[] if that's what backend sends
+  admins?: LeagueAdminUserDto[];
+  createdAt: string; // Date as string
+  updatedAt: string; // Date as string
+}
