@@ -17,9 +17,10 @@ export default function AuthenticatedAppLayout({ children }: { children: ReactNo
 
   return <html lang='en'>
     <body>
-      <AppLayout>
+      {/*<AppLayout>
         {children}
-      </AppLayout>
+      </AppLayout>*/}
+      {children}
     </body>
     </html>
 }

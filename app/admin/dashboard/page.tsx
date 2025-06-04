@@ -8,10 +8,10 @@ export default function AdminDashboardPage() {
 
   // These would ideally come from API calls
   const stats = [
-    { name: 'Total Leagues', stat: '12', href: 'admin/leagues' },
-    { name: 'Total Users', stat: '150', href: 'admin/users' },
-    { name: 'Active Seasons', stat: '3', href: 'admin/seasons' }, // Placeholder
-    { name: 'Platform Settings', stat: 'Manage', href: 'admin/settings' },
+    { name: 'Total Leagues', stat: '12', href: '/admin/leagues' },
+    { name: 'Total Users', stat: '150', href: '/admin/users' },
+    { name: 'Active Seasons', stat: '3', href: '/admin/seasons' }, // Placeholder
+    { name: 'Platform Settings', stat: 'Manage', href: '/admin/settings' },
   ];
 
   return (

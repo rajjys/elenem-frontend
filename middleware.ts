@@ -5,7 +5,7 @@ import { verifyJWT } from './utils';
 
 // Define your roles (ensure this matches your enum in auth.store)
 // Paths that do NOT require authentication
-const publicPaths = ['/login', '/register', '/access_denied', ]; // Add any other public routes
+const publicPaths = ['/login', '/register', '/access_denied','/' ]; // Add any other public routes
 
 // Paths that require SYSTEM_ADMIN role
 //Everything under /admin/* is protected and requires SYSTEM_ADMIN role
@@ -15,10 +15,14 @@ const systemAdminPaths = ['/admin']; // Adjust as per your admin routes
 const appPaths = [
     '/account/profile', '/account/security',
     '/dashboard', // Generic user dashboard
-    '/dashboard/league', // League Admin dashboard (if you create this)
-    '/dashboard/team',   // Team Admin dashboard (if you create this)
+    '/league/dashboard/', // League Admin dashboard (if you create this)
+    '/team/dashboard/',   // Team Admin dashboard (if you create this)
     '/league/manage',    // New: Manage own league
-    '/league/admins'     // New: Manage league admins
+    '/league/admins',    // New: Manage league admins
+    '/league/teams',     // LA list teams in their league
+    '/league/teams/create',// LA create team
+    '/league/teams/[teamId]/edit', // LA edit team (dynamic part needs careful matching or broad match)
+    '/team/manage',      // TA manage their team profile
 ];
 export async function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl;

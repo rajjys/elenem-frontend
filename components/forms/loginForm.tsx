@@ -41,13 +41,13 @@ export function LoginForm() {
       ///Redirect to the appropriate page based on user role
       const userRole = useAuthStore.getState().user?.role;
       if (userRole === Role.SYSTEM_ADMIN) {
-        router.push("admin/dashboard");
+        router.push("/admin/dashboard");
       } 
       else if (userRole === Role.LEAGUE_ADMIN){
-        router.push("/dashboard/league");
+        router.push("/league/dashboard");
       }
       else if (userRole === Role.TEAM_ADMIN) {
-        router.push("/dashboard/team");
+        router.push("/team/dashboard");
       } 
       else {
         router.push("/dashboard/user");

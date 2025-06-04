@@ -1,0 +1,68 @@
+So I'm building a SAAS platform for sport league management. 
+Basically i want to build it for full production and we have 4 important Roles as of SYSTEM_ADMINS, 
+LEAGUE_ADMINS(the actual clients), TEAM_ADMIN(extended client, for managing a team personal profile) and 
+GENERAL_USERS. We also have REFEREE, PLAYER and others but not important for now.
+
+The description of the projetct in the modules manifest but it's more about the backend.
+The frontend is an app router nextjs project.
+
+Now for scalability reasons, in the frontend I have separated the system admins routes from the other users roles. 
+It's better for clarity instead of general complex components. 
+In that logic, I plan to design a layout.tsx for each permission type that reflets their actions.
+
+Starting with SYSTEM_ADMIN. 
+Still at the beginning I'm still working on the structure but don't know each and every operation that the system admins will be doing. 
+It's still better to prepare.
+ What I want is a layout.tsx specifically for system admins that links to every operation and page the league admins will handle. 
+Focus on the Navbar. 
+I want a navbar that points to all the operations and pages for SYSTEM_ADMIN. 
+Read the manifest wisely, even the modules that don't appear in the manifest but you know are important for SYSTEM ADMIN managing a sport league. Add them all. 
+For example there's no accounting or messaging but you need to add them and all among others with their correspondings sublinks
+This will be like the comprehensive map of what features to build for system admins.
+For example
+*Operations: -Leagues -Teams -Games -Players -Referees -Transfers -GameEvents -Notifications -Stats ...
+*Users: -My Profile -Users -Admins -Security -*Permissions: - Permission Group -Access Control ...  ...
+*Dashboard:
+*General Analytics: ///Extended dashboard more contextualised
+*Public Access: -Public Routes -Public API use ...
+*Server/System Monitor: -Server Health -Requests -DB -CDN -Storage ...
+*Settings/Config: -Feature Settings -Access Setting ...
+*Messaging: -Message portal -Internal Message ...
+*Accounting: ///All about it
+*Sales/Ticketing: All about it
+*E-commerce/Merch: ////All about it
+*Subscriptions:
+*Payments/Outbound:
+*Media / Content Management: ///All about it
+*Live: -Live streaming -Real-time messages -Live Comments
+*Sponsorship:
+*Languages:
+*Compliance/Accessibility:///All about it
+*Advance Search: ////
+*Mobile App:
+This is some of the feature i can think of. I know there's a lot more.
+ Feel free to update, rearrange, add, remove, rephrase, restucture that list for a fully production ready multitenant SAAS platform.
+You can also create a separate document/manifest that describe every option and where it's suppose to link to and what we're supposed to implement with great attention to deatil.
+ As a bonus you can make it responsive but dont forget, every admin route start with /admin. 
+
+
+The new navbar, or sidebar is beautiful but with few issues
+- When i click for example on create User or System Admins, the Manage All Users also changes color and creates confusion.
+	Users don't know exactly which one is the focused one. I understand this is a grouping feature as a way to guide the user but it's achieving the opposite.
+	If any way possible, when clicking on League Defaults for example. Instead of Manage Leagues to also change to the same blue color, you can change the bg or all related League operations on the list. 
+	to A lighter blue bg that highlight all related links and the main focused link stays the main blue element.
+- On some devices, usually small. The menu open/close is straight and no smooth transition. 
+	I want the smooth transition on all devices.
+- When the side panel is closed, there's another a mini side panel that is now visible showing the group lastly focused on from the main panel yet the it doesnt disappear when clicked away. 
+	But if i click on a different icon, it also overlap over the existing one.
+	If keeping this feature, it has to detect click away and disappear and it has to appear near the icon clicked and not at top screen because now it is rendered behind the admin panel and only partially visible
+	Fix the click away detect and render near icon clicked and not under topbar
+
+That was perfect and it's responsive enough. Now I want the same for LEAGUE_ADMIN
+These are our principal customers so I need you to think of all the features they will need so i can plan for it. 
+These will then be implemented iteratively but the structure has to be clear and concise enough.
+Most of the features we could think of were planned in the manifest but since it's designed for the backend it won't consider all the tricky design questions of front end so find a way to adapt
+In the manifest many features are missing like permission management, accounting, internal communication, mail and whatsapp marketing and more...
+Run through the best sport management platform and analyse what they offer for league admins who are the principal users. What actions and views they will need.
+Using the same design pattern used for SYSTEM_ADMIN layout, design a comprehensive layout.tsx that will apply for league management routes and it's corresponding descriptive manifest.
+The routes for league management start with /league except for user profile and security which are under /account/profile /account/security since they are not related to league but to the person himslelf

@@ -10,6 +10,9 @@ async rewrites() {
       },
     ];
   },*/
+  images: {
+    domains: ["scontent-mba2-1.xx.fbcdn.net"],
+  }
 };
 
 export default nextConfig;

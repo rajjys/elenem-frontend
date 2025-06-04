@@ -42,7 +42,7 @@ export default function LeaguesPage() {
     <div>
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Manage Leagues</h1>
-        <Link href="admin/leagues/create">
+        <Link href="/admin/leagues/create">
           <Button type="button">Create New League</Button>
         </Link>
       </div>
@@ -72,8 +72,8 @@ export default function LeaguesPage() {
                      </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <Link href={`admin/leagues/${league.id}/`} className="text-indigo-400 hover:text-indigo-700 mr-3">View</Link>
-                    <Link href={`admin/leagues/${league.id}/edit`} className="text-indigo-600 hover:text-indigo-900">Edit</Link>
+                    <Link href={`/admin/leagues/id/${league.id}/`} className="text-indigo-400 hover:text-indigo-700 mr-3">View</Link>
+                    <Link href={`/admin/leagues/id/${league.id}/edit`} className="text-indigo-600 hover:text-indigo-900">Edit</Link>
                     {/* Add Delete button with confirmation */}
                   </td>
                 </tr>
