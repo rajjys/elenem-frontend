@@ -48,7 +48,8 @@ export default function EditTeamPageLA() {
         // A new endpoint like /leagues/my-league/users-for-assignment might be needed.
         // For demo, we'll mock or assume it. If using SystemAdmin user list, LA needs access.
         // const response = await api.get(`/system-admin/users?leagueId=${leagueId}&role=GENERAL_USER&role=TEAM_ADMIN`); // Example
-        const response = await api.get(`/users/league-admin/list-assignable?leagueId=${leagueId}`); // Hypothetical endpoint
+        //const response = await api.get(`/users/league-admin/list-assignable?leagueId=${leagueId}`); // Hypothetical endpoint
+        const response = await api.get(`/leagues/my-league/general-users`)
         setUsersInLeague(response.data || []);
     } catch (err) {
         console.error("Failed to fetch users for assignment:", err);

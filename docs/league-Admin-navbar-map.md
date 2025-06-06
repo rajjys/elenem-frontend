@@ -52,28 +52,36 @@ This manifest details the navigation structure specifically for League Administr
 
 ### A. Teams
 - **Manage Teams**
-  - **Route:** `/league/teams/all`
+  - **Route:** `/league/teams/`
   - **Description:** View list of all teams, create new teams, edit team profiles, approve pending team registrations, manage team status.
-- **Team Invitations**
-  - **Route:** `/league/teams/invitations`
-  - **Description:** Send and track invitations for new or existing teams to join the league.
 
-### B. Players
+### B. Players and Coaches
 - **Manage Players**
-  - **Route:** `/league/players/all`
-  - **Description:** View all registered players in the league, edit player details, assign players to teams, manage player status, view statistics.
+  - **Route:** `/league/players/`
+  - **Description:** View all registered players in the league, edit player details, assign players to teams, manage player status, view statistics, Oversee player registration, approve pending player sign-ups, manage custom registration fields.
 - **Player Registration Forms**
-  - **Route:** `/league/players/registration`
-  - **Description:** Oversee player registration, approve pending player sign-ups, manage custom registration fields.
+  - **Route:** `/league/Coaches`
+  - **Description:** 
 
 ### C. Officials & Referees
 - **Manage Officials**
-  - **Route:** `/league/officials/all`
+  - **Route:** `/league/officials/`
   - **Description:** Maintain a database of referees and other officials for the league, track availability, qualifications, and assign to games.
 - **Official Assignments**
   - **Route:** `/league/officials/assignments`
   - **Description:** View and manage game assignments for officials.
 
+- **Team Invitations**
+  - **Route:** `/league/teams/invitations`
+  - **Description:** Send and track invitations for new or existing teams to join the league.
+### D. Home Venues
+- **Stadiums**
+- **Route:** `/league/stadiums`
+  - **Description:** View and manage Stadiums and home venues.
+### E. Users
+- **Users**
+- **Route:** `/league/users`
+  - **Description:** View and manage different types of users in the league. League Users, Team managers and general users
 ---
 
 ## IV. Competition Management
@@ -231,9 +239,16 @@ This manifest details the navigation structure specifically for League Administr
 - **Description:** Access the platform's knowledge base, tutorials, and frequently asked questions.
 
 ### B. Submit Support Ticket
+- **Route:** `/league/support/faq`
+- **Description:** FAQ
+
+### C. Help Center & FAQs
+- **Route:** `/league/support/feedback`
+- **Description:** Feedback from users
+
+### D. Submit Support Ticket
 - **Route:** `/league/support/contact`
 - **Description:** A system for League Admins to submit support requests or report issues to the platform's administrators (SYSTEM_ADMIN or support team).
-
 ---
 
 _This manifest provides a comprehensive structure for the League Admin's capabilities._

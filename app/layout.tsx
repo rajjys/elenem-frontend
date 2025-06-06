@@ -1,26 +1,19 @@
 // app/(app)/layout.tsx
 "use client";
-import { ReactNode, useEffect } from 'react';
-import { useAuthStore } from '@/store/auth.store';
-import { useRouter } from 'next/navigation';
 import "./globals.css";
-import { AppLayout } from '@/components/AppLayout'; // The new layout component
 
-export default function AuthenticatedAppLayout({ children }: { children: ReactNode }) {
-  const { user, tokens, fetchUser } = useAuthStore();
-  const router = useRouter();
+// app/layout.tsx (if this is the root layout) or a specific public group layout
+import React, { ReactNode } from 'react';
+import { Inter } from 'next/font/google'; // Example font
 
-  useEffect(() => {
-    // No specific role check here, as this layout is for any authenticated user.
-    // Role-specific content within these pages can be handled by the page itself.
-  }, [tokens, user, router, fetchUser]);
+const inter = Inter({ subsets: ['latin'] });
 
-  return <html lang='en'>
-    <body>
-      {/*<AppLayout>
+export default function PublicLayout({ children }: { children: ReactNode }) {
+  return (
+    <html lang="en" className={inter.className} suppressHydrationWarning>
+      <body>
         {children}
-      </AppLayout>*/}
-      {children}
-    </body>
+        </body>
     </html>
+  );
 }

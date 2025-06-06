@@ -50,7 +50,7 @@ export function LoginForm() {
         router.push("/team/dashboard");
       } 
       else {
-        router.push("/dashboard/user");
+        router.push("/");
       }
     } catch (err: any) {
       setError(err.response?.data?.message || "Login failed. Please check your credentials.");

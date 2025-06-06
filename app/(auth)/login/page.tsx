@@ -29,7 +29,7 @@ export default function LoginPage() {
               router.push("/team/dashboard/");
             } 
             else {
-              router.push("/dashboard/user");
+              router.push("/");
             }
     }
   }, [user, tokens, router]);

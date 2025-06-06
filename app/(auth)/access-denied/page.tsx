@@ -1,13 +1,19 @@
 'use client'; // Mark as Client Component since we're using hooks
 
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
-interface AccessDeniedPageProps {
-  errorMessage?: string;
-}
 
-const AccessDeniedPage = ({ errorMessage }: AccessDeniedPageProps) => {
+
+const AccessDeniedPage = () => {
   const router = useRouter();
+  const params = useSearchParams();
+  const reason = params.get('reason');
+
+  let errorMessage = "You do not have permission to access this page.";
+  if (reason === 'system_admin_only') errorMessage = "Only System Admins can access this area.";
+  if (reason === 'league_admin_only') errorMessage = "Only League Admins can access this area.";
+  if (reason === 'team_admin_only') errorMessage = "Only Team Admins can access this area.";
+
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">

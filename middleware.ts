@@ -3,96 +3,74 @@ import type { NextRequest } from 'next/server';
 import { Role } from './prisma';
 import { verifyJWT } from './utils';
 
-// Define your roles (ensure this matches your enum in auth.store)
-// Paths that do NOT require authentication
-const publicPaths = ['/login', '/register', '/access_denied','/' ]; // Add any other public routes
-
-// Paths that require SYSTEM_ADMIN role
-//Everything under /admin/* is protected and requires SYSTEM_ADMIN role
-const systemAdminPaths = ['/admin']; // Adjust as per your admin routes
-
-//Paths that require authentication but not necessarily admin role
-const appPaths = [
-    '/account/profile', '/account/security',
-    '/dashboard', // Generic user dashboard
-    '/league/dashboard/', // League Admin dashboard (if you create this)
-    '/team/dashboard/',   // Team Admin dashboard (if you create this)
-    '/league/manage',    // New: Manage own league
-    '/league/admins',    // New: Manage league admins
-    '/league/teams',     // LA list teams in their league
-    '/league/teams/create',// LA create team
-    '/league/teams/[teamId]/edit', // LA edit team (dynamic part needs careful matching or broad match)
-    '/team/manage',      // TA manage their team profile
+const publicPaths = [
+  '/', '/about', '/help', '/explore', '/leagues', '/leagues/', '/leagues/*',
+  '/teams', '/teams/', '/teams/*', '/players', '/players/', '/players/*',
+  '/login', '/register', '/access-denied', '/blog', '/contact', '/pricing', '/features', '/terms', '/privacy'
 ];
+
+const generalUserPaths = [
+  '/account/profile', '/account/security', '/account/preferences'
+];
+
 export async function middleware(request: NextRequest) {
-    const { pathname } = request.nextUrl;
+  const { pathname, search } = request.nextUrl;
 
-    // 1. Handle public paths - no redirect needed
-    if (publicPaths.includes(pathname) || pathname.startsWith('/_next') || pathname.startsWith('/api/')) {
-        return NextResponse.next();
-    }
-
-    // 2. Retrieve token/user info from cookies or headers
-    // IMPORTANT: In a real app, you'd decode and verify your JWT here.
-    // For this example, we'll simulate fetching from a cookie.
-    // You'd typically store your access token in a secure, httpOnly cookie.
-    const accessToken = request.cookies.get('accessToken')?.value;
-    // If no access token, redirect to login
-    if (!accessToken) {
-        const url = request.nextUrl.clone();
-        url.pathname = '/login';
-        url.searchParams.set('redirect', pathname);
-        return NextResponse.redirect(url);
-    }
-    // Verify JWT (replace 'your-secret' with your actual secret)
-    const user = await verifyJWT(accessToken, process.env.JWT_SECRET || 'your-secret');
-    if (!user || (user.exp && user.exp * 1000 < Date.now())) {
-        const url = request.nextUrl.clone();
-        url.pathname = '/login';
-        url.searchParams.set('redirect', pathname);
-        const response = NextResponse.redirect(url);
-        response.cookies.set('accessToken', '', { maxAge: 0 });
-        return response;
-    }
-
-    // const userRole = request.cookies.get('userRole')?.value as Role; // Assuming you store role in a cookie too
-    const userRole = user.role;
-    // If access token exists, but it's an admin path, check role
-    if (systemAdminPaths.some(path => pathname.startsWith(path))) {
-        if (userRole !== Role.SYSTEM_ADMIN) { // Only SYSTEM_ADMIN for /admin/*
-            // Redirect to a specific "access denied" page or back to login
-            const url = request.nextUrl.clone();
-            url.pathname = '/access-denied'; // Or '/access-denied'
-            console.warn(`Middleware: Access denied for role ${userRole} trying to access ${pathname}`);
-            return NextResponse.redirect(url);
-        }
-    }
-    // 
-    // Check general authenticated app paths (any logged-in user can access these)
-    // No specific role check needed here beyond having an accessToken,
-    // unless some appPaths are role-specific (e.g., only PLAYER can see /app/player-dashboard)
-    if (appPaths.some(path => pathname.startsWith(path))) {
-        // User is authenticated (accessToken exists), allow access
-        // Further role-specific logic can be handled within the page/layout components if needed
-        
-    }
-
-    // If authenticated and authorized, proceed
- 
+  // 1. Allow all public paths
+  if (
+    publicPaths.some(path => pathname === path || (path.endsWith('/*') && pathname.startsWith(path.slice(0, -1)))) ||
+    pathname.startsWith('/_next') ||
+    pathname.startsWith('/api/')
+  ) {
     return NextResponse.next();
-}
+  }
 
-// Config: specify which paths the middleware should run on
-export const config = {
-    matcher: [
-        /*
-         * Match all request paths except for the ones starting with:
-         * - api (API routes)
-         * - _next/static (static files)
-         * - _next/image (image optimization files)
-         * - favicon.ico (favicon file)
-         * - Any public assets in /public folder
-         */
-        '/((?!api|_next/static|_next/image|favicon.ico|.*\\.png$).*)',
-    ],
-};
+  // 2. Check for access token
+  const accessToken = request.cookies.get('accessToken')?.value;
+  if (!accessToken) {
+    const url = request.nextUrl.clone();
+    url.pathname = '/login';
+    url.searchParams.set('redirect', pathname + search);
+    return NextResponse.redirect(url);
+  }
+
+  // 3. Decode JWT to get user role
+  const user = await verifyJWT(accessToken, process.env.JWT_SECRET || 'your-secret');
+  if (!user) {
+    const url = request.nextUrl.clone();
+    url.pathname = '/login';
+    url.searchParams.set('redirect', pathname + search);
+    return NextResponse.redirect(url);
+  }
+
+  // 4. Role-based access control
+  // Only match /admin (not /administer, etc.)
+  if (pathname === '/admin' || pathname.startsWith('/admin/')) {
+    if (user.role !== Role.SYSTEM_ADMIN) {
+      const url = request.nextUrl.clone();
+      url.pathname = '/access-denied';
+      url.searchParams.set('reason', 'system_admin_only');
+      return NextResponse.redirect(url);
+    }
+  } else if (pathname === '/league' || pathname.startsWith('/league/')) {
+    if (user.role !== Role.LEAGUE_ADMIN) {
+      const url = request.nextUrl.clone();
+      url.pathname = '/access-denied';
+      url.searchParams.set('reason', 'league_admin_only');
+      return NextResponse.redirect(url);
+    }
+  } else if (pathname === '/team' || pathname.startsWith('/team/')) {
+    if (user.role !== Role.TEAM_ADMIN) {
+      const url = request.nextUrl.clone();
+      url.pathname = '/access-denied';
+      url.searchParams.set('reason', 'team_admin_only');
+      return NextResponse.redirect(url);
+    }
+  } else if (generalUserPaths.some(path => pathname === path || pathname.startsWith(path))) {
+    // Any authenticated user can access
+    return NextResponse.next();
+  }
+
+  // All other routes: allow (public)
+  return NextResponse.next();
+}
