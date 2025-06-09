@@ -138,7 +138,6 @@ export default function LeagueAdminLayout({ children }: LeagueAdminLayoutProps) 
     const [activeFlyoutLabel, setActiveFlyoutLabel] = useState<string | null>(null);
     const [flyoutPosition, setFlyoutPosition] = useState<{ top: number; left: number } | null>(null);
     const [currentFlyoutTriggerRef, setCurrentFlyoutTriggerRef] = useState<RefObject<HTMLElement> | null>(null);
-    console.log("Current User:", user);
 
     const handleLogout = () => {
         // Call your actual logout function
