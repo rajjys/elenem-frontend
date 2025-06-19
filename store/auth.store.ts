@@ -1,9 +1,9 @@
 // store/auth.store.ts
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { api, setAuthToken } from '@/services/api'; // Your API service
-import Cookies from 'js-cookie'; // <-- Add this import
-import { User } from '@/prisma';
+import { api, setAuthToken } from '@/services/api';
+import Cookies from 'js-cookie';
+import { User, Role } from '@/prisma'; // Import User and Role from your new frontend types
 
 interface AuthTokens {
   accessToken: string;
@@ -13,11 +13,10 @@ interface AuthTokens {
 interface AuthState {
   user: User | null;
   tokens: AuthTokens | null;
-  login: (usernameOrEmail: string, password: string, leagueCode?: string) => Promise<void>;
+  login: (usernameOrEmail: string, password: string, tenantCode?: string) => Promise<void>;
   logout: () => void;
   fetchUser: () => Promise<void>;
-  setTokens: (tokens: AuthTokens) => void;
-  // Add refreshToken logic if needed
+  setTokens: (tokens: AuthTokens | null) => void;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -29,41 +28,38 @@ export const useAuthStore = create<AuthState>()(
         set({ tokens: newTokens });
         if (newTokens?.accessToken) {
           setAuthToken(newTokens.accessToken);
-          // Set client-readable cookies for middleware (less secure for accessToken)
           Cookies.set('accessToken', newTokens.accessToken, { expires: 7, secure: process.env.NODE_ENV === 'production' });
-          // Assuming user.role is available right after login:
-          const currentUserRole = get().user?.role;
-          if (currentUserRole) {
-            Cookies.set('userRole', currentUserRole, { expires: 7, secure: process.env.NODE_ENV === 'production' });
-          }
+          // When setting tokens, we don't have the full user object yet with roles array.
+          // The middleware will rely on decoding the JWT for roles, or `fetchUser` will populate it.
+          // For now, let's remove the singular `userRole` cookie set here, as it's unreliable with roles array.
+          // The middleware and `fetchUser` are responsible for definitive role handling.
         } else {
           setAuthToken(null);
-          // Clear cookies on logout
           Cookies.remove('accessToken');
-          Cookies.remove('userRole');
+          // Cookies.remove('userRole'); // Removed as discussed.
         }
       },
-      login: async (usernameOrEmail, password, leagueCode) => {
-        const response = await api.post('/auth/login', { usernameOrEmail, password, leagueCode });
-        const { accessToken, refreshToken, user } = response.data;
-
-        // Set user immediately after login (important for role to be available for cookie)
-        set({ user });
-        get().setTokens({ accessToken, refreshToken }); // This will now set cookies via setTokens
+      login: async (usernameOrEmail, password, tenantCode) => {
+        const payload = tenantCode ? { usernameOrEmail, password, tenantCode } : { usernameOrEmail, password };
+        const response = await api.post('/auth/login', payload);
+        const { accessToken, refreshToken, user } = response.data; // Assuming backend returns user object on login
+        get().setTokens({ accessToken, refreshToken });
+        set({ user }); // Set the user object directly from login response
+        // Optionally, if the backend doesn't return the full user on login, call fetchUser here:
+        // await get().fetchUser();
       },
       logout: async () => {
         try {
-          ///await api.post('/auth/logout');
-          
+          // Consider adding a backend logout call to invalidate refresh tokens
+          // await api.post('/auth/logout');
         } catch (error) {
           console.error("Logout failed on backend:", error);
         } finally {
-          get().setTokens(null as any);
+          get().setTokens(null);
           set({ user: null });
-          setAuthToken(null);
-          // Cookies are cleared by setTokens(null) call
+          // Cookies are cleared by setTokens(null) call and direct removal if any specific ones remain
           Cookies.remove('accessToken');
-          Cookies.remove('userRole');
+          Cookies.remove('userRole'); // Ensure this is removed if it was ever set somewhere else
         }
       },
       fetchUser: async () => {
@@ -71,11 +67,11 @@ export const useAuthStore = create<AuthState>()(
         try {
           const response = await api.get('/auth/me');
           set({ user: response.data });
-          // If role might be stale in cookie, update it here after fetching fresh user data
-          Cookies.set('userRole', response.data.role, { expires: 7, secure: process.env.NODE_ENV === 'production' });
+          // After fetching fresh user data, we rely on the `user.roles` array for client-side logic.
+          // No need to set `userRole` cookie here as it's singular and can be misleading.
         } catch (error) {
           console.error("Failed to fetch user:", error);
-          if ((error as any).response?.status === 401) {
+          if ((error as any).response?.status === 401 || (error as any).response?.status === 403) {
             get().logout();
           }
         }
@@ -85,6 +81,7 @@ export const useAuthStore = create<AuthState>()(
       name: 'auth-storage',
       storage: createJSONStorage(() => localStorage),
       onRehydrateStorage: () => (state) => {
+        // Re-apply auth token on rehydration (client-side only)
         if (state?.tokens?.accessToken) {
           setAuthToken(state.tokens.accessToken);
         }

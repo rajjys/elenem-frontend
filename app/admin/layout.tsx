@@ -8,7 +8,19 @@ import {
     FiHome, FiGrid, FiUsers, FiDollarSign, FiSettings, FiServer, FiShield,
     FiGlobe, FiHelpCircle, FiFileText, FiSearch, FiSmartphone, FiUser, FiLogOut,
     FiChevronDown, FiChevronRight, FiMenu, FiX, FiBarChart2, FiSliders, FiBell,
-    FiShoppingBag, FiFilm, FiSpeaker, FiBriefcase, FiZap, FiDatabase, FiMessageSquare, FiAward, FiEdit3, FiBox
+    FiShoppingBag, FiFilm, FiSpeaker, FiBriefcase, FiZap, FiDatabase, FiMessageSquare, FiAward, FiEdit3, FiBox,
+    FiVolume2,
+    FiPackage,
+    FiList,
+    FiTrendingUp,
+    FiCreditCard,
+    FiActivity,
+    FiAlertTriangle,
+    FiCode,
+    FiLock,
+    FiLayout,
+    FiMail,
+    FiBookOpen
 } from 'react-icons/fi';
 import { useAuthStore } from '@/store/auth.store';
 import { CollapsibleNavLink, FlyoutMenu, NavLink } from '@/components/layouts';
@@ -17,96 +29,62 @@ interface SystemAdminLayoutProps {
     children: ReactNode;
 }
 
-const navItems = [ // Same navItems structure as before
-    {
-        label: "Dashboard", icon: FiHome, subItems: [
-            { label: "Overview", href: "/admin/dashboard", icon: FiBarChart2 },
-            { label: "Platform Analytics", href: "/admin/analytics", icon: FiBarChart2 },
-        ]
-    },
-    {
-        label: "Platform Core", icon: FiGrid, subItems: [
-            { label: "Manage Leagues", href: "/admin/leagues/", icon: FiAward },
-            { label: "Create League", href: "/admin/leagues/create", icon: FiAward },
-            { label: "League Defaults", href: "/admin/leagues/defaults", icon: FiAward },
-            { label: "Manage All Users", href: "/admin/users/", icon: FiUsers },
-            { label: "Create User", href: "/admin/users/create", icon: FiUsers },
-            { label: "System Admins", href: "/admin/users/system-admins", icon: FiShield },
-            { label: "Roles & Permissions", href: "/admin/users/permissions", icon: FiShield },
-            { label: "Global Announcements", href: "/admin/content/announcements", icon: FiSpeaker },
-            { label: "Data Management Tools", href: "/admin/content/data-tools", icon: FiDatabase },
-            { label: "Static Content Pages", href: "/admin/content/pages", icon: FiFileText },
-        ]
-    },
-    {
-        label: "Financials & Billing", icon: FiDollarSign, subItems: [
-            { label: "Subscription Plans", href: "/admin/financials/plans", icon: FiDollarSign },
-            { label: "League Subscriptions", href: "/admin/financials/league-subscriptions", icon: FiDollarSign },
-            { label: "Platform Revenue", href: "/admin/financials/revenue", icon: FiDollarSign },
-            { label: "Payment Gateways", href: "/admin/financials/payment-gateways", icon: FiSettings },
-            { label: "Transaction Log", href: "/admin/financials/transactions", icon: FiFileText },
-            { label: "Payout Management", href: "/admin/financials/payouts", icon: FiDollarSign },
-        ]
-    },
-    {
-        label: "Modules & Features", icon: FiBox, subItems: [
-            { label: "Sports Core Defaults", href: "/admin/features/sports-core/settings", icon: FiZap },
-            { label: "Notification Templates", href: "/admin/features/notifications/templates", icon: FiBell },
-            { label: "Delivery Settings", href: "/admin/features/notifications/delivery-settings", icon: FiBell },
-            { label: "E-commerce Setup", href: "/admin/features/ecommerce/setup", icon: FiShoppingBag },
-            { label: "Ticketing Settings", href: "/admin/features/ticketing/settings", icon: FiBriefcase },
-            { label: "Live Streaming Providers", href: "/admin/features/live-streaming/providers", icon: FiFilm },
-            { label: "Media Storage & CDN", href: "/admin/features/media/storage-cdn", icon: FiServer },
-            { label: "Sponsorship Ads", href: "/admin/features/sponsorship/ad-management", icon: FiSpeaker },
-            { label: "Feature Flags", href: "/admin/features/flags", icon: FiSliders },
-        ]
-    },
-    {
-        label: "System & Infra", icon: FiServer, subItems: [
-            { label: "System Status", href: "/admin/system/status", icon: FiServer },
-            { label: "Background Jobs", href: "/admin/system/jobs", icon: FiServer },
-            { label: "Error Logs", href: "/admin/system/logs/errors", icon: FiFileText },
-            { label: "Request Logs", href: "/admin/system/logs/requests", icon: FiFileText },
-            { label: "Public API Config", href: "/admin/system/api/public-api", icon: FiGlobe },
-            { label: "Webhook Config", href: "/admin/system/api/webhooks", icon: FiGlobe },
-            { label: "3rd Party Integrations", href: "/admin/system/api/integrations", icon: FiGlobe },
-            { label: "Audit Logs", href: "/admin/system/security/audit-trail", icon: FiShield },
-            { label: "Security Settings", href: "/admin/system/security/settings", icon: FiShield },
-            { label: "Maintenance Mode", href: "/admin/system/maintenance", icon: FiSettings },
-            { label: "Database Overview", href: "/admin/system/database", icon: FiDatabase },
-        ]
-    },
-    {
-        label: "Customization", icon: FiEdit3, subItems: [
-            { label: "Platform Appearance", href: "/admin/customization/theme", icon: FiEdit3 },
-            { label: "Languages & Translations", href: "/admin/customization/languages", icon: FiGlobe },
-            { label: "System Email Templates", href: "/admin/customization/email-templates", icon: FiMessageSquare },
-        ]
-    },
-    {
-        label: "Support & Comm.", icon: FiHelpCircle, subItems: [
-            { label: "Admin Message Center", href: "/admin/support/messaging", icon: FiMessageSquare },
-            { label: "Helpdesk Config", href: "/admin/support/config", icon: FiHelpCircle },
-        ]
-    },
-    {
-        label: "Legal & Compliance", icon: FiFileText, subItems: [
-            { label: "Manage Documents", href: "/admin/compliance/documents", icon: FiFileText },
-            { label: "Data Privacy (GDPR)", href: "/admin/compliance/data-privacy", icon: FiShield },
-            { label: "Accessibility", href: "/admin/compliance/accessibility", icon: FiUser },
-        ]
-    },
-    {
-        label: "Advanced Search", icon: FiSearch, subItems: [
-            { label: "Search Configuration", href: "/admin/search/config", icon: FiSettings },
-        ]
-    },
-    {
-        label: "Mobile App", icon: FiSmartphone, subItems: [
-            { label: "App Versions", href: "/admin/mobile-app/versions", icon: FiSmartphone },
-            { label: "Global Push Control", href: "/admin/mobile-app/push-control", icon: FiBell },
-        ]
-    },
+const systemNavItems = [
+  {
+    label: "Dashboard",
+    icon: FiGrid,
+    subItems: [
+      { label: "Overview", basePath: "/admin/dashboard", icon: FiGrid },
+      { label: "Platform Analytics", basePath: "/admin/analytics", icon: FiBarChart2 },
+    ],
+  },
+  {
+    label: "Platform Core",
+    icon: FiBox,
+    subItems: [
+      { label: "Manage Tenants", basePath: "/admin/tenants", icon: FiUsers },
+      { label: "Manage All Users", basePath: "/admin/users", icon: FiUsers },
+      { label: "Roles & Permissions", basePath: "/admin/roles", icon: FiShield },
+      { label: "Global Announcements", basePath: "/admin/announcements", icon: FiVolume2 },
+      { label: "Data Management", basePath: "/admin/data", icon: FiDatabase },
+    ],
+  },
+  {
+    label: "Financials & Billing",
+    icon: FiDollarSign,
+    subItems: [
+      { label: "Subscription Plans", basePath: "/admin/financials/plans", icon: FiPackage },
+      { label: "Tenant Subscriptions", basePath: "/admin/financials/subscriptions", icon: FiList },
+      { label: "Platform Revenue", basePath: "/admin/financials/revenue", icon: FiTrendingUp },
+      { label: "Payment Gateways", basePath: "/admin/financials/gateways", icon: FiCreditCard },
+    ],
+  },
+  {
+    label: "System & Infrastructure",
+    icon: FiServer,
+    subItems: [
+      { label: "System Status", basePath: "/admin/system/status", icon: FiActivity },
+      { label: "Error Logs", basePath: "/admin/system/logs", icon: FiAlertTriangle },
+      { label: "API & Integrations", basePath: "/admin/system/api", icon: FiCode },
+      { label: "Security Settings", basePath: "/admin/system/security", icon: FiLock },
+    ],
+  },
+  {
+    label: "Customization",
+    icon: FiEdit3,
+    subItems: [
+      { label: "Platform Appearance", basePath: "/admin/customization/theme", icon: FiLayout },
+      { label: "Email Templates", basePath: "/admin/customization/emails", icon: FiMail },
+    ],
+  },
+  {
+    label: "Support",
+    icon: FiHelpCircle,
+    subItems: [
+      { label: "Helpdesk", basePath: "/admin/support/helpdesk", icon: FiHelpCircle },
+      { label: "Documentation", basePath: "/admin/support/docs", icon: FiBookOpen },
+    ],
+  },
 ];
 export default function SystemAdminLayout({ children }: SystemAdminLayoutProps) {
     const currentPath = usePathname();
@@ -179,7 +157,7 @@ export default function SystemAdminLayout({ children }: SystemAdminLayoutProps) 
                     </button>
                 </div>
                 <nav className="flex-grow p-2 space-y-1 overflow-y-auto">
-                    {navItems.map((category) => (
+                    {systemNavItems.map((category) => (
                         <CollapsibleNavLink
                             key={category.label}
                             category={category}
@@ -190,8 +168,8 @@ export default function SystemAdminLayout({ children }: SystemAdminLayoutProps) 
                         />
                     ))}
                     <div className="mt-auto pt-4 border-t border-gray-200"> {/* Ensure this is visually separated */}
-                        <NavLink item={{ label: "My Profile", href: "/admin/account/profile", icon: FiUser }} currentPath={currentPath} isSidebarOpen={isSidebarOpen} onClick={closeFlyout} />
-                        <NavLink item={{ label: "Security", href: "/admin/account/security", icon: FiShield }} currentPath={currentPath} isSidebarOpen={isSidebarOpen} onClick={closeFlyout} />
+                        <NavLink item={{ label: "My Profile", basePath: "/admin/account/profile", icon: FiUser }} currentPath={currentPath} isSidebarOpen={isSidebarOpen} onClick={closeFlyout} />
+                        <NavLink item={{ label: "Security", basePath: "/admin/account/security", icon: FiShield }} currentPath={currentPath} isSidebarOpen={isSidebarOpen} onClick={closeFlyout} />
                     </div>
                 </nav>
             </aside>
@@ -216,7 +194,7 @@ export default function SystemAdminLayout({ children }: SystemAdminLayoutProps) 
                         </button>
                     </div>
                     <nav className="flex-grow p-2 space-y-1 overflow-y-auto">
-                        {navItems.map((category) => (
+                        {systemNavItems.map((category) => (
                             <CollapsibleNavLink
                                 key={category.label}
                                 category={category}
@@ -228,8 +206,8 @@ export default function SystemAdminLayout({ children }: SystemAdminLayoutProps) 
                             />
                         ))}
                         <div className="mt-auto pt-4 border-t border-gray-200">
-                            <NavLink item={{ label: "My Profile", href: "/admin/account/profile", icon: FiUser }} currentPath={currentPath} isSidebarOpen={true} onClick={closeMobileMenu} />
-                            <NavLink item={{ label: "Security", href: "/admin/account/security", icon: FiShield }} currentPath={currentPath} isSidebarOpen={true} onClick={closeMobileMenu} />
+                            <NavLink item={{ label: "My Profile", basePath: "/admin/account/profile", icon: FiUser }} currentPath={currentPath} isSidebarOpen={true} onClick={closeMobileMenu} />
+                            <NavLink item={{ label: "Security", basePath: "/admin/account/security", icon: FiShield }} currentPath={currentPath} isSidebarOpen={true} onClick={closeMobileMenu} />
                         </div>
                     </nav>
                 </aside>
@@ -264,7 +242,7 @@ export default function SystemAdminLayout({ children }: SystemAdminLayoutProps) 
             {/* Desktop Collapsed Sidebar Flyout Menu */}
             {activeFlyoutLabel && !isSidebarOpen && flyoutPosition && (
                 <FlyoutMenu
-                    items={navItems.find(cat => cat.label === activeFlyoutLabel)?.subItems || []}
+                    items={systemNavItems.find(cat => cat.label === activeFlyoutLabel)?.subItems || []}
                     position={flyoutPosition}
                     currentPath={currentPath}
                     onClose={closeFlyout}

@@ -3,7 +3,7 @@ import { FiChevronDown, FiChevronRight } from "react-icons/fi";
 import { NavLink } from "./NavLink";
 
 interface CollapsibleNavLinkProps {
-    category: { label: string; icon: React.ElementType; subItems: Array<{ label: string; href: string; icon: React.ElementType }> };
+    category: { label: string; icon: React.ElementType; subItems: Array<{ label: string; basePath: string; icon: React.ElementType }> };
     currentPath: string;
     isSidebarOpen: boolean;
     onFlyoutToggle: (label: string, target: HTMLElement) => void;
@@ -12,14 +12,14 @@ interface CollapsibleNavLinkProps {
 }
 
 export const CollapsibleNavLink: React.FC<CollapsibleNavLinkProps> = ({ category, currentPath, isSidebarOpen, onFlyoutToggle, activeFlyoutLabel, onMobileLinkClick }) => {
-    const [accordionOpen, setAccordionOpen] = useState(category.subItems.some(sub => currentPath.startsWith(sub.href)));
+    const [accordionOpen, setAccordionOpen] = useState(category.subItems.some(sub => currentPath.startsWith(sub.basePath)));
     const CategoryIcon = category.icon;
     const triggerRef = useRef<HTMLButtonElement>(null);
-    const isCategoryActive = category.subItems.some(sub => currentPath === sub.href);
+    const isCategoryActive = category.subItems.some(sub => currentPath === sub.basePath);
     const isThisFlyoutActive = activeFlyoutLabel === category.label;
 
     useEffect(() => {
-        if (isSidebarOpen && category.subItems.some(sub => currentPath.startsWith(sub.href))) {
+        if (isSidebarOpen && category.subItems.some(sub => currentPath.startsWith(sub.basePath))) {
             setAccordionOpen(true);
         } else if (!isSidebarOpen) {
             setAccordionOpen(false);
@@ -60,7 +60,7 @@ export const CollapsibleNavLink: React.FC<CollapsibleNavLinkProps> = ({ category
                 <div className="pl-5 mt-1 space-y-0.5 border-l-2 border-indigo-100 ml-3">
                     {category.subItems.map(subItem => (
                         <NavLink
-                            key={subItem.href}
+                            key={subItem.basePath}
                             item={subItem}
                             currentPath={currentPath}
                             isSidebarOpen={isSidebarOpen}

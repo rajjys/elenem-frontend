@@ -6,7 +6,12 @@ import { usePathname, useRouter } from 'next/navigation';
 import React, { useState, ReactNode, useEffect, useRef, RefObject } from 'react';
 import {
     FiBarChart2, FiSettings, FiUsers, FiAward, FiCalendar, FiDollarSign, FiMessageSquare, FiImage, FiShoppingBag, FiHelpCircle,
-    FiUser, FiShield, FiLogOut, FiChevronDown, FiChevronRight, FiMenu, FiX, FiList, FiEdit3, FiVideo, FiHeart, FiBell
+    FiUser, FiShield, FiLogOut, FiChevronDown, FiChevronRight, FiMenu, FiX, FiList, FiEdit3, FiVideo, FiHeart, FiBell,
+    FiGrid,
+    FiEdit,
+    FiUserPlus,
+    FiBarChart,
+    FiMessageCircle
 } from 'react-icons/fi'; // Example icons
 // --- Reusable NavLink, CollapsibleNavLink, FlyoutMenu Components ---
 import { CollapsibleNavLink, FlyoutMenu, NavLink } from '@/components/layouts';
@@ -23,52 +28,50 @@ interface TeamAdminLayoutProps {
 
 // Define navigation structure for Team Admin
 const teamNavItems = [
-    {
-        label: "Dashboard", icon: FiBarChart2, subItems: [
-            { label: "Overview", href: "/team/dashboard", icon: FiBarChart2 },
-        ]
-    },
-    {
-        label: "Team Management", icon: FiAward, subItems: [
-            { label: "Edit Team Profile", href: "/team/profile/edit", icon: FiEdit3 },
-            { label: "Branding & Media", href: "/team/profile/media", icon: FiImage },
-            { label: "Team News & Posts", href: "/team/profile/posts", icon: FiMessageSquare },
-        ]
-    },
-    {
-        label: "Roster & Competition", icon: FiUsers, subItems: [
-            { label: "View Team Roster", href: "/team/roster", icon: FiUsers },
-            { label: "Manage Lineups", href: "/team/competition/lineups", icon: FiList },
-            { label: "Schedule & Results", href: "/team/competition/schedule", icon: FiCalendar },
-            { label: "Stats & Standings", href: "/team/competition/stats", icon: FiBarChart2 },
-        ]
-    },
-    {
-        label: "Communication", icon: FiMessageSquare, subItems: [
-            { label: "Team Messaging", href: "/team/communication/messages", icon: FiMessageSquare },
-            { label: "Fan Engagement", href: "/team/communication/fans", icon: FiHeart },
-            { label: "Notifications", href: "/team/communication/notifications", icon: FiBell },
-        ]
-    },
-    {
-        label: "Finances & Commerce", icon: FiDollarSign, subItems: [
-            { label: "Team Accounting", href: "/team/finances/accounting", icon: FiDollarSign },
-            { label: "Manage Merchandise", href: "/team/merchandise/products", icon: FiShoppingBag },
-            { label: "View Transactions", href: "/team/merchandise/transactions", icon: FiBarChart2 },
-        ]
-    },
-    {
-        label: "Live Studio", icon: FiVideo, subItems: [
-            { label: "Manage Live Streams", href: "/team/live/manage", icon: FiVideo },
-            { label: "Marketing Assets", href: "/team/live/marketing", icon: FiImage },
-        ]
-    },
-    {
-        label: "Support", icon: FiHelpCircle, subItems: [
-            { label: "Help Center", href: "/team/support/help", icon: FiHelpCircle },
-            { label: "Contact League Admin", href: "/team/support/contact", icon: FiMessageSquare },
-        ]
-    }
+  {
+    label: "Dashboard",
+    icon: FiGrid,
+    basePath: "/team/dashboard",
+  },
+  {
+    label: "Team Management",
+    icon: FiUsers,
+    subItems: [
+      { label: "Roster", basePath: "/team/roster", icon: FiUsers },
+      { label: "Team Profile", basePath: "/team/profile", icon: FiEdit },
+      { label: "Staff", basePath: "/team/staff", icon: FiUserPlus },
+    ],
+  },
+  {
+    label: "Competition",
+    icon: FiAward,
+    subItems: [
+      { label: "Schedule", basePath: "/team/schedule", icon: FiCalendar },
+      { label: "Lineups", basePath: "/team/lineups", icon: FiList },
+      { label: "Statistics", basePath: "/team/stats", icon: FiBarChart },
+    ],
+  },
+  {
+    label: "Communication",
+    icon: FiMessageCircle,
+    subItems: [
+      { label: "Team Chat", basePath: "/team/chat", icon: FiMessageSquare },
+      { label: "Notifications", basePath: "/team/notifications", icon: FiBell },
+    ],
+  },
+  {
+    label: "Finances",
+    icon: FiDollarSign,
+    subItems: [
+      { label: "Team Fees", basePath: "/team/finances/fees", icon: FiDollarSign },
+      { label: "Transactions", basePath: "/team/finances/transactions", icon: FiList },
+    ],
+  },
+  {
+    label: "Support",
+    icon: FiHelpCircle,
+    basePath: "/team/support",
+  },
 ];
 
 
@@ -134,8 +137,8 @@ export default function TeamAdminLayout({ children }: TeamAdminLayoutProps) {
                         />
                     ))}
                     <div className="mt-auto pt-4 border-t border-gray-200">
-                        <NavLink item={{ label: "My Profile", href: "/account/profile", icon: FiUser }} currentPath={currentPath} isSidebarOpen={isSidebarOpen} onClick={closeFlyout} />
-                        <NavLink item={{ label: "Security", href: "/account/security", icon: FiShield }} currentPath={currentPath} isSidebarOpen={isSidebarOpen} onClick={closeFlyout} />
+                        <NavLink item={{ label: "My Profile", basePath: "/account/profile", icon: FiUser }} currentPath={currentPath} isSidebarOpen={isSidebarOpen} onClick={closeFlyout} />
+                        <NavLink item={{ label: "Security", basePath: "/account/security", icon: FiShield }} currentPath={currentPath} isSidebarOpen={isSidebarOpen} onClick={closeFlyout} />
                     </div>
                 </nav>
             </aside>

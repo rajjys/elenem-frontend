@@ -1,27 +1,23 @@
-import z from "zod";
 
-//
-export enum Role {
-  SYSTEM_ADMIN = "SYSTEM_ADMIN",
-  GENERAL_USER = "GENERAL_USER",
-  LEAGUE_ADMIN = "LEAGUE_ADMIN",
-  TEAM_ADMIN = "TEAM_ADMIN",
-  PLAYER = "PLAYER",
-  REFEREE = "REFEREE"
-}
-export enum SportType {
-  FOOTBALL = "SOCCER",
-  BASKETBALL = "BASKETBALL",
-  VOLLEYBALL = "VOLLEYBALL",
-  /*
-  BASEBALL = "BASEBALL",
-  AMERICAN_FOOTBALL = "AMERICAN_FOOTBALL",
-  HOCKEY = "HOCKEY",
-  TENNIS = "TENNIS",
-  RUGBY = "RUGBY",
-  CRICKET = "CRICKET",
-  OTHER = "OTHER"*/
-}
+export * from './user-model';
+export * from './roles-enum';
+export * from './sport-types-enum';
+export * from './tenant-model';
+
+
+
+
+
+
+
+
+
+
+
+import z from "zod";
+import { User } from './user-model';
+import { SportType } from './sport-types-enum';
+
 export interface League {
   id: string;
   name: string;
@@ -49,35 +45,8 @@ export interface League {
   tiebreakerRules?: JSON;
 }
 
-export interface User {
-  id: string;
-  username: string;
-  email: string;
-  role: Role;
-  leagueId?: string | null; // League ID can be null if the user is not assigned to a league
-  league?: League | null;
-  teamManagingId?: string | null; // Team ID can be null if the user is not managing a team
-  firstName?: string;
-  lastName?: string;
-  emailVerified?: boolean;
-  profileImageUrl?: string;
-  createdById?: string;
-  updatedById?: string;
-  deletedById?: string;
-  createdAt?: Date | null;
-  updatedAt?: Date | null;
-  deletedAt?: Date | null; // Soft delete
-  createdBy?: User | null;
-  updatedBy?: User | null;
-  deletedBy?: User | null;
-  lastLogin?: Date | null // Last login timestamp
-  accountLocked?: boolean; // Account lock status
-  accountLockedUntil?: Date | null; // Optional lock duration
-  failedLoginAttempts?: number;
-  isActive?: boolean; // Optional field to indicate if the user is active
-  // Add any other fields you need
-  phone?: string;
-}
+
+
 
 // For MyLeagueDetailsDto used in frontend state and forms
 // This should mirror the structure returned by your backend '/leagues/my-league' endpoint.

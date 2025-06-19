@@ -7,9 +7,17 @@ import React, { useState, ReactNode, useEffect, useRef, RefObject } from 'react'
 import {
     FiBarChart2, FiSettings, FiUsers, FiAward, FiCalendar, FiDollarSign, FiSend, FiImage,
     FiGift, FiShoppingBag, FiHelpCircle, FiUser, FiShield, FiLogOut, FiChevronDown,
-    FiChevronRight, FiMenu, FiX, FiFileText, FiBriefcase, FiFlag, FiList, FiCheckSquare, FiClipboard, FiEdit3, FiPercent
+    FiChevronRight, FiMenu, FiX, FiFileText, FiBriefcase, FiFlag, FiList, FiCheckSquare, FiClipboard, FiEdit3, FiPercent,
+    FiTrendingUp,
+    FiUserCheck,
+    FiUserPlus,
+    FiClock,
+    FiFilePlus,
+    FiFileMinus,
+    FiVolume2,
+    FiMessageCircle,
+    FiMessageSquare
 } from 'react-icons/fi'; // Example icons
-import { useClickAway } from '@/hooks/useClickAway'; // Adjust path if needed
 import { useAuthStore } from '@/store/auth.store';
 import { MdStadium } from 'react-icons/md';
 // --- Reusable NavLink, CollapsibleNavLink, FlyoutMenu Components --- for components/layout
@@ -27,105 +35,64 @@ interface LeagueAdminLayoutProps {
 
 // Define navigation structure for League Admin
 const leagueNavItems = [
-    {
-        label: "Dashboard", icon: FiBarChart2, subItems: [
-            { label: "Overview", href: "/league/dashboard", icon: FiBarChart2 },
-            { label: "League Analytics", href: "/league/analytics", icon: FiBarChart2 },
-        ]
-    },
-    {
-        label: "People & Teams", icon: FiUsers, subItems: [
-            { label: "Teams", href: "/league/teams/", icon: FiAward },
-            { label: "Players", href: "/league/players/", icon: FiUsers },
-            { label: "Officials", href: "/league/officials/", icon: FiBriefcase },
-            { label: "Coaches", href: "/league/coaches/", icon: FiUsers },
-            { label: "Stadiums", href: "/league/stadiums/", icon: MdStadium},
-            { label: "Users", href: "/league/users/", icon: FiUsers },
-           // { label: "Volunteer Opportunities", href: "/league/volunteers/opportunities", icon: FiClipboard },
-           //{ label: "Contact Directory", href: "/league/directory", icon: FiUsers },
-            
-             //{ label: "Team Invitations", href: "/league/teams/invitations", icon: FiSend },
-        ]
-    },
-    {
-        label: "Competition", icon: FiCalendar, subItems: [
-            { label: "Manage Seasons", href: "/league/seasons", icon: FiCalendar },
-            { label: "Schedule Games", href: "/league/games/schedule", icon: FiCalendar },
-            { label: "Game Results", href: "/league/games/results", icon: FiCheckSquare },
-            { label: "Live Game Center", href: "/league/games/live-management", icon: FiSend },
-            { label: "League Standings", href: "/league/standings", icon: FiBarChart2 },
-            { label: "View Lineups", href: "/league/lineups/view", icon: FiList },
-            { label: "Disciplinary Actions", href: "/league/discipline", icon: FiFlag },
-        ]
-    },
-    {
-        label: "League Finances", icon: FiDollarSign, subItems: [
-            { label: "Financial Overview", href: "/league/finances/dashboard", icon: FiDollarSign },
-            { label: "Registration Fees", href: "/league/finances/registration-fees", icon: FiDollarSign },
-            { label: "Sponsorship Income", href: "/league/finances/sponsorships", icon: FiGift },
-            { label: "Other Revenue", href: "/league/finances/other-revenue", icon: FiDollarSign },
-            { label: "Manage Expenses", href: "/league/finances/expenses", icon: FiDollarSign },
-            { label: "Team Invoices", href: "/league/finances/invoices", icon: FiFileText },
-            { label: "Payments Log", href: "/league/finances/payments-log", icon: FiList },
-            { label: "Financial Reports", href: "/league/finances/reports", icon: FiBarChart2 },
-        ]
-    },
-    {
-        label: "Communication", icon: FiSend, subItems: [
-            { label: "League Announcements", href: "/league/communication/announcements", icon: FiSend },
-            { label: "Compose Message", href: "/league/communication/composer", icon: FiEdit3 },
-            { label: "Contact Lists", href: "/league/communication/groups", icon: FiUsers },
-            { label: "Newsletter", href: "/league/communication/newsletter", icon: FiFileText },
-            { label: "Promo Codes", href: "/league/communication/promos", icon: FiPercent },
-        ]
-    },
-    {
-        label: "Content & Media", icon: FiImage, subItems: [
-            { label: "League News", href: "/league/content/news", icon: FiFileText },
-            { label: "Media Galleries", href: "/league/content/media", icon: FiImage },
-            { label: "Document Center", href: "/league/content/documents", icon: FiFileText },
-        ]
-    },
-    {
-        label: "Sponsors", icon: FiGift, subItems: [
-            { label: "Manage Sponsors", href: "/league/sponsors", icon: FiGift },
-        ]
-    },
-    {
-         label: "Events & Tickets", icon: FiBriefcase, subItems: [
-             { label: "Manage Events", href: "/league/events/manage", icon: FiCalendar },
-             { label: "Ticket Sales", href: "/league/events/ticketing", icon: FiDollarSign },
-         ]
-     },
-     {
-         label: "Merchandise", icon: FiShoppingBag, subItems: [
-             { label: "Store Settings", href: "/league/merchandise/settings", icon: FiSettings },
-             { label: "Manage Products", href: "/league/merchandise/products", icon: FiShoppingBag },
-             { label: "View Orders", href: "/league/merchandise/orders", icon: FiList },
-         ]
-     },
-    {
-        label: "League Setup", icon: FiSettings, subItems: [
-            { label: "General Settings", href: "/league/settings/general", icon: FiSettings },
-            { label: "Competition Rules", href: "/league/settings/rules", icon: FiFlag },
-            { label: "Branding & Public Page", href: "/league/settings/branding", icon: FiEdit3 },
-            { label: "Registration Setup", href: "/league/settings/registration", icon: FiClipboard },
-            { label: "Payment Config", href: "/league/settings/payments", icon: FiDollarSign },
-            { label: "Manage Staff", href: "/league/staff/manage", icon: FiUsers },
-            { label: "Staff Roles", href: "/league/staff/roles", icon: FiShield },
-            { label: "User Roles & Permissions", href: "/league/roles", icon: FiShield },
-            { label: "User Groups", href: "/league/groups", icon: FiUsers },
-            { label: "Activity Log", href: "/league/activity-log", icon: FiList },
-        ]
-    },
-    {
-        label: "Support", icon: FiHelpCircle, subItems: [
-            { label: "Help Center", href: "/league/support/help", icon: FiHelpCircle },
-            { label: "Contact Support", href: "/league/support/contact", icon: FiSend },
-            { label: "FAQs", href: "/league/support/faqs", icon: FiHelpCircle},
-            { label: "Feedback", href: "/league/support/feedback", icon: FiClipboard},
-        ]
-    }
+  {
+    label: "Dashboard",
+    icon: FiBarChart2,
+    subItems: [
+      { label: "Overview", basePath: "/league/dashboard", icon: FiBarChart2 },
+      { label: "Analytics", basePath: "/league/analytics", icon: FiTrendingUp },
+    ],
+  },
+  {
+    label: "People & Teams",
+    icon: FiUsers,
+    subItems: [
+      { label: "Teams", basePath: "/league/teams", icon: FiUsers },
+      { label: "Players", basePath: "/league/players", icon: FiUser },
+      { label: "Officials", basePath: "/league/officials", icon: FiUserCheck },
+      { label: "Coaches", basePath: "/league/coaches", icon: FiUserPlus },
+    ],
+  },
+  {
+    label: "Competition",
+    icon: FiAward,
+    subItems: [
+      { label: "Seasons", basePath: "/league/seasons", icon: FiCalendar },
+      { label: "Schedule", basePath: "/league/schedule", icon: FiClock },
+      { label: "Results", basePath: "/league/results", icon: FiCheckSquare },
+      { label: "Standings", basePath: "/league/standings", icon: FiList },
+    ],
+  },
+  {
+    label: "Finances",
+    icon: FiDollarSign,
+    subItems: [
+      { label: "Overview", basePath: "/league/finances/overview", icon: FiTrendingUp },
+      { label: "Registration Fees", basePath: "/league/finances/fees", icon: FiFilePlus },
+      { label: "Sponsorships", basePath: "/league/finances/sponsorships", icon: FiGift },
+      { label: "Expenses", basePath: "/league/finances/expenses", icon: FiFileMinus },
+      { label: "Invoices", basePath: "/league/finances/invoices", icon: FiFileText },
+    ],
+  },
+  {
+    label: "Communication",
+    icon: FiMessageSquare,
+    subItems: [
+      { label: "Announcements", basePath: "/league/communication/announcements", icon: FiVolume2 },
+      { label: "Messaging", basePath: "/league/communication/messaging", icon: FiMessageCircle },
+      { label: "Contact Lists", basePath: "/league/communication/lists", icon: FiUsers },
+    ],
+  },
+  {
+    label: "Settings",
+    icon: FiSettings,
+    subItems: [
+      { label: "General", basePath: "/league/settings/general", icon: FiSettings },
+      { label: "Rules", basePath: "/league/settings/rules", icon: FiFileText },
+      { label: "Branding", basePath: "/league/settings/branding", icon: FiImage },
+      { label: "Staff", basePath: "/league/settings/staff", icon: FiUsers },
+    ],
+  },
 ];
 
 export default function LeagueAdminLayout({ children }: LeagueAdminLayoutProps) {
@@ -191,8 +158,8 @@ export default function LeagueAdminLayout({ children }: LeagueAdminLayoutProps) 
                     ))}
                     {/* Account links common for all users, but styled within this layout context */}
                     <div className="mt-auto pt-4 border-t border-gray-200">
-                        <NavLink item={{ label: "My Profile", href: "/league/account/profile", icon: FiUser }} currentPath={currentPath} isSidebarOpen={isSidebarOpen} onClick={closeFlyout} />
-                        <NavLink item={{ label: "Security", href: "/league/account/security", icon: FiShield }} currentPath={currentPath} isSidebarOpen={isSidebarOpen} onClick={closeFlyout} />
+                        <NavLink item={{ label: "My Profile", basePath: "/account/profile", icon: FiUser }} currentPath={currentPath} isSidebarOpen={isSidebarOpen} onClick={closeFlyout} />
+                        <NavLink item={{ label: "Security", basePath: "/account/security", icon: FiShield }} currentPath={currentPath} isSidebarOpen={isSidebarOpen} onClick={closeFlyout} />
                     </div>
                 </nav>
             </aside>
@@ -227,8 +194,8 @@ export default function LeagueAdminLayout({ children }: LeagueAdminLayoutProps) 
                             />
                         ))}
                         <div className="mt-auto pt-4 border-t border-gray-200">
-                            <NavLink item={{ label: "My Profile", href: "/account/profile", icon: FiUser }} currentPath={currentPath} isSidebarOpen={true} onClick={closeMobileMenu} />
-                            <NavLink item={{ label: "Security", href: "/account/security", icon: FiShield }} currentPath={currentPath} isSidebarOpen={true} onClick={closeMobileMenu} />
+                            <NavLink item={{ label: "My Profile", basePath: "/account/profile", icon: FiUser }} currentPath={currentPath} isSidebarOpen={true} onClick={closeMobileMenu} />
+                            <NavLink item={{ label: "Security", basePath: "/account/security", icon: FiShield }} currentPath={currentPath} isSidebarOpen={true} onClick={closeMobileMenu} />
                         </div>
                     </nav>
                 </aside>
@@ -242,13 +209,13 @@ export default function LeagueAdminLayout({ children }: LeagueAdminLayoutProps) 
                             <FiMenu className="w-6 h-6" />
                         </button>
                         <h1 className="text-xl font-semibold text-gray-800">
-                            {user?.league?.id? `${user.league.id} - Management` : "League Management"}
+                            {user?.managingLeague? `${user.managingLeague?.name} - Management` : "League Management"}
                         </h1>
                     </div>
                     {user && (
                         <div className="flex items-center space-x-3">
                             <span className="text-sm text-gray-700 hidden sm:inline">
-                                {user.username} ({user.league?.name || 'League Admin'})
+                                {user.username} ({user.managingLeague?.name || 'League Admin'})
                             </span>
                             <div className="w-9 h-9 rounded-full bg-green-600 text-white flex items-center justify-center text-sm font-semibold">
                                 {user.username.charAt(0).toUpperCase()}

@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 interface NavLinkProps {
-    item: { label: string; href: string; icon: React.ElementType };
+    item: { label: string; basePath: string; icon: React.ElementType };
     currentPath: string;
     isSidebarOpen: boolean;
     isFlyout?: boolean;
@@ -9,11 +9,11 @@ interface NavLinkProps {
 }
 
 export const NavLink: React.FC<NavLinkProps> = ({ item, currentPath, isSidebarOpen, isFlyout, onClick }) => {
-    const isActive = currentPath === item.href;
+    const isActive = currentPath === item.basePath;
     const Icon = item.icon;
     return (
         <Link
-            href={item.href}
+            href={item.basePath}
             onClick={onClick}
             className={`flex items-center py-2.5 px-4 rounded-md transition-colors duration-150
                 ${isActive

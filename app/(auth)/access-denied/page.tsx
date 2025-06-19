@@ -11,6 +11,7 @@ const AccessDeniedPage = () => {
 
   let errorMessage = "You do not have permission to access this page.";
   if (reason === 'system_admin_only') errorMessage = "Only System Admins can access this area.";
+  if (reason === 'tenant_admin_only') errorMessage = "Only Tenant Admins can access this area.";
   if (reason === 'league_admin_only') errorMessage = "Only League Admins can access this area.";
   if (reason === 'team_admin_only') errorMessage = "Only Team Admins can access this area.";
 

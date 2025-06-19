@@ -3,7 +3,7 @@ import { RefObject, useRef } from "react";
 import { NavLink } from "./NavLink";
 
 interface FlyoutMenuProps {
-    items: Array<{ label: string; href: string; icon: React.ElementType }>;
+    items: Array<{ label: string; basePath: string; icon: React.ElementType }>;
     position: { top: number; left: number };
     currentPath: string;
     onClose: () => void;
@@ -30,7 +30,7 @@ export const FlyoutMenu: React.FC<FlyoutMenuProps> = ({ items, position, current
                 {categoryLabel}
             </div>}
             {items.map(item => (
-                <div key={item.href} className="px-1.5">
+                <div key={item.basePath} className="px-1.5">
                     <NavLink
                         item={item}
                         currentPath={currentPath}
