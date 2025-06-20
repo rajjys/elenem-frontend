@@ -117,6 +117,20 @@ export function UpdateTenantForm({ tenantId, onSuccess, onCancel }: UpdateTenant
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 p-6 bg-white rounded-lg shadow-md">
       {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
       {successMessage && <p className="text-green-500 text-sm mb-4">{successMessage}</p>}
+      <div className="flex items-center space-x-2">
+        <Label htmlFor="isActive">Active Tenant</Label>
+        <input
+          id="isActive"
+          type="checkbox"
+          className="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+          checked={form.watch('isActive')}
+          onChange={(e) => form.setValue('isActive', e.target.checked)}
+          disabled={isSubmitting}
+        />
+        {errors.isActive && (
+          <p className="text-red-500 text-xs mt-1">{errors.isActive.message}</p>
+        )}
+      </div>
 
       <div>
         <Label htmlFor="name">Tenant Name</Label>
@@ -199,14 +213,6 @@ export function UpdateTenantForm({ tenantId, onSuccess, onCancel }: UpdateTenant
         <Input id="establishedYear" type="number" {...register('establishedYear', { valueAsNumber: true })} disabled={isSubmitting} placeholder="e.g., 2020" />
         {errors.establishedYear && <p className="text-red-500 text-xs mt-1">{errors.establishedYear.message}</p>}
       </div>
-
-      <div className="flex items-center space-x-2">
-        <Label htmlFor="isActive">Active</Label>
-        {/* Use form.watch to get the current value for the Switch component's checked prop */}
-        <Switch id="isActive" {...register('isActive')} disabled={isSubmitting} checked={form.watch('isActive')} onCheckedChange={(checked) => setValue('isActive', checked)} />
-        {errors.isActive && <p className="text-red-500 text-xs mt-1">{errors.isActive.message}</p>}
-      </div>
-
       <div className="flex justify-end space-x-4">
         {onCancel && (
           <Button type="button" variant="secondary" onClick={onCancel} disabled={isSubmitting}>

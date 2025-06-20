@@ -1,128 +1,156 @@
 // app/(admin)/users/page.tsx
 "use client";
-import { useEffect, useState } from 'react';
+
+import React, { useState, useEffect, useCallback } from 'react';
 import { api } from '@/services/api';
-import Link from 'next/link';
+import { UserBasic, PaginatedUsersResponseSchema, UserFilterParams } from '@/prisma/user-schemas';
+import { UsersTable, UserFilters } from '@/components/users';
+import { Pagination } from '@/components/ui/'; // Assuming you have a pagination component
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { Button } from '@/components/ui/button';
-//import {  User as PrismaUser } from "@prisma/client"; // Import User for type
-import { User } from '@/prisma';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { toast } from 'sonner'; // Assuming you use a toast notification library like Sonner
 
-
-
-
-
-export default function UsersPage() {
-  const [users, setUsers] = useState<User[]>([]);
+export default function AdminUsersPage() {
+  const router = useRouter();
+  const [users, setUsers] = useState<UserBasic[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [leagueFilter, setLeagueFilter] = useState(''); // League ID to filter by
+  const [totalItems, setTotalItems] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+  const [filters, setFilters] = useState<UserFilterParams>({
+    page: 1,
+    pageSize: 10,
+    sortBy: 'createdAt',
+    sortOrder: 'desc',
+  });
 
-  // You'd fetch actual leagues for the filter dropdown in a real app
-  // const [leaguesForFilter, setLeaguesForFilter] = useState<{id: string, name: string}[]>([]);
+  const fetchUsers = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const params = new URLSearchParams();
+      // Append filters to URLSearchParams
+      if (filters.search) params.append('search', filters.search);
+      if (filters.roles && filters.roles.length > 0) {
+        filters.roles.forEach(role => params.append('roles', role));
+      }
+      if (filters.isActive !== undefined) params.append('isActive', String(filters.isActive));
+      if (filters.isVerified !== undefined) params.append('isVerified', String(filters.isVerified));
+      if (filters.gender) params.append('gender', filters.gender);
+      if (filters.preferredLanguage) params.append('preferredLanguage', filters.preferredLanguage);
+      if (filters.tenantId) params.append('tenantId', filters.tenantId);
+      if (filters.managingLeagueId) params.append('managingLeagueId', filters.managingLeagueId);
+      if (filters.managingTeamId) params.append('managingTeamId', filters.managingTeamId);
+      if (filters.page) params.append('page', String(filters.page));
+      if (filters.pageSize) params.append('pageSize', String(filters.pageSize));
+      if (filters.sortBy) params.append('sortBy', filters.sortBy);
+      if (filters.sortOrder) params.append('sortOrder', filters.sortOrder);
 
+      const response = await api.get(`/system-admin/users?${params.toString()}`);
+      console.log(response);
+      
+      const validatedData = PaginatedUsersResponseSchema.parse(response.data);
+
+      setUsers(validatedData.data);
+      setTotalItems(validatedData.totalItems);
+      setTotalPages(validatedData.totalPages);
+    } catch (err: any) {
+      const errorMessage = err.response?.data?.message || err.message || 'Failed to fetch users.';
+      setError(errorMessage);
+      toast.error('Error fetching users', { description: errorMessage });
+      console.error('Fetch users error:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, [filters]);
 
   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        setLoading(true);
-        const params: any = {};
-        if (searchTerm) params.filter = searchTerm;
-        if (leagueFilter) params.leagueId = leagueFilter;
-        // Add pagination params.skip, params.take if needed
+    fetchUsers();
+  }, [fetchUsers]);
 
-        const response = await api.get('/system-admin/users', { params });
-        setUsers(response.data || []); // Ensure response.data is an array
-        setError(null);
-      } catch (err: any) {
-        setError(err.response?.data?.message || "Failed to fetch users.");
-        setUsers([]); // Clear users on error
-      } finally {
-        setLoading(false);
-      }
-    };
-    // Debounce search or fetch on filter change
-    const debounceTimer = setTimeout(() => {
-        fetchUsers();
-    }, 300);
-    return () => clearTimeout(debounceTimer);
-  }, [searchTerm, leagueFilter]);
+  const handleFilterChange = (newFilters: UserFilterParams) => {
+    setFilters(prev => ({
+      ...prev,
+      ...newFilters,
+      page: 1, // Reset to first page on any filter change
+    }));
+  };
 
-  if (loading && users.length === 0) return <p>Loading users...</p>;
-  // Don't show main error if there's already data and loading is for a filter
-  if (error && users.length === 0) return <p className="text-red-500">Error: {error}</p>;
+  const handlePageChange = (newPage: number) => {
+    setFilters(prev => ({ ...prev, page: newPage }));
+  };
+
+  const handlePageSizeChange = (newSize: number) => {
+    setFilters(prev => ({ ...prev, pageSize: newSize, page: 1 })); // Reset page to 1
+  };
+type SortableColumn = "firstName" | "lastName" | "username" | "email" | "createdAt" | "updatedAt" | "lastLoginAt";
+  const handleSort = (column: SortableColumn) => {
+    setFilters(prev => ({
+      ...prev,
+      sortBy: column,
+      sortOrder: prev.sortBy === column && prev.sortOrder === 'asc' ? 'desc' : 'asc',
+      page: 1, // Reset to first page on sort change
+    }));
+  };
+
+  const handleDeleteUser = async (userId: string) => {
+    if (!window.confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
+      return;
+    }
+    try {
+      await api.delete(`/system-admin/users/${userId}`); // Assuming DELETE /admin/users/:id endpoint
+      toast.success('User deleted successfully.');
+      fetchUsers(); // Re-fetch users to update the list
+    } catch (err: any) {
+      const errorMessage = err.response?.data?.message || err.message || 'Failed to delete user.';
+      toast.error('Error deleting user', { description: errorMessage });
+      console.error('Delete user error:', err);
+    }
+  };
+
+  const handleManageRoles = (userId: string) => {
+    // Navigate to a dedicated page or open a modal for role management
+    // For now, let's assume a dedicated page (e.g., /admin/users/:id/roles)
+    router.push(`/admin/users/${userId}/roles`);
+  };
 
   return (
-    <div>
-      <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
-        <h1 className="text-2xl font-bold">Manage Users</h1>
-        <div className="flex gap-2">
-            <input 
-                type="text"
-                placeholder="Search users..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-            />
-            {/* Basic league filter example - replace with a proper Select component fetching leagues */}
-            {/* <input 
-                type="text"
-                placeholder="Filter by League ID..."
-                value={leagueFilter}
-                onChange={(e) => setLeagueFilter(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-            /> */}
-            <Link href="/admin/users/create">
-                <Button>Create New User</Button>
-            </Link>
-        </div>
+    <div className="container mx-auto p-6">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold text-gray-900">User Management</h1>
+        <Link href="/admin/users/create" passHref>
+          <Button>Create New User</Button>
+        </Link>
       </div>
-      {loading && <p>Filtering users...</p>}
-      {error && <p className="text-red-500 bg-red-100 p-2 rounded mb-4">Error: {error}</p>}
-      
-      {users.length === 0 && !loading ? (
-        <p>No users found matching your criteria.</p>
+
+      <UserFilters
+        filters={filters}
+        onFilterChange={handleFilterChange}
+        onPageSizeChange={handlePageSizeChange}
+      />
+
+      {loading ? (
+        <LoadingSpinner />
+      ) : error ? (
+        <p className="text-red-500 text-center mt-8">Error: {error}</p>
       ) : (
-        <div className="bg-white shadow rounded-lg overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Username</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Full Name</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">League</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {users.map((user) => (
-                <tr key={user.id}>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{user.username}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{user.email}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{user.firstName} {user.lastName}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{user.role}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {user.league ? `${user.league.name} (${user.league.leagueCode})` : 'N/A'}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm">
-                     <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        user.accountLocked ? 'bg-red-100 text-red-800' : (user.deletedAt ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800')
-                     }`}>
-                        {user.accountLocked ? 'Locked' : (user.deletedAt ? 'Deleted' : 'Active')}
-                     </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <Link href={`/admin/users/id/${user.id}`} className="text-indigo-600 hover:text-indigo-900 mr-3">View</Link>
-                    <Link href={`/admin/users/id/${user.id}/edit`} className="text-indigo-600 hover:text-indigo-900">Edit</Link>
-                    {/* Add Delete button with confirmation */}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <>
+          <UsersTable
+            users={users}
+            onSort={handleSort}
+            sortBy={filters.sortBy || 'createdAt'}
+            sortOrder={filters.sortOrder || 'desc'}
+            onDelete={handleDeleteUser}
+            onManageRoles={handleManageRoles}
+          />
+          <Pagination
+            currentPage={filters.page || 1}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+          />
+        </>
       )}
     </div>
   );

@@ -99,6 +99,20 @@ export function CreateTenantForm({ onSuccess, onCancel }: CreateTenantFormProps)
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 p-6 bg-white rounded-lg shadow-md">
       {error && <p className="text-red-500 text-sm mb-4">Server Error. Contact Admin</p>}
       {successMessage && <p className="text-green-500 text-sm mb-4">{successMessage}</p>}
+      <div className="flex items-center space-x-2">
+        <input
+          id="isActive"
+          type="checkbox"
+          className="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+          checked={form.watch('isActive')}
+          onChange={(e) => form.setValue('isActive', e.target.checked)}
+          disabled={isSubmitting}
+        />
+        <Label htmlFor="isActive">Active Tenant</Label>
+        {errors.isActive && (
+          <p className="text-red-500 text-xs mt-1">{errors.isActive.message}</p>
+        )}
+      </div>
 
       <div>
         <Label htmlFor="name" required>Tenant Name</Label>
@@ -243,21 +257,14 @@ export function CreateTenantForm({ onSuccess, onCancel }: CreateTenantFormProps)
       </div>
 
       {/* For SYSTEM_ADMIN to assign an owner during creation - might be optional */}
-      {/* <div>
+      {<div>
         <Label htmlFor="ownerId">Owner User ID (Optional)</Label>
         <Input id="ownerId" type="text" {...register('ownerId')} disabled={isSubmitting} />
         {errors.ownerId && <p className="text-red-500 text-xs mt-1">{errors.ownerId.message}</p>}
         <p className="text-gray-500 text-xs mt-1">
           Assign an existing user as the owner of this tenant.
         </p>
-      </div> */}
-
-      <div className="flex items-center space-x-2">
-        <Label htmlFor="isActive">Active</Label>
-        <Switch id="isActive" {...register('isActive')} disabled={isSubmitting} checked={form.watch('isActive')} onCheckedChange={(checked) => form.setValue('isActive', checked)} />
-        {errors.isActive && <p className="text-red-500 text-xs mt-1">{errors.isActive.message}</p>}
-      </div>
-
+      </div> }
       <div className="flex justify-end space-x-4">
         {onCancel && (
           <Button type="button" variant="secondary" onClick={onCancel} disabled={isSubmitting}>

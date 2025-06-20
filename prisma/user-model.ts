@@ -1,7 +1,7 @@
 /// User Model frontend DTO
 
 import z from "zod";
-import { Role, RoleSchema } from ".";
+import { Gender, Role } from ".";
 
 // Basic Tenant type for nested relations in User
 interface BasicTenant {
@@ -51,7 +51,7 @@ export interface User {
 
   dateOfBirth?: string | null; // ISO 8601 string, as it's often sent as string from backend
   nationality?: string | null; // ISO 3166-1 alpha-2 code
-  gender?: string | null; // Assuming string or specific enum for gender
+  gender?: Gender | null; // Assuming string or specific enum for gender
   bio?: string | null;
   preferredLanguage?: string | null;
   timezone?: string | null;

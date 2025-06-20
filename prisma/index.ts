@@ -3,6 +3,7 @@ export * from './user-model';
 export * from './roles-enum';
 export * from './sport-types-enum';
 export * from './tenant-model';
+export * from './user-schemas';
 
 
 
