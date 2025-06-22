@@ -4,10 +4,10 @@
 import React from 'react';
 import { User, Role, UserBasic } from '@/prisma/';
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/';
 import { ArrowUpDown, Pencil, Trash, MoreVertical } from 'lucide-react';
 import {
+  Button,
+  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -129,8 +129,8 @@ export function UsersTable({ users, onSort, sortBy, sortOrder, onDelete, onManag
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
                     <DropdownMenuItem asChild>
-                      <Link href={`/admin/users/${user.id}/edit`} className="flex items-center">
-                        <Pencil className="mr-2 h-4 w-4" /> Edit Profile
+                      <Link href={`/admin/users/${user.id}/`} className="flex items-center">
+                        <Pencil className="mr-2 h-4 w-4" /> View/Edit
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => onManageRoles(user.id)} className="flex items-center cursor-pointer">

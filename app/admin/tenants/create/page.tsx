@@ -4,6 +4,7 @@
 import React from 'react';
 import { CreateTenantForm } from '@/components/forms/create-tenant-form'; // Your tenant creation form
 import { useRouter } from 'next/navigation';
+import { TenantForm } from '@/components/forms';
 
 export default function CreateTenantPage() {
   const router = useRouter();
@@ -21,7 +22,7 @@ export default function CreateTenantPage() {
   return (
     <div className="container mx-auto p-6 max-w-2xl">
       <h1 className="text-3xl font-bold text-gray-900 mb-6 text-center">Create New Tenant</h1>
-      <CreateTenantForm onSuccess={handleSuccess} onCancel={handleCancel} />
+      <TenantForm onSuccess={handleSuccess} onCancel={handleCancel} />
     </div>
   );
 }

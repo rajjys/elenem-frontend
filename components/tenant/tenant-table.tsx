@@ -46,7 +46,7 @@ export function TenantTable({ tenants, onEdit, onDelete }: TenantTableProps) {
                     <div className="text-sm font-medium text-gray-900">
                       {/* Link to tenant-specific dashboard, using contextTenantId for context */}
                       <Link
-                        href={`/tenant/dashboard?tenantSlug=${tenant.slug }&tenantId=${tenant.id}`}
+                        href={`/admin/tenants/${tenant.id}`}
                         className="text-indigo-600 hover:text-indigo-900"
                       >
                         {tenant.name}
