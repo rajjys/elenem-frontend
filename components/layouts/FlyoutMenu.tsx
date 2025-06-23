@@ -13,9 +13,10 @@ interface FlyoutMenuProps {
     triggerRef: RefObject<HTMLElement> | null;
     categoryLabel?: string;
     themeColor: string; // Add themeColor prop
+    buildLink: (basePath: string) => string; // Pass the buildLink function
 }
 
-export const FlyoutMenu: React.FC<FlyoutMenuProps> = ({ items, position, currentPath, onClose, onLinkClick, triggerRef, categoryLabel, themeColor }) => {
+export const FlyoutMenu: React.FC<FlyoutMenuProps> = ({ items, position, currentPath, onClose, onLinkClick, triggerRef, categoryLabel, themeColor, buildLink }) => {
     const flyoutRef = useRef<HTMLDivElement>(null);
     useClickAway(
       triggerRef ? [flyoutRef as React.RefObject<HTMLElement>, triggerRef as React.RefObject<HTMLElement>]
@@ -49,6 +50,7 @@ export const FlyoutMenu: React.FC<FlyoutMenuProps> = ({ items, position, current
                         isFlyout={true}
                         onClick={() => { onLinkClick(); onClose(); }}
                         themeColor={themeColor} // Pass themeColor
+                        buildLink={buildLink} // Pass down the function
                     />
                 </div>
             ))}

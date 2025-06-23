@@ -12,9 +12,10 @@ interface CollapsibleNavLinkProps {
     activeFlyoutLabel: string | null;
     onMobileLinkClick?: () => void;
     themeColor: string; // Add themeColor prop
+    buildLink: (basePath: string) => string; // Pass the buildLink function
 }
 
-export const CollapsibleNavLink: React.FC<CollapsibleNavLinkProps> = ({ category, currentPath, isSidebarOpen, onFlyoutToggle, activeFlyoutLabel, onMobileLinkClick, themeColor }) => {
+export const CollapsibleNavLink: React.FC<CollapsibleNavLinkProps> = ({ category, currentPath, isSidebarOpen, onFlyoutToggle, activeFlyoutLabel, onMobileLinkClick, themeColor, buildLink }) => {
     const [accordionOpen, setAccordionOpen] = useState(category.subItems.some(sub => currentPath.startsWith(sub.basePath)));
     const CategoryIcon = category.icon;
     const triggerRef = useRef<HTMLButtonElement>(null);
@@ -86,6 +87,7 @@ export const CollapsibleNavLink: React.FC<CollapsibleNavLinkProps> = ({ category
                             isSidebarOpen={isSidebarOpen}
                             onClick={onMobileLinkClick}
                             themeColor={themeColor} // Pass themeColor
+                            buildLink={buildLink} // Pass down the function
                         />
                     ))}
                 </div>

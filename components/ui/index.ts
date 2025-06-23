@@ -12,3 +12,4 @@ export * from './table';
 export * from './command';
 export * from './popover';
 export * from './dropdown-menu';
+export * from './card';

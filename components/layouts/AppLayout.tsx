@@ -23,6 +23,7 @@ import { useAuthStore } from '@/store/auth.store'; // Assuming this path is corr
 
 // Import your existing components. Replace these with your actual paths.
 import { CollapsibleNavLink, FlyoutMenu, NavLink } from '.'; // Adjust this import path if needed
+import { useContextualLink } from '@/hooks';
 
 // Type for a React Icon component
 type IconType = React.ComponentType<React.SVGProps<SVGSVGElement>>;
@@ -46,23 +47,25 @@ interface AppLayoutProps {
   children: ReactNode;
   navItems: NavCategory[]; // Array of navigation categories for the sidebar
   themeColor?: string; // e.g., 'indigo', 'blue', 'emerald' - used for dynamic styling
-  appName?: string; // e.g., "ELENEM Admin", "My App"
+  headerTitle?: string; // e.g., "ELENEM Admin", "My App"
   logoIcon?: IconType; // Icon component for the app logo
+  showContextSwitcher?: boolean; // Conditionally show the switcher
 }
 
 export default function AppLayout({
   children,
   navItems,
   themeColor = 'indigo', // Default theme color
-  appName = 'ELENEM Admin', // Default app name
+  headerTitle = 'ELENEM Admin', // Default app name
   logoIcon: LogoIcon = FiAward, // Default logo icon
+  showContextSwitcher = false,
 }: AppLayoutProps) {
   const currentPath = usePathname();
   const { user, logout } = useAuthStore();
   const router = useRouter();
+  const { buildLink } = useContextualLink();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
   const [activeFlyoutLabel, setActiveFlyoutLabel] = useState<string | null>(null);
   const [flyoutPosition, setFlyoutPosition] = useState<{ top: number; left: number } | null>(null);
   const [currentFlyoutTriggerRef, setCurrentFlyoutTriggerRef] = useState<RefObject<HTMLElement> | null>(null);
@@ -125,11 +128,11 @@ export default function AppLayout({
                          ${isSidebarOpen ? "w-64" : "w-20"}`}>
         <div className={`flex items-center p-4 border-b border-gray-200 ${isSidebarOpen ? "justify-between" : "justify-center"}`}>
           {isSidebarOpen && (
-            <Link href="/admin/dashboard" className="flex items-center space-x-2" onClick={closeFlyout}>
+            <Link href={buildLink(navItems[0]?.subItems[0]?.basePath || '/')} className="flex items-center space-x-2" onClick={closeFlyout}>
               <div className={`p-2 rounded-lg`} style={{ backgroundColor: primary600 }}>
                 <LogoIcon className="h-6 w-6 text-white" />
               </div>
-              <span className="font-bold text-xl" style={{ color: primary700 }}>{appName}</span>
+              <span className="font-bold text-xl" style={{ color: primary700 }}>{headerTitle}</span>
             </Link>
           )}
           <button onClick={toggleSidebar} className="p-1.5 rounded-md text-gray-600 hover:bg-gray-200">
@@ -146,12 +149,13 @@ export default function AppLayout({
               onFlyoutToggle={handleFlyoutToggle}
               activeFlyoutLabel={activeFlyoutLabel}
               themeColor={themeColor} // Pass theme color to your CollapsibleNavLink
+              buildLink={buildLink}
             />
           ))}
           {/* Account/Security links are fixed, but can be made dynamic via props if needed */}
           <div className="mt-auto pt-4 border-t border-gray-200">
-            <NavLink item={{ label: "My Profile", basePath: "/admin/account/profile", icon: FiUser }} currentPath={currentPath} isSidebarOpen={isSidebarOpen} onClick={closeFlyout} themeColor={themeColor} />
-            <NavLink item={{ label: "Security", basePath: "/admin/account/security", icon: FiShield }} currentPath={currentPath} isSidebarOpen={isSidebarOpen} onClick={closeFlyout} themeColor={themeColor} />
+            <NavLink item={{ label: "My Profile", basePath: "/account/profile", icon: FiUser }} buildLink={buildLink} currentPath={currentPath} isSidebarOpen={isSidebarOpen} onClick={closeFlyout} themeColor={themeColor} />
+            <NavLink item={{ label: "Security", basePath: "/account/security", icon: FiShield }} buildLink={buildLink} currentPath={currentPath} isSidebarOpen={isSidebarOpen} onClick={closeFlyout} themeColor={themeColor} />
             <button onClick={handleLogout} className={`flex items-center text-sm text-gray-600 p-2 rounded-md transition-colors w-full ${isSidebarOpen ? "justify-start pl-3" : "justify-center"}`}>
               <FiLogOut className={`w-5 h-5 ${isSidebarOpen ? "mr-3" : ""}`} />
               {isSidebarOpen && 'Logout'}
@@ -175,7 +179,7 @@ export default function AppLayout({
               <div className={`p-2 rounded-lg`} style={{ backgroundColor: primary600 }}>
                 <LogoIcon className="h-6 w-6 text-white" />
               </div>
-              <span className="font-bold text-xl" style={{ color: primary700 }}>{appName}</span>
+              <span className="font-bold text-xl" style={{ color: primary700 }}>{headerTitle}</span>
             </Link>
             <button onClick={closeMobileMenu} className="p-2 rounded-md text-gray-600 hover:bg-gray-100">
               <FiX className="w-6 h-6" />
@@ -192,12 +196,13 @@ export default function AppLayout({
                 activeFlyoutLabel={null}
                 onMobileLinkClick={closeMobileMenu}
                 themeColor={themeColor} // Pass theme color to your CollapsibleNavLink
+                buildLink={buildLink} 
               />
             ))}
             {/* Account/Security links for mobile */}
             <div className="mt-auto pt-4 border-t border-gray-200">
-              <NavLink item={{ label: "My Profile", basePath: "/admin/account/profile", icon: FiUser }} currentPath={currentPath} isSidebarOpen={true} onClick={closeMobileMenu} themeColor={themeColor} />
-              <NavLink item={{ label: "Security", basePath: "/admin/account/security", icon: FiShield }} currentPath={currentPath} isSidebarOpen={true} onClick={closeMobileMenu} themeColor={themeColor} />
+              <NavLink item={{ label: "My Profile", basePath: "/account/profile", icon: FiUser }} buildLink={buildLink} currentPath={currentPath} isSidebarOpen={true} onClick={closeMobileMenu} themeColor={themeColor} />
+              <NavLink item={{ label: "Security", basePath: "/account/security", icon: FiShield }} buildLink={buildLink} currentPath={currentPath} isSidebarOpen={true} onClick={closeMobileMenu} themeColor={themeColor} />
               <button onClick={handleLogout} className="flex items-center text-sm text-gray-600 p-2 rounded-md hover:bg-gray-100 transition-colors w-full justify-start pl-3">
                 <FiLogOut className="w-5 h-5 mr-3" />
                 Logout
@@ -244,6 +249,7 @@ export default function AppLayout({
           onLinkClick={closeFlyout}
           triggerRef={currentFlyoutTriggerRef}
           themeColor={themeColor} // Pass theme color to your FlyoutMenu
+          buildLink={buildLink} // Pass down the function
         />
       )}
     </div>

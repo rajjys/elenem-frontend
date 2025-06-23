@@ -145,7 +145,7 @@ export default function SystemAdminLayout({ children }: SystemAdminLayoutProps) 
         <AppLayout
       navItems={systemNavItems}
       themeColor="indigo" // Or 'blue', 'emerald', etc., as defined in tailwind.config.js
-      appName="ELENEM Admin"
+      headerTitle="ELENEM Admin"
       logoIcon={FiAward}
     >
       {children}

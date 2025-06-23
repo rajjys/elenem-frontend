@@ -4,10 +4,9 @@
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import React, { useState, ReactNode, useEffect, useRef, RefObject } from 'react';
-import { FiHome, FiBriefcase, FiUsers, FiSettings, FiHelpCircle, FiChevronDown, FiLogOut, FiShield, FiMenu, FiX, FiAward, FiShare2, FiDollarSign, FiTrendingUp, FiUser, FiBarChart2, FiCreditCard, FiMapPin, FiUserCheck, FiGift, FiRepeat, FiVolume2, FiFileText } from 'react-icons/fi';
+import { FiHome, FiBriefcase, FiUsers, FiSettings, FiHelpCircle, FiChevronDown, FiAward, FiShare2, FiTrendingUp, FiUser, FiBarChart2, FiCreditCard, FiMapPin, FiUserCheck, FiGift, FiRepeat, FiVolume2, FiFileText } from 'react-icons/fi';
 
 // Import reusable components and the new hook
-import { NavLink, FlyoutMenu, CollapsibleNavLink } from '@/components/layouts';
 import { useContextualLink } from '@/hooks';
 import { useAuthStore } from '@/store/auth.store';
 import AppLayout from '@/components/layouts/AppLayout';
@@ -129,58 +128,13 @@ export default function TenantAdminLayout({ children }: TenantAdminLayoutProps) 
     const currentPath = usePathname();
     const router = useRouter();
     const { buildLink } = useContextualLink();
-    const { user, logout } = useAuthStore();
-    // Reusable state and handlers from previous layouts
-    const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-    const [activeFlyoutLabel, setActiveFlyoutLabel] = useState<string | null>(null);
-    const [flyoutPosition, setFlyoutPosition] = useState<{ top: number; left: number } | null>(null);
-    const [currentFlyoutTriggerRef, setCurrentFlyoutTriggerRef] = useState<RefObject<HTMLElement> | null>(null);
     
-    
-    const handleLogout = () => {
-        logout();
-        router.push('/login');
-    }
-
-    const toggleSidebar = () => {
-        setIsSidebarOpen(!isSidebarOpen);
-        closeFlyout(); // Close flyout when sidebar state changes
-    }
-    const closeFlyout = () => {
-        setActiveFlyoutLabel(null);
-        setFlyoutPosition(null);
-        setCurrentFlyoutTriggerRef(null);
-    };
-    const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
-    const closeMobileMenu = () => setIsMobileMenuOpen(false);
-
-    const handleFlyoutToggle = (label: string, targetElement: HTMLElement) => {
-            if (activeFlyoutLabel === label || label === "") { // If clicking the same one or explicitly closing
-                setActiveFlyoutLabel(null);
-                setFlyoutPosition(null);
-                setCurrentFlyoutTriggerRef(null);
-            } else {
-                const rect = targetElement.getBoundingClientRect();
-                setActiveFlyoutLabel(label);
-                // Position to the right of the collapsed sidebar icon
-                setFlyoutPosition({ 
-                    top: rect.top, 
-                    left: rect.left + rect.width + 2 // Add small gap
-                });
-                 // Create a temporary ref object for the trigger to pass to useClickAway
-                const triggerRefObject = { current: targetElement };
-                setCurrentFlyoutTriggerRef(triggerRefObject as RefObject<HTMLElement>);
-            }
-        };
-
     return (
-        <AppLayout
+    <AppLayout
       navItems={tenantNavItems}
       themeColor="blue" // Or 'blue', 'emerald', etc., as defined in tailwind.config.js
-      appName="ELENEM Admin"
-      logoIcon={FiAward}
-    >
+      headerTitle="ELENEM Admin"
+      logoIcon={FiAward}>
       {children}
     </AppLayout>
     );

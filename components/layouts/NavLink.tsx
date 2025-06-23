@@ -8,9 +8,12 @@ interface NavLinkProps {
     isFlyout?: boolean;
     onClick?: () => void;
     themeColor: string; // Add themeColor prop
+    buildLink: (basePath: string) => string; // Function to build the final href
 }
 
-export const NavLink: React.FC<NavLinkProps> = ({ item, currentPath, isSidebarOpen, isFlyout, onClick, themeColor }) => {
+export const NavLink: React.FC<NavLinkProps> = ({ item, currentPath, isSidebarOpen, isFlyout, onClick, themeColor, buildLink }) => {
+    const finalHref = buildLink(item.basePath);
+    // More precise active check: Check if the pathname part of the URL matches 
     const isActive = currentPath === item.basePath;
     const Icon = item.icon;
 
@@ -21,7 +24,7 @@ export const NavLink: React.FC<NavLinkProps> = ({ item, currentPath, isSidebarOp
 
     return (
         <Link
-            href={item.basePath}
+            href={finalHref}
             onClick={onClick}
             className={`flex items-center py-2.5 px-4 rounded-md transition-colors duration-150
                 ${isActive
