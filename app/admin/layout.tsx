@@ -24,6 +24,7 @@ import {
 } from 'react-icons/fi';
 import { useAuthStore } from '@/store/auth.store';
 import { CollapsibleNavLink, FlyoutMenu, NavLink } from '@/components/layouts';
+import AppLayout from '@/components/layouts/AppLayout';
 
 interface SystemAdminLayoutProps {
     children: ReactNode;
@@ -141,115 +142,13 @@ export default function SystemAdminLayout({ children }: SystemAdminLayoutProps) 
 
 
     return (
-        <div className="flex h-screen bg-gray-100 overflow-hidden"> {/* Added overflow-hidden to body */}
-            {/* Desktop Sidebar */}
-            <aside className={`bg-white shadow-lg transition-all duration-300 ease-in-out hidden md:flex flex-col sticky top-0 h-full 
-                                ${isSidebarOpen ? "w-64" : "w-20"}`}>
-                <div className={`flex items-center p-4 border-b border-gray-200 ${isSidebarOpen ? "justify-between" : "justify-center"}`}>
-                    {isSidebarOpen && (
-                        <Link href="/admin/dashboard" className="flex items-center space-x-2" onClick={closeFlyout}>
-                            <div className="bg-indigo-600 text-white p-2 rounded-lg"><FiAward className="h-6 w-6" /></div>
-                            <span className="font-bold text-xl text-indigo-700">ELENEM Admin</span>
-                        </Link>
-                    )}
-                    <button onClick={toggleSidebar} className="p-1.5 rounded-md text-gray-600 hover:bg-gray-200">
-                        {isSidebarOpen ? <FiX className="w-5 h-5" /> : <FiMenu className="w-5 h-5" />}
-                    </button>
-                </div>
-                <nav className="flex-grow p-2 space-y-1 overflow-y-auto">
-                    {systemNavItems.map((category) => (
-                        <CollapsibleNavLink
-                            key={category.label}
-                            category={category}
-                            currentPath={currentPath}
-                            isSidebarOpen={isSidebarOpen}
-                            onFlyoutToggle={handleFlyoutToggle}
-                            activeFlyoutLabel={activeFlyoutLabel}
-                        />
-                    ))}
-                    <div className="mt-auto pt-4 border-t border-gray-200"> {/* Ensure this is visually separated */}
-                        <NavLink item={{ label: "My Profile", basePath: "/admin/account/profile", icon: FiUser }} currentPath={currentPath} isSidebarOpen={isSidebarOpen} onClick={closeFlyout} />
-                        <NavLink item={{ label: "Security", basePath: "/admin/account/security", icon: FiShield }} currentPath={currentPath} isSidebarOpen={isSidebarOpen} onClick={closeFlyout} />
-                    </div>
-                </nav>
-            </aside>
-
-            {/* Mobile Menu Container (Handles transition) */}
-            <div className={`fixed inset-0 z-40 flex md:hidden 
-                            ${isMobileMenuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"} 
-                            transition-opacity duration-300 ease-in-out`}>
-                {/* Overlay */}
-                <div className="fixed inset-0 bg-black/50" onClick={closeMobileMenu}></div>
-                {/* Mobile Sidebar */}
-                <aside className={`relative flex flex-col w-64 max-w-xs h-full bg-white shadow-xl py-4 z-50 
-                                 transform transition-transform duration-300 ease-in-out
-                                 ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-                     <div className="flex items-center justify-between px-4 pb-2 border-b">
-                        <Link href="/admin/dashboard" className="flex items-center space-x-2" onClick={closeMobileMenu}>
-                            <div className="bg-indigo-600 text-white p-2 rounded-lg"><FiAward className="h-6 w-6" /></div>
-                            <span className="font-bold text-xl text-indigo-700">ELENEM Admin</span>
-                        </Link>
-                        <button onClick={closeMobileMenu} className="p-2 rounded-md text-gray-600 hover:bg-gray-100">
-                            <FiX className="w-6 h-6" />
-                        </button>
-                    </div>
-                    <nav className="flex-grow p-2 space-y-1 overflow-y-auto">
-                        {systemNavItems.map((category) => (
-                            <CollapsibleNavLink
-                                key={category.label}
-                                category={category}
-                                currentPath={currentPath}
-                                isSidebarOpen={true} // In mobile, categories always behave as if sidebar is open for accordion
-                                onFlyoutToggle={() => {}} // No flyouts in mobile menu
-                                activeFlyoutLabel={null}
-                                onMobileLinkClick={closeMobileMenu}
-                            />
-                        ))}
-                        <div className="mt-auto pt-4 border-t border-gray-200">
-                            <NavLink item={{ label: "My Profile", basePath: "/admin/account/profile", icon: FiUser }} currentPath={currentPath} isSidebarOpen={true} onClick={closeMobileMenu} />
-                            <NavLink item={{ label: "Security", basePath: "/admin/account/security", icon: FiShield }} currentPath={currentPath} isSidebarOpen={true} onClick={closeMobileMenu} />
-                        </div>
-                    </nav>
-                </aside>
-            </div>
-
-            {/* Main Content Area */}
-            <div className="flex-1 flex flex-col overflow-hidden">
-                <header className="bg-white shadow-sm p-4 flex items-center justify-between sticky top-0 z-30">
-                    <div className="flex items-center">
-                        <button onClick={toggleMobileMenu} className="md:hidden p-2 rounded-md text-gray-600 hover:bg-gray-100 mr-2">
-                            <FiMenu className="w-6 h-6" />
-                        </button>
-                        <h1 className="text-xl font-semibold text-gray-800">Admin Panel</h1>
-                    </div>
-                    {user && (
-                        <div className="flex items-center space-x-3">
-                            <span className="text-sm text-gray-700 hidden sm:inline">Welcome, {user.username}</span>
-                            <div className="w-9 h-9 rounded-full bg-indigo-600 text-white flex items-center justify-center text-sm font-semibold">
-                                {user.firstName?.charAt(0).toUpperCase() || user.username?.charAt(0).toUpperCase()}
-                            </div>
-                            <button onClick={handleLogout} className="flex items-center text-sm text-gray-600 hover:text-indigo-700 p-2 rounded-md hover:bg-gray-100 transition-colors" title="Logout">
-                                <FiLogOut className="w-5 h-5" />
-                            </button>
-                        </div>
-                    )}
-                </header>
-                <main className="flex-1 p-6 overflow-y-auto bg-gray-50"> {/* Added bg-gray-50 to main content for contrast */}
-                    {children}
-                </main>
-            </div>
-
-            {/* Desktop Collapsed Sidebar Flyout Menu */}
-            {activeFlyoutLabel && !isSidebarOpen && flyoutPosition && (
-                <FlyoutMenu
-                    items={systemNavItems.find(cat => cat.label === activeFlyoutLabel)?.subItems || []}
-                    position={flyoutPosition}
-                    currentPath={currentPath}
-                    onClose={closeFlyout}
-                    onLinkClick={closeFlyout} // Clicking a link in flyout should close it
-                    triggerRef={currentFlyoutTriggerRef}
-                />
-            )}
-        </div>
+        <AppLayout
+      navItems={systemNavItems}
+      themeColor="indigo" // Or 'blue', 'emerald', etc., as defined in tailwind.config.js
+      appName="ELENEM Admin"
+      logoIcon={FiAward}
+    >
+      {children}
+    </AppLayout>
     );
 }

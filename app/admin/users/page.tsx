@@ -49,8 +49,6 @@ export default function AdminUsersPage() {
       if (filters.sortOrder) params.append('sortOrder', filters.sortOrder);
 
       const response = await api.get(`/system-admin/users?${params.toString()}`);
-      console.log(response);
-      
       const validatedData = PaginatedUsersResponseSchema.parse(response.data);
 
       setUsers(validatedData.data);
@@ -118,10 +116,10 @@ type SortableColumn = "firstName" | "lastName" | "username" | "email" | "created
 
   return (
     <div className="container mx-auto p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">User Management</h1>
+      <div className="flex justify-end items-center mb-6">
+        
         <Link href="/admin/users/create" passHref>
-          <Button>Create New User</Button>
+          <Button variant='primary'>Create New User</Button>
         </Link>
       </div>
 

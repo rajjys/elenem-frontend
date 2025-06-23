@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { api } from '@/services/api'; // Your API instance
 import { TenantBasic, TenantBasicSchema } from '@/prisma'; // Import your TenantBasic DTO and schema
 import { LoadingSpinner } from '@/components/ui/loading-spinner'; // Your loading spinner component
-import { TenantTable } from '@/components/tenant/tenant-table'; // Your tenant table component
+import { TenantsTable } from '@/components/tenant/tenants-table'; // Your tenant table component
 import { Button } from '@/components/ui/button'; // Your Button component
 import z from 'zod';
 
@@ -73,7 +73,7 @@ export default function AdminTenantsPage() {
       {error && <p className="text-red-500 text-center">{error}</p>}
 
       {!loading && !error && (
-        <TenantTable
+        <TenantsTable
           tenants={tenants}
           onEdit={handleEditTenant}
           onDelete={handleDeleteTenant}

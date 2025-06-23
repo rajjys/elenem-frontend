@@ -13,7 +13,7 @@ interface TenantTableProps {
   onDelete: (tenantId: string) => void;
 }
 
-export function TenantTable({ tenants, onEdit, onDelete }: TenantTableProps) {
+export function TenantsTable({ tenants, onEdit, onDelete }: TenantTableProps) {
   const { buildLink } = useContextualLink();
 
   if (tenants.length === 0) {
@@ -25,17 +25,26 @@ export function TenantTable({ tenants, onEdit, onDelete }: TenantTableProps) {
       <table className="min-w-full divide-y divide-gray-200">
         <thead className="bg-gray-50">
           <tr>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+            <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+            <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Code</th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sport Type</th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Active</th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Country</th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Owner</th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
           {tenants.map((tenant) => (
             <tr key={tenant.id}>
-              <td className="px-6 py-4 whitespace-nowrap">
+              <td className="px-2 py-4 whitespace-nowrap">
+                <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                  tenant.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                }`}>
+                  {tenant.isActive ? 'Active' : 'Inactive'}
+                </span>
+              </td>
+              <td className="py-4 whitespace-nowrap">
                 <div className="flex items-center">
                   {tenant.logoUrl && (
                     <div className="flex-shrink-0 h-10 w-10">
@@ -63,13 +72,15 @@ export function TenantTable({ tenants, onEdit, onDelete }: TenantTableProps) {
                 <div className="text-sm text-gray-900">{tenant.sportType}</div>
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
-                <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                  tenant.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                }`}>
-                  {tenant.isActive ? 'Active' : 'Inactive'}
-                </span>
+                <div className="text-sm text-gray-900">{tenant.country}</div>
               </td>
-              <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+              <td className="px-6 py-4 whitespace-nowrap">
+                <div className="text-sm text-gray-900">
+                  <Link href={`/admin/users/${tenant.owner?.id}`}>
+                    {tenant.owner?.username}
+                  </Link></div>
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                 {/* Updated Edit Link: Use Next.js Link component to the new edit page */}
                 <Link
                   href={`/admin/tenants/${tenant.id}/edit`}

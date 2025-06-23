@@ -11,6 +11,13 @@ export interface TenantBasic {
   logoUrl?: string | null;
   isActive: boolean;
   sportType: SportType; // From the provided Tenant model
+  country?: string | null;
+  owner?: {
+    id: string;
+    username: string;
+    firstName?: string | null;
+    lastName?: string | null;
+  } | null;
 }
 
 export const TenantBasicSchema = z.object({
@@ -22,10 +29,18 @@ export const TenantBasicSchema = z.object({
   logoUrl: z.string().url().nullable().optional(),
   isActive: z.boolean(),
   sportType: SportTypeSchema,
+  country: z.string().optional(),
+  owner: z.object({
+    id: z.string(),
+    username: z.string(),
+    firstName: z.string().nullable().optional(),
+    lastName: z.string().nullable().optional(),
+  }).nullable().optional(), // Expanded owner details
 });
 // Full Tenant Schema (for display/detail)
 export const TenantDetailsSchema = z.object({
   id: z.string().cuid(),
+  externalId: z.string().uuid(),
   name: z.string().min(1, "Tenant name is required").max(100),
   description: z.string().nullable().optional(),
   tenantCode: z.string().min(3, "Tenant code must be at least 3 characters").max(7, "Tenant code must be at most 7 characters").regex(/^[A-Z0-9]+$/, "Tenant code must be uppercase alphanumeric"),

@@ -12,7 +12,7 @@ interface AppLayoutProps {
   children: ReactNode;
 }
 
-export function AppLayout({ children }: AppLayoutProps) {
+export function PublicAppLayout({ children }: AppLayoutProps) {
   const { user, tokens, logout } = useAuthStore();
   const router = useRouter();
   const pathname = usePathname();
@@ -31,7 +31,7 @@ export function AppLayout({ children }: AppLayoutProps) {
 
   const getDashboardLink = () => {
     if (!user) return "/login";
-    switch (user.role as Role) {
+    switch (user.roles[0] as Role) {
       case Role.SYSTEM_ADMIN:
         return "/admin/dashboard";
       case Role.LEAGUE_ADMIN:

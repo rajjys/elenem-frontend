@@ -19,9 +19,9 @@ export default function TenantDashboardPage() {
   useEffect(() => {
     const fetchTenantDetails = async () => {
       if (!tenantSlug) {
-        setError('No tenant specified in the URL context.');
-        setLoading(false);
-        return;
+        //setError('No tenant specified in the URL context.');
+        //setLoading(false);
+        //return;
       }
 
       setLoading(true);

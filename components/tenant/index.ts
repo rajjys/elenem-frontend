@@ -1,1 +1,1 @@
-export * from './tenant-table';
+export * from './tenants-table';
