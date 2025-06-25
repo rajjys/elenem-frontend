@@ -20,7 +20,8 @@ import {
     FiLock,
     FiLayout,
     FiMail,
-    FiBookOpen
+    FiBookOpen,
+    FiTv
 } from 'react-icons/fi';
 import { useAuthStore } from '@/store/auth.store';
 import { CollapsibleNavLink, FlyoutMenu, NavLink } from '@/components/layouts';
@@ -45,6 +46,7 @@ const systemNavItems = [
     subItems: [
       { label: "Manage Tenants", basePath: "/admin/tenants", icon: FiUsers },
       { label: "Manage All Users", basePath: "/admin/users", icon: FiUsers },
+      { label: "Manage Leagues", basePath: "/admin/leagues", icon: FiTv},
       { label: "Roles & Permissions", basePath: "/admin/roles", icon: FiShield },
       { label: "Global Announcements", basePath: "/admin/announcements", icon: FiVolume2 },
       { label: "Data Management", basePath: "/admin/data", icon: FiDatabase },
@@ -143,11 +145,11 @@ export default function SystemAdminLayout({ children }: SystemAdminLayoutProps) 
 
     return (
         <AppLayout
-      navItems={systemNavItems}
-      themeColor="indigo" // Or 'blue', 'emerald', etc., as defined in tailwind.config.js
-      headerTitle="ELENEM Admin"
-      logoIcon={FiAward}
-    >
+          navItems={systemNavItems}
+          themeColor="indigo" // Or 'blue', 'emerald', etc., as defined in tailwind.config.js
+          headerTitle="System Admin"
+          logoIcon={FiAward}
+        >
       {children}
     </AppLayout>
     );

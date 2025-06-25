@@ -1,86 +1,160 @@
 // app/(admin)/leagues/page.tsx
 "use client";
-import { useEffect, useState } from 'react';
-import { api } from '@/services/api';
-import Link from 'next/link';
-import { Button } from '@/components/ui/button'; // Assuming you have a Button component
-import { League } from '@/prisma';
 
-export default function LeaguesPage() {
-  const [leagues, setLeagues] = useState<League[]>([]);
+import React, { useState, useEffect, useCallback } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { api } from '@/services/api'; // Your actual API instance
+import { LeagueBasic, PaginatedLeaguesResponseSchema, LeagueFilterParams } from '@/prisma/league-schemas'; // Your actual League types and schemas
+import { LeagueFilters } from '@/components/league/league-filters'; // Your new LeagueFilters component
+import { LeaguesTable } from '@/components/league/leagues-table'; // Your new LeaguesTable component
+import { Pagination } from '@/components/ui/'; // Your Pagination component
+import { LoadingSpinner } from '@/components/ui/loading-spinner'; // Your LoadingSpinner component
+import { Button } from '@/components/ui/button'; // Your Button component
+import { toast } from 'sonner'; // Your toast notification library (e.g., Sonner)
+import z from 'zod'; // Your Zod library
+
+export default function AdminLeaguesPage() {
+  const router = useRouter();
+  const [leagues, setLeagues] = useState<LeagueBasic[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-   
-  useEffect(() => {
-    const fetchLeagues = async () => {
-      try {
-        setLoading(true);
-        const response = await api.get('/system-admin/leagues'); // Using the API client
-        setLeagues(response.data);
-        setError(null);
-      } catch (err: any) {
-        setError(err.response?.data?.message || "Failed to fetch leagues.");
-      } finally {
-        setLoading(false);
+  const [totalItems, setTotalItems] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+  const [filters, setFilters] = useState<LeagueFilterParams>({
+    page: 1,
+    pageSize: 10,
+    sortBy: 'createdAt', // Default sort
+    sortOrder: 'desc',   // Default sort order
+  });
+
+  const fetchLeagues = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const params = new URLSearchParams();
+      // Append filters to URLSearchParams based on LeagueFilterParams
+      if (filters.search) params.append('search', filters.search);
+      if (filters.tenantIds && filters.tenantIds.length > 0) {
+        filters.tenantIds.forEach(id => params.append('tenantIds', id));
       }
-    };
+      if (filters.leagueIds && filters.leagueIds.length > 0) {
+        filters.leagueIds.forEach(id => params.append('leagueIds', id));
+      }
+      if (filters.sportType) params.append('sportType', filters.sportType);
+      if (filters.country) params.append('country', filters.country);
+      if (filters.visibility) params.append('visibility', filters.visibility);
+      if (filters.status !== undefined) params.append('status', String(filters.status)); // Use 'status' as per your DTO/model
+      if (filters.gender) params.append('gender', filters.gender);
+      if (filters.parentLeagueId) params.append('parentLeagueId', filters.parentLeagueId);
+      if (filters.division) params.append('division', filters.division);
+      if (filters.establishedYear !== undefined) params.append('establishedYear', String(filters.establishedYear));
+      if (filters.page) params.append('page', String(filters.page));
+      if (filters.pageSize) params.append('pageSize', String(filters.pageSize));
+      if (filters.sortBy) params.append('sortBy', filters.sortBy);
+      if (filters.sortOrder) params.append('sortOrder', filters.sortOrder);
+
+      // Your actual API call to list leagues
+      const response = await api.get(`/leagues?${params.toString()}`);
+      // Validate data with Zod schema
+      const validatedData = PaginatedLeaguesResponseSchema.parse(response.data);
+
+      setLeagues(validatedData.data);
+      setTotalItems(validatedData.totalItems);
+      setTotalPages(validatedData.totalPages);
+    } catch (err: any) {
+      const errorMessage = err.response?.data?.message || err.message || 'Failed to fetch leagues.';
+      setError(errorMessage);
+      toast.error('Error fetching leagues', { description: errorMessage });
+      console.error('Fetch leagues error:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, [filters]); // Dependency on filters to re-fetch when filters change
+
+  useEffect(() => {
     fetchLeagues();
+  }, [fetchLeagues]); // Re-fetch when fetchLeagues callback changes (due to filters)
+
+  // Use useCallback for handler functions to prevent unnecessary re-renders in child components
+  const handleFilterChange = useCallback((newFilters: LeagueFilterParams) => {
+    setFilters(prev => ({
+      ...prev,
+      ...newFilters,
+      page: 1, // Reset to first page on any filter change
+    }));
   }, []);
 
-  if (loading) return <p>Loading leagues...</p>;
-  if (error) {
-    ///If Unauthorized, redirect to login
-    if (error === "Unauthorized"){
-      // Logout user and redirect to login
+  const handlePageChange = useCallback((newPage: number) => {
+    setFilters(prev => ({ ...prev, page: newPage }));
+  }, []);
 
-      ///return null; //prevent further rendering
+  const handlePageSizeChange = useCallback((newSize: number) => {
+    setFilters(prev => ({ ...prev, pageSize: newSize, page: 1 })); // Reset page to 1
+  }, []);
+
+  type SortableColumn = 'name' | 'leagueCode' | 'sportType' | 'country' | 'ownerUsername' | 'createdAt' | 'updatedAt' | 'division' | 'establishedYear';
+  const handleSort = useCallback((column: SortableColumn) => {
+    setFilters(prev => ({
+      ...prev,
+      sortBy: column,
+      sortOrder: prev.sortBy === column && prev.sortOrder === 'asc' ? 'desc' : 'asc',
+      page: 1, // Reset to first page on sort change
+    }));
+  }, []);
+
+  const handleDeleteLeague = useCallback(async (leagueId: string) => {
+    // Replacing window.confirm with a toast for non-blocking confirmation.
+    // In a production app, use a dedicated custom modal for user confirmation.
+    const confirmed = window.confirm('Are you sure you want to delete this league? This action cannot be undone.'); // Using window.confirm temporarily for demonstration
+    if (!confirmed) {
+      return;
     }
-    return <p className="text-red-500">Error: {error}</p>;
-  }
+
+    try {
+      await api.delete(`/leagues/${leagueId}`); // Your actual DELETE API call
+      toast.success('League deleted successfully.');
+      fetchLeagues(); // Re-fetch leagues to update the list
+    } catch (err: any) {
+      const errorMessage = err.response?.data?.message || err.message || 'Failed to delete league.';
+      toast.error('Error deleting league', { description: errorMessage });
+      console.error('Delete league error:', err);
+    }
+  }, [fetchLeagues]); // fetchLeagues is a dependency because it's called inside
 
   return (
-    <div>
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Manage Leagues</h1>
-        <Link href="/admin/leagues/create">
-          <Button type="button">Create New League</Button>
+    <div className="container mx-auto p-6">
+      <div className="flex justify-between items-center mb-4">
+        {/* League Filters component */}
+        <LeagueFilters
+          filters={filters}
+          onFilterChange={handleFilterChange}
+          onPageSizeChange={handlePageSizeChange}
+        />
+        <Link href="/admin/leagues/create" passHref>
+          <Button variant="primary" className='whitespace-nowrap'>Create New League</Button>
         </Link>
       </div>
-      {leagues.length === 0 ? (
-        <p>No leagues found.</p>
+
+      {loading ? (
+        <LoadingSpinner />
+      ) : error ? (
+        <p className="text-red-500 text-center mt-8">Error: {error}</p>
       ) : (
-        <div className="bg-white shadow rounded-lg">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Code</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sport</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {leagues.map((league) => (
-                <tr key={league.id}>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{league.name}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{league.leagueCode}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{league.sportType}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm">
-                     <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${league.status ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                        {league.status ? 'Active' : 'Inactive'}
-                     </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <Link href={`/admin/leagues/id/${league.id}/`} className="text-indigo-400 hover:text-indigo-700 mr-3">View</Link>
-                    <Link href={`/admin/leagues/id/${league.id}/edit`} className="text-indigo-600 hover:text-indigo-900">Edit</Link>
-                    {/* Add Delete button with confirmation */}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <>
+          <LeaguesTable
+            leagues={leagues}
+            onSort={handleSort}
+            sortBy={filters.sortBy || 'createdAt'}
+            sortOrder={filters.sortOrder || 'desc'}
+            onDelete={handleDeleteLeague}
+          />
+          <Pagination
+            currentPage={filters.page || 1}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+          />
+        </>
       )}
     </div>
   );

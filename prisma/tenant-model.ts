@@ -1,12 +1,13 @@
 // src/prisma/tenant-schemas.ts
 import * as z from 'zod';
-import { SportType, Role, SportTypeSchema } from './index'; // Assuming SportType and Role are defined in src/prisma/index.ts
+import { SportType, Role, SportTypeSchema, TenantType, TenantTypeSchema } from './index'; // Assuming SportType and Role are defined in src/prisma/index.ts
 
 export interface TenantBasic {
   id: string;
   externalId: string;
   name: string;
   tenantCode: string;
+  tenantType: TenantType;
   slug: string;
   logoUrl?: string | null;
   isActive: boolean;
@@ -19,12 +20,24 @@ export interface TenantBasic {
     lastName?: string | null;
   } | null;
 }
+export interface TenantFilterParams {
+  search?: string;
+  isActive?: boolean;
+  tenantType?: TenantType;
+  sportType?: SportType;
+  country?: string;
+  page?: number;
+  pageSize?: number;
+  sortBy?: 'name' | 'tenantCode' | 'tenantType' | 'sportType' | 'country' | 'ownerUsername' | 'createdAt' | 'updatedAt';
+  sortOrder?: 'asc' | 'desc';
+}
 
 export const TenantBasicSchema = z.object({
   id: z.string().cuid(),
   externalId: z.string().uuid(),
   name: z.string(),
   tenantCode: z.string(),
+  tenantType: TenantTypeSchema,
   slug: z.string(),
   logoUrl: z.string().url().nullable().optional(),
   isActive: z.boolean(),
@@ -44,7 +57,8 @@ export const TenantDetailsSchema = z.object({
   name: z.string().min(1, "Tenant name is required").max(100),
   description: z.string().nullable().optional(),
   tenantCode: z.string().min(3, "Tenant code must be at least 3 characters").max(7, "Tenant code must be at most 7 characters").regex(/^[A-Z0-9]+$/, "Tenant code must be uppercase alphanumeric"),
-  sportType: z.nativeEnum(SportType),
+  TenantType: TenantTypeSchema,
+  sportType: SportTypeSchema,
   country: z.string().min(2, "Country is required").max(2, "Country must be a 2-letter ISO code"), // ISO 2-letter code
   region: z.string().nullable().optional(),
   city: z.string().nullable().optional(),
@@ -72,6 +86,7 @@ export const CreateTenantSchema = z.object({
   name: z.string().min(1, "Tenant name is required").max(100),
   description: z.string().nullable().optional(),
   tenantCode: z.string().min(3, "Tenant code must be at least 3 characters").max(7, "Tenant code must be at most 7 characters").regex(/^[A-Z0-9]+$/, "Tenant code must be uppercase alphanumeric"),
+  TenantType: TenantTypeSchema,
   sportType: z.nativeEnum(SportType),
   country: z.string().min(2, "Country is required").max(2, "Country must be a 2-letter ISO code"),
   region: z.string().nullable().optional(),
@@ -92,6 +107,7 @@ export const UpdateTenantSchema = z.object({
   name: z.string().min(1, "Tenant name is required").max(100),
   description: z.string().nullable().optional(),
   tenantCode: z.string().min(3, "Tenant code must be at least 3 characters").max(7, "Tenant code must be at most 7 characters").regex(/^[A-Z0-9]+$/, "Tenant code must be uppercase alphanumeric").optional(),
+  TenantType: TenantTypeSchema.optional(),
   sportType: z.nativeEnum(SportType).optional(),
   country: z.string().min(2, "Country is required").max(2, "Country must be a 2-letter ISO code").optional(),
   region: z.string().nullable().optional(),
@@ -127,7 +143,6 @@ export const PaginatedUserResponseDtoSchema = z.object({
 });
 
 export type PaginatedResponseDto = z.infer<typeof PaginatedUserResponseDtoSchema>;
-
 // Extend or create a new Zod schema for fetching parameters if necessary for owner dropdown
 export const GetUsersParamsSchema = z.object({
   page: z.number().int().min(1).optional(),
@@ -143,3 +158,13 @@ export const GetUsersParamsSchema = z.object({
   managingTeamId: z.string().optional(),
 });
 export type GetUsersParamsDto = z.infer<typeof GetUsersParamsSchema>;
+// Paginated Response Schema for Leagues
+export const PaginatedTenantsResponseSchema = z.object({
+  data: z.array(TenantBasicSchema),
+  totalItems: z.number().int().min(0),
+  totalPages: z.number().int().min(0),
+  currentPage: z.number().int().min(1),
+  pageSize: z.number().int().min(1),
+});
+
+export type PaginatedTenantsResponse = z.infer<typeof PaginatedTenantsResponseSchema>;

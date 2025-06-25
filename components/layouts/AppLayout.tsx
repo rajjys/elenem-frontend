@@ -24,6 +24,7 @@ import { useAuthStore } from '@/store/auth.store'; // Assuming this path is corr
 // Import your existing components. Replace these with your actual paths.
 import { CollapsibleNavLink, FlyoutMenu, NavLink } from '.'; // Adjust this import path if needed
 import { useContextualLink } from '@/hooks';
+import { ContextSwitcher } from './navigation/ContextSwitcher';
 
 // Type for a React Icon component
 type IconType = React.ComponentType<React.SVGProps<SVGSVGElement>>;
@@ -175,7 +176,7 @@ export default function AppLayout({
                                  transform transition-transform duration-300 ease-in-out
                                  ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
           <div className="flex items-center justify-between px-4 pb-2 border-b">
-            <Link href="/admin/dashboard" className="flex items-center space-x-2" onClick={closeMobileMenu}>
+            <Link href={buildLink(navItems[0]?.subItems[0]?.basePath || '/')} className="flex items-center space-x-2" onClick={closeMobileMenu}>
               <div className={`p-2 rounded-lg`} style={{ backgroundColor: primary600 }}>
                 <LogoIcon className="h-6 w-6 text-white" />
               </div>
@@ -221,6 +222,7 @@ export default function AppLayout({
             </button>
             <h1 className="text-xl font-semibold text-gray-800">Context title Here</h1>
           </div>
+          {showContextSwitcher && <ContextSwitcher />}
           {user && (
             <div className="flex items-center space-x-3">
               <span className="text-sm text-gray-700 hidden sm:inline">Welcome, {user.username}</span>

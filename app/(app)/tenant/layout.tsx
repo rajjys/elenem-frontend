@@ -131,10 +131,11 @@ export default function TenantAdminLayout({ children }: TenantAdminLayoutProps) 
     
     return (
     <AppLayout
-      navItems={tenantNavItems}
-      themeColor="blue" // Or 'blue', 'emerald', etc., as defined in tailwind.config.js
-      headerTitle="ELENEM Admin"
-      logoIcon={FiAward}>
+        navItems={tenantNavItems}
+        themeColor="blue" // Or 'blue', 'emerald', etc., as defined in tailwind.config.js
+        headerTitle="Tenant Admin"
+        logoIcon={FiAward}
+      >
       {children}
     </AppLayout>
     );

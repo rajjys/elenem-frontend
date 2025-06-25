@@ -116,18 +116,18 @@ type SortableColumn = "firstName" | "lastName" | "username" | "email" | "created
 
   return (
     <div className="container mx-auto p-6">
-      <div className="flex justify-end items-center mb-6">
-        
+      <div className="flex justify-between items-center mb-4">
+        <UserFilters
+          filters={filters}
+          onFilterChange={handleFilterChange}
+          onPageSizeChange={handlePageSizeChange}
+        />
         <Link href="/admin/users/create" passHref>
-          <Button variant='primary'>Create New User</Button>
+          <Button variant='primary' className='whitespace-nowrap'>Create New User</Button>
         </Link>
       </div>
 
-      <UserFilters
-        filters={filters}
-        onFilterChange={handleFilterChange}
-        onPageSizeChange={handlePageSizeChange}
-      />
+
 
       {loading ? (
         <LoadingSpinner />
