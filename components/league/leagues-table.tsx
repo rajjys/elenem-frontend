@@ -105,9 +105,9 @@ export function LeaguesTable({ leagues, onSort, sortBy, sortOrder, onDelete }: L
             <TableRow key={league.id}>
               <TableCell className="px-6 py-4 whitespace-nowrap">
                 <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                  league.status ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                  league.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                 }`}>
-                  {league.status ? 'Active' : 'Inactive'}
+                  {league.isActive ? 'Active' : 'Inactive'}
                 </span>
               </TableCell>
               <TableCell className="px-6 py-4 whitespace-nowrap">

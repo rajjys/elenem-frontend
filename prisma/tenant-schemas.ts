@@ -50,6 +50,8 @@ export const TenantBasicSchema = z.object({
     lastName: z.string().nullable().optional(),
   }).nullable().optional(), // Expanded owner details
 });
+export type TenantBasicDto = z.infer<typeof TenantBasicSchema>;
+
 // Full Tenant Schema (for display/detail)
 export const TenantDetailsSchema = z.object({
   id: z.string().cuid(),
@@ -167,4 +169,4 @@ export const PaginatedTenantsResponseSchema = z.object({
   pageSize: z.number().int().min(1),
 });
 
-export type PaginatedTenantsResponse = z.infer<typeof PaginatedTenantsResponseSchema>;
+export type PaginatedTenantsResponseDto = z.infer<typeof PaginatedTenantsResponseSchema>;

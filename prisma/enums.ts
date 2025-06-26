@@ -11,7 +11,17 @@ export enum Role {
   COACH = "COACH",
   GENERAL_USER = "GENERAL_USER",
 }
+export enum Gender {
+  MALE = 'MALE',
+  FEMALE = 'FEMALE',
+  MIXED = 'MIXED',
+  OTHER = 'OTHER',
+}
 
+export enum SupportedLanguage {
+  ENGLISH = 'ENGLISH',
+  FRANCAIS = 'FRANCAIS',
+}
 // User Interface - Reflects the structure of the User object returned by your
 // backend's `/auth/me` endpoint or contained within the JWT payload.
 // Zod schema for Role enum (useful for runtime validation of API responses or form data)
@@ -47,3 +57,5 @@ export const RoleSchema = z.nativeEnum(Role);
 export const SportTypeSchema = z.nativeEnum(SportType);
 export const LeagueVisibilitySchema = z.nativeEnum(LeagueVisibility);
 export const TenantTypeSchema = z.nativeEnum(TenantType);
+export const GenderSchema = z.nativeEnum(Gender);
+export const SupportedLanguageSchema = z.nativeEnum(SupportedLanguage);

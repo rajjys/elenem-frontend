@@ -44,7 +44,7 @@ export default function AdminLeaguesPage() {
       if (filters.sportType) params.append('sportType', filters.sportType);
       if (filters.country) params.append('country', filters.country);
       if (filters.visibility) params.append('visibility', filters.visibility);
-      if (filters.status !== undefined) params.append('status', String(filters.status)); // Use 'status' as per your DTO/model
+      if (filters.isActive !== undefined) params.append('isActive', String(filters.isActive)); // Use 'isActive' as per your DTO/model
       if (filters.gender) params.append('gender', filters.gender);
       if (filters.parentLeagueId) params.append('parentLeagueId', filters.parentLeagueId);
       if (filters.division) params.append('division', filters.division);
@@ -56,6 +56,7 @@ export default function AdminLeaguesPage() {
 
       // Your actual API call to list leagues
       const response = await api.get(`/leagues?${params.toString()}`);
+      console.log("Fetched leagues response:", response.data)
       // Validate data with Zod schema
       const validatedData = PaginatedLeaguesResponseSchema.parse(response.data);
 

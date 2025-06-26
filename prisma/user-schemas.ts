@@ -1,18 +1,9 @@
 // src/prisma/user-schemas.ts
 import * as z from 'zod';
-import { Role } from '.';// Assuming Role enum is exported from your main prisma.ts or similar
+import { GenderSchema, Role, RoleSchema, SupportedLanguage, SupportedLanguageSchema } from '.';// Assuming Role enum is exported from your main prisma.ts or similar
 
 // --- Enums ---
-export enum Gender {
-  MALE = 'MALE',
-  FEMALE = 'FEMALE',
-  OTHER = 'OTHER',
-}
 
-export enum SupportedLanguage {
-  ENGLISH = 'ENGLISH',
-  FRANCAIS = 'FRANCAIS',
-}
 
 // --- Base User Schemas ---
 
@@ -24,7 +15,7 @@ export const UserBasicSchema = z.object({
   email: z.string().email('Invalid email address'),
   firstName: z.string().min(1, 'First name is required'),
   lastName: z.string().min(1, 'Last name is required'),
-  roles: z.array(z.nativeEnum(Role)).default([Role.GENERAL_USER]), // User can have multiple roles
+  roles: z.array((RoleSchema)).default([Role.GENERAL_USER]), // User can have multiple roles
   isActive: z.boolean(),
   avatarUrl: z.string().url().optional().or(z.literal('')), // Allowing empty string for optional URL
   profileImageUrl: z.string().url().optional().or(z.literal('')), // Allowing empty string for optional URL
@@ -39,10 +30,10 @@ export const UserDetailSchema = UserBasicSchema.extend({
   phone: z.string().optional().or(z.literal('')),
   dateOfBirth: z.preprocess((arg) => (typeof arg === 'string' ? new Date(arg) : arg), z.date()).optional().nullable(),
   nationality: z.string().optional().or(z.literal('')),
-  gender: z.nativeEnum(Gender).optional().nullable(),
+  gender: GenderSchema.optional().nullable(),
   bio: z.string().optional().or(z.literal('')),
   // avatarUrl is present in the model but profileImageUrl seems to be the primary for display
-  preferredLanguage: z.nativeEnum(SupportedLanguage).optional().nullable(),
+  preferredLanguage: SupportedLanguageSchema.optional().nullable(),
   timezone: z.string().optional().or(z.literal('')),
   // Note: For JSON fields, we typically receive/send them as objects, so z.any() or specific object schemas
   notificationPreferences: z.record(z.string(), z.any()).optional().nullable(), // For flexible JSON object
@@ -87,12 +78,12 @@ export const CreateUserSchema = z.object({
   phone: z.string().optional().or(z.literal('')),
   dateOfBirth: z.string().optional(), // Send as ISO date string if present
   nationality: z.string().optional().or(z.literal('')),
-  gender: z.nativeEnum(Gender).optional(),
+  gender: GenderSchema.optional(),
   bio: z.string().optional().or(z.literal('')),
-  preferredLanguage: z.nativeEnum(SupportedLanguage).optional(),
+  preferredLanguage: SupportedLanguageSchema.optional(),
   timezone: z.string().optional().or(z.literal('')),
   // roles are handled contextually or by separate API for System Admin
-  roles: z.array(z.nativeEnum(Role)).optional(), // Only for System Admin direct creation
+  roles: z.array(RoleSchema).optional(), // Only for System Admin direct creation
   isActive: z.boolean().default(true).optional(),
   isVerified: z.boolean().default(false).optional(),
   // No direct creation of managingLeagueId, tenantId here; these are set by association flows
@@ -110,9 +101,9 @@ export const UpdateUserSchema = z.object({
   phone: z.string().optional().or(z.literal('')),
   dateOfBirth: z.string().optional(), // Send as ISO date string if present
   nationality: z.string().optional().or(z.literal('')),
-  gender: z.nativeEnum(Gender).optional(),
+  gender: GenderSchema.optional(),
   bio: z.string().optional().or(z.literal('')),
-  preferredLanguage: z.nativeEnum(SupportedLanguage).optional(),
+  preferredLanguage: SupportedLanguageSchema.optional(),
   timezone: z.string().optional().or(z.literal('')),
   isActive: z.boolean().optional(),
   isVerified: z.boolean().optional(),
@@ -130,7 +121,7 @@ export type UpdatePasswordDto = z.infer<typeof UpdatePasswordSchema>;
 
 // For promoting/demoting user roles (System Admin only)
 export const UpdateUserRolesSchema = z.object({
-  roles: z.array(z.nativeEnum(Role)).min(1, 'At least one role must be assigned.'),
+  roles: z.array(RoleSchema).min(1, 'At least one role must be assigned.'),
   // For contextual roles like LEAGUE_ADMIN or TEAM_ADMIN, these IDs are sent alongside the role update
   managingLeagueId: z.string().cuid().optional().nullable(), // To set/unset the league managed by this user
   managingTeamId: z.string().cuid().optional().nullable(),   // To set/unset the team managed by this user
@@ -143,13 +134,13 @@ export type UpdateUserRolesDto = z.infer<typeof UpdateUserRolesSchema>;
 
 export const UserFilterSchema = z.object({
   search: z.string().optional(), // General search term (username, email, first/last name)
-  roles: z.array(z.nativeEnum(Role)).optional(), // Filter by one or more roles
+  roles: z.array(RoleSchema).optional(), // Filter by one or more roles
   isActive: z.boolean().optional(), // Filter by active status
   isVerified: z.boolean().optional(), // Filter by verification status
   tenantId: z.string().cuid().optional().nullable(), // Filter by association with a specific tenant (can be null for unassigned)
   managingLeagueId: z.string().cuid().optional().nullable(), // Filter by association as league admin (can be null for unassigned)
   managingTeamId: z.string().cuid().optional().nullable(), // Filter by association as team admin (can be null for unassigned)
-  gender: z.nativeEnum(Gender).optional(),
+  gender: GenderSchema.optional(),
   preferredLanguage: z.nativeEnum(SupportedLanguage).optional(),
   page: z.number().int().min(1).default(1).optional(),
   pageSize: z.number().int().min(1).max(50).default(10).optional(), // Max 50 per page is a reasonable default limit

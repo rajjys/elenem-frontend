@@ -52,7 +52,7 @@ export const LeagueBasicSchema: z.ZodSchema<any> = z.lazy(() => z.object({
   bannerImageUrl: z.string().nullable().optional(),
   sportType: SportTypeSchema,
 
-  status: z.boolean(),
+  isActive: z.boolean(),
   visibility: LeagueVisibilitySchema,
 
   createdAt: z.preprocess((arg) => new Date(arg as string), z.date()),
@@ -83,7 +83,7 @@ export const PaginatedLeaguesResponseSchema = z.object({
   pageSize: z.number().int().min(1),
 });
 
-export type PaginatedLeaguesResponse = z.infer<typeof PaginatedLeaguesResponseSchema>;
+export type PaginatedLeaguesResponseDto = z.infer<typeof PaginatedLeaguesResponseSchema>;
 
 // You might also want Zod schemas for your request parameters (GetLeaguesDto)
 // For frontend usage, you usually define your filter state type,
@@ -97,7 +97,7 @@ export const LeagueFilterParamsSchema = z.object({
     sportType: z.nativeEnum(SportType).optional(),
     country: z.string().optional(),
     visibility: z.nativeEnum(LeagueVisibility).optional(),
-    status: z.boolean().optional(),
+    isActive: z.boolean().optional(),
     gender: z.nativeEnum(Gender).optional(),
     parentLeagueId: z.string().cuid().optional(),
     division: z.string().optional(),
@@ -113,7 +113,7 @@ export interface LeagueFilterParams {
   sportType?: SportType;
   country?: string;
   visibility?: LeagueVisibility;
-  status?: boolean; // Corresponds to `isActive` for filters
+  isActive?: boolean; // Corresponds to `isActive` for filters
   gender?: Gender;
   parentLeagueId?: string;
   division?: string;
@@ -124,3 +124,78 @@ export interface LeagueFilterParams {
   sortOrder?: 'asc' | 'desc';
 }
 //export type GetLeaguesParams = z.infer<typeof LeagueFilterParamsSchema>;
+// NEW: Zod schemas for points system and tiebreakers
+export const PointRuleSchema = z.object({
+  outcome: z.string().min(1, "Outcome is required"), // e.g., "WIN", "DRAW", "WIN_3_0"
+  points: z.number().int(),
+  // Add other conditions if necessary, e.g., 'conditionType': 'SET_SCORE', 'value': '3_0'
+});
+
+export const BonusPointRuleSchema = z.object({
+  condition: z.string().min(1, "Condition is required"), // e.g., "CLEAN_SHEET", "SCORED_3_GOALS"
+  points: z.number().int(),
+});
+
+export const PointSystemConfigSchema = z.object({
+  rules: z.array(PointRuleSchema),
+  bonusPoints: z.array(BonusPointRuleSchema).optional(),
+});
+
+export const TieBreakerRuleSchema = z.object({
+  order: z.number().int().min(1),
+  metric: z.string().min(1, "Metric is required"), // e.g., "HEAD_TO_HEAD_POINTS", "GOAL_DIFFERENCE"
+  sort: z.enum(['ASC', 'DESC', 'RANDOM']),
+});
+
+export const TieBreakerConfigSchema = z.array(TieBreakerRuleSchema);
+
+
+// NEW: League Schemas
+export const CreateLeagueSchema = z.object({
+  name: z.string().min(1, 'League name is required').max(100, 'League name cannot exceed 100 characters'),
+  description: z.string().max(500, 'Description cannot exceed 500 characters').optional().nullable(),
+  leagueCode: z.string().min(3, 'League code must be at least 3 characters').max(10, 'League code cannot exceed 10 characters').toUpperCase(),
+  sportType: z.nativeEnum(SportType),
+  visibility: z.nativeEnum(LeagueVisibility).default(LeagueVisibility.PUBLIC).optional(),
+  gender: z.nativeEnum(Gender),
+  country: z.string().min(2, 'Country is required').max(2), // ISO 2-letter code
+  region: z.string().max(100, 'Region cannot exceed 100 characters').optional().nullable(),
+  city: z.string().max(100, 'City cannot exceed 100 characters').optional().nullable(),
+  state: z.string().max(100, 'State cannot exceed 100 characters').optional().nullable(),
+  establishedYear: z.number().int().min(1800).max(new Date().getFullYear()).optional().nullable(),
+  logoUrl: z.string().url('Invalid URL format').optional().nullable(),
+  bannerImageUrl: z.string().url('Invalid URL format').optional().nullable(),
+  isActive: z.boolean().default(true).optional(),
+  ownerId: z.string().cuid().optional().nullable(), // Owner of the league (a GENERAL_USER)
+  tenantId: z.string().cuid(), // Required for league creation
+  parentLeagueId: z.string().cuid().optional().nullable(), // For divisions or sub-leagues
+  division: z.string().max(50).optional().nullable(), // e.g., "D1", "Pro League"
+
+  // NEW: Points System & Tiebreakers
+  pointSystemConfig: PointSystemConfigSchema,
+  tieBreakerConfig: TieBreakerConfigSchema,
+});
+
+export const UpdateLeagueSchema = CreateLeagueSchema.extend({
+  //id: z.string().cuid(),
+});
+
+export const LeagueDetailsSchema = UpdateLeagueSchema.extend({
+  id: z.string().cuid(),
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
+  tenant: TenantLiteResponseSchema, // For displaying tenant name
+  owner: UserLiteResponseSchema.optional().nullable(),
+  parentLeague: z.object({
+    id: z.string().cuid(),
+    name: z.string(),
+  }).optional().nullable(),
+});
+
+export type LeagueDetails = z.infer<typeof LeagueDetailsSchema>;
+export type PointRule = z.infer<typeof PointRuleSchema>;
+export type BonusPointRule = z.infer<typeof BonusPointRuleSchema>;
+export type PointSystemConfig = z.infer<typeof PointSystemConfigSchema>;
+export type TieBreakerRule = z.infer<typeof TieBreakerRuleSchema>;
+export type TieBreakerConfig = z.infer<typeof TieBreakerConfigSchema>;
+
