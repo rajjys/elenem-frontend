@@ -1,221 +1,193 @@
-// app/(admin)/users/[userId]/page.tsx
+// app/(admin)/users/[id]/page.tsx
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { api } from '@/services/api';
-import { UserDetail, UserDetailSchema, UpdateUserDto, UpdateUserSchema } from '@/prisma/user-schemas'; // Import UserDetail and its schema, plus UpdateUserDto
-import { UserForForm, UserForm, UserFormValues } from '@/components/forms/user-form'; // Import the reusable user form
-import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { Button } from '@/components/ui/button';
-import { toast } from 'sonner'; // For notifications
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { toast } from 'sonner';
+import { useAuthStore } from '@/store/auth.store';
+import { Role, UserDetail } from '@/prisma';
 
-interface UserDetailPageProps {
-  params: {
-    userId: string; // The user ID will be extracted from the URL path
-  };
-}
-
-export default function UserDetailPage({ params }: UserDetailPageProps) {
+export default function UserProfilePage() {
+  const { userId } = useParams<{ userId: string }>();
   const router = useRouter();
-  const { userId } = params;
+  const userAuth = useAuthStore((state) => state.user); // Get user from auth store
 
-  const [user, setUser] = useState<UserDetail | null>(null);
+  const [profileUser, setProfileUser] = useState<UserDetail | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [isEditMode, setIsEditMode] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [canEdit, setCanEdit] = useState(false);
 
-  // Function to fetch user details
-  const fetchUserDetails = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await api.get(`/system-admin/users/${userId}`); // GET /admin/users/:id
-      console.log(response.data);
-      const validatedUser = response.data; // Validate with Zod
-      setUser(validatedUser);
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.message || err.message || "Failed to fetch user details.";
-      setError(errorMessage);
-      toast.error("Error loading user", { description: errorMessage });
-      console.error('Fetch user details error:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const currentUserRoles = userAuth?.roles || [];
+  const currentUsersTenantId = userAuth?.tenantId;
+  const isSystemAdmin = currentUserRoles.includes(Role.SYSTEM_ADMIN);
+  const isTenantAdmin = currentUserRoles.includes(Role.TENANT_ADMIN);
+  const isLeagueAdmin = currentUserRoles.includes(Role.LEAGUE_ADMIN);
 
   useEffect(() => {
-    if (userId) {
-      fetchUserDetails();
-    } else {
-      setError("User ID not provided.");
-      setLoading(false);
+    if (userAuth === undefined) {
+      return; // Still loading auth state
     }
-  }, [userId]); // Re-fetch if userId changes
 
-  // Handle form submission for updating a user
-  const handleUpdateUser = async (data: UserFormValues) => {
-    setIsSubmitting(true);
-    setError(null);
-    try {
-      // Prepare data for the API based on UpdateUserDto
-      const payload: UpdateUserDto = {
-        username: data.username,
-        email: data.email,
-        firstName: data.firstName,
-        lastName: data.lastName,
-        profileImageUrl: data.profileImageUrl || undefined,
-        phone: data.phone || undefined,
-        // Ensure dateOfBirth is sent as ISO string if not null/undefined
-        dateOfBirth: data.dateOfBirth ? new Date(data.dateOfBirth).toISOString() : undefined,
-        nationality: data.nationality || undefined,
-        gender: data.gender || undefined,
-        bio: data.bio || undefined,
-        //avatarUrl: data.avatarUrl || undefined,
-        preferredLanguage: data.preferredLanguage || undefined,
-        timezone: data.timezone || undefined,
-        // isActive and isVerified can also be updated here if needed
-        // password is handled separately or by a different endpoint
-      };
-
-      await api.put(`/system-admin/users/${userId}`, payload); // PUT /admin/users/:id
-      toast.success("User updated successfully!");
-      setIsEditMode(false); // Exit edit mode
-      fetchUserDetails(); // Re-fetch updated data
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.message || err.message || "Failed to update user.";
-      setError(errorMessage);
-      toast.error("Error updating user", { description: errorMessage });
-      console.error('Update user error:', err);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  // Logic for deleting a user (from UsersTable, but can also be here)
-  const handleDeleteUser = async () => {
-    if (!window.confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
+    if (userAuth === null) {
+      toast.error("Authentication required", { description: "Please log in to view user profiles." });
+      router.push('/login');
       return;
     }
-    setIsSubmitting(true);
-    try {
-      await api.delete(`/system-admin/users/${userId}`); // DELETE /admin/users/:id
-      toast.success('User soft-deleted successfully.');
-      router.push('/admin/users'); // Redirect back to user list
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.message || err.message || 'Failed to delete user.';
-      toast.error('Error deleting user', { description: errorMessage });
-      console.error('Delete user error:', err);
-    } finally {
-      setIsSubmitting(false);
+
+    const fetchUserProfile = async () => {
+      setLoading(true);
+      try {
+        const response = await api.get<UserDetail>(`/users/${userId}`); // Use /users endpoint
+        console.log(response.data);
+        const fetchedUser = response.data;
+        setProfileUser(fetchedUser);
+
+        // Determine if current user can edit this profile based on roles and tenant context
+        let userCanEdit = false;
+        if (isSystemAdmin) {
+          userCanEdit = true;
+        } else if (isTenantAdmin && fetchedUser.tenantId === currentUsersTenantId) {
+          userCanEdit = true;
+        } else if (isLeagueAdmin && fetchedUser.managingLeagueId === userAuth.managingLeagueId) {
+          // This logic assumes League Admin can edit users specifically managed by their league.
+          // Adjust if League Admin can only edit users within their tenant, etc.
+          userCanEdit = true;
+        } else if (fetchedUser.id === userAuth.id) { // User can always edit their own profile
+          userCanEdit = true;
+        }
+        setCanEdit(userCanEdit);
+
+      } catch (error) {
+        console.error('Failed to fetch user profile:', error);
+        toast.error("Failed to load user profile.", { description: "User not found or access denied." });
+        //router.push('/admin/users'); // Redirect to user list
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (userId) {
+      fetchUserProfile();
+    } else {
+      setLoading(false);
+      router.push('/admin/users'); // Redirect if no ID
     }
-  };
+  }, [userId, userAuth, router, isSystemAdmin, isTenantAdmin, isLeagueAdmin, currentUsersTenantId]);
 
-  if (loading) {
-    return <LoadingSpinner />;
+  if (loading || userAuth === undefined) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <p>Loading user profile...</p>
+      </div>
+    );
   }
 
-  if (error) {
-    return <p className="text-red-500 text-center mt-8">{error}</p>;
+  if (userAuth === null || !profileUser) {
+    return null; // Redirect already handled or user not found
   }
-
-  if (!user) {
-    return <p className="text-center mt-8">User not found.</p>;
-  }
-
-  // Transform UserDetail to UserForForm for initialData prop
-  const userForForm: UserForForm = {
-    id: user.id,
-    username: user.username,
-    email: user.email,
-    firstName: user.firstName,
-    lastName: user.lastName,
-    profileImageUrl: user.profileImageUrl || undefined,
-    phone: user.phone || undefined,
-    //dateOfBirth: user.dateOfBirth || undefined,
-    nationality: user.nationality || undefined,
-    gender: user.gender || undefined,
-    bio: user.bio || undefined,
-    avatarUrl: user.avatarUrl || undefined,
-    preferredLanguage: user.preferredLanguage || undefined,
-    timezone: user.timezone || undefined,
-    password: "", // Always empty for security
-  };
 
   return (
-    <div className="container mx-auto p-6 max-w-4xl">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">
-          {isEditMode ? `Edit User: ${user.username}` : `User Profile: ${user.username}`}
-        </h1>
-        <div className="space-x-4">
-          {!isEditMode ? (
-            <Button onClick={() => setIsEditMode(true)} disabled={isSubmitting}>
-              Edit Profile
-            </Button>
-          ) : (
-            <Button variant="outline" onClick={() => setIsEditMode(false)} disabled={isSubmitting}>
-              Cancel Edit
-            </Button>
-          )}
-          <Button variant="danger" onClick={handleDeleteUser} disabled={isSubmitting}>
-            Delete User
-          </Button>
-        </div>
-      </div>
-
-      {isEditMode ? (
-        <UserForm
-          initialData={userForForm}
-          onSubmit={handleUpdateUser}
-          isLoading={isSubmitting}
-          isEditMode={true}
-        />
-      ) : (
-        <div className="bg-white p-6 rounded-lg shadow-md space-y-4">
-          <div className="flex items-center space-x-4 mb-4">
-            {user.profileImageUrl && (
-              <img
-                src={user.profileImageUrl}
-                alt={`${user.username} Profile`}
-                className="w-24 h-24 rounded-full object-cover"
-              />
+    <div className="container mx-auto py-8">
+      <Card className="max-w-4xl mx-auto shadow-lg rounded-lg">
+        <CardHeader>
+          <div className="flex justify-between items-start">
+            <div>
+              <CardTitle className="text-3xl font-bold text-gray-900">{profileUser.username}</CardTitle>
+              <CardDescription className="text-gray-600 mt-1">{profileUser.email}</CardDescription>
+            </div>
+            {canEdit && (
+              <Button onClick={() => router.push(`/admin/users/edit/${profileUser.id}`)} variant="default">
+                Edit Profile
+              </Button>
             )}
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {profileUser.avatarUrl && (
+            <img src={profileUser.avatarUrl} alt={`${profileUser.username}'s avatar`} className="w-24 h-24 object-cover rounded-full border-2 border-gray-200 mb-4" />
+          )}
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
             <div>
-              <p className="text-lg font-semibold">{user.firstName} {user.lastName}</p>
-              <p className="text-gray-600">@{user.username}</p>
-              <p className="text-gray-600">{user.email}</p>
+              <p className="text-sm font-medium text-gray-500">Full Name</p>
+              <p className="text-lg font-semibold">{profileUser.firstName} {profileUser.lastName}</p>
             </div>
+            <div>
+              <p className="text-sm font-medium text-gray-500">Status</p>
+              <Badge variant={profileUser.isActive ? "success" : "destructive"}>
+                {profileUser.isActive ? 'Active' : 'Inactive'}
+              </Badge>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-gray-500">Verified</p>
+              <Badge variant={profileUser.isVerified ? "success" : "destructive"}>
+                {profileUser.isVerified ? 'Verified' : 'Not Verified'}
+              </Badge>
+            </div>
+            {profileUser.tenantId && (
+              <div>
+                <p className="text-sm font-medium text-gray-500">Tenant</p>
+                <p className="text-lg font-semibold">
+                  {/* If UserDetail doesn't include tenant name, you might need to fetch it */}
+                  {profileUser.tenantId} {/* Display ID, or fetch name if needed */}
+                </p>
+              </div>
+            )}
+            {profileUser.phone && (
+              <div>
+                <p className="text-sm font-medium text-gray-500">Phone</p>
+                <p className="text-lg font-semibold">{profileUser.phone}</p>
+              </div>
+            )}
+            {profileUser.dateOfBirth && (
+              <div>
+                <p className="text-sm font-medium text-gray-500">Date of Birth</p>
+                <p className="text-lg font-semibold">{new Date(profileUser.dateOfBirth).toLocaleDateString()}</p>
+              </div>
+            )}
+            {profileUser.nationality && (
+              <div>
+                <p className="text-sm font-medium text-gray-500">Nationality</p>
+                <p className="text-lg font-semibold">{profileUser.nationality}</p>
+              </div>
+            )}
+            {profileUser.gender && (
+              <div>
+                <p className="text-sm font-medium text-gray-500">Gender</p>
+                <p className="text-lg font-semibold">{profileUser.gender}</p>
+              </div>
+            )}
+            {profileUser.preferredLanguage && (
+              <div>
+                <p className="text-sm font-medium text-gray-500">Preferred Language</p>
+                <p className="text-lg font-semibold">{profileUser.preferredLanguage}</p>
+              </div>
+            )}
+            {profileUser.timezone && (
+              <div>
+                <p className="text-sm font-medium text-gray-500">Timezone</p>
+                <p className="text-lg font-semibold">{profileUser.timezone}</p>
+              </div>
+            )}
           </div>
 
-          <p><span className="font-medium">Roles:</span> {user.roles.map(role => role.replace(/_/g, ' ')).join(', ')}</p>
-          <p><span className="font-medium">Status:</span> {user.isActive ? 'Active' : 'Inactive'} / {user.isVerified ? 'Verified' : 'Unverified'}</p>
-          {user.phone && <p><span className="font-medium">Phone:</span> {user.phone}</p>}
-          {user.dateOfBirth && <p><span className="font-medium">Date of Birth:</span> {new Date(user.dateOfBirth).toLocaleDateString()}</p>}
-          {user.nationality && <p><span className="font-medium">Nationality:</span> {user.nationality}</p>}
-          {user.gender && <p><span className="font-medium">Gender:</span> {user.gender}</p>}
-          {user.preferredLanguage && <p><span className="font-medium">Preferred Language:</span> {user.preferredLanguage}</p>}
-          {user.timezone && <p><span className="font-medium">Timezone:</span> {user.timezone}</p>}
-          {user.bio && (
+          {profileUser.bio && (
             <div>
-              <span className="font-medium">Bio:</span>
-              <p className="whitespace-pre-wrap">{user.bio}</p>
+              <p className="text-sm font-medium text-gray-500">Bio</p>
+              <p className="text-base text-gray-800">{profileUser.bio}</p>
             </div>
           )}
-          {user.tenantId && <p><span className="font-medium">Tenant ID:</span> {user.tenantId}</p>}
-          {user.managingLeagueId && <p><span className="font-medium">Managing League ID:</span> {user.managingLeagueId}</p>}
-          {user.managingTeamId && <p><span className="font-medium">Managing Team ID:</span> {user.managingTeamId}</p>}
 
-          <div className="mt-6 border-t pt-4">
-            <h3 className="text-xl font-semibold mb-2">Audit Information</h3>
-            <p className="text-sm text-gray-500">Created At: {new Date(user.createdAt).toLocaleString()}</p>
-            <p className="text-sm text-gray-500">Last Updated At: {new Date(user.updatedAt).toLocaleString()}</p>
-            {user.lastLoginAt && <p className="text-sm text-gray-500">Last Login At: {new Date(user.lastLoginAt).toLocaleString()}</p>}
-            {user.deletedAt && <p className="text-sm text-red-500">Deleted At: {new Date(user.deletedAt).toLocaleString()}</p>}
+          <div className="text-sm text-gray-500 mt-6 border-t pt-4">
+            <p>Created At: {new Date(profileUser.createdAt).toLocaleString()}</p>
+            <p>Last Updated: {new Date(profileUser.updatedAt).toLocaleString()}</p>
+            {profileUser.lastLoginAt && <p>Last Login: {new Date(profileUser.lastLoginAt).toLocaleString()}</p>}
           </div>
-        </div>
-      )}
+        </CardContent>
+      </Card>
     </div>
   );
 }

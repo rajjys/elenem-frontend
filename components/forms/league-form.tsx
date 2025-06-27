@@ -226,13 +226,14 @@ export function LeagueForm({
         const params = new URLSearchParams({
           roles: Role.GENERAL_USER.toString(),
           pageSize: '100',
+          tenantId: currentTenantId || '',
         });
         // For league owner, it can be any GENERAL_USER in the system, or one specific to the tenant
         // For now, let's fetch all general users not assigned to a specific tenant OR those in the current tenant
         // A more robust solution might fetch users based on selected tenant.
         // If system admin is creating, they see all. If tenant admin, they only see users within their tenant.
         if (isTenantAdmin && currentTenantId) {
-          params.append('tenantId', currentTenantId);
+          //params.append('tenantId', currentTenantId);
         } else if (isSystemAdmin) {
           // If system admin, fetch all general users, potentially cross-tenant
           // Or, dynamically fetch based on selected tenant in the form
@@ -287,7 +288,7 @@ export function LeagueForm({
             pageSize: '100', // Fetch all potential parent leagues within the tenant
             // A parent league usually has no parent itself (or null) and is a top-level league
             // The backend query should filter for this to prevent circular references and illogical nesting
-            parentLeagueId: 'null', // Assuming parent leagues are those without a parent themselves
+            ///parentLeagueId: 'null', // Assuming parent leagues are those without a parent themselves
           });
           const response = await api.get<PaginatedLeaguesResponseDto>(`/leagues?${params.toString()}`);
           // Filter out the current league itself in edit mode to prevent self-parenting

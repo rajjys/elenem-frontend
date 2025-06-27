@@ -59,7 +59,7 @@ export const TenantDetailsSchema = z.object({
   name: z.string().min(1, "Tenant name is required").max(100),
   description: z.string().nullable().optional(),
   tenantCode: z.string().min(3, "Tenant code must be at least 3 characters").max(7, "Tenant code must be at most 7 characters").regex(/^[A-Z0-9]+$/, "Tenant code must be uppercase alphanumeric"),
-  TenantType: TenantTypeSchema,
+  tenantType: TenantTypeSchema,
   sportType: SportTypeSchema,
   country: z.string().min(2, "Country is required").max(2, "Country must be a 2-letter ISO code"), // ISO 2-letter code
   region: z.string().nullable().optional(),
@@ -79,6 +79,16 @@ export const TenantDetailsSchema = z.object({
     firstName: z.string().nullable().optional(),
     lastName: z.string().nullable().optional(),
   }).nullable().optional(), // Expanded owner details
+  leagues: z.array(z.object({
+    id: z.string().cuid(),
+    name: z.string(),
+    leagueCode: z.string(),
+    sportType: SportTypeSchema,
+    country: z.string().optional(),
+    isActive: z.boolean(),
+    createdAt: z.preprocess((arg) => new Date(arg as string), z.date()),
+    updatedAt: z.preprocess((arg) => new Date(arg as string), z.date()),
+  })).optional(), // Optional array of leagues associated with the tenant
 });
 
 export type TenantDetails = z.infer<typeof TenantDetailsSchema>;

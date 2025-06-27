@@ -2,7 +2,7 @@
 "use client";
 
 import React from 'react';
-import { useRouter } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { TenantForm } from '@/components/forms/tenant-form';
 import { Button } from '@/components/ui/button';
 import { TenantDetails, TenantDetailsSchema } from '@/prisma';
@@ -18,7 +18,7 @@ interface EditTenantPageProps {
 
 export default function EditTenantPage({ params }: EditTenantPageProps) {
   const router = useRouter();
-  const { tenantId } = params;
+  const { tenantId } = useParams<{ tenantId: string }>();
 
   const [tenantData, setTenantData] = React.useState<TenantDetails | null>(null);
   const [loading, setLoading] = React.useState(true);

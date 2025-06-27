@@ -2,13 +2,14 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { api } from '@/services/api';
 import { TenantDetails, TenantDetailsSchema } from '@/prisma/';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { countryNameToCode } from '@/utils';
+import { LeaguesTable } from '@/components/league';
 
 interface TenantDetailPageProps {
   params: {
@@ -18,7 +19,7 @@ interface TenantDetailPageProps {
 
 export default function TenantDetailPage({ params }: TenantDetailPageProps) {
   const router = useRouter();
-  const { tenantId } = params;
+  const { tenantId } = useParams<{ tenantId: string }>();
 
   const [tenant, setTenant] = useState<TenantDetails | null>(null);
   const [loading, setLoading] = useState(true);
@@ -29,7 +30,7 @@ export default function TenantDetailPage({ params }: TenantDetailPageProps) {
     setLoading(true);
     setError(null);
     try {
-      const response = await api.get(`/system-admin/tenants/${tenantId}`);
+      const response = await api.get(`/tenants/${tenantId}`);
       console.log(response);
       const validatedTenant = TenantDetailsSchema.parse(response.data);
       setTenant(validatedTenant);
@@ -62,7 +63,7 @@ export default function TenantDetailPage({ params }: TenantDetailPageProps) {
     }
     setIsDeleting(true);
     try {
-      await api.delete(`/system-admin/tenants/${tenantId}`); // Soft delete endpoint
+      await api.delete(`/tenants/${tenantId}`); // Soft delete endpoint
       toast.success("Tenant soft-deleted successfully!");
       router.push('/admin/tenants'); // Redirect to tenant list
     } catch (err: any) {
@@ -173,6 +174,14 @@ export default function TenantDetailPage({ params }: TenantDetailPageProps) {
           <p className="text-sm text-gray-500">Last Updated At: {new Date(tenant.updatedAt).toLocaleString()}</p>
         </div>
       </div>
+      <LeaguesTable 
+        leagues={tenant.leagues || []} 
+        onSort={function (sortBy: 'name' | 'sportType' | 'country' | 'establishedYear' | 'createdAt' | 'updatedAt' | 'leagueCode' | 'ownerUsername' | 'division'): void {
+          throw new Error('Function not implemented.');
+        } } sortOrder={'desc'} sortBy={''} onDelete={function (leagueId: string): void {
+          throw new Error('Function not implemented.');
+        } }        
+      />
     </div>
   );
 }

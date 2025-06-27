@@ -1,6 +1,6 @@
 // src/prisma/user-schemas.ts
 import * as z from 'zod';
-import { GenderSchema, Role, RoleSchema, SupportedLanguage, SupportedLanguageSchema } from '.';// Assuming Role enum is exported from your main prisma.ts or similar
+import { GenderSchema, Role, RoleSchema, SupportedLanguage, SupportedLanguageSchema, TenantLiteResponseSchema } from '.';// Assuming Role enum is exported from your main prisma.ts or similar
 
 // --- Enums ---
 
@@ -59,6 +59,11 @@ export const UserDetailSchema = UserBasicSchema.extend({
 
   // Tenant, League, Team association IDs (nullable for filtering/selection)
   tenantId: z.string().cuid().optional().nullable(),
+  tenant: z.object({
+    id: z.string(),
+    name: z.string(),
+    leagueCode: z.string(),
+  }).optional().nullable(),
   managingLeagueId: z.string().cuid().optional().nullable(), // Unique for LEAGUE_ADMIN
   managingTeamId: z.string().cuid().optional().nullable(),
 });
