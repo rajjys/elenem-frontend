@@ -45,8 +45,8 @@ const systemNavItems = [
     icon: FiBox,
     subItems: [
       { label: "Manage Tenants", basePath: "/admin/tenants", icon: FiUsers },
-      { label: "Manage All Users", basePath: "/admin/users", icon: FiUsers },
       { label: "Manage Leagues", basePath: "/admin/leagues", icon: FiTv},
+      { label: "Manage All Users", basePath: "/admin/users", icon: FiUsers },
       { label: "Roles & Permissions", basePath: "/admin/roles", icon: FiShield },
       { label: "Global Announcements", basePath: "/admin/announcements", icon: FiVolume2 },
       { label: "Data Management", basePath: "/admin/data", icon: FiDatabase },

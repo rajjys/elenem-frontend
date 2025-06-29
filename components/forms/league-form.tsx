@@ -30,7 +30,9 @@ import {
   BonusPointRule,
   TieBreakerRule,
   PaginatedTenantsResponseDto,
-  PaginatedLeaguesResponseDto
+  PaginatedLeaguesResponseDto,
+  PaginatedUsersResponseSchema,
+  UserBasic
 } from '@/prisma/'; // Adjust import path as per your project structure
 import { api } from '@/services/api';
 import { countryNameToCode, sanitizeEmptyStrings } from '@/utils/'; // Assuming utils exists
@@ -189,7 +191,7 @@ export function LeagueForm({
   } = form;
 
   const [loadingUsers, setLoadingUsers] = useState(false);
-  const [availableOwners, setAvailableOwners] = useState<UserResponseDto[]>([]);
+  const [availableOwners, setAvailableOwners] = useState<UserBasic[]>([]);
   const [loadingTenants, setLoadingTenants] = useState(false);
   const [availableTenants, setAvailableTenants] = useState<TenantBasicDto[]>([]);
   const [loadingParentLeagues, setLoadingParentLeagues] = useState(false);
@@ -224,25 +226,13 @@ export function LeagueForm({
       setLoadingUsers(true);
       try {
         const params = new URLSearchParams({
-          roles: Role.GENERAL_USER.toString(),
-          pageSize: '100',
+          //roles: Role.GENERAL_USER.toString(),
+          //pageSize: '100',
           tenantId: currentTenantId || '',
         });
-        // For league owner, it can be any GENERAL_USER in the system, or one specific to the tenant
-        // For now, let's fetch all general users not assigned to a specific tenant OR those in the current tenant
-        // A more robust solution might fetch users based on selected tenant.
-        // If system admin is creating, they see all. If tenant admin, they only see users within their tenant.
-        if (isTenantAdmin && currentTenantId) {
-          //params.append('tenantId', currentTenantId);
-        } else if (isSystemAdmin) {
-          // If system admin, fetch all general users, potentially cross-tenant
-          // Or, dynamically fetch based on selected tenant in the form
-          // For simplicity, let's fetch users not assigned to any tenant or those with a tenantId.
-          // In a real system, you might fetch users belonging to the currently selected tenant.
-        }
-
-        const response = await api.get<PaginatedResponseDto>(`/system-admin/users?${params.toString()}`); // Assuming this endpoint handles roles
-        setAvailableOwners(response.data.data);
+        const response = await api.get(`/users?${params.toString()}`);
+        const validatedOwners = PaginatedUsersResponseSchema.parse(response.data);
+        setAvailableOwners(validatedOwners.data);
       } catch (error) {
         console.error('Failed to fetch users for owner dropdown:', error);
         toast.error("Failed to load users for owner selection.");

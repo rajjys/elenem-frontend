@@ -48,7 +48,7 @@ export default function AdminUsersPage() {
       if (filters.sortBy) params.append('sortBy', filters.sortBy);
       if (filters.sortOrder) params.append('sortOrder', filters.sortOrder);
 
-      const response = await api.get(`/system-admin/users?${params.toString()}`);
+      const response = await api.get(`/users?${params.toString()}`);
       const validatedData = PaginatedUsersResponseSchema.parse(response.data);
 
       setUsers(validatedData.data);
@@ -98,7 +98,7 @@ type SortableColumn = "firstName" | "lastName" | "username" | "email" | "created
       return;
     }
     try {
-      await api.delete(`/system-admin/users/${userId}`); // Assuming DELETE /admin/users/:id endpoint
+      await api.delete(`/users/${userId}`); // Assuming DELETE /admin/users/:id endpoint
       toast.success('User deleted successfully.');
       fetchUsers(); // Re-fetch users to update the list
     } catch (err: any) {

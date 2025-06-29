@@ -19,6 +19,7 @@ import {
   PaginatedResponseDto,
   SportType,
   Role,
+  TenantType,
  
 } from '@/prisma/'; // Import types and schemas, including UserResponseDto and PaginatedResponseDto
 
@@ -48,6 +49,7 @@ export function TenantForm({ initialData, isEditMode = false, onSuccess, onCance
         description: initialData?.description ?? undefined,
         tenantCode: initialData?.tenantCode || '',
         sportType: initialData?.sportType || SportType.FOOTBALL,
+        tenantType: initialData?.tenantType || TenantType.COMMERCIAL,
         country: initialData?.country || '',
         region: initialData?.region ?? undefined,
         city: initialData?.city ?? undefined,
@@ -63,6 +65,7 @@ export function TenantForm({ initialData, isEditMode = false, onSuccess, onCance
         description: undefined,
         tenantCode: '',
         sportType: SportType.FOOTBALL,
+        tenantType: initialData?.tenantType || TenantType.COMMERCIAL,
         country: '',
         region: undefined,
         city: undefined,
@@ -97,7 +100,7 @@ export function TenantForm({ initialData, isEditMode = false, onSuccess, onCance
           pageSize: '100', // Fetch a reasonable number, consider pagination for large user bases
         });
         params.append('tenantId', 'null');
-        const response = await api.get<PaginatedResponseDto>(`/system-admin/users?${params.toString()}`);
+        const response = await api.get<PaginatedResponseDto>(`/users?${params.toString()}`);
         setAvailableOwners(response.data.data);
       } catch (error) {
         console.error('Failed to fetch users for owner dropdown:', error);
@@ -129,12 +132,12 @@ export function TenantForm({ initialData, isEditMode = false, onSuccess, onCance
       let response;
       if (isEditMode && initialData?.id) {
         // Update existing tenant
-        response = await api.put(`/system-admin/tenants/${initialData.id}`, payload);
+        response = await api.put(`/tenants/${initialData.id}`, payload);
         console.log(response);
         toast.success("Tenant updated successfully!");
       } else {
         // Create new tenant
-        response = await api.post('/system-admin/tenants', payload);
+        response = await api.post('/tenants', payload);
         toast.success("Tenant created successfully!");
         reset(defaultFormValues); // Reset form for new creation
       }
@@ -200,6 +203,9 @@ export function TenantForm({ initialData, isEditMode = false, onSuccess, onCance
           onValueChange={(value: SportType) => setValue('sportType', value)}
           disabled={isSubmitting}
         >
+          <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select Sport" />
+            </SelectTrigger>
           <SelectContent>
             {Object.values(SportType).map((type) => (
               <SelectItem key={type} value={type} >
@@ -210,7 +216,27 @@ export function TenantForm({ initialData, isEditMode = false, onSuccess, onCance
         </Select>
         {errors.sportType && <p className="text-red-500 text-xs mt-1">{errors.sportType.message}</p>}
       </div>
-
+      {/* Tenant Type Dropdown - NEW */}
+      <div>
+        <Label htmlFor="tenantType" required={!isEditMode}>Tenant Type</Label>
+        <Select
+          value={watch('tenantType')}
+          onValueChange={(value: TenantType) => setValue('tenantType', value)}
+          disabled={isSubmitting}
+        >
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="Select a tenant type" />
+          </SelectTrigger>
+          <SelectContent>
+            {Object.values(TenantType).map((type) => (
+              <SelectItem key={type} value={type}>
+                {type.replace(/_/g, ' ')}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        {errors.tenantType && <p className="text-red-500 text-xs mt-1">{errors.tenantType.message}</p>}
+      </div>
       <div>
         <Label htmlFor="description">Description</Label>
         <TextArea id="description" {...register('description')} disabled={isSubmitting} rows={3} />

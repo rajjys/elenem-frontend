@@ -7,7 +7,7 @@ import { UserForm } from '@/components/forms/user-form';
 import { toast } from 'sonner';
 
 export default function EditUserPage() {
-  const { id } = useParams<{ id: string }>();
+  const { userId } = useParams<{ userId: string }>();
   const router = useRouter();
 
   const handleSuccess = (userId: string) => {
@@ -22,7 +22,7 @@ export default function EditUserPage() {
   return (
     <div className="container mx-auto py-8">
       <UserForm
-        userId={id} // Pass the ID to the form for fetching initial data
+        userId={userId} // Pass the ID to the form for fetching initial data
         isEditMode={true}
         onSuccess={handleSuccess}
         onCancel={handleCancel}

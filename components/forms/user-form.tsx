@@ -55,9 +55,9 @@ export function UserForm({
   onSuccess,
   onCancel,
 }: UserFormProps) {
-  const userAuth = useAuthStore((state) => state.user); // Get user from auth store
-  const currentUserRoles = userAuth?.roles || [];
-  const currentUsersTenantId = userAuth?.tenantId;
+  const user = useAuthStore((state) => state.user); // Get user from auth store
+  const currentUserRoles = user?.roles || [];
+  const currentUsersTenantId = user?.tenantId;
   const isSystemAdmin = currentUserRoles.includes(Role.SYSTEM_ADMIN);
   const isTenantAdmin = currentUserRoles.includes(Role.TENANT_ADMIN);
   const isLeagueAdmin = currentUserRoles.includes(Role.LEAGUE_ADMIN);
@@ -181,7 +181,7 @@ export function UserForm({
   const displayTenantName = initialUserData?.tenant?.name || availableTenants.find(t => t.id === currentUsersTenantId)?.name;
 
   const onSubmit = useCallback(async (data: UserFormValues) => {
-    if (!userAuth) {
+    if (!user) {
       toast.error("Authentication required.", { description: "Please log in to perform this action." });
       return;
     }
@@ -229,10 +229,10 @@ export function UserForm({
       toast.error(`Error ${isEditMode ? 'updating' : 'creating'} user`, { description: errorMessage });
       console.error(`${isEditMode ? 'Update' : 'Create'} user error:`, err);
     }
-  }, [isEditMode, userId, onSuccess, reset, userAuth]); // Add userAuth to dependencies
+  }, [isEditMode, userId, onSuccess, reset, user]); // Add userAuth to dependencies
 
   // Overall loading state for the form
-  const overallLoading = isSubmitting || loadingForm || loadingTenants || userAuth === undefined;
+  const overallLoading = isSubmitting || loadingForm || loadingTenants || user === undefined;
 
   // Authorization check for rendering the form
   const isAuthorizedToViewForm =
@@ -240,7 +240,7 @@ export function UserForm({
     (isTenantAdmin && currentUsersTenantId !== null) ||
     (isLeagueAdmin && currentUsersTenantId !== null);
 
-  if (userAuth === undefined) { // Still loading auth state
+  if (user === undefined) { // Still loading auth state
     return (
       <div className="flex justify-center items-center h-screen">
         <p>Loading authentication state...</p>
@@ -248,7 +248,7 @@ export function UserForm({
     );
   }
 
-  if (userAuth === null) { // Not authenticated
+  if (user === null) { // Not authenticated
     toast.error("Authentication required", { description: "Please log in to access user management." });
     // This redirect should ideally happen at the page level, but as a fallback for the component
     if (typeof window !== 'undefined') {

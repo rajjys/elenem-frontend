@@ -17,8 +17,8 @@ export const UserBasicSchema = z.object({
   lastName: z.string().min(1, 'Last name is required'),
   roles: z.array((RoleSchema)).default([Role.GENERAL_USER]), // User can have multiple roles
   isActive: z.boolean(),
-  avatarUrl: z.string().url().optional().or(z.literal('')), // Allowing empty string for optional URL
-  profileImageUrl: z.string().url().optional().or(z.literal('')), // Allowing empty string for optional URL
+  avatarUrl: z.string().url().optional().or(z.literal('')).nullable(), // Allowing empty string for optional URL
+  profileImageUrl: z.string().url().optional().or(z.literal('')).nullable(), // Allowing empty string for optional URL
   createdAt: z.preprocess((arg) => (typeof arg === 'string' ? new Date(arg) : arg), z.date()),
   updatedAt: z.preprocess((arg) => (typeof arg === 'string' ? new Date(arg) : arg), z.date()),
 });
@@ -79,7 +79,7 @@ export const CreateUserSchema = z.object({
   password: z.string().min(8, 'Password must be at least 8 characters long'),
   firstName: z.string().min(1, 'First name is required'),
   lastName: z.string().min(1, 'Last name is required'),
-  profileImageUrl: z.string().url('Invalid URL').optional().or(z.literal('')),
+  profileImageUrl: z.string().url('Invalid URL').optional().or(z.literal('')).nullable(),
   phone: z.string().optional().or(z.literal('')),
   dateOfBirth: z.string().optional(), // Send as ISO date string if present
   nationality: z.string().optional().or(z.literal('')),
@@ -102,7 +102,7 @@ export const UpdateUserSchema = z.object({
   email: z.string().email('Invalid email address').optional(),
   firstName: z.string().min(1, 'First name is required').optional(),
   lastName: z.string().min(1, 'Last name is required').optional(),
-  profileImageUrl: z.string().url('Invalid URL').optional().or(z.literal('')),
+  profileImageUrl: z.string().url('Invalid URL').optional().or(z.literal('')).nullable(),
   phone: z.string().optional().or(z.literal('')),
   dateOfBirth: z.string().optional(), // Send as ISO date string if present
   nationality: z.string().optional().or(z.literal('')),

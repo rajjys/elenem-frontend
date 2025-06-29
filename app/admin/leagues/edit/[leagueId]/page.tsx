@@ -23,7 +23,6 @@ export default function EditLeaguePage() {
   useEffect(() => {
     if (user) {
       setCurrentUserRoles(user.roles || []);
-      setCurrentTenantId(user.tenantId || undefined);
 
       const canEdit = user.roles.includes(Role.SYSTEM_ADMIN) || user.roles.includes(Role.TENANT_ADMIN);
       setIsAuthorized(canEdit);
@@ -46,6 +45,7 @@ export default function EditLeaguePage() {
               return;
             }
             setLeague(response.data);
+            setCurrentTenantId(response.data.tenantId || undefined);
           } catch (error) {
             console.error('Failed to fetch league details:', error);
             toast.error("Failed to load league details.", { description: "League not found or access denied." });
