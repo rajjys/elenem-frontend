@@ -1,13 +1,14 @@
 /// User Model frontend DTO
 
 import z from "zod";
-import { Gender, Role } from ".";
+import { Gender, Role, SportType, SportTypeSchema } from ".";
 
 // Basic Tenant type for nested relations in User
 interface BasicTenant {
   id: string;
   externalId: string;
   name: string;
+  sportType: SportType
 }
 
 // Basic League type for nested relations in User
@@ -79,6 +80,7 @@ export const UserSchema = z.object({
     id: z.string().cuid(),
     externalId: z.string().uuid(),
     name: z.string(),
+    //sportType: z.nativeEnum(SportType),
   }).nullable().optional(),
 
   managingLeagueId: z.string().cuid().nullable().optional(),

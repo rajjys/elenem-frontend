@@ -148,7 +148,7 @@ export function LeaguesTable({ leagues, onSort, sortBy, sortOrder, onDelete }: L
                 </div>
               </TableCell>
               <TableCell className="px-6 py-4 whitespace-nowrap">
-                <div className="text-sm text-gray-900">{league.sportType}</div>
+                <div className="text-sm text-gray-900">{league.tenant.sportType}</div>
               </TableCell>
               <TableCell className="px-6 py-4 whitespace-nowrap">
                 <div className="text-sm text-gray-900">{league.country || 'N/A'}</div>

@@ -19,6 +19,7 @@ export default function EditLeaguePage() {
   const [currentUserRoles, setCurrentUserRoles] = useState<Role[]>([]);
   const [currentTenantId, setCurrentTenantId] = useState<string | undefined>(undefined);
   const [isAuthorized, setIsAuthorized] = useState(false);
+  const isEditMode = true; //This is an edit page
 
   useEffect(() => {
     if (user) {
@@ -60,8 +61,9 @@ export default function EditLeaguePage() {
         router.push('/admin/leagues'); // Redirect if no ID
       }
     } else if (!user) {
+      ///this is handled by the middleware but you can uncomment this if you want to redirect to login
       toast.error("Authentication required", { description: "Please log in to edit a league." });
-      router.push('/login');
+      //router.push('/login');
     }
   }, [leagueId, user, router]);
 
@@ -96,8 +98,6 @@ export default function EditLeaguePage() {
       <LeagueForm
         initialData={league}
         isEditMode
-        currentUserRoles={currentUserRoles}
-        currentTenantId={currentTenantId}
         onSuccess={handleSuccess}
         onCancel={handleCancel}
       />

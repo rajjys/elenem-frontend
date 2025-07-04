@@ -7,6 +7,7 @@ export const TenantLiteResponseSchema = z.object({
   id: z.string().cuid(),
   name: z.string(),
   tenantCode: z.string(),
+  sportType: SportTypeSchema,
 });
 export type TenantLiteResponseDto = z.infer<typeof TenantLiteResponseSchema>;
 
@@ -50,8 +51,6 @@ export const LeagueBasicSchema: z.ZodSchema<any> = z.lazy(() => z.object({
   description: z.string().nullable().optional(),
   logoUrl: z.string().nullable().optional(),
   bannerImageUrl: z.string().nullable().optional(),
-  sportType: SportTypeSchema,
-
   isActive: z.boolean(),
   visibility: LeagueVisibilitySchema,
 
@@ -94,7 +93,7 @@ export const LeagueFilterParamsSchema = z.object({
     search: z.string().optional(),
     tenantIds: z.array(z.string().cuid()).optional(), // Assuming CUIDs
     leagueIds: z.array(z.string().cuid()).optional(), // Assuming CUIDs
-    sportType: z.nativeEnum(SportType).optional(),
+    sportType: SportTypeSchema.optional(),
     country: z.string().optional(),
     visibility: z.nativeEnum(LeagueVisibility).optional(),
     isActive: z.boolean().optional(),
@@ -143,7 +142,8 @@ export const PointSystemConfigSchema = z.object({
 
 export const TieBreakerRuleSchema = z.object({
   order: z.number().int().min(1),
-  metric: z.string().min(1, "Metric is required"), // e.g., "HEAD_TO_HEAD_POINTS", "GOAL_DIFFERENCE"
+  rule: z.string().min(1, "rule is required"), // e.g., "HEAD_TO_HEAD_POINTS", "GOAL_DIFFERENCE"
+  description: z.string().min(1, "Description is required"), // e.g., "Points in head-to-head matches"
   sort: z.enum(['ASC', 'DESC', 'RANDOM']),
 });
 
@@ -155,7 +155,6 @@ export const CreateLeagueSchema = z.object({
   name: z.string().min(1, 'League name is required').max(100, 'League name cannot exceed 100 characters'),
   description: z.string().max(500, 'Description cannot exceed 500 characters').optional().nullable(),
   leagueCode: z.string().min(3, 'League code must be at least 3 characters').max(10, 'League code cannot exceed 10 characters').toUpperCase(),
-  sportType: z.nativeEnum(SportType),
   visibility: z.nativeEnum(LeagueVisibility).default(LeagueVisibility.PUBLIC).optional(),
   gender: z.nativeEnum(Gender),
   country: z.string().min(2, 'Country is required').max(2), // ISO 2-letter code

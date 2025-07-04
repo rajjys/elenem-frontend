@@ -36,6 +36,7 @@ export default function LeagueProfilePage() {
       const fetchLeague = async () => {
         try {
           const response = await api.get<LeagueDetails>(`/leagues/${leagueId}`);
+          console.log('Fetched league details:', response.data);
           setLeague(response.data);
 
           // Determine if user can edit this specific league
@@ -59,8 +60,8 @@ export default function LeagueProfilePage() {
       };
       fetchLeague();
     } else if (!user) {
-      toast.error("Authentication required", { description: "Please log in to view league details." });
-      router.push('/login');
+      //toast.error("Authentication required", { description: "Please log in to view league details." });
+      //router.push('/login');
     }
   }, [leagueId, user, router]);
 
@@ -107,7 +108,7 @@ export default function LeagueProfilePage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
             <div>
               <p className="text-sm font-medium text-gray-500">Sport Type</p>
-              <p className="text-lg font-semibold">{league.sportType.replace(/_/g, ' ')}</p>
+              <p className="text-lg font-semibold">{league.tenant.sportType.replace(/_/g, ' ')}</p>
             </div>
             <div>
               <p className="text-sm font-medium text-gray-500">Visibility</p>
@@ -206,7 +207,7 @@ export default function LeagueProfilePage() {
               <ol className="list-decimal list-inside space-y-2">
                 {league.tieBreakerConfig.map((breaker, index) => (
                   <li key={index} className="text-gray-700">
-                    <span className="font-semibold">{breaker.metric.replace(/_/g, ' ')}</span> ({breaker.sort})
+                    <span className="font-semibold">{breaker.rule?.replace(/_/g, ' ')}</span> ({breaker.sort})
                   </li>
                 ))}
               </ol>

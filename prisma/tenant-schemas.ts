@@ -83,7 +83,6 @@ export const TenantDetailsSchema = z.object({
     id: z.string().cuid(),
     name: z.string(),
     leagueCode: z.string(),
-    sportType: SportTypeSchema,
     country: z.string().optional(),
     isActive: z.boolean(),
     createdAt: z.preprocess((arg) => new Date(arg as string), z.date()),

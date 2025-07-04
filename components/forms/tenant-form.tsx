@@ -22,6 +22,7 @@ import {
   TenantType,
  
 } from '@/prisma/'; // Import types and schemas, including UserResponseDto and PaginatedResponseDto
+import { init } from 'next/dist/compiled/webpack/webpack';
 
 // Define a union type for form input based on create or update
 type TenantFormValues = 
@@ -95,11 +96,12 @@ export function TenantForm({ initialData, isEditMode = false, onSuccess, onCance
     const fetchUsers = async () => {
       setLoadingUsers(true);
       try {
-        const params = new URLSearchParams({
-          roles: Role.GENERAL_USER.toString(), // Fetch users with GENERAL_USER role
-          pageSize: '100', // Fetch a reasonable number, consider pagination for large user bases
-        });
+
+        const params = new URLSearchParams();
+        const roles = [Role.GENERAL_USER];
+        roles.forEach(role => params.append('roles', role));
         params.append('tenantId', 'null');
+        console.log('Params: ', params.toString());
         const response = await api.get<PaginatedResponseDto>(`/users?${params.toString()}`);
         setAvailableOwners(response.data.data);
       } catch (error) {
@@ -317,8 +319,11 @@ export function TenantForm({ initialData, isEditMode = false, onSuccess, onCance
         {errors.establishedYear && <p className="text-red-500 text-xs mt-1">{errors.establishedYear.message}</p>}
       </div>
 
-      <div>
-        <Label htmlFor="ownerId">Owner (General User)</Label>
+      <div className='py-2'>
+        <Label htmlFor="ownerId">
+                Owner ({isEditMode && initialData?.owner?.username && 
+                  <span>{initialData?.owner?.firstName} - {initialData?.owner?.lastName}</span>})
+        </Label>
         {loadingUsers ? (
           <p className="text-gray-500">Loading users...</p>
         ) : (

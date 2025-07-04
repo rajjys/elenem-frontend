@@ -47,7 +47,7 @@ export default function AdminUsersPage() {
       if (filters.pageSize) params.append('pageSize', String(filters.pageSize));
       if (filters.sortBy) params.append('sortBy', filters.sortBy);
       if (filters.sortOrder) params.append('sortOrder', filters.sortOrder);
-
+      console.log("param: ", params.toString());
       const response = await api.get(`/users?${params.toString()}`);
       const validatedData = PaginatedUsersResponseSchema.parse(response.data);
 

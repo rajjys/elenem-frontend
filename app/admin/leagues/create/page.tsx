@@ -58,8 +58,8 @@ export default function CreateLeaguePage() {
   return (
     <div className="container mx-auto py-8">
       <LeagueForm
-        currentUserRoles={currentUserRoles}
-        currentTenantId={currentTenantId}
+        //currentUserRoles={currentUserRoles}
+        //currentTenantId={currentTenantId}
         onSuccess={handleSuccess}
         onCancel={handleCancel}
       />

@@ -33,7 +33,7 @@ export default function UserProfilePage() {
 
     if (userAuth === null) {
       toast.error("Authentication required", { description: "Please log in to view user profiles." });
-      router.push('/login');
+      //router.push('/login');
       return;
     }
 
@@ -132,7 +132,7 @@ export default function UserProfilePage() {
                 <p className="text-sm font-medium text-gray-500">Tenant</p>
                 <p className="text-lg font-semibold">
                   {/* If UserDetail doesn't include tenant name, you might need to fetch it */}
-                  {profileUser.tenantId} {/* Display ID, or fetch name if needed */}
+                  {profileUser.tenant?.name} {/* Display ID, or fetch name if needed */}
                 </p>
               </div>
             )}

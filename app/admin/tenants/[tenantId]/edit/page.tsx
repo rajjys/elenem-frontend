@@ -29,7 +29,7 @@ export default function EditTenantPage({ params }: EditTenantPageProps) {
       setLoading(true);
       setError(null);
       try {
-        const response = await api.get(`/system-admin/tenants/${tenantId}`);
+        const response = await api.get(`/tenants/${tenantId}`);
         const validatedData = TenantDetailsSchema.parse(response.data);
         setTenantData(validatedData);
       } catch (err: any) {
