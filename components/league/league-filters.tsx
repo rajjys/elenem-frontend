@@ -39,7 +39,7 @@ export function LeagueFilters({ filters, onFilterChange, onPageSizeChange }: Lea
   const [selectedSportType, setSelectedSportType] = useState<SportType | undefined>(filters.sportType);
   const [selectedCountry, setSelectedCountry] = useState<string | undefined>(filters.country);
   const [selectedVisibility, setSelectedVisibility] = useState<LeagueVisibility | undefined>(filters.visibility);
-  const [selectedStatus, setSelectedStatus] = useState<boolean | undefined>(filters.status); // Corresponds to `isActive`
+  const [isActive, setIsActive] = useState<boolean | undefined>(filters.isActive); // Corresponds to `isActive`
   const [selectedGender, setSelectedGender] = useState<Gender | undefined>(filters.gender);
   const [selectedParentLeagueId, setSelectedParentLeagueId] = useState<string | undefined>(filters.parentLeagueId);
   const [selectedDivision, setSelectedDivision] = useState<string | undefined>(filters.division);
@@ -94,7 +94,7 @@ export function LeagueFilters({ filters, onFilterChange, onPageSizeChange }: Lea
     const newSportType = selectedSportType;
     const newCountry = selectedCountry;
     const newVisibility = selectedVisibility;
-    const newStatus = selectedStatus;
+    const newisActive = isActive;
     const newGender = selectedGender;
     const newParentLeagueId = selectedParentLeagueId;
     const newDivision = selectedDivision === '' ? undefined : selectedDivision;
@@ -106,7 +106,7 @@ export function LeagueFilters({ filters, onFilterChange, onPageSizeChange }: Lea
     const hasSportTypeChanged = newSportType !== filters.sportType;
     const hasCountryChanged = newCountry !== filters.country;
     const hasVisibilityChanged = newVisibility !== filters.visibility;
-    const hasStatusChanged = newStatus !== filters.status;
+    const hasStatusChanged = newisActive !== filters.isActive;
     const hasGenderChanged = newGender !== filters.gender;
     const hasParentLeagueIdChanged = newParentLeagueId !== filters.parentLeagueId;
     const hasDivisionChanged = newDivision !== (filters.division || undefined);
@@ -122,7 +122,7 @@ export function LeagueFilters({ filters, onFilterChange, onPageSizeChange }: Lea
         sportType: newSportType,
         country: newCountry,
         visibility: newVisibility,
-        status: newStatus,
+        isActive: newisActive,
         gender: newGender,
         parentLeagueId: newParentLeagueId,
         division: newDivision,
@@ -135,7 +135,7 @@ export function LeagueFilters({ filters, onFilterChange, onPageSizeChange }: Lea
     selectedSportType,
     selectedCountry,
     selectedVisibility,
-    selectedStatus,
+    isActive,
     selectedGender,
     selectedParentLeagueId,
     selectedDivision,
@@ -158,7 +158,7 @@ export function LeagueFilters({ filters, onFilterChange, onPageSizeChange }: Lea
     setSelectedSportType(undefined);
     setSelectedCountry(undefined);
     setSelectedVisibility(undefined);
-    setSelectedStatus(undefined);
+    setIsActive(undefined);
     setSelectedGender(undefined);
     setSelectedParentLeagueId(undefined);
     setSelectedDivision(undefined);
@@ -171,7 +171,7 @@ export function LeagueFilters({ filters, onFilterChange, onPageSizeChange }: Lea
       sportType: undefined,
       country: undefined,
       visibility: undefined,
-      status: undefined,
+      isActive: undefined,
       gender: undefined,
       parentLeagueId: undefined,
       division: undefined,
@@ -216,16 +216,16 @@ export function LeagueFilters({ filters, onFilterChange, onPageSizeChange }: Lea
             <div className="flex items-center space-x-2 mt-2">
               <Switch
                 id="leagueStatus"
-                checked={selectedStatus || false}
-                onCheckedChange={setSelectedStatus}
+                checked={isActive || false}
+                onCheckedChange={setIsActive}
               />
               <Label htmlFor="leagueStatus" className="text-sm font-medium text-gray-700">Active Leagues</Label>
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => setSelectedStatus(undefined)}
+                onClick={() => setIsActive(undefined)}
                 className="ml-2 text-gray-500 hover:bg-gray-100 rounded-md px-2 py-1"
-                disabled={selectedStatus === undefined}
+                disabled={isActive === undefined}
               >
                 Clear
               </Button>

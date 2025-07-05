@@ -53,7 +53,7 @@ export default function AdminLeaguesPage() {
       if (filters.pageSize) params.append('pageSize', String(filters.pageSize));
       if (filters.sortBy) params.append('sortBy', filters.sortBy);
       if (filters.sortOrder) params.append('sortOrder', filters.sortOrder);
-      console.log('Fetching leagues with params:', params.toString());
+      //console.log('Fetching leagues with params:', params.toString());
       // Your actual API call to list leagues
       const response = await api.get(`/leagues?${params.toString()}`);
       // Validate data with Zod schema

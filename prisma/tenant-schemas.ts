@@ -88,6 +88,33 @@ export const TenantDetailsSchema = z.object({
     createdAt: z.preprocess((arg) => new Date(arg as string), z.date()),
     updatedAt: z.preprocess((arg) => new Date(arg as string), z.date()),
   })).optional(), // Optional array of leagues associated with the tenant
+  teams: z.array(z.object({
+    id: z.string().cuid(),
+    name: z.string(),
+    isActive: z.boolean(),
+    createdAt: z.preprocess((arg) => new Date(arg as string), z.date()),
+    updatedAt: z.preprocess((arg) => new Date(arg as string), z.date()),
+  })).optional(),
+  players: z.array(z.object({
+    id: z.string().cuid(),
+    name: z.string(),
+    isActive: z.boolean(),
+    createdAt: z.preprocess((arg) => new Date(arg as string), z.date()),
+    updatedAt: z.preprocess((arg) => new Date(arg as string), z.date()),
+  })).optional(),
+  games: z.array(z.object({
+    id: z.string().cuid(),
+    name: z.string(),
+    createdAt: z.preprocess((arg) => new Date(arg as string), z.date()),
+    updatedAt: z.preprocess((arg) => new Date(arg as string), z.date()),
+  })).optional(),
+  seasons: z.array(z.object({
+    id: z.string().cuid(),
+    name: z.string(),
+    isActive: z.boolean(),
+    createdAt: z.preprocess((arg) => new Date(arg as string), z.date()),
+    updatedAt: z.preprocess((arg) => new Date(arg as string), z.date()),
+  })).optional(),
 });
 
 export type TenantDetails = z.infer<typeof TenantDetailsSchema>;
