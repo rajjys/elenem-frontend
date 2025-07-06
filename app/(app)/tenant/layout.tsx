@@ -85,20 +85,20 @@ const tenantNavItems = [
     label: "Organization",
     icon: FiBriefcase,
     subItems: [
-      { label: "Leagues", basePath: "/tenant/organization/leagues", icon: FiAward },
-      { label: "Users & Staff", basePath: "/tenant/organization/users", icon: FiUsers },
-      { label: "Settings", basePath: "/tenant/organization/settings", icon: FiSettings },
-      { label: "Billing", basePath: "/tenant/organization/billing", icon: FiCreditCard },
+      { label: "Leagues", basePath: "/tenant/leagues", icon: FiAward },
+      { label: "Users & Staff", basePath: "/tenant/users", icon: FiUsers },
+      { label: "Settings", basePath: "/tenant/settings", icon: FiSettings },
+      { label: "Billing", basePath: "/tenant/billing", icon: FiCreditCard },
     ],
   },
   {
     label: "Shared Resources",
     icon: FiShare2,
     subItems: [
-      { label: "Venues", basePath: "/tenant/resources/venues", icon: FiMapPin },
-      { label: "Player Database", basePath: "/tenant/resources/players", icon: FiUsers },
-      { label: "Officials Pool", basePath: "/tenant/resources/officials", icon: FiUserCheck },
-      { label: "Sponsors", basePath: "/tenant/resources/sponsors", icon: FiGift },
+      { label: "Venues", basePath: "/tenant/venues", icon: FiMapPin },
+      { label: "Player Database", basePath: "/tenant/players", icon: FiUsers },
+      { label: "Officials Pool", basePath: "/tenant/officials", icon: FiUserCheck },
+      { label: "Sponsors", basePath: "/tenant/sponsors", icon: FiGift },
     ],
   },
   {
@@ -132,7 +132,7 @@ export default function TenantAdminLayout({ children }: TenantAdminLayoutProps) 
     return (
     <AppLayout
         navItems={tenantNavItems}
-        themeColor="blue" // Or 'blue', 'emerald', etc., as defined in tailwind.config.js
+        themeColor="purple" // Or 'blue', 'emerald', etc., as defined in tailwind.config.js
         headerTitle="Tenant Admin"
         logoIcon={FiAward}
       >

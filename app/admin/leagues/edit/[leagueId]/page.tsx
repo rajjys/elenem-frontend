@@ -5,7 +5,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { LeagueForm } from '@/components/forms/league-form';
 import { api } from '@/services/api';
-import { LeagueDetails, PaginatedResponseDto, Role } from '@/prisma/'; // Adjust import path
+import { LeagueDetails, Role } from '@/prisma/'; // Adjust import path
 import { toast } from 'sonner';
 import { useAuthStore } from '@/store/auth.store';
 
@@ -97,7 +97,7 @@ export default function EditLeaguePage() {
     <div className="container mx-auto py-8">
       <LeagueForm
         initialData={league}
-        isEditMode
+        isEditMode={isEditMode}
         onSuccess={handleSuccess}
         onCancel={handleCancel}
       />

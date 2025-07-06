@@ -1,4 +1,3 @@
-// components/ui/textarea.tsx
 import React from 'react';
 
 interface TextAreaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
@@ -22,7 +21,7 @@ export const TextArea = React.forwardRef<HTMLTextAreaElement, TextAreaProps>(
           rows={3}
           className={`mt-1 block w-full px-3 py-2 border ${
             error ? 'border-red-500' : 'border-gray-300'
-          } rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
+          } rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm`}
           {...props}
         />
         {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
@@ -31,3 +30,5 @@ export const TextArea = React.forwardRef<HTMLTextAreaElement, TextAreaProps>(
   }
 );
 TextArea.displayName = 'TextArea';
+// This TextArea component is a simple wrapper around the HTML <textarea> element.
+// It accepts props for label, error messages, and standard textarea attributes.

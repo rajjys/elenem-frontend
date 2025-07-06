@@ -1,4 +1,4 @@
-import { SearchIcon } from "lucide-react";
+import { SearchIcon } from "lucide-react"; // Assuming you're keeping lucide-react for this icon
 import React from "react";
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
@@ -14,87 +14,33 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ({ label, name, type = 'text', error, required, restrict = 'none', maxCharacters, hint, autoTrim = false, onChange, onBlur, ...props }, ref) => {
     const allowedControlKeys = [
-      'Backspace',
-      'Delete',
-      'ArrowLeft',
-      'ArrowRight',
-      'Tab',
-      'Home',
-      'End',
+      'Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab', 'Home', 'End',
     ];
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-      // Allow control keys regardless of restriction
-      if (allowedControlKeys.includes(e.key)) {
-        return;
-      }
-
-      // Special handling for 'numeric' restrict
-      if (restrict === 'numeric') {
-        if (!/^\d$/.test(e.key)) {
-          e.preventDefault();
-        }
-        return; // Exit early if numeric
-      }
-
-      // Restrict other characters based on `restrict` prop
-      if (restrict === 'alpha' && !/^[a-zA-Z\s]$/.test(e.key)) {
-        // Allow letters + space
-        e.preventDefault();
-      } else if (restrict === 'uppercase') {
-        // For uppercase, we'll convert on change/blur, but still block non-alpha characters
-        if (!/^[a-zA-Z]$/.test(e.key)) {
-          e.preventDefault();
-        }
-      } else if (restrict === 'alphanumeric' && !/^[a-zA-Z0-9]$/.test(e.key)) {
-        e.preventDefault();
-      }
-
-      // Call original onKeyDown if provided
+      if (allowedControlKeys.includes(e.key)) return;
+      if (restrict === 'numeric' && !/^\d$/.test(e.key)) e.preventDefault();
+      else if (restrict === 'alpha' && !/^[a-zA-Z\s]$/.test(e.key)) e.preventDefault();
+      else if (restrict === 'uppercase' && !/^[a-zA-Z]$/.test(e.key)) e.preventDefault();
+      else if (restrict === 'alphanumeric' && !/^[a-zA-Z0-9]$/.test(e.key)) e.preventDefault();
       props.onKeyDown?.(e);
     };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       let value = e.target.value;
-
-      // Apply restriction logic before maxLength for type="number"
-      if (restrict === 'uppercase') {
-        value = value.toUpperCase();
-      }
-
-      if (restrict === 'numeric') {
-        // Ensure only digits are in the value for numeric restriction
-        value = value.replace(/[^0-9]/g, '');
-      }
-
-      // If type is "number" or restrict is "year", manually enforce maxCharacters.
-      // This is crucial because maxLength HTML attribute is ignored for type="number".
+      if (restrict === 'uppercase') value = value.toUpperCase();
+      if (restrict === 'numeric') value = value.replace(/[^0-9]/g, '');
       if ((type === 'number' || restrict === 'year') && maxCharacters !== undefined) {
-        if (value.length > maxCharacters) {
-          value = value.slice(0, maxCharacters);
-        }
+        if (value.length > maxCharacters) value = value.slice(0, maxCharacters);
       }
-
-      e.target.value = value; // Update the input's displayed value
-
-      // Call the original onChange prop if it exists
+      e.target.value = value;
       onChange?.(e);
     };
 
     const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
       let value = e.target.value;
-
-      if (restrict === 'uppercase') {
-        value = value.toUpperCase();
-        e.target.value = value;
-      }
-
-      if (autoTrim && value.trim() !== value) {
-        value = value.trim();
-        e.target.value = value;
-      }
-
-      // Call the original onBlur prop
+      if (restrict === 'uppercase') { value = value.toUpperCase(); e.target.value = value; }
+      if (autoTrim && value.trim() !== value) { value = value.trim(); e.target.value = value; }
       onBlur?.(e);
     };
 
@@ -108,10 +54,10 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
             {required && <span className="text-red-500 ml-1">*</span>}
           </label>
         )}
-        <div className={`relative ${isSearchType ? 'flex items-center' : ''}`}> {/* Wrapper for icon */}
+        <div className={`relative ${isSearchType ? 'flex items-center' : ''}`}>
           {isSearchType && (
-            <div className="absolute left-3"> {/* Icon position */}
-              <SearchIcon />
+            <div className="absolute left-3">
+              <SearchIcon className="h-5 w-5 text-gray-400" /> {/* Added default icon sizing/color */}
             </div>
           )}
           <input
@@ -122,7 +68,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
             maxLength={maxCharacters}
             className={`block w-full px-3 py-2 border ${
               error ? 'border-red-500' : 'border-gray-300'
-            } rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm ${
+            } rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm ${
               isSearchType ? 'pl-10' : ''
             } ${props.className || ''}`}
             {...props}

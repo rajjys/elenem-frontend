@@ -456,12 +456,13 @@ export function LeagueForm({
       )}
 
       {(isTenantAdmin || isLeagueAdmin) && currentUsersTenantId && (
-        <div className="bg-blue-50 border border-blue-200 text-blue-800 p-3 rounded-md text-sm">
-          <p>This league will be associated with tenant:</p>
-          <p className="font-semibold">
-            {initialData?.tenant?.name || availableTenants.find(t => t.id === currentUsersTenantId)?.name || currentUsersTenantId}
+        <div className="bg-blue-50 border border-blue-200 text-blue-800 p-3 rounded-md text-base">
+          <p>Associated with tenant:
+            <span className="pl-1 font-semibold">
+              {initialData?.tenant?.name || userAuth?.tenant?.name || availableTenants.find(t => t.id === currentUsersTenantId)?.name || currentUsersTenantId}
+            </span>
           </p>
-          <p className="text-sm">Sport Type: <span className="font-semibold">{effectiveTenantSportType?.replace(/_/g, ' ')}</span></p>
+          <p className="text-sm">Sport: <span className="font-semibold">{effectiveTenantSportType?.replace(/_/g, ' ')}</span></p>
           <input type="hidden" {...register('tenantId')} value={currentUsersTenantId} />
         </div>
       )}

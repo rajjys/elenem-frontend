@@ -1,4 +1,3 @@
-// components/ui/switch.tsx
 import React from 'react';
 
 interface SwitchProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange'> {
@@ -35,7 +34,7 @@ export const Switch = React.forwardRef<HTMLInputElement, SwitchProps>(
           />
           <div
             className={`w-11 h-6 flex items-center flex-shrink-0 p-1 rounded-full cursor-pointer transition-colors duration-300 ${
-              checked ? 'bg-indigo-600' : 'bg-gray-300'
+              checked ? 'bg-primary-600' : 'bg-gray-300'
             } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
             <div
@@ -51,3 +50,6 @@ export const Switch = React.forwardRef<HTMLInputElement, SwitchProps>(
   }
 );
 Switch.displayName = 'Switch';
+// This Switch component is a custom toggle switch that can be used in forms.
+// It accepts props for label, checked state, error messages, and a callback for when the checked state changes.
+// The switch is styled to match the primary theme color when checked, and it includes accessibility features

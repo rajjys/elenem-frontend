@@ -1,26 +1,8 @@
 import React, { useState, ReactNode, useEffect, useRef, RefObject } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import {
-  FiHome, FiGrid, FiUsers, FiDollarSign, FiSettings, FiServer, FiShield,
-  FiGlobe, FiHelpCircle, FiFileText, FiSearch, FiSmartphone, FiUser, FiLogOut,
-  FiChevronDown, FiChevronRight, FiMenu, FiX, FiBarChart2, FiSliders, FiBell,
-  FiShoppingBag, FiFilm, FiSpeaker, FiBriefcase, FiZap, FiDatabase, FiMessageSquare, FiAward, FiEdit3, FiBox,
-  FiVolume2,
-  FiPackage,
-  FiList,
-  FiTrendingUp,
-  FiCreditCard,
-  FiActivity,
-  FiAlertTriangle,
-  FiCode,
-  FiLock,
-  FiLayout,
-  FiMail,
-  FiBookOpen
-} from 'react-icons/fi'; // Keep these imports as your NavLink/CollapsibleNavLink likely use them
+import {FiShield,FiUser, FiLogOut, FiMenu, FiX, FiAward} from 'react-icons/fi'; // Keep these imports as your NavLink/CollapsibleNavLink likely use them
 import { useAuthStore } from '@/store/auth.store'; // Assuming this path is correct
-
 // Import your existing components. Replace these with your actual paths.
 import { CollapsibleNavLink, FlyoutMenu, NavLink } from '.'; // Adjust this import path if needed
 import { useContextualLink } from '@/hooks';
@@ -106,37 +88,26 @@ export default function AppLayout({
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
   const closeMobileMenu = () => setIsMobileMenuOpen(false);
 
-  // Set CSS variables based on themeColor prop
-  // These variables are used in inline styles below
-  const primary600 = `rgb(var(--color-${themeColor}-600) / <alpha-value>)`;
-  const primary700 = `rgb(var(--color-${themeColor}-700) / <alpha-value>)`;
-  // primary100 is used within NavLink and CollapsibleNavLink, ensure they receive it
-  // and have the necessary CSS variable setup in their own files if they don't use direct props
+  // Determine the theme class to apply to the main container
+  const themeClass = `${themeColor}-theme`; // e.g., "emerald-theme"
 
   return (
     <div
-      className="flex h-screen bg-gray-100 overflow-hidden"
-      style={{
-        // Define CSS variables for dynamic theme colors.
-        // These rely on your tailwind.config.js mapping primary colors to CSS variables.
-        '--indigo-100': `var(--color-${themeColor}-100)`, // Example mapping, adjust to your Tailwind config
-        '--indigo-600': `var(--color-${themeColor}-600)`,
-        '--indigo-700': `var(--color-${themeColor}-700)`,
-      } as React.CSSProperties} // Cast to allow custom CSS variables
+      className={`flex h-screen bg-gray-100 overflow-hidden ${themeClass}`} // Apply themeClass here
     >
       {/* Desktop Sidebar */}
       <aside className={`bg-white shadow-lg transition-all duration-300 ease-in-out hidden md:flex flex-col sticky top-0 h-full
-                         ${isSidebarOpen ? "w-64" : "w-20"}`}>
+                          ${isSidebarOpen ? "w-64" : "w-20"}`}>
         <div className={`flex items-center p-4 border-b border-gray-200 ${isSidebarOpen ? "justify-between" : "justify-center"}`}>
           {isSidebarOpen && (
             <Link href={buildLink(navItems[0]?.subItems[0]?.basePath || '/')} className="flex items-center space-x-2" onClick={closeFlyout}>
-              <div className={`p-2 rounded-lg`} style={{ backgroundColor: primary600 }}>
+              <div className={`p-2 rounded-lg bg-primary-600`}> {/* Uses primary theme */}
                 <LogoIcon className="h-6 w-6 text-white" />
               </div>
-              <span className="font-bold text-xl" style={{ color: primary700 }}>{headerTitle}</span>
+              <span className="font-bold text-xl text-primary-700">{headerTitle}</span> {/* Uses primary theme */}
             </Link>
           )}
-          <button onClick={toggleSidebar} className="p-1.5 rounded-md text-gray-600 hover:bg-gray-200">
+          <button onClick={toggleSidebar} className="p-1.5 rounded-md text-gray-600 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-500"> {/* Uses primary theme for focus ring */}
             {isSidebarOpen ? <FiX className="w-5 h-5" /> : <FiMenu className="w-5 h-5" />}
           </button>
         </div>
@@ -157,7 +128,7 @@ export default function AppLayout({
           <div className="mt-auto pt-4 border-t border-gray-200">
             <NavLink item={{ label: "My Profile", basePath: "/account/profile", icon: FiUser }} buildLink={buildLink} currentPath={currentPath} isSidebarOpen={isSidebarOpen} onClick={closeFlyout} themeColor={themeColor} />
             <NavLink item={{ label: "Security", basePath: "/account/security", icon: FiShield }} buildLink={buildLink} currentPath={currentPath} isSidebarOpen={isSidebarOpen} onClick={closeFlyout} themeColor={themeColor} />
-            <button onClick={handleLogout} className={`flex items-center text-sm text-gray-600 p-2 rounded-md transition-colors w-full ${isSidebarOpen ? "justify-start pl-3" : "justify-center"}`}>
+            <button onClick={handleLogout} className={`flex items-center text-sm p-2 rounded-md transition-colors w-full ${isSidebarOpen ? "justify-start pl-3" : "justify-center"} text-primary-700 hover:bg-primary-100`} title="Logout"> {/* Uses primary theme */}
               <FiLogOut className={`w-5 h-5 ${isSidebarOpen ? "mr-3" : ""}`} />
               {isSidebarOpen && 'Logout'}
             </button>
@@ -177,12 +148,12 @@ export default function AppLayout({
                                  ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
           <div className="flex items-center justify-between px-4 pb-2 border-b">
             <Link href={buildLink(navItems[0]?.subItems[0]?.basePath || '/')} className="flex items-center space-x-2" onClick={closeMobileMenu}>
-              <div className={`p-2 rounded-lg`} style={{ backgroundColor: primary600 }}>
+              <div className={`p-2 rounded-lg bg-primary-600`}> {/* Uses primary theme */}
                 <LogoIcon className="h-6 w-6 text-white" />
               </div>
-              <span className="font-bold text-xl" style={{ color: primary700 }}>{headerTitle}</span>
+              <span className="font-bold text-xl text-primary-700">{headerTitle}</span> {/* Uses primary theme */}
             </Link>
-            <button onClick={closeMobileMenu} className="p-2 rounded-md text-gray-600 hover:bg-gray-100">
+            <button onClick={closeMobileMenu} className="p-2 rounded-md text-gray-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-500"> {/* Uses primary theme for focus ring */}
               <FiX className="w-6 h-6" />
             </button>
           </div>
@@ -204,7 +175,7 @@ export default function AppLayout({
             <div className="mt-auto pt-4 border-t border-gray-200">
               <NavLink item={{ label: "My Profile", basePath: "/account/profile", icon: FiUser }} buildLink={buildLink} currentPath={currentPath} isSidebarOpen={true} onClick={closeMobileMenu} themeColor={themeColor} />
               <NavLink item={{ label: "Security", basePath: "/account/security", icon: FiShield }} buildLink={buildLink} currentPath={currentPath} isSidebarOpen={true} onClick={closeMobileMenu} themeColor={themeColor} />
-              <button onClick={handleLogout} className="flex items-center text-sm text-gray-600 p-2 rounded-md hover:bg-gray-100 transition-colors w-full justify-start pl-3">
+              <button onClick={handleLogout} className="flex items-center text-sm p-2 rounded-md transition-colors w-full justify-start pl-3 text-primary-700 hover:bg-primary-100"> {/* Uses primary theme */}
                 <FiLogOut className="w-5 h-5 mr-3" />
                 Logout
               </button>
@@ -217,7 +188,7 @@ export default function AppLayout({
       <div className="flex-1 flex flex-col overflow-hidden">
         <header className="bg-white shadow-sm p-4 flex items-center justify-between sticky top-0 z-30">
           <div className="flex items-center">
-            <button onClick={toggleMobileMenu} className="md:hidden p-2 rounded-md text-gray-600 hover:bg-gray-100 mr-2">
+            <button onClick={toggleMobileMenu} className="md:hidden p-2 rounded-md text-gray-600 hover:bg-gray-100 mr-2 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-500"> {/* Uses primary theme for focus ring */}
               <FiMenu className="w-6 h-6" />
             </button>
             <h1 className="text-xl font-semibold text-gray-800">Context title Here</h1>
@@ -226,10 +197,10 @@ export default function AppLayout({
           {user && (
             <div className="flex items-center space-x-3">
               <span className="text-sm text-gray-700 hidden sm:inline">Welcome, {user.username}</span>
-              <div className={`w-9 h-9 rounded-full text-white flex items-center justify-center text-sm font-semibold`} style={{ backgroundColor: primary600 }}>
+              <div className={`w-9 h-9 rounded-full text-white flex items-center justify-center text-sm font-semibold bg-primary-600`}> {/* Uses primary theme */}
                 {user.firstName?.charAt(0).toUpperCase() || user.username?.charAt(0).toUpperCase()}
               </div>
-              <button onClick={handleLogout} className={`flex items-center text-sm text-gray-600 p-2 rounded-md hover:bg-gray-100 transition-colors`} style={{ color: primary700, '--hover-text-color': primary700 } as React.CSSProperties} title="Logout">
+              <button onClick={handleLogout} className={`flex items-center text-sm p-2 rounded-md transition-colors text-primary-700 hover:bg-primary-100`} title="Logout"> {/* Uses primary theme */}
                 <FiLogOut className="w-5 h-5" />
                 Logout
               </button>
@@ -240,7 +211,6 @@ export default function AppLayout({
           {children}
         </main>
       </div>
-
       {/* Desktop Collapsed Sidebar Flyout Menu */}
       {activeFlyoutLabel && !isSidebarOpen && flyoutPosition && (
         <FlyoutMenu
@@ -257,3 +227,5 @@ export default function AppLayout({
     </div>
   );
 }
+// Note: This AppLayout component is designed to be flexible and reusable.
+// You can pass different `navItems`, `themeColor`, and other props to customize it

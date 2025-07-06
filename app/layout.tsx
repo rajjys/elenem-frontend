@@ -10,7 +10,7 @@ const inter = Inter({ subsets: ['latin'] });
 
 export default function PublicLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" className={inter.className} suppressHydrationWarning>
+    <html lang="en" className={`${inter.className}`} suppressHydrationWarning>
       <body>
         {children}
         </body>

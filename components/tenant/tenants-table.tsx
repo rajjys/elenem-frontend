@@ -9,7 +9,7 @@ import { ArrowUpDown, Pencil, Trash, MoreVertical } from 'lucide-react';
 import { useContextualLink } from '@/hooks/useContextualLink'; // Your custom hook (mocked below)
 type SortableColumn = 'name' | 'tenantCode' | 'sportType' | 'country' | 'ownerUsername' | 'createdAt' | 'updatedAt';
 
-interface TenantsTableProps {
+interface TenantsTableProps { 
   tenants: TenantBasic[];
   onSort: (sortBy: SortableColumn) => void;
   sortOrder: 'asc' | 'desc';
