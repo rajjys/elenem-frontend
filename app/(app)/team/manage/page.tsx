@@ -4,8 +4,8 @@ import { useEffect, useState, useCallback } from 'react';
 import { api } from '@/services/api';
 import { useAuthStore } from '@/store/auth.store';
 import { MyTeamProfileFormByTA } from '@/components/forms/MyTeamProfileFormByTA';
-import { TeamDetailsFrontendDto } from '@/prisma';
-import { Role } from '@/prisma';
+import { TeamDetailsFrontendDto } from '@/schemas';
+import { Role } from '@/schemas';
 
 export default function ManageMyTeamPage() {
   const { user, tokens } = useAuthStore();

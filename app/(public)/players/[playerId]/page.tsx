@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import { api } from '@/services/api';
-import { PlayerPublicDto } from '@/prisma'
+import { PlayerPublicDto } from '@/schemas'
 import Link from 'next/link';
 
 export default function PublicPlayerProfilePage() {

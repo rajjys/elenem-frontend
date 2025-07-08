@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/'; // Your UI components
 
 // Your League-specific types from prisma
-import { LeagueBasic, Gender, SportType, LeagueVisibility } from '@/prisma/'; // Assuming LeagueBasic is here
+import { LeagueBasic, Gender, SportType, LeagueVisibility } from '@/schemas'; // Assuming LeagueBasic is here
 
 // Icons from Lucide React
 import { ArrowUpDown, Pencil, Trash, MoreVertical } from 'lucide-react';

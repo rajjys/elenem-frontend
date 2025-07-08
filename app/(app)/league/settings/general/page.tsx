@@ -3,10 +3,10 @@
 import { useEffect, useState } from 'react';
 import { api } from '@/services/api';
 import { useAuthStore } from '@/store/auth.store';
-import { MyLeagueDetailsDto } from '@/prisma'; // Create this shared DTO type
+import { MyLeagueDetailsDto } from '@/schemas'; // Create this shared DTO type
 import { MyLeagueDetailsForm } from '@/components/forms/MyLeagueDetailsForm';
 import { MyLeagueSettingsForm } from '@/components/forms/MyLeagueSettingsForm';
-import { Role } from '@/prisma';
+import { Role } from '@/schemas';
 
 // Define MyLeagueDetailsDto in a shared types directory if not already, e.g., shared-types/league.dto.ts
 // For now, defining a simplified version here:

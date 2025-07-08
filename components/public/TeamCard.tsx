@@ -1,6 +1,6 @@
 // components/public/TeamCard.tsx
 import Link from 'next/link';
-import { TeamPublicFrontendDto } from '@/prisma';
+import { TeamPublicFrontendDto } from '@/schemas';
 interface TeamCardProps {
   team: TeamPublicFrontendDto;
   leagueId?: string; // Optional, if you want to construct link relative to league

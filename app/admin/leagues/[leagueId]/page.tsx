@@ -4,7 +4,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { api } from '@/services/api';
-import { LeagueDetails, Role } from '@/prisma/'; // Adjust import path
+import { LeagueDetails, Role } from '@/schemas'; // Adjust import path
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';

@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { api } from '@/services/api';
 import { TeamFormByLA } from '@/components/forms/TeamFormByLA';
-import { TeamDetailsFrontendDto, UserForAssignmentDto } from '@/prisma';
+import { TeamDetailsFrontendDto, UserForAssignmentDto } from '@/schemas';
 import { TeamAdminsManager } from '@/components/league/TeamAdminsManager'; // We'll create this
 import { Button } from '@/components/ui/button';
 // import { Modal } from '@/components/ui/modal';

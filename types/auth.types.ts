@@ -1,6 +1,6 @@
 // src/types/auth.types.ts
 import { JWTPayload } from 'jose';
-import { Role } from '../prisma'; // Assuming Role enum is in your prisma/index.ts
+import { Role } from '../schemas'; // Assuming Role enum is in your prisma/index.ts
 
 /**
  * Interface representing the custom claims within your JWT payload.

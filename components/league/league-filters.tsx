@@ -22,7 +22,7 @@ import {
 } from '@/components/ui/dialog';
 
 // Your League-specific types and enums from prisma
-import { LeagueFilterParams, SportType, LeagueVisibility, Gender } from '@/prisma/';
+import { LeagueFilterParams, SportType, LeagueVisibility, Gender } from '@/schemas';
 
 // Icons from Lucide React
 import { Filter as FilterIcon, Search as SearchIcon } from 'lucide-react';

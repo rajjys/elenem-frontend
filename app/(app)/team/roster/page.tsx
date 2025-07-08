@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { api } from '@/services/api';
 import { useAuthStore } from '@/store/auth.store';
 import { Button } from '@/components/ui/button';
-import { PlayerDetailsDto } from '@/prisma';
+import { PlayerDetailsDto } from '@/schemas';
 export default function TeamAdminRosterPage() {
   const { user } = useAuthStore();
   const [roster, setRoster] = useState<PlayerDetailsDto[]>([]);

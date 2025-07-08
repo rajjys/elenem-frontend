@@ -13,7 +13,7 @@ import {
   SportType,
   SportTypeSchema,
   Role, // Assuming Role for context (though not directly used in this form)
-} from '@/prisma'; // Import your new types
+} from '@/schemas'; // Import your new types
 
 import { api } from '@/services/api'; // Your Axios instance
 import { useRouter } from 'next/navigation';

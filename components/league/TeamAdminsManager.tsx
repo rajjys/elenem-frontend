@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { api } from '@/services/api';
 import { Button } from '@/components/ui/button';
 import { Select } from '@/components/ui/select';
-import { TeamManagerFrontendDto, UserForAssignmentDto } from '@/prisma'
+import { TeamManagerFrontendDto, UserForAssignmentDto } from '@/schemas'
 // import { Modal } from '@/components/ui/modal';
 
 interface TeamAdminsManagerProps {

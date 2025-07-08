@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { TextArea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { PlayerDetailsDto, TeamDetailsFrontendDto } from '@/prisma';
+import { PlayerDetailsDto, TeamDetailsFrontendDto } from '@/schemas';
 
 const playerSchema = z.object({
   firstName: z.string().min(2, "First name is required"),

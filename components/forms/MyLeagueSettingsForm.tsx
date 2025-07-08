@@ -3,7 +3,7 @@ import { useForm as useFormHook } from "react-hook-form"; // Renamed to avoid co
 import { zodResolver as zodResolverHook } from "@hookform/resolvers/zod"; // Renamed
 import * as zSchema from "zod"; // Renamed
 import { Button, TextArea } from "../ui";
-import { MyLeagueDetailsDto } from "@/prisma";
+import { MyLeagueDetailsDto } from "@/schemas";
 import { useEffect, useState } from "react";
 import { api } from "@/services/api";
 // ... other imports (Input, Button, api, useState, useEffect)

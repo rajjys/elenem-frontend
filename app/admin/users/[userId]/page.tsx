@@ -9,7 +9,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { useAuthStore } from '@/store/auth.store';
-import { Role, UserDetail } from '@/prisma';
+import { Role, UserDetail } from '@/schemas';
 
 export default function UserProfilePage() {
   const { userId } = useParams<{ userId: string }>();

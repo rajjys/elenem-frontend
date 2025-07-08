@@ -3,7 +3,7 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { api, setAuthToken } from '@/services/api';
 import Cookies from 'js-cookie';
-import { User, Role } from '@/prisma'; // Import User and Role from your new frontend types
+import { User, Role } from '@/schemas'; // Import User and Role from your new frontend types
 
 interface AuthTokens {
   accessToken: string;

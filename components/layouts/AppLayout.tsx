@@ -7,7 +7,7 @@ import { useAuthStore } from '@/store/auth.store'; // Assuming this path is corr
 import { CollapsibleNavLink, FlyoutMenu, NavLink } from '.'; // Adjust this import path if needed
 import { useContextualLink } from '@/hooks';
 import { ContextSwitcher } from './navigation/ContextSwitcher';
-import { Role } from '@/prisma';
+import { Role } from '@/schemas';
 
 // Type for a React Icon component
 type IconType = React.ComponentType<React.SVGProps<SVGSVGElement>>;

@@ -2,7 +2,7 @@
 "use client";
 
 import React from 'react';
-import { User, Role, UserBasic } from '@/prisma/';
+import { User, Role, UserBasic } from '@/schemas';
 import Link from 'next/link';
 import { ArrowUpDown, Pencil, Trash, MoreVertical } from 'lucide-react';
 import {

@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { api } from '@/services/api';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { SportType } from '@/prisma';
+import { SportType } from '@/schemas';
 // import { SportType, User as PrismaUser } from "@prisma/client"; // Import User for owner type
 
 

@@ -4,7 +4,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { api } from '@/services/api';
-import { TenantDetails, TenantDetailsSchema } from '@/prisma/';
+import { TenantDetails, TenantDetailsSchema } from '@/schemas';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';

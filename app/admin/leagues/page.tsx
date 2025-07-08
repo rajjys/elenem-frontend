@@ -5,7 +5,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { api } from '@/services/api'; // Your actual API instance
-import { LeagueBasic, PaginatedLeaguesResponseSchema, LeagueFilterParams } from '@/prisma/league-schemas'; // Your actual League types and schemas
+import { LeagueBasic, PaginatedLeaguesResponseSchema, LeagueFilterParams } from '@/schemas/league-schemas'; // Your actual League types and schemas
 import { LeagueFilters } from '@/components/league/league-filters'; // Your new LeagueFilters component
 import { LeaguesTable } from '@/components/league/leagues-table'; // Your new LeaguesTable component
 import { Pagination } from '@/components/ui/'; // Your Pagination component

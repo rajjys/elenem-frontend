@@ -8,7 +8,7 @@ import { Input } from "../ui/input";
 import { useAuthStore } from "@/store/auth.store";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Role } from "@/prisma"; // Assuming this path for your frontend types
+import { Role } from "@/schemas"; // Assuming this path for your frontend types
 
 
 export function LoginForm() {

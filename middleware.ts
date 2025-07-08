@@ -1,7 +1,7 @@
 // middleware.ts
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { Role } from './prisma'; // Assuming Role enum is imported from Prisma or shared types
+import { Role } from './schemas'; // Assuming Role enum is imported from Prisma or shared types
 import { verifyJWT } from './utils'; // Your utility to verify JWT
 import { JwtPayload } from './types';
 

@@ -5,7 +5,7 @@ import React from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { TenantForm } from '@/components/forms/tenant-form';
 import { Button } from '@/components/ui/button';
-import { TenantDetails, TenantDetailsSchema } from '@/prisma';
+import { TenantDetails, TenantDetailsSchema } from '@/schemas';
 import { api } from '@/services/api';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { toast } from 'sonner';

@@ -5,7 +5,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { api } from '@/services/api'; // Your actual API instance
-import { TenantBasic, PaginatedTenantsResponseSchema, TenantFilterParams } from '@/prisma'// Your actual Prisma types and schemas
+import { TenantBasic, PaginatedTenantsResponseSchema, TenantFilterParams } from '@/schemas'// Your actual Prisma types and schemas
 import { TenantFilters } from '@/components/tenant/tenant-filters'; // Your new TenantFilters component
 import { TenantsTable } from '@/components/tenant/tenants-table'; // Your new TenantsTable component
 import { Pagination } from '@/components/ui/'; // Your Pagination component

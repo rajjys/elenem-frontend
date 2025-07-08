@@ -4,8 +4,8 @@ import { useState } from 'react';
 import { api } from '@/services/api';
 import { Select } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { PlayerDetailsDto } from '@/prisma';
-import { TeamDetailsFrontendDto } from '@/prisma';
+import { PlayerDetailsDto } from '@/schemas';
+import { TeamDetailsFrontendDto } from '@/schemas';
 
 interface PlayerTeamAssignmentProps {
   playerId: string;

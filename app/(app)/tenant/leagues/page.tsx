@@ -10,7 +10,7 @@ import { useAuthStore } from '@/store/auth.store';
 import { api } from '@/services/api';
 import { toast } from 'sonner';
 import { z } from 'zod';
-import { LeagueBasic, PaginatedLeaguesResponseSchema, Role } from '@/prisma';
+import { LeagueBasic, PaginatedLeaguesResponseSchema, Role } from '@/schemas';
 import { useContextualLink } from '@/hooks';
 
 // Define the League schema based on common data structures

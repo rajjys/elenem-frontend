@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { api } from '@/services/api';
 import { TeamCard } from '@/components/public/TeamCard';
-import { TeamPublicFrontendDto,LeaguePublicDetailsDto } from '@/prisma';
+import { TeamPublicFrontendDto,LeaguePublicDetailsDto } from '@/schemas';
 import Link from 'next/link';
 
 export default function PublicLeagueTeamsPage() {

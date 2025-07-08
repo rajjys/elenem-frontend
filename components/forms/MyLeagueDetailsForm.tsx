@@ -8,7 +8,7 @@ import { TextArea } from "@/components/ui/textarea";// Assuming you have TextAre
 import { Button } from "@/components/ui/button";
 import { api } from "@/services/api";
 import { useState, useEffect } from "react";
-import { MyLeagueDetailsDto } from "@/prisma"; // Create this shared DTO type
+import { MyLeagueDetailsDto } from "@/schemas"; // Create this shared DTO type
 
 // Matches UpdateMyLeagueDetailsDto from backend
 const detailsSchema = z.object({

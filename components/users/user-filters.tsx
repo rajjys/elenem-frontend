@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Role, Gender, SupportedLanguage, UserFilterParams } from '@/prisma/'; // Import all necessary enums and types
+import { Role, Gender, SupportedLanguage, UserFilterParams } from '@/schemas'; // Import all necessary enums and types
 import { MultiSelect } from '@/components/ui/multi-select'; // Your new multi-select component
 import { Switch } from '@/components/ui/switch';
 import { useDebounce } from 'use-debounce'; // You'll need to install this: npm install use-debounce

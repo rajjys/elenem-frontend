@@ -5,8 +5,8 @@ import { useParams, useRouter } from 'next/navigation';
 import { api } from '@/services/api';
 import { PlayerFormByLA } from '@/components/forms/PlayerFormByLA';
 import { PlayerTeamAssignment } from '@/components/league/PlayerTeamAssignment';
-import { PlayerDetailsDto, PlayerFormValues } from '@/prisma';
-import { TeamDetailsFrontendDto } from '@/prisma'; // Use shared type
+import { PlayerDetailsDto, PlayerFormValues } from '@/schemas';
+import { TeamDetailsFrontendDto } from '@/schemas'; // Use shared type
 
 export default function EditPlayerPageLA() {
   const params = useParams();

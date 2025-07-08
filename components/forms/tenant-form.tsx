@@ -21,7 +21,7 @@ import {
   Role,
   TenantType,
  
-} from '@/prisma/'; // Import types and schemas, including UserResponseDto and PaginatedResponseDto
+} from '@/schemas'; // Import types and schemas, including UserResponseDto and PaginatedResponseDto
 import { init } from 'next/dist/compiled/webpack/webpack';
 
 // Define a union type for form input based on create or update

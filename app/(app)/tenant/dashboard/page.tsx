@@ -5,7 +5,7 @@ import { useParams, useRouter, useSearchParams } from 'next/navigation'; // Or u
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useAuthStore } from '@/store/auth.store';
-import { Role, TenantDetails, TenantDetailsSchema } from '@/prisma';
+import { Role, TenantDetails, TenantDetailsSchema } from '@/schemas';
 import { api } from '@/services/api';
 import { toast } from 'sonner';
 import { useContextualLink } from '@/hooks';

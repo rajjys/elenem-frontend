@@ -1,5 +1,5 @@
 // components/public/TeamPublicProfile.tsx
-import { TeamPublicFrontendDto } from "@/prisma";
+import { TeamPublicFrontendDto } from "@/schemas";
 // import PlayerCard from './PlayerCard'; // If you have player data
 
 interface TeamPublicProfileProps {

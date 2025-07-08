@@ -1,6 +1,6 @@
 // src/schemas/league-schemas.ts (or a similar location for your Zod schemas)
 import * as z from 'zod';
-import { SportType, LeagueVisibility, Gender, Role, SportTypeSchema, LeagueVisibilitySchema } from '@/prisma/'; // Assuming these enums are available or you'll mock them
+import { SportType, LeagueVisibility, Gender, Role, SportTypeSchema, LeagueVisibilitySchema } from '@/schemas'; // Assuming these enums are available or you'll mock them
 
 // Helper schemas for nested objects (similar to your DTOs)
 export const TenantLiteResponseSchema = z.object({

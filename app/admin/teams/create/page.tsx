@@ -5,7 +5,7 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { LeagueForm } from '@/components/forms/league-form';
 import { toast } from 'sonner';
-import { Role } from '@/prisma/'; // Assuming Role enum is exported from prisma
+import { Role } from '@/schemas'; // Assuming Role enum is exported from prisma
 import { useAuthStore } from '@/store/auth.store';
 import { TeamForm } from '@/components/forms';
 //import { useAuth } from '@/hooks/useAuth'; // Assuming you have an authentication hook to get user roles and tenantId

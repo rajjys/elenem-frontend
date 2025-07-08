@@ -6,7 +6,7 @@ import { api } from '@/services/api';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 // Make sure to import the correct User type from your Prisma client
-import type { User } from '@/prisma';
+import type { User } from '@/schemas';
 
 interface UserDetails  {
   league?: { id: string; name: string; leagueCode: string } | null;

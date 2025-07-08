@@ -4,7 +4,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { api } from '@/services/api';
 import { useAuthStore } from '@/store/auth.store';
-import { Role } from '@/prisma';
+import { Role } from '@/schemas';
 import { InviteLeagueAdminForm } from '@/components/forms/InviteLeagueAdminForm';
 import { LeagueAdminsTable } from '@/components/league/LeagueAdminsTable';
 

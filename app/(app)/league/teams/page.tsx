@@ -1,131 +1,180 @@
-// app/(app)/league/teams/page.tsx (List Teams for LA)
+// app/(league)/teams/page.tsx
 "use client";
-import { useEffect, useState, useCallback } from 'react';
-import { api } from '@/services/api';
-import { useAuthStore } from '@/store/auth.store';
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { TeamDetailsFrontendDto } from '@/prisma'; // Use shared type
-import { Role } from '@/prisma';
 
-export default function LeagueAdminTeamsPage() {
-  const { user, tokens } = useAuthStore();
-  const [teams, setTeams] = useState<TeamDetailsFrontendDto[]>([]);
+import React, { useState, useEffect, useCallback } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { api } from '@/services/api';
+import { TeamDetails, TeamFilterParams, TeamFilterParamsSchema, Role, SortableColumn } from '@/schemas/';
+import { TeamsFilters, TeamsTable } from '@/components/team/';
+import { Pagination, LoadingSpinner, Button } from '@/components/ui/';
+import { toast } from 'sonner';
+import { useAuthStore } from '@/store/auth.store';
+
+export default function LeagueTeamsPage() {
+  const router = useRouter();
+  const { user } = useAuthStore();
+  const currentUserRoles = user?.roles || [];
+  const currentTenantId = user?.tenantId;
+  const currentLeagueId = user?.managingLeagueId; // League Admin's league ID
+
+  const [teams, setTeams] = useState<TeamDetails[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [totalItems, setTotalItems] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+  const [filters, setFilters] = useState<TeamFilterParams>({
+    page: 1,
+    pageSize: 10,
+    sortBy: 'createdAt',
+    sortOrder: 'desc',
+    tenantId: currentTenantId, // Automatically filter by current tenant ID (League Admin has a tenant)
+    leagueId: currentLeagueId, // Automatically filter by current league ID
+  });
+
+  // Update filters when currentLeagueId becomes available
+  useEffect(() => {
+    if (currentLeagueId && filters.leagueId !== currentLeagueId) {
+      setFilters(prev => ({ ...prev, leagueId: currentLeagueId, tenantId: currentTenantId, page: 1 }));
+    }
+  }, [currentLeagueId, currentTenantId, filters.leagueId]);
+
 
   const fetchTeams = useCallback(async () => {
-    if (user?.role === Role.LEAGUE_ADMIN && user.leagueId && tokens?.accessToken) {
-      setLoading(true);
-      try {
-        const params: any = {};
-        if (searchTerm) params.filter = searchTerm;
-        // Add pagination if needed: params.skip, params.take
-
-        // Endpoint for LA to list teams in their league
-        const response = await api.get<TeamDetailsFrontendDto[]>('/teams/league-admin/list', { params });
-        setTeams(response.data || []);
-        setError(null);
-      } catch (err: any) {
-        setError(err.response?.data?.message || "Failed to fetch teams.");
-        setTeams([]);
-      } finally {
-        setLoading(false);
-      }
-    } else {
-        setError("Access Denied or not a League Admin.");
-        setLoading(false);
+    setLoading(true);
+    setError(null);
+    if (!currentLeagueId) {
+      setLoading(false);
+      setError("League ID not available. Please log in as a League Admin.");
+      return;
     }
-  }, [user, tokens, searchTerm]);
+
+    try {
+      const validatedFilters = TeamFilterParamsSchema.parse(filters);
+      const params = new URLSearchParams();
+
+      Object.entries(validatedFilters).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== '') {
+          if (Array.isArray(value)) {
+            value.forEach(item => params.append(key, String(item)));
+          } else {
+            params.append(key, String(value));
+          }
+        }
+      });
+
+      const response = await api.get(`/teams?${params.toString()}`);
+                  // Assuming your API returns data in { data: [], totalItems, totalPages, currentPage, pageSize } format
+                  //const validatedData = PaginatedTeamsResponseSchema.parse(response.data);
+                  const validatedData = response.data;
+            
+                  setTeams(validatedData.data); //
+                  setTotalItems(validatedData.totalItems);
+                  setTotalPages(validatedData.totalPages);
+    } catch (err: any) {
+      const errorMessage = err.response?.data?.message || err.message || 'Failed to fetch teams.';
+      setError(errorMessage);
+      toast.error('Error fetching teams', { description: errorMessage });
+      console.error('Fetch teams error:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, [filters, currentLeagueId, currentTenantId]);
 
   useEffect(() => {
-    const debounceTimer = setTimeout(() => {
-        fetchTeams();
-    }, 300);
-    return () => clearTimeout(debounceTimer);
+    // Authorization check for League Admin
+    //if (!user || !currentUserRoles.includes(Role.LEAGUE_ADMIN)) {
+      //toast.error("Unauthorized", { description: "You do not have permission to view this page." });
+      //router.push('/dashboard');
+      //return;
+    //}
+    if (currentLeagueId) { // Only fetch if leagueId is available
+      fetchTeams();
+    }
+  }, [fetchTeams, user, currentUserRoles, router, currentLeagueId]);
+
+  const handleFilterChange = useCallback((newFilters: TeamFilterParams) => {
+    setFilters(prev => ({
+      ...prev,
+      ...newFilters,
+      tenantId: currentTenantId, // Ensure tenantId remains fixed
+      leagueId: currentLeagueId, // Ensure leagueId remains fixed
+      page: 1,
+    }));
+  }, [currentTenantId, currentLeagueId]);
+
+  const handlePageChange = useCallback((newPage: number) => {
+    setFilters(prev => ({ ...prev, page: newPage }));
+  }, []);
+
+  const handlePageSizeChange = useCallback((newSize: number) => {
+    setFilters(prev => ({ ...prev, pageSize: newSize, page: 1 }));
+  }, []);
+
+  const handleSort = useCallback((column: SortableColumn) => {
+    setFilters(prev => ({
+      ...prev,
+      sortBy: column,
+      sortOrder: prev.sortBy === column && prev.sortOrder === 'asc' ? 'desc' : 'asc',
+      page: 1,
+    }));
+  }, []);
+
+  const handleDeleteTeam = useCallback(async (teamId: string) => {
+    const confirmed = window.confirm('Are you sure you want to delete this team? This action cannot be undone.');
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      await api.delete(`/teams/${teamId}`);
+      toast.success('Team deleted successfully.');
+      fetchTeams();
+    } catch (err: any) {
+      const errorMessage = err.response?.data?.message || err.message || 'Failed to delete team.';
+      toast.error('Error deleting team', { description: errorMessage });
+      console.error('Delete team error:', err);
+    }
   }, [fetchTeams]);
 
+  if (loading && !teams.length) {
+    return <LoadingSpinner />;
+  }
 
-  if (loading && teams.length === 0) return <div className="p-6 text-center">Loading teams...</div>;
-  if (error && teams.length === 0) return <div className="p-6 text-center text-red-500 bg-red-50 rounded-md">{error}</div>;
+  if (error) {
+    return <p className="text-red-500 text-center mt-8">Error: {error}</p>;
+  }
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-        <h1 className="text-2xl font-bold text-gray-800">Manage Teams in Your League</h1>
-        <div className="flex gap-2 w-full sm:w-auto">
-             <input 
-                type="text"
-                placeholder="Search teams by name..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm w-full sm:w-auto"
-            />
-            <Link href="/league/teams/create">
-                <Button>Create New Team</Button>
-            </Link>
-        </div>
+    <div className="container mx-auto p-6">
+      <div className="flex justify-between items-center mb-4">
+        <TeamsFilters
+          filters={filters}
+          onFilterChange={handleFilterChange}
+          onPageSizeChange={handlePageSizeChange}
+          fixedTenantId={currentTenantId} // Pass fixed tenant ID
+          fixedLeagueId={currentLeagueId} // Pass fixed league ID to filters
+        />
+        <Link href="/league/teams/create" passHref>
+          <Button variant="primary" className='whitespace-nowrap'>Create New Team</Button>
+        </Link>
       </div>
-      
-      {loading && <p className="text-sm text-gray-500">Filtering teams...</p>}
-      {error && !loading && <p className="text-red-500 bg-red-100 p-3 rounded text-sm mb-4">{error}</p>}
 
-      {teams.length === 0 && !loading ? (
-        <div className="text-center py-10 bg-white shadow rounded-lg">
-            <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                <path vectorEffect="non-scaling-stroke" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
-            </svg>
-            <h3 className="mt-2 text-sm font-medium text-gray-900">No teams found</h3>
-            <p className="mt-1 text-sm text-gray-500">Get started by creating a new team.</p>
-            <div className="mt-6">
-                <Link href="/league/teams/create">
-                    <Button>Create New Team</Button>
-                </Link>
-            </div>
-        </div>
-
-      ) : (
-        <div className="bg-white shadow rounded-lg overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Logo</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Home Venue</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Admins</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {teams.map((team) => (
-                <tr key={team.id}>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {team.logoUrl ? (
-                      <img src={team.logoUrl} alt={`${team.name} logo`} className="h-10 w-10 rounded-full object-cover" 
-                           onError={(e) => (e.currentTarget.style.display = 'none')} />
-                    ) : (
-                      <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 text-sm">
-                        {team.name.substring(0, 2).toUpperCase()}
-                      </div>
-                    )}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{team.name}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{team.homeVenue || 'N/A'}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {team.managers && team.managers.length > 0 ? team.managers.map(m => m.username).join(', ') : 'None'}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <Link href={`/league/teams/id/${team.id}/edit`} className="text-indigo-600 hover:text-indigo-900">
-                      Edit / Manage
-                    </Link>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+      <TeamsTable
+        teams={teams}
+        onSort={handleSort}
+        sortBy={filters.sortBy || 'createdAt'}
+        sortOrder={filters.sortOrder || 'desc'}
+        onDelete={handleDeleteTeam}
+        currentUserRoles={currentUserRoles}
+        currentTenantId={currentTenantId}
+        currentLeagueId={currentLeagueId}
+      />
+      <Pagination
+        currentPage={filters.page || 1}
+        totalPages={totalPages}
+        onPageChange={handlePageChange}
+      />
     </div>
   );
 }

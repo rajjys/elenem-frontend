@@ -34,7 +34,7 @@ import {
   PaginatedLeaguesResponseDto,
   PaginatedUsersResponseSchema,
   UserBasic
-} from '@/prisma/'; // Adjust import path as per your project structure
+} from '@/schemas'; // Adjust import path as per your project structure
 import { api } from '@/services/api';
 import { countryNameToCode, sanitizeEmptyStrings } from '@/utils/'; // Assuming utils exists
 

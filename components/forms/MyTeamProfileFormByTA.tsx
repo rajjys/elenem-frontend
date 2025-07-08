@@ -8,7 +8,7 @@ import { TextArea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { api } from "@/services/api";
 import { useState, useEffect } from "react";
-import { UpdateTeamProfileByTaFrontendDto, TeamDetailsFrontendDto } from '@/prisma';
+import { UpdateTeamProfileByTaFrontendDto, TeamDetailsFrontendDto } from '@/schemas';
 
 // Matches UpdateTeamProfileByTaDto from backend
 const teamProfileSchemaByTA = z.object({

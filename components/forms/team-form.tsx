@@ -17,14 +17,14 @@ import { FiChevronDown, FiChevronRight, FiInfo, FiLink, FiMapPin, FiGlobe, FiUse
 
 import { useAuthStore } from '@/store/auth.store';
 import { api } from '@/services/api';
-import { Role, TeamVisibility } from '@/prisma/'; // Assuming these are from your Prisma client
+import { Role, TeamVisibility } from '@/schemas'; // Assuming these are from your Prisma client
 import {
   CreateTeamFormSchema,
   UpdateTeamByLaFormSchema,
   UpdateTeamProfileByTaFormSchema,
   TeamDetails, // Assuming TeamDetails is an extended type of your form values
   TeamFormValues,
-} from '@/prisma'; // Adjust path as needed for your Zod schemas
+} from '@/schemas'; // Adjust path as needed for your Zod schemas
 import { sanitizeEmptyStrings } from '@/utils';
 
 // Define types for fetched data

@@ -3,7 +3,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { api } from '@/services/api';
-import { UserBasic, PaginatedUsersResponseSchema, UserFilterParams } from '@/prisma/user-schemas';
+import { UserBasic, PaginatedUsersResponseSchema, UserFilterParams } from '@/schemas/user-schemas';
 import { UsersTable, UserFilters } from '@/components/users';
 import { Pagination } from '@/components/ui/'; // Assuming you have a pagination component
 import { LoadingSpinner } from '@/components/ui/loading-spinner';

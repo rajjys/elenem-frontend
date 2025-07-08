@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { api } from '@/services/api';
-import { TeamPublicFrontendDto } from '@/prisma';
+import { TeamPublicFrontendDto } from '@/schemas';
 import { TeamPublicProfile } from '@/components/public/TeamPublicProfile';
 import Link from 'next/link';
 

@@ -5,7 +5,7 @@ import { api } from '@/services/api';
 import { useAuthStore } from '@/store/auth.store';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { PlayerDetailsDto } from '@/prisma'; // Create this shared type
+import { PlayerDetailsDto } from '@/schemas'; // Create this shared type
 
 export default function LeagueAdminPlayersPage() {
   const { user } = useAuthStore();

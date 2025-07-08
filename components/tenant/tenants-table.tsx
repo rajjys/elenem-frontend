@@ -1,7 +1,7 @@
 // components/tenant/tenants-table.tsx
 "use client";
 
-import { TenantBasic, TenantDetails } from '@/prisma';
+import { TenantBasic, TenantDetails } from '@/schemas';
 import React from 'react';
 import { Button, Table, TableBody, TableCell, TableHead, TableHeader, TableRow, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/';
 import Link from 'next/link';

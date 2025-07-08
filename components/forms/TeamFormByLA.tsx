@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { api } from "@/services/api";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { CreateTeamFrontendDto, UpdateTeamByLaFrontendDto, TeamDetailsFrontendDto } from '@/prisma';
+import { CreateTeamFrontendDto, UpdateTeamByLaFrontendDto, TeamDetailsFrontendDto } from '@/schemas';
 
 // Schema for both create and update by LA
 const teamSchemaByLA = z.object({

@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useAuthStore } from '@/store/auth.store';
 import { useRouter, usePathname } from 'next/navigation';
 import { ReactNode, useEffect, useState } from 'react';
-import { Role } from '@/prisma';
+import { Role } from '@/schemas';
 import { FiMenu, FiX, FiUser, FiLock, FiHome, FiLogOut, FiSettings, FiUsers, FiAward, FiShield, FiDatabase } from 'react-icons/fi';
 import { verifyJWT } from '@/utils';
 

@@ -11,7 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { useDebounce } from 'use-debounce'; // Your useDebounce hook
-import { TenantType, SportType, TenantFilterParams } from '@/prisma'; // Your Tenant types
+import { TenantType, SportType, TenantFilterParams } from '@/schemas'; // Your Tenant types
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '../ui';
 import { FilterIcon, SearchIcon } from 'lucide-react';
 

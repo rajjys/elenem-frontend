@@ -16,7 +16,7 @@ import {
   TextArea
 } from "@/components/ui/";
 import { useState, useEffect, useCallback } from "react";
-import { Gender, SupportedLanguage, Role, TenantBasicDto, UserDetail, PaginatedTenantsResponseDto } from "@/prisma"; // Import UserDetail
+import { Gender, SupportedLanguage, Role, TenantBasicDto, UserDetail, PaginatedTenantsResponseDto } from "@/schemas"; // Import UserDetail
 import { api } from '@/services/api';
 import { toast } from 'sonner';
 import { useAuthStore } from '@/store/auth.store'; // Import useAuthStore

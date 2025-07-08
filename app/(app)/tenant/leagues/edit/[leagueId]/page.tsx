@@ -5,7 +5,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { LeagueForm } from '@/components/forms/league-form'; // Adjust path if needed
 import { api } from '@/services/api';
-import { LeagueDetails, Role } from '@/prisma/'; // Adjust import path for LeagueDetails, Role
+import { LeagueDetails, Role } from '@/schemas'; // Adjust import path for LeagueDetails, Role
 import { toast } from 'sonner';
 import { useAuthStore } from '@/store/auth.store';
 

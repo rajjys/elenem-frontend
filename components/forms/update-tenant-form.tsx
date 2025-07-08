@@ -12,7 +12,7 @@ import {
   UpdateTenantDto,
   SportType,
   TenantDetailsSchema,
-} from '@/prisma'; // Import necessary types and schemas
+} from '@/schemas'; // Import necessary types and schemas
 import { api } from '@/services/api';
 
 interface UpdateTenantFormProps {

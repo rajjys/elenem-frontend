@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select } from "@/components/ui/select";
 import { TextArea } from "@/components/ui/textarea";
-import { SportType } from "@/prisma";
+import { SportType } from "@/schemas";
 
 const sportTypeOptions = Object.values(SportType).map(type => ({ value: type, label: type }));
 

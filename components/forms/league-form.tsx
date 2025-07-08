@@ -30,7 +30,7 @@ import {
   TieBreakerRule,
   TenantBasicDto, // Assuming this is the type for availableTenants
   PaginatedLeaguesResponseDto
-} from '@/prisma/';
+} from '@/schemas';
 import { api } from '@/services/api';
 import { countryNameToCode, sanitizeEmptyStrings } from '@/utils/';
 import { useAuthStore } from '@/store/auth.store';

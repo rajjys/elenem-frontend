@@ -9,7 +9,7 @@ import { api } from "@/services/api";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select } from "@/components/ui/select";
-import { Role } from "@/prisma";
+import { Role } from "@/schemas";
 import { useAuthStore } from "@/store/auth.store";
 
 
