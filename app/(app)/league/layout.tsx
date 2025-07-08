@@ -13,22 +13,14 @@ import {
     FiUserPlus,
     FiClock,
     FiFilePlus,
-    FiFileMinus,
     FiVolume2,
     FiMessageCircle,
-    FiMessageSquare
+    FiMessageSquare,
+    FiFileMinus
 } from 'react-icons/fi'; // Example icons
 import { useAuthStore } from '@/store/auth.store';
 import { MdStadium } from 'react-icons/md';
-// --- Reusable NavLink, CollapsibleNavLink, FlyoutMenu Components --- for components/layout
-import { CollapsibleNavLink, FlyoutMenu, NavLink } from '@/components/layouts';
 import AppLayout from '@/components/layouts/AppLayout';
-
-interface LeagueAdminUser { // For displaying user info
-    username: string;
-    leagueName?: string; // Potentially display the league they are managing
-    avatarInitial?: string;
-}
 
 interface LeagueAdminLayoutProps {
     children: ReactNode;
@@ -97,46 +89,16 @@ const leagueNavItems = [
 ];
 
 export default function LeagueAdminLayout({ children }: LeagueAdminLayoutProps) {
-    const currentPath = usePathname();
-    const { user, logout } = useAuthStore();
-    const router = useRouter();
-    const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-    const [activeFlyoutLabel, setActiveFlyoutLabel] = useState<string | null>(null);
-    const [flyoutPosition, setFlyoutPosition] = useState<{ top: number; left: number } | null>(null);
-    const [currentFlyoutTriggerRef, setCurrentFlyoutTriggerRef] = useState<RefObject<HTMLElement> | null>(null);
-
-    const handleLogout = () => {
-        // Call your actual logout function
-        logout();
-        router.push('/login');
-    };
-
-    const handleFlyoutToggle = (label: string, targetElement: HTMLElement) => {
-        if (activeFlyoutLabel === label || label === "") {
-            setActiveFlyoutLabel(null); setFlyoutPosition(null); setCurrentFlyoutTriggerRef(null);
-        } else {
-            const rect = targetElement.getBoundingClientRect();
-            setActiveFlyoutLabel(label);
-            setFlyoutPosition({ top: rect.top, left: rect.left + rect.width + 2 });
-            setCurrentFlyoutTriggerRef({ current: targetElement });
-        }
-    };
-    const closeFlyout = () => {
-        setActiveFlyoutLabel(null); setFlyoutPosition(null); setCurrentFlyoutTriggerRef(null);
-    };
-    const toggleSidebar = () => { setIsSidebarOpen(!isSidebarOpen); closeFlyout(); }
-    const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
-    const closeMobileMenu = () => setIsMobileMenuOpen(false);
+    //const currentPath = usePathname();
+    //const { user, logout } = useAuthStore();
+    //const router = useRouter();
 
     return (
         <AppLayout
               navItems={leagueNavItems}
-              themeColor="blue" // Or 'blue', 'emerald', etc., as defined in tailwind.config.js
+              themeColor="purple" // Or 'blue', 'emerald', etc., as defined in tailwind.config.js
               headerTitle="League Admin"
-              logoIcon={FiAward}
-        >
+              logoIcon={FiAward}>
               {children}
             </AppLayout>
     );

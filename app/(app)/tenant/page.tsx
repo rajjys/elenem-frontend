@@ -1,9 +1,12 @@
+import router from 'next/navigation';
 import React from 'react'
 
 const TenantPage = () => {
+
+  //router.redirect('/dashboard');
   return (
     <div>
-      Tenant Admin | Tenant Page
+      Redirecting to Dashboard
     </div>
   )
 }

@@ -1,13 +1,14 @@
 'use client';
 import { FiUsers, FiDollarSign, FiAward, FiBarChart2, FiShoppingCart, FiCalendar, FiBox, FiTrendingUp, FiUser, FiActivity, FiList, FiZap, FiFilm, FiSpeaker, FiCreditCard, FiShield, FiSettings, FiAlertTriangle, FiMessageSquare } from 'react-icons/fi';
 import Head from 'next/head';
-import { useRouter } from 'next/navigation'; // Or useNavigation from next/navigation for App Router
+import { useParams, useRouter, useSearchParams } from 'next/navigation'; // Or useNavigation from next/navigation for App Router
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useAuthStore } from '@/store/auth.store';
 import { Role, TenantDetails, TenantDetailsSchema } from '@/prisma';
 import { api } from '@/services/api';
 import { toast } from 'sonner';
+import { useContextualLink } from '@/hooks';
 
 // Assuming these types are defined elsewhere or inline for this example
 interface StatCardProps {
@@ -130,12 +131,18 @@ export default function TenantDashboard() {
     const [tenant, setTenant] = useState<TenantDetails | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-
-
-    const currentTenantId = userAuth?.tenantId;//Or get it from a global store or context
+    const { buildLink } = useContextualLink();
+    const ctxTenantId = useSearchParams().get('ctxTenantId'); // Use search params if needed
+    
+    // Determine current tenant ID based on user roles
     const isSystemAdmin = currentUserRoles.includes(Role.SYSTEM_ADMIN);
     const isTenantAdmin = currentUserRoles.includes(Role.TENANT_ADMIN);
-
+    
+    const currentTenantId = isSystemAdmin
+    ? ctxTenantId
+    : isTenantAdmin
+    ? userAuth?.tenantId
+    : null;
     //Fetch tenant-specific data if needed, e.g., tenant name, logo, etc.
     const fetchTenantDetails = async () => {
         setLoading(true);
@@ -164,12 +171,12 @@ export default function TenantDashboard() {
     
     // Dynamically generate stat cards based on tenant data
     const statCards = [
-        { title: "Total Leagues", value: tenant?.leagues?.length || 0, icon: FiAward, bgColorClass: "bg-blue-100", textColorClass: "text-blue-600", href: "/tenant/leagues" },
-        { title: "Total Teams", value: tenant?.teams?.length || 0, icon: FiUsers, bgColorClass: "bg-green-100", textColorClass: "text-green-600", href: "/tenant/teams" },
-        { title: "Total Players", value: tenant?.players?.length || 0, icon: FiUser, bgColorClass: "bg-purple-100", textColorClass: "text-purple-600", href: "/tenant/players" },
-        { title: "Upcoming Games", value: mockUpcomingGames.length, icon: FiCalendar, bgColorClass: "bg-orange-100", textColorClass: "text-orange-600", href: "/tenant/games" },
-        { title: "Tickets Sold (Today)", value: 120, icon: FiShoppingCart, bgColorClass: "bg-red-100", textColorClass: "text-red-600", href: "/tenant/tickets" }, // Keeping mock for now as per request
-        { title: "Active Seasons", value: tenant?.seasons?.length || 0, icon: FiTrendingUp, bgColorClass: "bg-teal-100", textColorClass: "text-teal-600", href: "/tenant/seasons" }, // Keeping mock for now as per request
+        { title: "Total Leagues", value: tenant?.leagues?.length || 0, icon: FiAward, bgColorClass: "bg-blue-100", textColorClass: "text-blue-600", href: buildLink("/tenant/leagues") },
+        { title: "Total Teams", value: tenant?.teams?.length || 0, icon: FiUsers, bgColorClass: "bg-green-100", textColorClass: "text-green-600", href: buildLink("/tenant/teams") },
+        { title: "Total Players", value: tenant?.players?.length || 0, icon: FiUser, bgColorClass: "bg-purple-100", textColorClass: "text-purple-600", href: buildLink("/tenant/players") },
+        { title: "Upcoming Games", value: mockUpcomingGames.length, icon: FiCalendar, bgColorClass: "bg-orange-100", textColorClass: "text-orange-600", href: buildLink("/tenant/games") },
+        { title: "Tickets Sold (Today)", value: 120, icon: FiShoppingCart, bgColorClass: "bg-red-100", textColorClass: "text-red-600", href: buildLink("/tenant/tickets") }, // Keeping mock for now as per request
+        { title: "Active Seasons", value: tenant?.seasons?.length || 0, icon: FiTrendingUp, bgColorClass: "bg-teal-100", textColorClass: "text-teal-600", href: buildLink("/tenant/seasons") }, // Keeping mock for now as per request
     ];
 
     return (
@@ -238,7 +245,7 @@ export default function TenantDashboard() {
                 <section className="bg-white p-6 rounded-lg shadow-md mb-8">
                     <div className="flex justify-between items-center mb-4">
                         <h2 className="text-xl font-semibold text-gray-800">Upcoming Games</h2>
-                        <Link href="/games" className="text-emerald-600 hover:text-emerald-700 text-sm font-medium">
+                        <Link href={buildLink("/games")} className="text-emerald-600 hover:text-emerald-700 text-sm font-medium">
                             View All Games
                         </Link>
                     </div>

@@ -19,7 +19,7 @@ interface TenantsTableProps {
 }
 
 export function TenantsTable({ tenants, onSort, sortBy, sortOrder, onDelete }: TenantsTableProps) {
-  // const { buildLink } = useContextualLink(); // Keep if your real app uses it
+  const { buildLink } = useContextualLink(); // Keep if your real app uses it
 
   const getSortIndicator = (column: string) => {
     if (sortBy === column) {
@@ -100,7 +100,7 @@ export function TenantsTable({ tenants, onSort, sortBy, sortOrder, onDelete }: T
                   <div className="ml-4">
                     <div className="text-sm font-medium text-gray-900">
                       <Link
-                        href={`/admin/tenants/${tenant.id}`}
+                        href={`/tenant/dashboard?ctxTenantId=${tenant.id}`}
                         className="text-indigo-600 hover:text-indigo-900"
                       >
                         {tenant.name}
@@ -140,8 +140,8 @@ export function TenantsTable({ tenants, onSort, sortBy, sortOrder, onDelete }: T
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
                     <DropdownMenuItem asChild>
-                      <Link href={`/admin/tenants/${tenant.id}/edit`} className="flex items-center">
-                        <Pencil className="mr-2 h-4 w-4" /> View/Edit
+                      <Link href={`/admin/tenants/${tenant.id}`} className="flex items-center">
+                        <Pencil className="mr-2 h-4 w-4" /> View Tenant
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => onDelete(tenant.id)} className="flex items-center text-red-600 cursor-pointer">

@@ -12,9 +12,9 @@ import { useSearchParams } from 'next/navigation';
 export const useContextualLink = () => {
   const searchParams = useSearchParams();
 
-  const contextTenantId = searchParams.get('tenantId');
-  const contextLeagueId = searchParams.get('leagueId');
-  const contextTeamId = searchParams.get('teamId');
+  const contextTenantId = searchParams.get('ctxTenantId');
+  const contextLeagueId = searchParams.get('ctxLeagueId');
+  const contextTeamId = searchParams.get('ctxTeamId');
 
   /**
    * Builds a complete, context-aware URL.
@@ -25,13 +25,13 @@ export const useContextualLink = () => {
     const contextualParams = new URLSearchParams();
 
     if (contextTenantId) {
-      contextualParams.set('tenantId', contextTenantId);
+      contextualParams.set('ctxTenantId', contextTenantId);
     }
     if (contextLeagueId) {
-      contextualParams.set('leagueId', contextLeagueId);
+      contextualParams.set('ctxLeagueId', contextLeagueId);
     }
     if (contextTeamId) {
-      contextualParams.set('teamId', contextTeamId);
+      contextualParams.set('ctxTeamId', contextTeamId);
     }
 
     const queryString = contextualParams.toString();

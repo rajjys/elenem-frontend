@@ -5,12 +5,13 @@ import React, { useState, useEffect, useCallback } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import { FiAward, FiPlusCircle, FiSearch } from 'react-icons/fi';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuthStore } from '@/store/auth.store';
 import { api } from '@/services/api';
 import { toast } from 'sonner';
 import { z } from 'zod';
-import { LeagueBasic, PaginatedLeaguesResponseSchema } from '@/prisma';
+import { LeagueBasic, PaginatedLeaguesResponseSchema, Role } from '@/prisma';
+import { useContextualLink } from '@/hooks';
 
 // Define the League schema based on common data structures
 // This should match your backend DTO for a single League
@@ -39,7 +40,6 @@ interface LeagueFilterParams {
 export default function TenantLeaguesPage() {
   const router = useRouter();
   const userAuth = useAuthStore((state) => state.user);
-  const currentTenantId = userAuth?.tenantId;
 
   const [leagues, setLeagues] = useState<LeagueBasic[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -52,6 +52,17 @@ export default function TenantLeaguesPage() {
     sortBy: 'name',
     sortOrder: 'asc',
   });
+  const { buildLink } = useContextualLink();
+  const currentUserRoles = userAuth?.roles || [];
+  const ctxTenantId = useSearchParams().get('ctxTenantId'); // Use search params if needed
+  // Determine current tenant ID based on user roles
+      const isSystemAdmin = currentUserRoles.includes(Role.SYSTEM_ADMIN);
+      const isTenantAdmin = currentUserRoles.includes(Role.TENANT_ADMIN);
+  const currentTenantId = isSystemAdmin
+    ? ctxTenantId
+    : isTenantAdmin
+    ? userAuth?.tenantId
+    : null;
 
   const fetchLeagues = useCallback(async () => {
     if (!currentTenantId) {
@@ -64,11 +75,13 @@ export default function TenantLeaguesPage() {
     setError(null);
     try {
       const params = new URLSearchParams();
-      ///params.append('tenantId', currentTenantId); // Use currentTenantId directly
+      if(isSystemAdmin){
+        params.append('tenantIds', currentTenantId); // Use currentTenantId directly
+        }
 
       console.log('Fetching leagues with params:', params.toString());
 
-      const response = await api.get(`/leagues?`);
+      const response = await api.get(`/leagues?${params.toString()}`);
       const validatedData = PaginatedLeaguesResponseSchema.parse(response.data);
 
       setLeagues(validatedData.data);
@@ -162,7 +175,7 @@ export default function TenantLeaguesPage() {
                 {leagues.map((league) => (
                   <tr key={league.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      <Link href={`/league/${league.id}`} className="text-emerald-600 hover:underline">
+                      <Link href={`${buildLink('/league/dashboard/')}?ctxLeagueId=${league.id}`} className="text-emerald-600 hover:underline">
                         {league.name}
                       </Link>
                     </td>

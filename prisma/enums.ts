@@ -53,9 +53,15 @@ export enum LeagueVisibility {
   PRIVATE = "PRIVATE",// Requires invitation or approval to view
   ARCHIVED = "ARCHIVED" // Old leagues, viewable but inactive for new operations
 }
+export enum TeamVisibility {
+  PUBLIC = "PUBLIC",
+  PRIVATE = "PRIVATE", // Requires invitation or approval to view
+  ARCHIVED = "ARCHIVED" // Old teams, viewable but inactive for new operations
+}
 export const RoleSchema = z.nativeEnum(Role);
 export const SportTypeSchema = z.nativeEnum(SportType);
 export const LeagueVisibilitySchema = z.nativeEnum(LeagueVisibility);
+export const TeamVisibilitySchema = z.nativeEnum(TeamVisibility); ///
 export const TenantTypeSchema = z.nativeEnum(TenantType);
 export const GenderSchema = z.nativeEnum(Gender);
 export const SupportedLanguageSchema = z.nativeEnum(SupportedLanguage);

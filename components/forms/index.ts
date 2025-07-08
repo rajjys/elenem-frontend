@@ -7,3 +7,5 @@ export * from './loginForm';
 export * from './create-tenant-form';
 export * from './tenant-form';
 export * from './user-form';
+export * from './team-form';
+export * from './league-form';

@@ -7,6 +7,7 @@ import { useAuthStore } from '@/store/auth.store'; // Assuming this path is corr
 import { CollapsibleNavLink, FlyoutMenu, NavLink } from '.'; // Adjust this import path if needed
 import { useContextualLink } from '@/hooks';
 import { ContextSwitcher } from './navigation/ContextSwitcher';
+import { Role } from '@/prisma';
 
 // Type for a React Icon component
 type IconType = React.ComponentType<React.SVGProps<SVGSVGElement>>;
@@ -44,7 +45,7 @@ export default function AppLayout({
   showContextSwitcher = false,
 }: AppLayoutProps) {
   const currentPath = usePathname();
-  const { user, logout } = useAuthStore();
+  const { user: userAuth, logout } = useAuthStore();
   const router = useRouter();
   const { buildLink } = useContextualLink();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -52,6 +53,24 @@ export default function AppLayout({
   const [activeFlyoutLabel, setActiveFlyoutLabel] = useState<string | null>(null);
   const [flyoutPosition, setFlyoutPosition] = useState<{ top: number; left: number } | null>(null);
   const [currentFlyoutTriggerRef, setCurrentFlyoutTriggerRef] = useState<RefObject<HTMLElement> | null>(null);
+
+  const isSystemAdmin = userAuth?.roles.includes(Role.SYSTEM_ADMIN);
+  const isTenantAdmin = userAuth?.roles.includes(Role.TENANT_ADMIN);
+  const isLeagueAdmin = userAuth?.roles.includes(Role.LEAGUE_ADMIN);
+  const isTeamAdmin   = userAuth?.roles.includes(Role.TEAM_ADMIN);
+  const isPlayer       = userAuth?.roles.includes(Role.PLAYER);
+  const isCoach        = userAuth?.roles.includes(Role.COACH);
+  const isReferee      = userAuth?.roles.includes(Role.REFEREE);
+
+  // dashboard link based on user roles
+  const dashboardLink = isSystemAdmin ? '/admin/dashboard' :
+                        isTenantAdmin ? '/tenant/dashboard' :
+                        isLeagueAdmin ? '/league/dashboard' :
+                        isTeamAdmin ? '/team/dashboard' :
+                        isPlayer ? '/player/dashboard' :
+                        isCoach ? '/coach/dashboard' :
+                        isReferee ? '/referee/dashboard' :
+                        '/dashboard'; // Default fallback
 
   const handleLogout = () => {
     logout();
@@ -100,7 +119,7 @@ export default function AppLayout({
                           ${isSidebarOpen ? "w-64" : "w-20"}`}>
         <div className={`flex items-center p-4 border-b border-gray-200 ${isSidebarOpen ? "justify-between" : "justify-center"}`}>
           {isSidebarOpen && (
-            <Link href={buildLink(navItems[0]?.subItems[0]?.basePath || '/')} className="flex items-center space-x-2" onClick={closeFlyout}>
+            <Link href={dashboardLink} className="flex items-center space-x-2" onClick={closeFlyout}>
               <div className={`p-2 rounded-lg bg-primary-600`}> {/* Uses primary theme */}
                 <LogoIcon className="h-6 w-6 text-white" />
               </div>
@@ -194,11 +213,11 @@ export default function AppLayout({
             <h1 className="text-xl font-semibold text-gray-800">Context title Here</h1>
           </div>
           {showContextSwitcher && <ContextSwitcher />}
-          {user && (
+          {userAuth && (
             <div className="flex items-center space-x-3">
-              <span className="text-sm text-gray-700 hidden sm:inline">Welcome, {user.username}</span>
+              <span className="text-sm text-gray-700 hidden sm:inline">Welcome, {userAuth.username}</span>
               <div className={`w-9 h-9 rounded-full text-white flex items-center justify-center text-sm font-semibold bg-primary-600`}> {/* Uses primary theme */}
-                {user.firstName?.charAt(0).toUpperCase() || user.username?.charAt(0).toUpperCase()}
+                {userAuth.firstName?.charAt(0).toUpperCase() || userAuth.username?.charAt(0).toUpperCase()}
               </div>
               <button onClick={handleLogout} className={`flex items-center text-sm p-2 rounded-md transition-colors text-primary-700 hover:bg-primary-100`} title="Logout"> {/* Uses primary theme */}
                 <FiLogOut className="w-5 h-5" />

@@ -37,8 +37,8 @@ const teamNavItems = [
     label: "Dashboard",
     icon: FiGrid,
     subItems: [
-          { label: "Overview", basePath: "/league/dashboard", icon: FiBarChart2 },
-          { label: "Analytics", basePath: "/league/analytics", icon: FiTrendingUp },
+          { label: "Overview", basePath: "/team/dashboard", icon: FiBarChart2 },
+          { label: "Analytics", basePath: "/team/analytics", icon: FiTrendingUp },
         ]
   },
   {
@@ -124,7 +124,7 @@ export default function TeamAdminLayout({ children }: TeamAdminLayoutProps) {
     return (
         <AppLayout
               navItems={teamNavItems}
-              themeColor="blue" // Or 'blue', 'emerald', etc., as defined in tailwind.config.js
+              themeColor="emerald" // Or 'blue', 'emerald', etc., as defined in tailwind.config.js
               headerTitle="Team Admin"
               logoIcon={FiAward}>
               {children}

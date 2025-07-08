@@ -125,7 +125,7 @@ export function LeaguesTable({ leagues, onSort, sortBy, sortOrder, onDelete }: L
                   <div className="ml-4">
                     <div className="text-sm font-medium text-gray-900">
                       <Link
-                        href={buildLink(`/admin/leagues/${league.id}`)}
+                        href={(`/league/dashboard?ctxTenantId=${league.tenantId}&ctxLeagueId=${league.id}`)}
                         className="text-indigo-600 hover:text-indigo-900"
                       >
                         {league.name}
