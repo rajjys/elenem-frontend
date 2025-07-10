@@ -41,6 +41,7 @@ import {
 import { TeamVisibility, Role, SportType, Gender } from '@/schemas'; // Import enums
 import { TeamDetails } from '@/schemas'; // Adjust path to your DTOs
 import { ArrowUpDown, MoreVertical, Pencil, Trash } from 'lucide-react';
+import Image from 'next/image';
 
 type SortableColumn = 'name' | 'shortCode' | 'leagueName' | 'tenantName' | 'country' | 'city' | 'establishedYear' | 'createdAt' | 'updatedAt';
 
@@ -179,11 +180,15 @@ export function TeamsTable({ teams, onSort, sortBy, sortOrder, onDelete, current
                 <div className="flex items-center">
                   {team.logoUrl && (
                     <div className="flex-shrink-0 h-10 w-10">
-                      <img
-                        className="h-10 w-10 rounded-full object-cover"
+                      <Image
+                        className='h-10 w-10 rounded-full object-cover border border-gray-400'
                         src={team.logoUrl}
-                        alt={`${team.name} Logo`}
-                        onError={(e) => { e.currentTarget.src = `https://placehold.co/40x40/cccccc/333333?text=${team.name.charAt(0)}`; }}
+                        height={60}
+                        width={60}
+                        placeholder="blur"
+                        blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkqAcAAIUAgUW0RjgAAAAASUVORK5CYII="
+                        alt={`${team.shortCode} Logo`}
+                        // onError={(e) => { e.currentTarget.src = `https://placehold.co/40x40/cccccc/333333?text=${team.name.charAt(0)}`; }}
                       />
                     </div>
                   )}

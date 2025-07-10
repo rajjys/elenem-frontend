@@ -103,7 +103,11 @@ export const TeamDetailsSchema = BaseTeamSchema.extend({
     username: z.string(),
     firstName: z.string().optional(),
     lastName: z.string().optional()
-  }))
+  })),
+  homeVenue : z.object({
+    id: z.string().cuid(),
+    name: z.string(),
+  }),
 });
 
 export type TeamDetails = z.infer<typeof TeamDetailsSchema>;

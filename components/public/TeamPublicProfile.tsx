@@ -1,9 +1,11 @@
 // components/public/TeamPublicProfile.tsx
-import { TeamPublicFrontendDto } from "@/schemas";
+//import { TeamPublicFrontendDto } from "@/schemas";
 // import PlayerCard from './PlayerCard'; // If you have player data
 
+import { TeamDetails } from "@/schemas";
+
 interface TeamPublicProfileProps {
-  team: TeamPublicFrontendDto;
+  team: TeamDetails;
   // players?: PlayerPublicDto[]; // Example
 }
 
@@ -35,7 +37,7 @@ export function TeamPublicProfile({ team /*, players */ }: TeamPublicProfileProp
           )}
           <div className="mt-4 sm:mt-0 sm:ml-6 text-center sm:text-left">
             <h1 className="text-3xl md:text-4xl font-bold text-gray-900">{team.name}</h1>
-            {team.homeVenue && <p className="text-md text-gray-600 mt-1">Home Venue: {team.homeVenue}</p>}
+            {team.homeVenue && <p className="text-md text-gray-600 mt-1">Home Venue: {team.homeVenue.name}</p>}
           </div>
         </div>
 

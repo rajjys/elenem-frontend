@@ -1,8 +1,9 @@
 // components/public/TeamCard.tsx
+import { TeamDetails } from '@/schemas';
 import Link from 'next/link';
-import { TeamPublicFrontendDto } from '@/schemas';
+//import { TeamPublicFrontendDto } from '@/schemas';
 interface TeamCardProps {
-  team: TeamPublicFrontendDto;
+  team: TeamDetails;
   leagueId?: string; // Optional, if you want to construct link relative to league
 }
 
@@ -48,7 +49,7 @@ export function TeamCard({ team, leagueId }: TeamCardProps) {
           )}
           {team.homeVenue && (
             <p className="text-xs text-gray-500">
-              <span className="font-medium">Venue:</span> {team.homeVenue}
+              <span className="font-medium">Venue:</span> {team.homeVenue.name}
             </p>
           )}
         </div>

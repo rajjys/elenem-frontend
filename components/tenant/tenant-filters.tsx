@@ -132,9 +132,6 @@ export function TenantFilters({ filters, onFilterChange, onPageSizeChange }: Ten
       {/* Search Input - always visible */}
       <div className="flex-grow max-w-sm">
         <Label htmlFor="tenantSearch" className="sr-only">Search Tenants</Label>
-        <div className="absolute left-3 top-1/2 -translate-y-1/2">
-          <SearchIcon />
-        </div>
         <Input
           id="tenantSearch"
           type="search" // Use type="search" to benefit from native browser behaviors (e.g., clear button)

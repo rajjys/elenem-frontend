@@ -13,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
 import { CountryDropdown, RegionDropdown } from 'react-country-region-selector';
-import { FiChevronDown, FiChevronRight, FiInfo, FiLink, FiMapPin, FiGlobe, FiUsers, FiAward, FiSettings, FiImage, FiBox } from 'react-icons/fi';
+import { FiChevronDown, FiChevronRight, FiInfo, FiMapPin, FiUsers, FiAward, FiSettings, FiImage, FiBox } from 'react-icons/fi';
 
 import { useAuthStore } from '@/store/auth.store';
 import { api } from '@/services/api';
@@ -25,7 +25,7 @@ import {
   TeamDetails, // Assuming TeamDetails is an extended type of your form values
   TeamFormValues,
 } from '@/schemas'; // Adjust path as needed for your Zod schemas
-import { sanitizeEmptyStrings } from '@/utils';
+import { countryNameToCode, sanitizeEmptyStrings } from '@/utils';
 
 // Define types for fetched data
 interface TenantBasicDto {
@@ -70,8 +70,8 @@ export const TeamForm: React.FC<TeamFormProps> = ({
   fixedTenantId,
   fixedLeagueId,
 }) => {
-  const user = useAuthStore((state) => state.user);
-  const currentUserRoles = user?.roles || [];
+  const userAuth = useAuthStore((state) => state.user);
+  const currentUserRoles = userAuth?.roles || [];
   const isSystemAdmin = currentUserRoles.includes(Role.SYSTEM_ADMIN);
   const isTenantAdmin = currentUserRoles.includes(Role.TENANT_ADMIN);
   const isLeagueAdmin = currentUserRoles.includes(Role.LEAGUE_ADMIN);
@@ -131,6 +131,7 @@ if (isEditMode) {
 
   const watchedTenantId = watch('tenantId');
   const watchedCountry = watch('country');
+  const watchedRegion = watch('region');
   const watchedIsActive = watch('isActive'); // Watch for LA/SA to see/change
   const watchedVisibility = watch('visibility'); // Watch for LA/SA to see/change
 
@@ -232,7 +233,7 @@ if (isEditMode) {
     try {
       // Fetch users who are not already SYSTEM_ADMIN, TENANT_ADMIN, LEAGUE_ADMIN, or TEAM_ADMIN
       // This might require a backend endpoint that filters by roles and managingTeamId
-      const response = await api.get(`/users?tenantId=${tenantId}&roles[]=PLAYER&roles[]=COACH&pageSize=100`); // Example: fetch players/coaches
+      const response = await api.get(`/users?tenantId=${tenantId}&roles[]=PLAYER&roles[]=COACH&roles[]=GENERAL_USER&pageSize=100`); // Example: fetch players/coaches
       setAvailableTeamAdmins(response.data.data);
     } catch (err) {
       toast.error("Failed to fetch users for team admin assignment.");
@@ -330,7 +331,7 @@ if (isEditMode) {
         <div className="border rounded-lg bg-gray-50">
           <button
             type="button"
-            className="flex justify-between items-center w-full p-4 font-semibold text-left text-gray-700"
+            className="flex justify-between items-center w-full p-2 font-semibold text-left text-gray-700"
             onClick={() => toggleSection('tenancyLeague')}
           >
             <span><FiAward className="inline-block mr-2" /> Tenancy & League Assignment</span>
@@ -429,7 +430,7 @@ if (isEditMode) {
       <div className="border rounded-lg">
         <button
           type="button"
-          className="flex justify-between items-center w-full p-4 font-semibold text-left text-gray-700"
+          className="flex justify-between items-center w-full p-2 font-semibold text-left text-gray-700"
           onClick={() => toggleSection('basicInfo')}
         >
           <span><FiInfo className="inline-block mr-2" /> Basic Information</span>
@@ -440,14 +441,14 @@ if (isEditMode) {
             <Input
               label="Team Name"
               {...register('name')}
-              error={typeof errors.name?.message === 'string' ? errors.name.message : 'Invalid input'}
+              error={errors.name?.message && (typeof errors.name?.message === 'string' ? errors.name.message : 'Invalid input')}
               required
               disabled={isSubmitting}
             />
             <Input
               label="Short Code"
               {...register('shortCode')}
-              error={typeof errors.shortCode?.message === 'string' ? errors.shortCode.message : 'Invalid input'}
+              error={errors.shortCode?.message && (typeof errors.shortCode?.message === 'string' ? errors.shortCode.message : 'Invalid input')}
               disabled={isSubmitting}
               hint="e.g., FCB, LFC (unique within league)"
             />
@@ -455,7 +456,7 @@ if (isEditMode) {
               <TextArea
                 label="Description"
                 {...register('description')}
-                error={typeof errors.description?.message === 'string' ? errors.description.message : 'Invalid input'}
+                error={errors.description?.message && (typeof errors.description?.message === 'string' ? errors.description.message : 'Invalid input')}
                 disabled={isSubmitting}
               />
             </div>
@@ -463,7 +464,7 @@ if (isEditMode) {
               label="Established Year"
               type="number"
               {...register('establishedYear', { valueAsNumber: true })}
-              error={typeof errors.establishedYear?.message === 'string' ? errors.establishedYear.message : 'Invalid input'}
+              error={errors.establishedYear?.message && (typeof errors.establishedYear?.message === 'string' ? errors.establishedYear.message : 'Invalid input')}
               disabled={isSubmitting}
               hint="Year the team was established (e.g., 1990)"
               restrict="numeric"
@@ -477,7 +478,7 @@ if (isEditMode) {
       <div className="border rounded-lg">
         <button
           type="button"
-          className="flex justify-between items-center w-full p-4 font-semibold text-left text-gray-700"
+          className="flex justify-between items-center w-full p-2 font-semibold text-left text-gray-700"
           onClick={() => toggleSection('location')}
         >
           <span><FiMapPin className="inline-block mr-2" /> Location Details</span>
@@ -488,8 +489,15 @@ if (isEditMode) {
             <div className="flex flex-col space-y-2">
               <Label htmlFor="country">Country</Label>
               <CountryDropdown
-                value={watchedCountry || ''}
-                onChange={(val) => setValue('country', val, { shouldValidate: true })}
+                id="country"
+                value={watchedCountry}
+                onChange={(val) => {
+                  const isoCode = countryNameToCode[val] || '';
+                  setValue('country', val, { shouldValidate: true });
+                  // Clear region when country changes
+                  watchedRegion && setValue('region', undefined, { shouldValidate: true });
+                  setValue('region', undefined, { shouldValidate: true });
+                }}
                 className={`w-full px-3 py-2 border ${errors.country ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm`}
                 disabled={isSubmitting}
               />
@@ -499,16 +507,26 @@ if (isEditMode) {
                 </p>
               )}
             </div>
+            <div>
+              <Label htmlFor="country">Region</Label>
+              <RegionDropdown
+                id="region"
+                country={watchedCountry}
+                value={watch('state') || ''}
+                onChange={(val) => setValue('state', val, { shouldValidate: true })}
+                className={`w-full px-3 py-2 border ${errors.state ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm`}
+                disabled={isSubmitting || !watchedCountry}
+              />
+              {errors.state?.message && (
+                <p className="text-red-500 text-xs mt-1">
+                  {typeof errors.state.message === 'string' ? errors.state.message : 'Invalid input'}
+                </p>
+              )}
+            </div>
             <Input
               label="City"
               {...register('city')}
-              error={typeof errors.city?.message === 'string' ? errors.city.message : 'Invalid input'}
-              disabled={isSubmitting}
-            />
-            <Input
-              label="State/Region"
-              {...register('state')}
-              error={typeof errors.state?.message === 'string' ? errors.state.message : 'Invalid input'}
+              error={errors.city?.message && (typeof errors.city?.message === 'string' ? errors.city.message : 'Invalid input')}
               disabled={isSubmitting}
             />
             {/* Home Venue (only editable by SA/TA/LA) */}
@@ -581,14 +599,14 @@ if (isEditMode) {
             <Input
               label="Logo URL"
               {...register('logoUrl')}
-              error={typeof errors.logoUrl?.message === 'string' ? errors.logoUrl.message : 'Invalid input'}
+              error={errors.logoUrl?.message && (typeof errors.logoUrl?.message === 'string' ? errors.logoUrl.message : 'Invalid input')}
               disabled={isSubmitting}
               hint="URL to the team's primary logo image"
             />
             <Input
               label="Banner Image URL"
               {...register('bannerImageUrl')}
-              error={typeof errors.bannerImageUrl?.message === 'string' ? errors.bannerImageUrl.message : 'Invalid input'}
+              error={errors.bannerImageUrl?.message && (typeof errors.bannerImageUrl?.message === 'string' ? errors.bannerImageUrl.message : 'Invalid input')}
               disabled={isSubmitting}
               hint="URL to the team's banner image (e.g., for profile header)"
             />
@@ -615,7 +633,7 @@ if (isEditMode) {
                 checked={watchedIsActive}
                 onCheckedChange={(checked) => setValue('isActive', checked)}
                 disabled={isSubmitting}
-                error={typeof errors.isActive?.message === 'string' ? errors.isActive.message : 'Invalid input'}
+                error={errors.isActive?.message && (typeof errors.isActive?.message === 'string' ? errors.isActive.message : 'Invalid input')}
               />
               <div className="flex flex-col space-y-2">
                 <Label htmlFor="visibility">Visibility</Label>
@@ -637,7 +655,7 @@ if (isEditMode) {
                 </Select>
                 {errors.visibility?.message && (
                     <p className="text-red-500 text-xs mt-1">
-                      {typeof errors.visibility.message === 'string' ? errors.visibility.message : 'Invalid input'}
+                      {errors.visibility.message && (typeof errors.visibility.message === 'string' ? errors.visibility.message : 'Invalid input')}
                     </p>
                   )}
               </div>
@@ -728,7 +746,7 @@ if (isEditMode) {
                   setValue('teamProfile', e.target.value as any, { shouldValidate: true });
                 }
               }}
-              error={typeof errors.teamProfile?.message === 'string' ? errors.teamProfile.message : 'Invalid input'}
+              error={errors.teamProfile?.message && (typeof errors.teamProfile?.message === 'string' ? errors.teamProfile.message : 'Invalid input')}
               disabled={isSubmitting}
               rows={8}
               //hint="Enter custom team data in JSON format (e.g., {'slogan': 'Go Team!'})"

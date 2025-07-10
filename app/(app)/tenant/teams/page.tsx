@@ -3,7 +3,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { api } from '@/services/api';
 import { TeamDetails, TeamFilterParams, TeamFilterParamsSchema, Role, SortableColumn } from '@/schemas/';
 import { TeamsFilters, TeamsTable } from '@/components/team/';
@@ -13,10 +13,20 @@ import { useAuthStore } from '@/store/auth.store';
 
 export default function TenantTeamsPage() {
   const router = useRouter();
-  const { user } = useAuthStore();
-  const currentUserRoles = user?.roles || [];
-  const currentTenantId = user?.tenantId; // Tenant Admin's tenant ID
-  const currentLeagueId = user?.managingLeagueId; // Not directly used for filtering here, but passed to table
+  const { user: userAuth } = useAuthStore();
+  const currentUserRoles = userAuth?.roles || [];
+  const ctxTenantId = useSearchParams().get('ctxTenantId'); // Use search params if needed
+      
+      // Determine current tenant ID based on user roles
+      const isSystemAdmin = currentUserRoles.includes(Role.SYSTEM_ADMIN);
+      const isTenantAdmin = currentUserRoles.includes(Role.TENANT_ADMIN);
+      
+      const currentTenantId = isSystemAdmin
+      ? ctxTenantId
+      : isTenantAdmin
+      ? userAuth?.tenantId
+      : null;
+  const currentLeagueId = userAuth?.managingLeagueId; // Not directly used for filtering here, but passed to table
 
   const [teams, setTeams] = useState<TeamDetails[]>([]);
   const [loading, setLoading] = useState(true);
@@ -89,7 +99,7 @@ export default function TenantTeamsPage() {
     if (currentTenantId) { // Only fetch if tenantId is available
       fetchTeams();
     }
-  }, [fetchTeams, user, currentUserRoles, router, currentTenantId]);
+  }, [fetchTeams, userAuth, currentUserRoles, router, currentTenantId]);
 
   const handleFilterChange = useCallback((newFilters: TeamFilterParams) => {
     setFilters(prev => ({

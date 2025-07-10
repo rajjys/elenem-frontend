@@ -273,7 +273,7 @@ export function TenantForm({ initialData, isEditMode = false, onSuccess, onCance
           className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
           disabled={isSubmitting}
         />
-        {errors.country && <p className="text-red-500 text-xs mt-1">{errors.country.message}</p>}
+        {errors.country?.message && <p className="text-red-500 text-xs mt-1">{errors.country.message}</p>}
       </div>
       <div>
         <Label htmlFor="region">Region / Province / State</Label>
