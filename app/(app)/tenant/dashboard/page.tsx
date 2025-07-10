@@ -5,20 +5,15 @@ import { useParams, useRouter, useSearchParams } from 'next/navigation'; // Or u
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useAuthStore } from '@/store/auth.store';
-import { Role, TenantDetails, TenantDetailsSchema } from '@/schemas';
+import { LeagueBasic, PaginatedLeaguesResponseSchema, Role, TenantDetails, TenantDetailsSchema } from '@/schemas';
 import { api } from '@/services/api';
 import { toast } from 'sonner';
 import { useContextualLink } from '@/hooks';
-
-// Assuming these types are defined elsewhere or inline for this example
-interface StatCardProps {
-    title: string;
-    value: string | number;
-    icon: React.ElementType;
-    bgColorClass: string;
-    textColorClass: string;
-    href: string; // Added href prop
-}
+import { StatsCard } from '@/components/ui/stats-card';
+import { Building, Building2, Calendar, Crown, Eye, Flag, FlagIcon, MoreVertical, Plus, Settings, ShoppingCart, Target, Ticket, TrendingUp, Trophy, UserPlus, Users } from 'lucide-react';
+import { Avatar, Badge, Button, Card, CardContent, CardHeader, CardTitle, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui';
+import Image from 'next/image';
+import { capitalize } from '@/utils';
 
 interface UpcomingGame {
     id: string;
@@ -42,24 +37,6 @@ interface NavCategory {
     icon: React.ElementType;
     subItems: NavItem[];
 }
-
-const StatCard: React.FC<StatCardProps> = ({ title, value, icon: Icon, bgColorClass, textColorClass, href }) => {
-    return (
-        <Link href={href} className="block"> {/* Wrap with Link component */}
-            <div className="bg-white p-6 rounded-lg shadow-md flex items-center justify-between transition-transform transform hover:scale-105">
-                <div>
-                    <p className="text-sm font-medium text-gray-500">{title}</p>
-                    <p className="text-2xl font-bold mt-1">{value}</p>
-                </div>
-                <div className={`p-3 rounded-full ${bgColorClass}`}>
-                    <Icon className={`w-8 h-8 ${textColorClass}`} />
-                </div>
-            </div>
-        </Link>
-    );
-};
-
-
 
     const mockUpcomingGames: UpcomingGame[] = [
         { id: '1', homeTeam: "Thunderbolts FC", awayTeam: "Rapid Strikers", league: "Premier League '25", date: "2025-07-07", time: "19:00", venue: "City Arena", status: "Scheduled" },
@@ -129,6 +106,7 @@ export default function TenantDashboard() {
     const userAuth = useAuthStore((state) => state.user);
     const currentUserRoles = userAuth?.roles || [];
     const [tenant, setTenant] = useState<TenantDetails | null>(null);
+    const [leagues, setLeagues] = useState<LeagueBasic>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const { buildLink } = useContextualLink();
@@ -161,86 +139,210 @@ export default function TenantDashboard() {
           setLoading(false);
         }
       };
+      const fetchLeagues = async () => {
+
+        if (!currentTenantId) {
+              setError("Tenant ID is not available.");
+              setLoading(false);
+              return;
+            }
+        
+            setLoading(true);
+            setError(null);
+            try {
+              const params = new URLSearchParams();
+              if(isSystemAdmin){
+                params.append('tenantIds', currentTenantId); // Use currentTenantId directly
+                }
+              const response = await api.get(`/leagues?${params.toString()}`);
+              const validatedData = PaginatedLeaguesResponseSchema.parse(response.data);
+                console.log('Fetched leagues:', validatedData.data);
+              setLeagues(validatedData.data);
+            } catch (err: any) {
+              const errorMessage = err.response?.data?.message || err.message || 'Failed to fetch leagues.';
+              setError(errorMessage);
+              toast.error('Error fetching leagues', { description: errorMessage });
+              console.error('Fetch leagues error:', err);
+            } finally {
+              setLoading(false);
+            }
+      };
     useEffect(() => {
         // Fetch tenant-specific data if needed, e.g., tenant name, logo, etc.
         if (currentTenantId) {
             fetchTenantDetails();
-            
+            fetchLeagues();
         }
     }, [currentTenantId]);
     
     // Dynamically generate stat cards based on tenant data
     const statCards = [
-        { title: "Total Leagues", value: tenant?.leagues?.length || 0, icon: FiAward, bgColorClass: "bg-blue-100", textColorClass: "text-blue-600", href: buildLink("/tenant/leagues") },
-        { title: "Total Teams", value: tenant?.teams?.length || 0, icon: FiUsers, bgColorClass: "bg-green-100", textColorClass: "text-green-600", href: buildLink("/tenant/teams") },
-        { title: "Total Players", value: tenant?.players?.length || 0, icon: FiUser, bgColorClass: "bg-purple-100", textColorClass: "text-purple-600", href: buildLink("/tenant/players") },
-        { title: "Upcoming Games", value: mockUpcomingGames.length, icon: FiCalendar, bgColorClass: "bg-orange-100", textColorClass: "text-orange-600", href: buildLink("/tenant/games") },
-        { title: "Tickets Sold (Today)", value: 120, icon: FiShoppingCart, bgColorClass: "bg-red-100", textColorClass: "text-red-600", href: buildLink("/tenant/tickets") }, // Keeping mock for now as per request
-        { title: "Active Seasons", value: tenant?.seasons?.length || 0, icon: FiTrendingUp, bgColorClass: "bg-teal-100", textColorClass: "text-teal-600", href: buildLink("/tenant/seasons") }, // Keeping mock for now as per request
-    ];
-
+        { title: "Total Leagues", value: tenant?.leagues?.length || 0, description: "Active Leagues Under Management", trend: {isPositive: true, value: 3.6, timespan: "season"}, icon: Trophy, bgColorClass: "bg-blue-400", textColorClass: "text-white", href: buildLink("/tenant/leagues") },
+        { title: "Total Teams", value: tenant?.teams?.length || 0, description: "Active Teams in all Leagues", trend: {isPositive: false, value: 2.6, timespan: "season"}, icon: Building, bgColorClass: "bg-green-400", textColorClass: "text-white", href: buildLink("/tenant/teams") },
+        { title: "Total Players", value: mockUpcomingGames.length, description: "Active Players in all Leagues", trend: {isPositive: true, value: 4.8, timespan: "season"}, icon: Calendar, bgColorClass: "bg-orange-400", textColorClass: "text-white", href: buildLink("/tenant/players") },
+        { title: "Tickets Sold (Today)", value: 120, description: "Active Leagues Under Management", trend: {isPositive: true, value: 3.6, timespan: "season"}, icon: Ticket, bgColorClass: "bg-red-400", textColorClass: "text-white", href: buildLink("/tenant/tickets") }, // Keeping mock for now as per request
+    ]
+    const recentActivities = [
+  { id: 1, action: "New league created", details: "Professional Volleyball League", time: "5 min ago", type: "league" },
+  { id: 2, action: "Manager assigned", details: "John Smith assigned to Basketball League", time: "15 min ago", type: "manager" },
+  { id: 3, action: "Payment received", details: "$3,200 from Soccer League subscription", time: "1 hour ago", type: "payment" },
+  { id: 4, action: "League completed", details: "Junior Tennis League finished season", time: "2 hours ago", type: "league" },
+  { id: 5, action: "New team registered", details: "Thunder Bolts joined Basketball League", time: "3 hours ago", type: "team" }
+];
     return (
             <div className="min-h-screen">
               <Head>
                 <title>Tenant Dashboard - ELENEM Sports</title>
               </Head>
-                <h1 className="text-3xl font-bold text-gray-800 mb-6">Dashboard Overview</h1>
-
+              <div className='flex items-center justify-between'>
+                <h1 className="text-2xl font-bold text-gray-800 mb-6">{tenant?.name}</h1>
+                <div className='flex whitespace-nowrap text-sm gap-3'>
+                    <button onClick={() => router.push('/tenant/settings')}
+                        className="w-full flex items-center justify-center text-gray-800 px-2 py-2 mx-2 border border-gray-200 rounded-md transition-colors">
+                        <Settings className="h-4 w-4 mr-2" /> Settings
+                    </button>
+                    <button onClick={() => router.push('/tenant/leagues/create')}
+                        className="w-full flex items-center justify-center bg-emerald-600 text-white py-2 px-2 rounded-md hover:bg-emerald-700 transition-colors">
+                        <Plus className="h-4 w-4 mr-2" /> Create New League
+                    </button>
+                </div>
+              </div>
                 {/* Key Metrics Section */}
                 <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
                     {statCards.map((card, index) => (
-                        <StatCard key={index} {...card} />
+                        <StatsCard key={index} {...card} />
                     ))}
                 </section>
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-4">
+                {/* Leagues Overview */}
+                <div className="lg:col-span-2">
+                    <Card className="shadow-elevated">
+                    <CardHeader className="flex flex-row items-center justify-between">
+                        <CardTitle className="text-lg font-semibold">Your Leagues</CardTitle>
+                        <Button variant="default" size="sm" onClick={() => router.push(buildLink('/tenant/leagues'))}>
+                        <Eye className="h-4 w-4 mr-2" />
+                        View All
+                        </Button>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        {leagues?.map((league: LeagueBasic) => (
+                        <Link href={`${buildLink('/league/dashboard')}&ctxLeagueId=${league.id}`} className='m-1' key={league.id}>
+                            <div className="p-4 border border-gray-200 rounded-lg hover:bg-gray-200/30 transition-colors">
+                                <div className="flex items-center justify-between mb-3">
+                                    <div className="flex items-center gap-3">
+                                        <Avatar src={league.logoUrl} name={league.name} size={50} className="mr-2" />
+                                        <div>
+                                        <h3 className="font-semibold text-foreground">{league.name}</h3>
+                                        <div className="flex items-center gap-2 text-xs text-gray-500">
+                                            <span>{capitalize(tenant?.sportType.toString())}</span>
+                                            <span>•</span>
+                                            <span>season 2025</span>
+                                        </div>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <Badge variant={league.isActive === true ? 'success' : 'secondary'}>
+                                        {league.isActive === true? "Active" : "inactive"}
+                                        </Badge>
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button variant="secondary" size="sm">
+                                                    <MoreVertical className="h-4 w-4" />
+                                                </Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent align="end">
+                                                <DropdownMenuItem>
+                                                <Eye className="mr-2 h-4 w-4" />
+                                                View Details
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem>
+                                                <UserPlus className="mr-2 h-4 w-4" />
+                                                Assign Manager
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem>
+                                                <Settings className="mr-2 h-4 w-4" />
+                                                Configure
+                                                </DropdownMenuItem>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                    </div>
+                                    </div>
+                                    
+                                    <div className="grid grid-cols-3 gap-4 text-sm">
+                                    <div className="flex items-center gap-1 text-muted-foreground">
+                                        <Building2 className="h-3 w-3" />
+                                        <span>{league.teams?.length} Teams</span>
+                                    </div>
+                                    <div className="flex items-center gap-1 text-muted-foreground">
+                                        <Crown className="h-3 w-3" />
+                                        <span>{league.managingUsers?.length} Managers</span>
+                                    </div>
+                                    <div className="flex items-center gap-1 text-green-600 font-bold">
+                                        <TrendingUp className="h-3 w-3" />
+                                        <span>$0</span>
+                                    </div>
+                                    </div>
+                                </div>
+                            </Link>
+                        ))}
+                    </CardContent>
+                    </Card>
+                </div>
 
-                {/* Quick Actions / Important Alerts Section (Example) */}
-                <section className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                    <div className="bg-white p-6 rounded-lg shadow-md">
-                        <h2 className="text-xl font-semibold text-gray-800 mb-4">Quick Actions</h2>
-                        <div className="space-y-3">
-                            <button
-                                onClick={() => router.push('/tenant/games/schedule')}
-                                className="w-full flex items-center justify-center bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors"
-                            >
-                                <FiCalendar className="mr-2" /> Schedule Game
-                            </button>
-                            <button
-                                onClick={() => router.push('/tenant/leagues/create')}
-                                className="w-full flex items-center justify-center bg-emerald-600 text-white py-2 px-4 rounded-md hover:bg-emerald-700 transition-colors"
-                            >
-                                <FiAward className="mr-2" /> Create New League
-                            </button>
-                            <button
-                                onClick={() => router.push('/tenant/teams/create')}
-                                className="w-full flex items-center justify-center border border-gray-300 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-50 transition-colors"
-                            >
-                                <FiUsers className="mr-2" /> Add New Team
-                            </button>
-                            <button
-                                onClick={() => router.push('/tenant/players/register')}
-                                className="w-full flex items-center justify-center border border-gray-300 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-50 transition-colors"
-                            >
-                                <FiUser className="mr-2" /> Register New Player
-                            </button>
+                {/* Recent Activity */}
+                <div>
+                    <Card className="shadow-elevated">
+                    <CardHeader>
+                        <CardTitle className="text-lg font-semibold">Recent Activity</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        {recentActivities.map((activity) => (
+                        <div key={activity.id} className="flex items-start gap-3 p-3 rounded-lg hover:bg-muted/30 transition-colors">
+                            <div className="flex-shrink-0 mt-1">
+                            {activity.type === 'league' && <Trophy className="h-4 w-4 text-primary" />}
+                            {activity.type === 'manager' && <Users className="h-4 w-4 text-warning" />}
+                            {activity.type === 'payment' && <TrendingUp className="h-4 w-4 text-success" />}
+                            {activity.type === 'team' && <Target className="h-4 w-4 text-accent" />}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                            <p className="font-medium text-sm text-foreground">{activity.action}</p>
+                            <p className="text-xs text-muted-foreground truncate">{activity.details}</p>
+                            <p className="text-xs text-muted-foreground mt-1">{activity.time}</p>
+                            </div>
                         </div>
-                    </div>
-
-                    <div className="bg-white p-6 rounded-lg shadow-md">
-                        <h2 className="text-xl font-semibold text-gray-800 mb-4">Important Alerts</h2>
-                        <ul className="space-y-2">
-                            <li className="flex items-center text-red-600">
-                                <FiAlertTriangle className="mr-2" /> Pending Player Transfers: 3
-                            </li>
-                            <li className="flex items-center text-orange-600">
-                                <FiMessageSquare className="mr-2" /> New Support Tickets: 1
-                            </li>
-                            <li className="flex items-center text-blue-600">
-                                <FiDollarSign className="mr-2" /> Unreconciled Payments: 2
-                            </li>
-                        </ul>
-                    </div>
+                        ))}
+                    </CardContent>
+                    </Card>
+                </div>
+                </div>
+                {/* Quick Actions */}
+                <section className='mb-4'>
+                    <Card className="shadow-elevated">
+                    <CardHeader>
+                        <CardTitle className="text-lg font-semibold">Quick Actions</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <Button variant="outline" className="h-20 flex-col gap-2">
+                            <Plus className="h-6 w-6" />
+                            <span className="text-sm">Create League</span>
+                        </Button>
+                        <Button variant="outline" className="h-20 flex-col gap-2">
+                            <UserPlus className="h-6 w-6" />
+                            <span className="text-sm">Add Manager</span>
+                        </Button>
+                        <Button variant="outline" className="h-20 flex-col gap-2">
+                            <Calendar className="h-6 w-6" />
+                            <span className="text-sm">Schedule Game</span>
+                        </Button>
+                        <Button variant="outline" className="h-20 flex-col gap-2">
+                            <TrendingUp className="h-6 w-6" />
+                            <span className="text-sm">View Analytics</span>
+                        </Button>
+                        </div>
+                    </CardContent>
+                    </Card>
                 </section>
-
                 {/* Upcoming Games Table */}
                 <section className="bg-white p-6 rounded-lg shadow-md mb-8">
                     <div className="flex justify-between items-center mb-4">

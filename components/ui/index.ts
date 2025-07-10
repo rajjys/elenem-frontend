@@ -15,3 +15,4 @@ export * from './dropdown-menu';
 export * from './card';
 export * from './dialog';
 export * from './badge';
+export * from './avatar';

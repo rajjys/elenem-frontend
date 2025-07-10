@@ -60,7 +60,19 @@ export const LeagueBasicSchema: z.ZodSchema<any> = z.lazy(() => z.object({
 
   ownerId: z.string().cuid().nullable().optional(),
   owner: UserLiteResponseSchema.nullable().optional(),
-
+  managingUsers: z.array(UserLiteResponseSchema).optional(), // Array of users managing the league
+  teams: z.array(z.object({
+    id: z.string().cuid(),
+    name: z.string(),
+    logoUrl: z.string().nullable().optional(),
+    shortCode: z.string().nullable().optional(),
+    bannerImageUrl: z.string().nullable().optional(),
+    isActive: z.boolean(),
+    country: z.string().nullable().optional(),
+    region: z.string().nullable().optional(),
+    city: z.string().nullable().optional(),
+    state: z.string().nullable().optional(),
+  })).optional(),
   // If you include createdBy, updatedBy, deletedBy in LeagueResponseDto, add them here:
   // createdById: z.string().cuid().nullable().optional(),
   // createdBy: UserLiteResponseSchema.nullable().optional(),

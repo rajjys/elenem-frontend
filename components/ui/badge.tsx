@@ -21,7 +21,7 @@ export function Badge({ children, variant = 'default', className }: BadgeProps) 
       baseClasses += ' bg-secondary text-secondary-foreground hover:bg-secondary/80'; // Example: light gray
       break;
     case 'success':
-      baseClasses += ' bg-green-500 text-white hover:bg-green-600'; // For active states
+      baseClasses += ' bg-green-600 text-white'; // For active states
       break;
     case 'destructive':
       baseClasses += ' bg-red-500 text-white hover:bg-red-600'; // For inactive/error states
