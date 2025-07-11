@@ -127,7 +127,7 @@ export default function TenantDashboard() {
         setError(null);
         try {
           const response = await api.get(`/tenants/${currentTenantId}`);
-          console.log(response);
+          //console.log(response);
           const validatedTenant = TenantDetailsSchema.parse(response.data);
           setTenant(validatedTenant);
         } catch (err: any) {
@@ -190,11 +190,11 @@ export default function TenantDashboard() {
   { id: 5, action: "New team registered", details: "Thunder Bolts joined Basketball League", time: "3 hours ago", type: "team" }
 ];
     return (
-            <div className="min-h-screen">
-              <Head>
+        <div className="min-h-screen">
+            <Head>
                 <title>Tenant Dashboard - ELENEM Sports</title>
-              </Head>
-              <div className='flex items-center justify-between'>
+            </Head>  
+            <section className='flex items-center justify-between'>
                 <h1 className="text-2xl font-bold text-gray-800 mb-6">{tenant?.name}</h1>
                 <div className='flex whitespace-nowrap text-sm gap-3'>
                     <button onClick={() => router.push('/tenant/settings')}
@@ -206,25 +206,25 @@ export default function TenantDashboard() {
                         <Plus className="h-4 w-4 mr-2" /> Create New League
                     </button>
                 </div>
-              </div>
+            </section>
                 {/* Key Metrics Section */}
-                <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
-                    {statCards.map((card, index) => (
-                        <StatsCard key={index} {...card} />
-                    ))}
-                </section>
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-4">
-                {/* Leagues Overview */}
+            <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
+                {statCards.map((card, index) => (
+                    <StatsCard key={index} {...card} />
+                ))}    
+            </section>
+            {/* Leagues Overview */}
+            <section className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-4">
                 <div className="lg:col-span-2">
                     <Card className="shadow-elevated">
-                    <CardHeader className="flex flex-row items-center justify-between">
-                        <CardTitle className="text-lg font-semibold">Your Leagues</CardTitle>
-                        <Button variant="default" size="sm" onClick={() => router.push(buildLink('/tenant/leagues'))}>
-                        <Eye className="h-4 w-4 mr-2" />
-                        View All
-                        </Button>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
+                        <CardHeader className="flex flex-row items-center justify-between">
+                            <CardTitle className="text-lg font-semibold">Your Leagues</CardTitle>
+                            <Button variant="default" size="sm" onClick={() => router.push(buildLink('/tenant/leagues'))}>
+                                <Eye className="h-4 w-4 mr-2" />
+                                    View All
+                            </Button>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
                         {leagues?.map((league: LeagueBasic) => (
                         <Link href={`${buildLink('/league/dashboard')}&ctxLeagueId=${league.id}`} className='m-1' key={league.id}>
                             <div className="p-4 border border-gray-200 rounded-lg hover:bg-gray-200/30 transition-colors">
@@ -271,11 +271,11 @@ export default function TenantDashboard() {
                                     <div className="grid grid-cols-3 gap-4 text-sm">
                                     <div className="flex items-center gap-1 text-muted-foreground">
                                         <Building2 className="h-3 w-3" />
-                                        <span>{league.teams?.length} Teams</span>
+                                        <span className='text-gray-500'>{league.teams?.length} Teams</span>
                                     </div>
                                     <div className="flex items-center gap-1 text-muted-foreground">
                                         <Crown className="h-3 w-3" />
-                                        <span>{league.managingUsers?.length} Managers</span>
+                                        <span className='text-gray-500'>{league.managingUsers?.length} Managers</span>
                                     </div>
                                     <div className="flex items-center gap-1 text-green-600 font-bold">
                                         <TrendingUp className="h-3 w-3" />
@@ -314,37 +314,37 @@ export default function TenantDashboard() {
                     </CardContent>
                     </Card>
                 </div>
-                </div>
-                {/* Quick Actions */}
-                <section className='mb-4'>
-                    <Card className="shadow-elevated">
+            </section>
+            {/* Quick Actions */}
+            <section className='mb-4'>
+                <Card className="shadow-elevated">
                     <CardHeader>
                         <CardTitle className="text-lg font-semibold">Quick Actions</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <Button variant="outline" className="h-20 flex-col gap-2">
+                        <Button variant="default" className="h-20 flex-col gap-2">
                             <Plus className="h-6 w-6" />
                             <span className="text-sm">Create League</span>
                         </Button>
-                        <Button variant="outline" className="h-20 flex-col gap-2">
+                        <Button variant="default" className="h-20 flex-col gap-2">
                             <UserPlus className="h-6 w-6" />
                             <span className="text-sm">Add Manager</span>
                         </Button>
-                        <Button variant="outline" className="h-20 flex-col gap-2">
+                        <Button variant="default" className="h-20 flex-col gap-2">
                             <Calendar className="h-6 w-6" />
                             <span className="text-sm">Schedule Game</span>
                         </Button>
-                        <Button variant="outline" className="h-20 flex-col gap-2">
+                        <Button variant="default" className="h-20 flex-col gap-2">
                             <TrendingUp className="h-6 w-6" />
                             <span className="text-sm">View Analytics</span>
                         </Button>
                         </div>
                     </CardContent>
                     </Card>
-                </section>
-                {/* Upcoming Games Table */}
-                <section className="bg-white p-6 rounded-lg shadow-md mb-8">
+            </section>    
+            {/* Upcoming Games Table */}
+            <section className="bg-white p-6 rounded-lg shadow-md mb-8" hidden>
                     <div className="flex justify-between items-center mb-4">
                         <h2 className="text-xl font-semibold text-gray-800">Upcoming Games</h2>
                         <Link href={buildLink("/games")} className="text-emerald-600 hover:text-emerald-700 text-sm font-medium">
@@ -397,8 +397,8 @@ export default function TenantDashboard() {
                             </tbody>
                         </table>
                     </div>
-                </section>
-                {/* Additional sections can be added here, e.g., "Recent Activity," "Revenue Trends" */}
-            </div>
+            </section>
+            {/* Additional sections can be added here, e.g., "Recent Activity," "Revenue Trends" */}
+        </div>
     );
 }

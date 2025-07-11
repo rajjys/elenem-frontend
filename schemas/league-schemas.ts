@@ -73,6 +73,13 @@ export const LeagueBasicSchema: z.ZodSchema<any> = z.lazy(() => z.object({
     city: z.string().nullable().optional(),
     state: z.string().nullable().optional(),
   })).optional(),
+  players: z.array(z.object({
+    id: z.string().cuid(),
+    firstName: z.string().nullable().optional(),
+    lastName: z.string().nullable().optional(),
+    email: z.string().email(),
+    profilePictureUrl: z.string().nullable().optional(),
+  }))
   // If you include createdBy, updatedBy, deletedBy in LeagueResponseDto, add them here:
   // createdById: z.string().cuid().nullable().optional(),
   // createdBy: UserLiteResponseSchema.nullable().optional(),

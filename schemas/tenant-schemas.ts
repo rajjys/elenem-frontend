@@ -87,7 +87,7 @@ export const TenantDetailsSchema = z.object({
     isActive: z.boolean(),
     createdAt: z.preprocess((arg) => new Date(arg as string), z.date()),
     updatedAt: z.preprocess((arg) => new Date(arg as string), z.date()),
-    logoUrl: z.string(),
+    logoUrl: z.string().optional(),
   })).optional(), // Optional array of leagues associated with the tenant
   teams: z.array(z.object({
     id: z.string().cuid(),

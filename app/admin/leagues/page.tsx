@@ -57,6 +57,7 @@ export default function AdminLeaguesPage() {
       // Your actual API call to list leagues
       const response = await api.get(`/leagues?${params.toString()}`);
       // Validate data with Zod schema
+      console.log('Leagues response:', response.data);
       const validatedData = PaginatedLeaguesResponseSchema.parse(response.data);
 
       setLeagues(validatedData.data);

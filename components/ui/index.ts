@@ -16,3 +16,5 @@ export * from './card';
 export * from './dialog';
 export * from './badge';
 export * from './avatar';
+export * from './stats-card';
+export * from './progress';
