@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
-import { Avatar } from "@/components/ui/";
+import { Avatar, StatsCard } from "@/components/ui/";
 import {
   Users,
   Building2,
@@ -42,13 +42,17 @@ import {
   Clock,
   Plus
 } from "lucide-react";
+import { useContextualLink } from "@/hooks";
 
 const SystemAdminDashboard = () => {
+
+  const { buildLink } = useContextualLink();
+
   const systemMetrics = [
-    { title: "Total Users", value: "12,847", change: "+8.2%", icon: Users, color: "text-blue-600" },
-    { title: "Active Tenants", value: "324", change: "+12.1%", icon: Building2, color: "text-green-600" },
-    { title: "Monthly Revenue", value: "$89,230", change: "+15.3%", icon: DollarSign, color: "text-emerald-600" },
-    { title: "System Uptime", value: "99.97%", change: "+0.02%", icon: Activity, color: "text-purple-600" }
+    { title: "Total Users", value: "12,847", description: "Active Individual Users", trend: {isPositive: true, value: 3.6, timespan: "season"}, icon: Users, bgColorClass: "bg-blue-400", textColorClass: "text-white", href: buildLink("/admin/users") },
+    { title: "Active Tenants", value: "324", description: "Tenants with active subscriptions", trend: {isPositive: true, value: 3.6, timespan: "season"}, icon: Building2, bgColorClass: "bg-green-400", textColorClass: "text-white", href: buildLink("/admin/tenants") },
+    { title: "Monthly Revenue", value: "$89,230", description: "Income From Subscriptions",trend: {isPositive: true, value: 3.6, timespan: "season"}, icon: DollarSign, bgColorClass: "bg-orange-400", textColorClass: "text-white", href: buildLink("/admin/financials/revenue")  },
+    { title: "System Uptime", value: "99.97%", description: "Average Time Alive", trend: {isPositive: true, value: 4.8, timespan: "season"}, icon: Activity, color: "text-purple-600", bgColorClass: "bg-red-400", textColorClass: "text-white", href: buildLink("/admin/system/status")  },
   ];
 
   const userManagement = [
@@ -115,11 +119,11 @@ const SystemAdminDashboard = () => {
         {/* Header */}
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold text-foreground flex items-center gap-3">
-              <Crown className="h-8 w-8 text-primary" />
+            <h1 className="text-2xl font-bold text-foreground flex items-center gap-3">
+              <Crown className="h-8 w-8 text-blue-400" />
               System Administration
             </h1>
-            <p className="text-muted-foreground mt-1">Complete platform oversight and management</p>
+            <p className="text-gray-500 mt-1">Complete platform oversight and management</p>
           </div>
           <div className="flex gap-3">
             <Button variant="outline" size="sm">
@@ -136,26 +140,13 @@ const SystemAdminDashboard = () => {
         {/* System Metrics Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {systemMetrics.map((metric, index) => (
-            <Card key={index} className="hover:shadow-md transition-shadow">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
-                  {metric.title}
-                </CardTitle>
-                <metric.icon className={`h-5 w-5 ${metric.color}`} />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-foreground">{metric.value}</div>
-                <p className="text-xs text-muted-foreground">
-                  <span className="text-green-600">{metric.change}</span> from last month
-                </p>
-              </CardContent>
-            </Card>
+              <StatsCard key={index} {...metric} />
           ))}
         </div>
 
         {/* Main Content Tabs */}
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6">
+          <TabsList className="grid w-full grid-cols-6 bg-gray-200">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="users">User Management</TabsTrigger>
             <TabsTrigger value="system">System Health</TabsTrigger>

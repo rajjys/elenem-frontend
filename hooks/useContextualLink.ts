@@ -16,23 +16,17 @@ export const useContextualLink = () => {
   const contextLeagueId = searchParams.get('ctxLeagueId');
   const contextTeamId = searchParams.get('ctxTeamId');
 
-  /**
-   * Builds a complete, context-aware URL.
-   * @param basePath The base path of the link (e.g., '/league/games').
-   * @returns The full path including any necessary context query parameters.
-   */
-  const buildLink = (basePath: string): string => {
+  const buildLink = (basePath: string, overrideParams: Record<string, string> = {}): string => {
     const contextualParams = new URLSearchParams();
 
-    if (contextTenantId) {
-      contextualParams.set('ctxTenantId', contextTenantId);
-    }
-    if (contextLeagueId) {
-      contextualParams.set('ctxLeagueId', contextLeagueId);
-    }
-    if (contextTeamId) {
-      contextualParams.set('ctxTeamId', contextTeamId);
-    }
+    if (contextTenantId) contextualParams.set('ctxTenantId', contextTenantId);
+    if (contextLeagueId) contextualParams.set('ctxLeagueId', contextLeagueId);
+    if (contextTeamId) contextualParams.set('ctxTeamId', contextTeamId);
+
+    // Override or append custom values
+    Object.entries(overrideParams).forEach(([key, value]) => {
+      contextualParams.set(key, value);
+    });
 
     const queryString = contextualParams.toString();
     return queryString ? `${basePath}?${queryString}` : basePath;

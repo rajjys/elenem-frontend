@@ -175,7 +175,7 @@ export default function TenantLeaguesPage() {
                 {leagues.map((league) => (
                   <tr key={league.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      <Link href={`${buildLink('/league/dashboard/')}&ctxLeagueId=${league.id}`} className="text-emerald-600 hover:underline">
+                      <Link href={buildLink('/league/dashboard', { ctxLeagueId: league.id })} className="text-emerald-600 hover:underline">
                         {league.name}
                       </Link>
                     </td>

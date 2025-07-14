@@ -101,7 +101,7 @@ export function TenantForm({ initialData, isEditMode = false, onSuccess, onCance
         const roles = [Role.GENERAL_USER];
         roles.forEach(role => params.append('roles', role));
         params.append('tenantId', 'null');
-        console.log('Params: ', params.toString());
+        //console.log('Params: ', params.toString());
         const response = await api.get<PaginatedResponseDto>(`/users?${params.toString()}`);
         setAvailableOwners(response.data.data);
       } catch (error) {
@@ -135,7 +135,7 @@ export function TenantForm({ initialData, isEditMode = false, onSuccess, onCance
       if (isEditMode && initialData?.id) {
         // Update existing tenant
         response = await api.put(`/tenants/${initialData.id}`, payload);
-        console.log(response);
+        //console.log(response);
         toast.success("Tenant updated successfully!");
       } else {
         // Create new tenant

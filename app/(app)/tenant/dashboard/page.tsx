@@ -226,7 +226,7 @@ export default function TenantDashboard() {
                         </CardHeader>
                         <CardContent className="space-y-4">
                         {leagues?.map((league: LeagueBasic) => (
-                        <Link href={`${buildLink('/league/dashboard')}&ctxLeagueId=${league.id}`} className='m-1' key={league.id}>
+                        <Link href={buildLink('/league/dashboard', { ctxLeagueId: league.id })} className='m-1' key={league.id}>
                             <div className="p-4 border border-gray-200 rounded-lg hover:bg-gray-200/30 transition-colors">
                                 <div className="flex items-center justify-between mb-3">
                                     <div className="flex items-center gap-3">

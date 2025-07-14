@@ -120,7 +120,7 @@ export default function AdminTenantsPage() {
           onFilterChange={handleFilterChange}
           onPageSizeChange={handlePageSizeChange}
         />
-        <Link href="/admin/tenants/create" passHref>
+        <Link href="/tenant/create" passHref>
           <Button variant="primary" className='whitespace-nowrap'>Create New Tenant</Button>
         </Link>
       </div>

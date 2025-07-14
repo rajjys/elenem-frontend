@@ -5,9 +5,10 @@ import {FiShield,FiUser, FiLogOut, FiMenu, FiX, FiAward} from 'react-icons/fi'; 
 import { useAuthStore } from '@/store/auth.store'; // Assuming this path is correct
 // Import your existing components. Replace these with your actual paths.
 import { CollapsibleNavLink, FlyoutMenu, NavLink } from '.'; // Adjust this import path if needed
-import { useContextualLink } from '@/hooks';
+import { useContextualLink, useSidebarEligibility } from '@/hooks';
 import { ContextSwitcher } from './navigation/ContextSwitcher';
 import { Role } from '@/schemas';
+import { AppLayoutNavbar } from './AppLayourNavbar';
 
 // Type for a React Icon component
 type IconType = React.ComponentType<React.SVGProps<SVGSVGElement>>;
@@ -71,7 +72,7 @@ export default function AppLayout({
                         isCoach ? '/coach/dashboard' :
                         isReferee ? '/referee/dashboard' :
                         '/dashboard'; // Default fallback
-
+  const shouldShowSidebar = useSidebarEligibility()
   const handleLogout = () => {
     logout();
     router.push('/login');
@@ -111,27 +112,23 @@ export default function AppLayout({
   const themeClass = `${themeColor}-theme`; // e.g., "emerald-theme"
 
   return (
-    <div
-      className={`flex h-screen bg-gray-100 overflow-hidden ${themeClass}`} // Apply themeClass here
-    >
-      {/* Desktop Sidebar */}
-      <aside className={`bg-white shadow-lg transition-all duration-300 ease-in-out hidden md:flex flex-col sticky top-0 h-full
-                          ${isSidebarOpen ? "w-64" : "w-20"}`}>
+  <div className={`flex flex-col h-screen bg-gray-100 ${themeClass}`}>
+    
+    {/* Navbar is always visible */}
+    <AppLayoutNavbar dashboardLink={dashboardLink} /> 
+    <div className='flex flex-1 overflow-hidden'>
+      {/* Sidebar (desktop) */}
+    {shouldShowSidebar && (
+      <aside className={`bg-white shadow-lg transition-all duration-300 ease-in-out hidden md:flex flex-col sticky top-16 h-[calc(100vh-4rem)]
+                        ${isSidebarOpen ? "w-64" : "w-20"}`}>
         <div className={`flex items-center p-4 border-b border-gray-200 ${isSidebarOpen ? "justify-between" : "justify-center"}`}>
-          {isSidebarOpen && (
-            <Link href={dashboardLink} className="flex items-center space-x-2" onClick={closeFlyout}>
-              <div className={`p-2 rounded-lg bg-primary-600`}> {/* Uses primary theme */}
-                <LogoIcon className="h-6 w-6 text-white" />
-              </div>
-              <span className="font-bold text-xl text-primary-700">{headerTitle}</span> {/* Uses primary theme */}
-            </Link>
-          )}
-          <button onClick={toggleSidebar} className="p-1.5 rounded-md text-gray-600 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-500"> {/* Uses primary theme for focus ring */}
+          <button onClick={toggleSidebar} className="p-1.5 rounded-md text-gray-600 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-500">
             {isSidebarOpen ? <FiX className="w-5 h-5" /> : <FiMenu className="w-5 h-5" />}
           </button>
         </div>
+
         <nav className="flex-grow p-2 space-y-1 overflow-y-auto">
-          {navItems.map((category) => (
+          {navItems.map(category => (
             <CollapsibleNavLink
               key={category.label}
               category={category}
@@ -139,62 +136,75 @@ export default function AppLayout({
               isSidebarOpen={isSidebarOpen}
               onFlyoutToggle={handleFlyoutToggle}
               activeFlyoutLabel={activeFlyoutLabel}
-              themeColor={themeColor} // Pass theme color to your CollapsibleNavLink
+              themeColor={themeColor}
               buildLink={buildLink}
             />
           ))}
-          {/* Account/Security links are fixed, but can be made dynamic via props if needed */}
           <div className="mt-auto pt-4 border-t border-gray-200">
-            <NavLink item={{ label: "My Profile", basePath: "/account/profile", icon: FiUser }} buildLink={buildLink} currentPath={currentPath} isSidebarOpen={isSidebarOpen} onClick={closeFlyout} themeColor={themeColor} />
-            <NavLink item={{ label: "Security", basePath: "/account/security", icon: FiShield }} buildLink={buildLink} currentPath={currentPath} isSidebarOpen={isSidebarOpen} onClick={closeFlyout} themeColor={themeColor} />
-            <button onClick={handleLogout} className={`flex items-center text-sm p-2 rounded-md transition-colors w-full ${isSidebarOpen ? "justify-start pl-3" : "justify-center"} text-primary-700 hover:bg-primary-100`} title="Logout"> {/* Uses primary theme */}
+            <NavLink 
+              item={{ label: "My Profile", basePath: "/account/profile", icon: FiUser }} 
+              buildLink={buildLink} 
+              currentPath={currentPath} 
+              isSidebarOpen={isSidebarOpen} 
+              onClick={closeFlyout} 
+              themeColor={themeColor} /> 
+            <NavLink 
+              item={{ label: "Security", basePath: "/account/security", icon: FiShield }} 
+              buildLink={buildLink} 
+              currentPath={currentPath} 
+              isSidebarOpen={isSidebarOpen} 
+              onClick={closeFlyout} 
+              themeColor={themeColor} />
+            <button onClick={handleLogout} className={`flex items-center text-sm p-2 rounded-md transition-colors w-full ${isSidebarOpen ? "justify-start pl-3" : "justify-center"} text-primary-700 hover:bg-primary-100`}>
               <FiLogOut className={`w-5 h-5 ${isSidebarOpen ? "mr-3" : ""}`} />
               {isSidebarOpen && 'Logout'}
             </button>
           </div>
         </nav>
       </aside>
+    )}
 
-      {/* Mobile Menu Container (Handles transition) */}
-      <div className={`fixed inset-0 z-40 flex md:hidden
-                               ${isMobileMenuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}
-                               transition-opacity duration-300 ease-in-out`}>
-        {/* Overlay */}
+    {/* Mobile Sidebar */}
+    {shouldShowSidebar && (
+      <div className={`fixed inset-0 z-40 flex md:hidden ${isMobileMenuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"} transition-opacity duration-300 ease-in-out`}>
         <div className="fixed inset-0 bg-black/50" onClick={closeMobileMenu}></div>
-        {/* Mobile Sidebar */}
-        <aside className={`relative flex flex-col w-64 max-w-xs h-full bg-white shadow-xl py-4 z-50
-                                 transform transition-transform duration-300 ease-in-out
-                                 ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        <aside className={`relative flex flex-col w-64 max-w-xs h-full bg-white shadow-xl py-4 z-50 transform transition-transform duration-300 ease-in-out ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+          {/* Optional header for mobile */}
           <div className="flex items-center justify-between px-4 pb-2 border-b">
-            <Link href={buildLink(navItems[0]?.subItems[0]?.basePath || '/')} className="flex items-center space-x-2" onClick={closeMobileMenu}>
-              <div className={`p-2 rounded-lg bg-primary-600`}> {/* Uses primary theme */}
-                <LogoIcon className="h-6 w-6 text-white" />
-              </div>
-              <span className="font-bold text-xl text-primary-700">{headerTitle}</span> {/* Uses primary theme */}
-            </Link>
-            <button onClick={closeMobileMenu} className="p-2 rounded-md text-gray-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-500"> {/* Uses primary theme for focus ring */}
+            <button onClick={closeMobileMenu} className="p-2 rounded-md text-gray-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-500">
               <FiX className="w-6 h-6" />
             </button>
           </div>
           <nav className="flex-grow p-2 space-y-1 overflow-y-auto">
-            {navItems.map((category) => (
-              <CollapsibleNavLink
-                key={category.label}
-                category={category}
-                currentPath={currentPath}
-                isSidebarOpen={true} // In mobile, categories always behave as if sidebar is open for accordion
-                onFlyoutToggle={() => {}} // No flyouts in mobile menu
-                activeFlyoutLabel={null}
-                onMobileLinkClick={closeMobileMenu}
-                themeColor={themeColor} // Pass theme color to your CollapsibleNavLink
-                buildLink={buildLink} 
+            {navItems.map(category => (
+              <CollapsibleNavLink 
+                key={category.label} 
+                category={category} 
+                currentPath={currentPath} 
+                isSidebarOpen={true} // In mobile, categories always behave as if sidebar is open for accordion 
+                onFlyoutToggle={() => {}} // No flyouts in mobile menu 
+                activeFlyoutLabel={null} 
+                onMobileLinkClick={closeMobileMenu} 
+                themeColor={themeColor} // Pass theme color to your CollapsibleNavLink 
+                buildLink={buildLink}
               />
-            ))}
-            {/* Account/Security links for mobile */}
+            ))} 
             <div className="mt-auto pt-4 border-t border-gray-200">
-              <NavLink item={{ label: "My Profile", basePath: "/account/profile", icon: FiUser }} buildLink={buildLink} currentPath={currentPath} isSidebarOpen={true} onClick={closeMobileMenu} themeColor={themeColor} />
-              <NavLink item={{ label: "Security", basePath: "/account/security", icon: FiShield }} buildLink={buildLink} currentPath={currentPath} isSidebarOpen={true} onClick={closeMobileMenu} themeColor={themeColor} />
-              <button onClick={handleLogout} className="flex items-center text-sm p-2 rounded-md transition-colors w-full justify-start pl-3 text-primary-700 hover:bg-primary-100"> {/* Uses primary theme */}
+              <NavLink 
+                item={{ label: "My Profile", basePath: "/account/profile", icon: FiUser }} 
+                buildLink={buildLink} currentPath={currentPath} 
+                isSidebarOpen={true} onClick={closeMobileMenu} 
+                themeColor={themeColor} 
+              /> 
+              <NavLink 
+                item={{ label: "Security", basePath: "/account/security", icon: FiShield }} 
+                buildLink={buildLink} 
+                currentPath={currentPath} 
+                isSidebarOpen={true} 
+                onClick={closeMobileMenu} 
+                themeColor={themeColor}
+              />
+              <button onClick={handleLogout} className="flex items-center text-sm p-2 rounded-md transition-colors w-full justify-start pl-3 text-primary-700 hover:bg-primary-100">
                 <FiLogOut className="w-5 h-5 mr-3" />
                 Logout
               </button>
@@ -202,49 +212,33 @@ export default function AppLayout({
           </nav>
         </aside>
       </div>
+    )}
 
-      {/* Main Content Area */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <header className="bg-white shadow-sm p-4 flex items-center justify-between sticky top-0 z-30">
-          <div className="flex items-center">
-            <button onClick={toggleMobileMenu} className="md:hidden p-2 rounded-md text-gray-600 hover:bg-gray-100 mr-2 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-500"> {/* Uses primary theme for focus ring */}
-              <FiMenu className="w-6 h-6" />
-            </button>
-            <h1 className="text-xl font-semibold text-gray-800">Context title Here</h1>
-          </div>
-          {showContextSwitcher && <ContextSwitcher />}
-          {userAuth && (
-            <div className="flex items-center space-x-3">
-              <span className="text-sm text-gray-700 hidden sm:inline">Welcome, {userAuth.username}</span>
-              <div className={`w-9 h-9 rounded-full text-white flex items-center justify-center text-sm font-semibold bg-primary-600`}> {/* Uses primary theme */}
-                {userAuth.firstName?.charAt(0).toUpperCase() || userAuth.username?.charAt(0).toUpperCase()}
-              </div>
-              <button onClick={handleLogout} className={`flex items-center text-sm p-2 rounded-md transition-colors text-primary-700 hover:bg-primary-100`} title="Logout"> {/* Uses primary theme */}
-                <FiLogOut className="w-5 h-5" />
-                Logout
-              </button>
-            </div>
-          )}
-        </header>
-        <main className="flex-1 p-6 overflow-y-auto bg-gray-50">
-          {children}
-        </main>
-      </div>
-      {/* Desktop Collapsed Sidebar Flyout Menu */}
-      {activeFlyoutLabel && !isSidebarOpen && flyoutPosition && (
-        <FlyoutMenu
-          items={navItems.find(cat => cat.label === activeFlyoutLabel)?.subItems || []}
-          position={flyoutPosition}
-          currentPath={currentPath}
-          onClose={closeFlyout}
-          onLinkClick={closeFlyout}
-          triggerRef={currentFlyoutTriggerRef}
-          themeColor={themeColor} // Pass theme color to your FlyoutMenu
-          buildLink={buildLink} // Pass down the function
-        />
-      )}
+    {/* Content */}
+    <div className="flex-1 flex flex-col overflow-hidden">
+      <main className="flex-1 p-6 overflow-y-auto bg-gray-50">
+        {children}
+      </main>
     </div>
-  );
+
+    {/* Flyout (collapsed sidebar) */}
+    {activeFlyoutLabel && !isSidebarOpen && flyoutPosition && (
+      <FlyoutMenu
+        items={navItems.find(cat => cat.label === activeFlyoutLabel)?.subItems || []}
+        position={flyoutPosition}
+        currentPath={currentPath}
+        onClose={closeFlyout}
+        onLinkClick={closeFlyout}
+        triggerRef={currentFlyoutTriggerRef}
+        themeColor={themeColor}
+        buildLink={buildLink}
+      />
+    )}
+    </div>
+    
+  </div>
+)
+
 }
 // Note: This AppLayout component is designed to be flexible and reusable.
 // You can pass different `navItems`, `themeColor`, and other props to customize it

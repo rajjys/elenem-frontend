@@ -25,7 +25,6 @@ import {
     FiTerminal
 } from 'react-icons/fi';
 import { useAuthStore } from '@/store/auth.store';
-import { CollapsibleNavLink, FlyoutMenu, NavLink } from '@/components/layouts';
 import AppLayout from '@/components/layouts/AppLayout';
 
 interface SystemAdminLayoutProps {
@@ -92,58 +91,6 @@ const systemNavItems = [
   },
 ];
 export default function SystemAdminLayout({ children }: SystemAdminLayoutProps) {
-    const currentPath = usePathname();
-    const { user, logout } = useAuthStore();
-    const router = useRouter();
-    const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-    const [activeFlyoutLabel, setActiveFlyoutLabel] = useState<string | null>(null);
-    const [flyoutPosition, setFlyoutPosition] = useState<{ top: number; left: number } | null>(null);
-    const [currentFlyoutTriggerRef, setCurrentFlyoutTriggerRef] = useState<RefObject<HTMLElement> | null>(null);
-
-
-    //const user: SystemAdminUser | null = { username: "SysAdmin", avatarInitial: "SA" };
-    const handleLogout = () => {
-        logout();
-        router.push('/login');
-    };
-
-    const SIDEBAR_OPEN_WIDTH = 64 * 4; // 256px or w-64
-    const SIDEBAR_CLOSED_WIDTH = 20 * 4; // 80px or w-20
-
-    const handleFlyoutToggle = (label: string, targetElement: HTMLElement) => {
-        if (activeFlyoutLabel === label || label === "") { // If clicking the same one or explicitly closing
-            setActiveFlyoutLabel(null);
-            setFlyoutPosition(null);
-            setCurrentFlyoutTriggerRef(null);
-        } else {
-            const rect = targetElement.getBoundingClientRect();
-            setActiveFlyoutLabel(label);
-            // Position to the right of the collapsed sidebar icon
-            setFlyoutPosition({ 
-                top: rect.top, 
-                left: rect.left + rect.width + 2 // Add small gap
-            });
-             // Create a temporary ref object for the trigger to pass to useClickAway
-            const triggerRefObject = { current: targetElement };
-            setCurrentFlyoutTriggerRef(triggerRefObject as RefObject<HTMLElement>);
-        }
-    };
-    
-    const closeFlyout = () => {
-        setActiveFlyoutLabel(null);
-        setFlyoutPosition(null);
-        setCurrentFlyoutTriggerRef(null);
-    };
-
-    const toggleSidebar = () => {
-        setIsSidebarOpen(!isSidebarOpen);
-        closeFlyout(); // Close flyout when sidebar state changes
-    }
-    const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
-    const closeMobileMenu = () => setIsMobileMenuOpen(false);
-
 
     return (
         <AppLayout
