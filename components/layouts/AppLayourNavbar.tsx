@@ -1,7 +1,7 @@
-// components/layout/DashboardNavbar.tsx
+// components/layout/AppLayoutNavbar.tsx
 'use client'
 
-import { Bell, Search, User, LogOut, UserCircle, Settings } from 'lucide-react'
+import { Bell, Search, User, LogOut, UserCircle, Settings, Menu } from 'lucide-react' // Import Menu icon
 import { useRouter } from 'next/navigation'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -16,11 +16,17 @@ import {
 import Link from 'next/link'
 import { useAuthStore } from '@/store/auth.store'
 
-export function AppLayoutNavbar({ dashboardLink }: { dashboardLink: string }) {
+interface AppLayoutNavbarProps {
+  dashboardLink: string;
+  onMobileMenuToggle: () => void; // New prop for toggling mobile menu
+}
+
+export function AppLayoutNavbar({ dashboardLink, onMobileMenuToggle }: AppLayoutNavbarProps) {
   const router = useRouter()
-  const { user } = useAuthStore()
+  const { user, logout } = useAuthStore()
 
   const handleLogout = () => {
+    logout() // Call the logout function from the auth store
     router.push('/logout') // Or call a logout mutation
   }
 
@@ -28,6 +34,16 @@ export function AppLayoutNavbar({ dashboardLink }: { dashboardLink: string }) {
     <header className="bg-white shadow-sm h-16 flex items-center justify-between px-6 sticky top-0 z-30">
       {/* Left Section */}
       <div className="flex items-center gap-4">
+        {/* Mobile menu toggle button - visible only on small screens */}
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={onMobileMenuToggle}
+          className="md:hidden" // Hide on medium and larger screens
+        >
+          <Menu className="h-6 w-6" />
+        </Button>
+
         <Link href={dashboardLink} className="flex items-center gap-2 font-semibold text-gray-700 hover:text-primary-600 transition-colors">
           <div className="bg-primary-600 p-2 rounded text-white">
             <UserCircle className="h-5 w-5" />
@@ -35,7 +51,7 @@ export function AppLayoutNavbar({ dashboardLink }: { dashboardLink: string }) {
           <span className="text-sm">Dashboard</span>
         </Link>
 
-        <div className="relative">
+        <div className="relative hidden md:block"> {/* Search bar hidden on mobile */}
           <Input
             placeholder="Search teams, players, games..."
             type='search'

@@ -3,23 +3,22 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { api } from '@/services/api';
-import { SeasonResponseDto, SeasonFilterParams, PaginatedSeasonsResponseSchema, SeasonFilterParamsSchema, SeasonSortableColumn } from '@/schemas';
-import { SeasonsFilters } from '@/components/season/seasons-filters';
-import { SeasonsTable } from '@/components/season/seasons-table';
-import { Pagination } from '@/components/ui/pagination';
-import { LoadingSpinner } from '@/components/ui/loading-spinner';
-import { Button } from '@/components/ui/button';
-import { toast } from 'sonner';
+import { api } from '@/services/api'; // Your actual API instance
+import { SeasonResponseDto, SeasonFilterParams, PaginatedSeasonsResponseSchema, SeasonFilterParamsSchema, SeasonSortableColumn } from '@/schemas'; // Your Season DTOs and schemas
+import { SeasonsTable, SeasonsFilters } from '@/components/season/'; // Your new SeasonsTable component
+import { Pagination } from '@/components/ui/'; // Your Pagination component
+import { LoadingSpinner } from '@/components/ui/'; // Your LoadingSpinner component
+import { Button } from '@/components/ui/'; // Your Button component
+import { toast } from 'sonner'; // Your toast notification library (e.g., Sonner)
 import { Role } from '@/schemas';
-import { useAuthStore } from '@/store/auth.store';
-import * as z from 'zod';
+import { useAuthStore } from '@/store/auth.store'; // Auth store to get user roles
+import * as z from 'zod'; // Import Zod
 
-export default function TenantSeasonsPage() {
+export default function AdminSeasonsPage() {
   const router = useRouter();
-  const { user } = useAuthStore();
+  const { user } = useAuthStore(); // Get user from auth store
   const currentUserRoles = user?.roles || [];
-  const currentTenantId = user?.tenantId; // Tenant Admin's tenant ID
+  const currentTenantId = user?.tenantId;
   const currentLeagueId = user?.managingLeagueId;
 
   const [seasons, setSeasons] = useState<SeasonResponseDto[]>([]);
@@ -32,25 +31,11 @@ export default function TenantSeasonsPage() {
     pageSize: 10,
     sortBy: 'createdAt',
     sortOrder: 'desc',
-    tenantId: currentTenantId, // Automatically filter by current tenant ID
   });
-
-  // Update filters when currentTenantId becomes available
-  useEffect(() => {
-    if (currentTenantId && filters.tenantId !== currentTenantId) {
-      setFilters(prev => ({ ...prev, tenantId: currentTenantId, page: 1 }));
-    }
-  }, [currentTenantId, filters.tenantId]);
 
   const fetchSeasons = useCallback(async () => {
     setLoading(true);
     setError(null);
-    if (!currentTenantId) {
-      setLoading(false);
-      setError("Tenant ID not available. Please log in as a Tenant Admin.");
-      return;
-    }
-
     try {
       const validatedFilters = SeasonFilterParamsSchema.parse(filters);
       const params = new URLSearchParams();
@@ -79,35 +64,32 @@ export default function TenantSeasonsPage() {
     } finally {
       setLoading(false);
     }
-  }, [filters, currentTenantId]);
+  }, [filters]);
 
   useEffect(() => {
-    // Authorization check for Tenant Admin
-    if (!user || !currentUserRoles.includes(Role.TENANT_ADMIN)) {
+    // Authorization check for System Admin
+    if (!user || !currentUserRoles.includes(Role.SYSTEM_ADMIN)) {
       toast.error("Unauthorized", { description: "You do not have permission to view this page." });
-      router.push('/dashboard');
+      router.push('/dashboard'); // Redirect to a suitable page
       return;
     }
-    if (currentTenantId) { // Only fetch if tenantId is available
-      fetchSeasons();
-    }
-  }, [fetchSeasons, user, currentUserRoles, router, currentTenantId]);
+    fetchSeasons();
+  }, [fetchSeasons, user, currentUserRoles, router]);
 
   const handleFilterChange = useCallback((newFilters: SeasonFilterParams) => {
     setFilters(prev => ({
       ...prev,
       ...newFilters,
-      tenantId: currentTenantId, // Ensure tenantId remains fixed
-      page: 1,
+      page: 1, // Reset to first page on any filter change
     }));
-  }, [currentTenantId]);
+  }, []);
 
   const handlePageChange = useCallback((newPage: number) => {
     setFilters(prev => ({ ...prev, page: newPage }));
   }, []);
 
   const handlePageSizeChange = useCallback((newSize: number) => {
-    setFilters(prev => ({ ...prev, pageSize: newSize, page: 1 }));
+    setFilters(prev => ({ ...prev, pageSize: newSize, page: 1 })); // Reset page to 1
   }, []);
 
   const handleSort = useCallback((column: SeasonSortableColumn) => {
@@ -126,9 +108,9 @@ export default function TenantSeasonsPage() {
     }
 
     try {
-      await api.delete(`/seasons/${seasonId}`);
+      await api.delete(`/seasons/${seasonId}`); // Assuming DELETE API call
       toast.success('Season deleted successfully.');
-      fetchSeasons();
+      fetchSeasons(); // Re-fetch seasons to update the list
     } catch (err: any) {
       const errorMessage = err.response?.data?.message || err.message || 'Failed to delete season.';
       toast.error('Error deleting season', { description: errorMessage });
@@ -151,7 +133,7 @@ export default function TenantSeasonsPage() {
           filters={filters}
           onFilterChange={handleFilterChange}
           onPageSizeChange={handlePageSizeChange}
-          fixedTenantId={currentTenantId} // Pass fixed tenant ID to filters
+          // No fixedTenantId or fixedLeagueId for System Admin page
         />
         <Link href="/season/create" passHref>
           <Button variant="primary" className='whitespace-nowrap'>Create New Season</Button>

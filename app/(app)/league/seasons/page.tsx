@@ -1,8 +1,9 @@
+// app/(league)/seasons/page.tsx
 "use client";
 
 import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { api } from '@/services/api';
 import { SeasonResponseDto, SeasonFilterParams, PaginatedSeasonsResponseSchema, SeasonFilterParamsSchema, SeasonSortableColumn } from '@/schemas';
 import { SeasonsFilters } from '@/components/season/seasons-filters';
@@ -15,13 +16,30 @@ import { Role } from '@/schemas';
 import { useAuthStore } from '@/store/auth.store';
 import * as z from 'zod';
 
-export default function TenantSeasonsPage() {
+export default function LeagueSeasonsPage() {
   const router = useRouter();
-  const { user } = useAuthStore();
-  const currentUserRoles = user?.roles || [];
-  const currentTenantId = user?.tenantId; // Tenant Admin's tenant ID
-  const currentLeagueId = user?.managingLeagueId;
+  const { user: userAuth } = useAuthStore();
+  const currentUserRoles = userAuth?.roles || [];
+  const ctxTenantId = useSearchParams().get('ctxTenantId'); // Use search params if needed
+  const ctxLeagueId = useSearchParams().get('ctxLeagueId'); // Use search params if needed
+  
+  // Determine current tenant ID based on user roles
+        const isSystemAdmin = currentUserRoles.includes(Role.SYSTEM_ADMIN);
+        const isTenantAdmin = currentUserRoles.includes(Role.TENANT_ADMIN);
+        const isLeagueAdmin = currentUserRoles.includes(Role.LEAGUE_ADMIN);
 
+  const currentTenantId = isSystemAdmin
+      ? ctxTenantId
+      : isTenantAdmin || isLeagueAdmin
+      ? userAuth?.tenantId
+      : null;
+
+  const currentLeagueId = isSystemAdmin || isTenantAdmin
+      ? ctxLeagueId
+      : isLeagueAdmin
+      ? userAuth?.managingLeagueId
+      : null;
+      
   const [seasons, setSeasons] = useState<SeasonResponseDto[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -33,21 +51,23 @@ export default function TenantSeasonsPage() {
     sortBy: 'createdAt',
     sortOrder: 'desc',
     tenantId: currentTenantId, // Automatically filter by current tenant ID
+    leagueId: currentLeagueId, // Automatically filter by current league ID
   });
 
-  // Update filters when currentTenantId becomes available
+  // Update filters when currentLeagueId becomes available
   useEffect(() => {
-    if (currentTenantId && filters.tenantId !== currentTenantId) {
-      setFilters(prev => ({ ...prev, tenantId: currentTenantId, page: 1 }));
+    if (currentLeagueId && filters.leagueId !== currentLeagueId) {
+      setFilters(prev => ({ ...prev, leagueId: currentLeagueId, tenantId: currentTenantId, page: 1 }));
     }
-  }, [currentTenantId, filters.tenantId]);
+  }, [currentLeagueId, currentTenantId, filters.leagueId]);
+
 
   const fetchSeasons = useCallback(async () => {
     setLoading(true);
     setError(null);
-    if (!currentTenantId) {
+    if (!currentLeagueId) {
       setLoading(false);
-      setError("Tenant ID not available. Please log in as a Tenant Admin.");
+      setError("League ID not available. Please log in as a League Admin.");
       return;
     }
 
@@ -64,7 +84,7 @@ export default function TenantSeasonsPage() {
           }
         }
       });
-
+      console.log("Fetchig params: ", params);
       const response = await api.get(`/seasons?${params.toString()}`);
       const validatedData = PaginatedSeasonsResponseSchema.parse(response.data);
 
@@ -79,28 +99,23 @@ export default function TenantSeasonsPage() {
     } finally {
       setLoading(false);
     }
-  }, [filters, currentTenantId]);
+  }, [filters, currentLeagueId, currentTenantId]);
 
   useEffect(() => {
-    // Authorization check for Tenant Admin
-    if (!user || !currentUserRoles.includes(Role.TENANT_ADMIN)) {
-      toast.error("Unauthorized", { description: "You do not have permission to view this page." });
-      router.push('/dashboard');
-      return;
-    }
-    if (currentTenantId) { // Only fetch if tenantId is available
+    if (currentLeagueId) { // Only fetch if leagueId is available
       fetchSeasons();
     }
-  }, [fetchSeasons, user, currentUserRoles, router, currentTenantId]);
+  }, [fetchSeasons, userAuth, currentUserRoles, router, currentLeagueId]);
 
   const handleFilterChange = useCallback((newFilters: SeasonFilterParams) => {
     setFilters(prev => ({
       ...prev,
       ...newFilters,
       tenantId: currentTenantId, // Ensure tenantId remains fixed
+      leagueId: currentLeagueId, // Ensure leagueId remains fixed
       page: 1,
     }));
-  }, [currentTenantId]);
+  }, [currentTenantId, currentLeagueId]);
 
   const handlePageChange = useCallback((newPage: number) => {
     setFilters(prev => ({ ...prev, page: newPage }));
@@ -151,7 +166,8 @@ export default function TenantSeasonsPage() {
           filters={filters}
           onFilterChange={handleFilterChange}
           onPageSizeChange={handlePageSizeChange}
-          fixedTenantId={currentTenantId} // Pass fixed tenant ID to filters
+          fixedTenantId={currentTenantId} // Pass fixed tenant ID
+          fixedLeagueId={currentLeagueId} // Pass fixed league ID to filters
         />
         <Link href="/season/create" passHref>
           <Button variant="primary" className='whitespace-nowrap'>Create New Season</Button>

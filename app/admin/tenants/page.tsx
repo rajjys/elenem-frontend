@@ -9,7 +9,7 @@ import { TenantBasic, PaginatedTenantsResponseSchema, TenantFilterParams } from 
 import { TenantFilters } from '@/components/tenant/tenant-filters'; // Your new TenantFilters component
 import { TenantsTable } from '@/components/tenant/tenants-table'; // Your new TenantsTable component
 import { Pagination } from '@/components/ui/'; // Your Pagination component
-import { LoadingSpinner } from '@/components/ui/loading-spinner'; // Your LoadingSpinner component
+import { LoadingSpinner } from '@/components/ui/'; // Your LoadingSpinner component
 import { Button } from '@/components/ui/button'; // Your Button component
 import { toast } from 'sonner'; // Your toast notification library (e.g., Sonner)
 import z from 'zod'; // Your Zod library

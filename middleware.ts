@@ -111,6 +111,10 @@ export async function middleware(request: NextRequest) {
     '/account/profile',
     '/account/security',
     '/account/preferences',
+    '/season',
+    '/player',
+    '/coach',
+    '/referee'
     // Add other paths specific to logged-in general users, players, referees etc.
     // E.g., '/player-dashboard', '/referee-assignments'
   ];

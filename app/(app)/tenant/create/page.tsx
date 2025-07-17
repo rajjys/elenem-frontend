@@ -4,7 +4,7 @@
 import React from 'react'
 import { useRouter } from 'next/navigation'
 import { TenantForm } from '@/components/forms'
-import { AccessGate } from '@/components/access/AccessGate'
+import { AccessGate } from '@/app/(auth)/AccessGate'
 import { Role } from '@/schemas'
 
 export default function CreateTenantPage() {
