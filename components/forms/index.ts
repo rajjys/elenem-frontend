@@ -10,3 +10,4 @@ export * from './user-form';
 export * from './team-form';
 export * from './league-form';
 export * from './season-form';
+export * from './game-form';
