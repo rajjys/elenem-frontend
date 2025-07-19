@@ -15,6 +15,7 @@ export const useContextualLink = () => {
   const contextTenantId = searchParams.get('ctxTenantId');
   const contextLeagueId = searchParams.get('ctxLeagueId');
   const contextTeamId = searchParams.get('ctxTeamId');
+  const contextGameId = searchParams.get('ctxGameId');
 
   const buildLink = (basePath: string, overrideParams: Record<string, string> = {}): string => {
     const contextualParams = new URLSearchParams();
@@ -22,6 +23,7 @@ export const useContextualLink = () => {
     if (contextTenantId) contextualParams.set('ctxTenantId', contextTenantId);
     if (contextLeagueId) contextualParams.set('ctxLeagueId', contextLeagueId);
     if (contextTeamId) contextualParams.set('ctxTeamId', contextTeamId);
+    if (contextGameId) contextualParams.set('ctxGameId', contextGameId);
 
     // Override or append custom values
     Object.entries(overrideParams).forEach(([key, value]) => {

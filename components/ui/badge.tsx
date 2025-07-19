@@ -24,10 +24,10 @@ export function Badge({ children, variant = 'default', className }: BadgeProps) 
       baseClasses += ' bg-green-600 text-white'; // For active states
       break;
     case 'destructive':
-      baseClasses += ' bg-red-500 text-white hover:bg-red-600'; // For inactive/error states
+      baseClasses += ' bg-red-600 text-white hover:bg-red-700'; // For inactive/error states
       break;
     case 'outline':
-      baseClasses += ' text-foreground border border-input bg-background hover:bg-accent'; // Outline style
+      baseClasses += ' text-green-600 border border-green-600 bg-emerald-50 hover:bg-accent'; // Outline style
       break;
     default:
       baseClasses += ' bg-gray-500 text-white'; // Fallback

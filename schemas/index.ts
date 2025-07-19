@@ -6,3 +6,4 @@ export * from './user-schemas';
 export * from './league-schemas';
 export * from './team-schemas';
 export * from './season-schemas';
+export * from './game-schemas';

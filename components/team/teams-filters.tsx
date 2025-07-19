@@ -108,7 +108,7 @@ export function TeamsFilters({ filters, onFilterChange, onPageSizeChange, fixedT
 
     try {
       const params = new URLSearchParams();
-      if (idToFetch) params.append('tenantId', idToFetch);
+      if (idToFetch) params.append('tenantIds', idToFetch);
       if (fixedLeagueId) params.append('leagueId', fixedLeagueId); // If league is fixed, fetch only that one
 
       const response = await api.get(`/leagues?${params.toString()}&pageSize=100`); // Assuming endpoint
@@ -255,7 +255,7 @@ export function TeamsFilters({ filters, onFilterChange, onPageSizeChange, fixedT
                   </SelectTrigger>
                   <SelectContent className='bg-white rounded-md shadow-lg z-50'>
                     <SelectItem value="clear_selection">Clear Selection</SelectItem>
-                    {availableTenants.map(tenant => (
+                    {availableTenants?.map(tenant => (
                       <SelectItem key={tenant.id} value={tenant.id}>{tenant.name}</SelectItem>
                     ))}
                   </SelectContent>
@@ -277,13 +277,13 @@ export function TeamsFilters({ filters, onFilterChange, onPageSizeChange, fixedT
                   </SelectTrigger>
                   <SelectContent className='bg-white rounded-md shadow-lg z-50'>
                     <SelectItem value="clear_selection">Clear Selection</SelectItem>
-                    {availableLeagues.map(league => (
+                    {availableLeagues?.map(league => (
                       <SelectItem key={league.id} value={league.id}>{league.name}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
                 {(!selectedTenantId && isSystemAdmin) && <p className="text-gray-500 text-xs mt-1">Select a tenant to load leagues.</p>}
-                {(selectedTenantId || fixedTenantId) && availableLeagues.length === 0 && <p className="text-gray-500 text-xs mt-1">No leagues found for this tenant.</p>}
+                {(selectedTenantId || fixedTenantId) && availableLeagues?.length === 0 && <p className="text-gray-500 text-xs mt-1">No leagues found for this tenant.</p>}
               </div>
             )}
 

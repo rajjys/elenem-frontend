@@ -23,7 +23,7 @@ export default function CreateGamePage() {
     const redirectPath = isSystemAdmin ? "/admin/games":
                          isTenantAdmin ? "/tenant/games" :
                          isLeagueAdmin ? "/league/games" :
-                         "/seasons"; // Default fallback path  
+                         "/games"; // Default fallback path  
 
   const handleSuccess = useCallback((seasonId: string) => {
     toast.success(`Game ${seasonId} created successfully!`);

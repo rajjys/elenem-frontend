@@ -17,7 +17,13 @@ export enum Gender {
   MIXED = 'MIXED',
   OTHER = 'OTHER',
 }
-
+export enum GameStatus {
+  SCHEDULED = 'SCHEDULED',
+  IN_PROGRESS = 'IN_PROGRESS',
+  COMPLETED = 'COMPLETED',
+  POSTPONED = 'POSTPONED',
+  CANCELLED = 'CANCELLED'
+}
 export enum SupportedLanguage {
   ENGLISH = 'ENGLISH',
   FRANCAIS = 'FRANCAIS',

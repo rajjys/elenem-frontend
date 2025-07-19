@@ -11,7 +11,7 @@ async rewrites() {
     ];
   },*/
   images: {
-    domains: ["scontent-mba2-1.xx.fbcdn.net"],
+    domains: ["scontent-mba2-1.xx.fbcdn.net", "scontent.fgom1-1.fna.fbcdn.net"],
   }
 };
 

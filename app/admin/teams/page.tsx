@@ -72,7 +72,7 @@ export default function AdminTeamsPage() {
     // Authorization check for System Admin
     if (!user || !currentUserRoles.includes(Role.SYSTEM_ADMIN)) {
       toast.error("Unauthorized", { description: "You do not have permission to view this page." });
-      router.push('/dashboard'); // Redirect to a suitable page
+      //router.push('/dashboard'); // Redirect to a suitable page
       return;
     }
     fetchTeams();

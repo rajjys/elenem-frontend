@@ -1,0 +1,444 @@
+// components/game/games-filters.tsx
+"use client";
+
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
+import { useDebounce } from 'use-debounce';
+
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+
+import { Filter as FilterIcon } from 'lucide-react';
+
+import { GameFilterParams } from '@/schemas'; // Your GameFilterParams schema
+import { GameStatus, Role } from '@/schemas'; // Prisma enums
+import { useAuthStore } from '@/store/auth.store';
+import { api } from '@/services/api'; // Your API instance
+import { toast } from 'sonner';
+
+interface GamesFiltersProps {
+  filters: GameFilterParams;
+  onFilterChange: (newFilters: GameFilterParams) => void;
+  onPageSizeChange: (pageSize: number) => void;
+  fixedTenantId?: string | null; // Tenant ID if context is fixed
+  fixedLeagueId?: string | null; // League ID if context is fixed
+  fixedSeasonId?: string | null; // Season ID if context is fixed
+  fixedTeamId?: string | null; // Team ID if context is fixed (e.g., Team Dashboard)
+}
+
+interface TenantBasicDto { id: string; name: string; }
+interface LeagueBasicDto { id: string; name: string; tenantId: string; }
+interface SeasonBasicDto { id: string; name: string; leagueId: string; tenantId: string; }
+interface TeamBasicDto { id: string; name: string; leagueId: string; tenantId: string; }
+
+export function GamesFilters({ filters, onFilterChange, onPageSizeChange, fixedTenantId, fixedLeagueId, fixedSeasonId, fixedTeamId }: GamesFiltersProps) {
+  const user = useAuthStore((state) => state.user);
+  const isSystemAdmin = user?.roles?.includes(Role.SYSTEM_ADMIN);
+  const isTenantAdmin = user?.roles?.includes(Role.TENANT_ADMIN);
+  const isLeagueAdmin = user?.roles?.includes(Role.LEAGUE_ADMIN);
+  const isTeamAdmin = user?.roles?.includes(Role.TEAM_ADMIN);
+
+  const [search, setSearch] = useState(filters.search || '');
+  const [selectedTenantId, setSelectedTenantId] = useState(fixedTenantId || filters.tenantId || '');
+  const [selectedLeagueId, setSelectedLeagueId] = useState(fixedLeagueId || filters.leagueId || '');
+  const [selectedSeasonId, setSelectedSeasonId] = useState(fixedSeasonId || filters.seasonId || '');
+  const [selectedTeamId, setSelectedTeamId] = useState(fixedTeamId || filters.teamId || '');
+  const [selectedStatus, setSelectedStatus] = useState<GameStatus | undefined>(filters.status);
+  const [selectedDate, setSelectedDate] = useState(filters.date || ''); // YYYY-MM-DD
+  const [isActive, setIsActive] = useState<boolean | undefined>(filters.isActive);
+  const [pageSizeInput, setPageSizeInput] = useState(String(filters.pageSize || 12));
+
+  const [debouncedSearch] = useDebounce(search, 500);
+  const [debouncedSelectedDate] = useDebounce(selectedDate, 500);
+  const [debouncedPageSizeInput] = useDebounce(pageSizeInput, 500);
+
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const [availableTenants, setAvailableTenants] = useState<TenantBasicDto[]>([]);
+  const [availableLeagues, setAvailableLeagues] = useState<LeagueBasicDto[]>([]);
+  const [availableSeasons, setAvailableSeasons] = useState<SeasonBasicDto[]>([]);
+  const [availableTeams, setAvailableTeams] = useState<TeamBasicDto[]>([]);
+
+  // Memoize options
+  const statusOptions = useMemo(() => Object.values(GameStatus).map(status => ({
+    value: status,
+    label: status.replace(/_/g, ' ')
+  })), []);
+
+  // Fetch tenants (for System Admin)
+  const fetchTenants = useCallback(async () => {
+    if (!isSystemAdmin) return;
+    try {
+      const response = await api.get('/tenants?pageSize=100');
+      setAvailableTenants(response.data.data);
+      console.log("Tenant: ", response.data.data);
+    } catch (err) {
+      toast.error("Failed to fetch tenants.");
+      console.error("Fetch tenants error:", err);
+    }
+  }, [isSystemAdmin]);
+
+  // Fetch leagues based on selectedTenantId or fixed IDs
+  const fetchLeagues = useCallback(async (tenantId?: string) => {
+    const idToFetch = tenantId || fixedTenantId;
+    if (!idToFetch && !fixedLeagueId) {
+      setAvailableLeagues([]);
+      return;
+    }
+    try {
+      const params = new URLSearchParams();
+      if (idToFetch) params.append('tenantIds', idToFetch);
+      if (fixedLeagueId) params.append('leagueIds', fixedLeagueId);
+      const response = await api.get(`/leagues?${params.toString()}&pageSize=100`); // Assuming endpoint
+      setAvailableLeagues(response.data.items);
+    } catch (err) {
+      toast.error("Failed to fetch leagues.");
+      console.error("Fetch leagues error:", err);
+    }
+  }, [fixedTenantId, fixedLeagueId]);
+
+  // Fetch seasons based on selectedLeagueId or fixed IDs
+  const fetchSeasons = useCallback(async (leagueId?: string) => {
+    const idToFetch = leagueId || fixedLeagueId;
+    if (!idToFetch && !fixedSeasonId) {
+      setAvailableSeasons([]);
+      return;
+    }
+    try {
+      const params = new URLSearchParams();
+      if (idToFetch) params.append('leagueId', idToFetch);
+      if (fixedSeasonId) params.append('seasonId', fixedSeasonId);
+      const response = await api.get(`/seasons`, { params: { ...Object.fromEntries(params), take: 100 } });
+      setAvailableSeasons(response.data.items);
+    } catch (err) {
+      toast.error("Failed to fetch seasons.");
+      console.error("Fetch seasons error:", err);
+    }
+  }, [fixedLeagueId, fixedSeasonId]);
+
+  // Fetch teams based on selectedLeagueId or fixed IDs
+  const fetchTeams = useCallback(async (leagueId?: string) => {
+    const idToFetch = leagueId || fixedLeagueId;
+    if (!idToFetch && !fixedTeamId) {
+      setAvailableTeams([]);
+      return;
+    }
+    try {
+      const params = new URLSearchParams();
+      if (idToFetch) params.append('leagueId', idToFetch);
+      if (fixedTeamId) params.append('teamId', fixedTeamId);
+      const response = await api.get(`/teams`, { params: { ...Object.fromEntries(params), take: 100 } });
+      setAvailableTeams(response.data.items);
+    } catch (err) {
+      toast.error("Failed to fetch teams.");
+      console.error("Fetch teams error:", err);
+    }
+  }, [fixedLeagueId, fixedTeamId]);
+
+
+  // Initial fetches
+  useEffect(() => {
+    if (isSystemAdmin) {
+      fetchTenants();
+    }
+  }, [isSystemAdmin, fetchTenants]);
+
+  useEffect(() => {
+    if (isSystemAdmin || isTenantAdmin) {
+      fetchLeagues(selectedTenantId);
+    }
+  }, [isSystemAdmin, isTenantAdmin, selectedTenantId, fetchLeagues]);
+
+  useEffect(() => {
+    if (isSystemAdmin || isTenantAdmin || isLeagueAdmin) {
+      fetchSeasons(selectedLeagueId);
+      fetchTeams(selectedLeagueId); // Teams are also under a league
+    }
+  }, [isSystemAdmin, isTenantAdmin, isLeagueAdmin, selectedLeagueId, fetchSeasons, fetchTeams]);
+
+
+  // Apply filters after debounced changes
+  useEffect(() => {
+    const newFilters: GameFilterParams = {
+      ...filters,
+      search: debouncedSearch === '' ? undefined : debouncedSearch,
+      tenantId: selectedTenantId === '' ? undefined : selectedTenantId,
+      leagueId: selectedLeagueId === '' ? undefined : selectedLeagueId,
+      seasonId: selectedSeasonId === '' ? undefined : selectedSeasonId,
+      teamId: selectedTeamId === '' ? undefined : selectedTeamId,
+      status: selectedStatus,
+      date: debouncedSelectedDate === '' ? undefined : debouncedSelectedDate,
+      isActive: isActive,
+      page: 1, // Reset to first page on any filter change
+    };
+
+    const hasChanged = Object.keys(newFilters).some(key =>
+      newFilters[key as keyof GameFilterParams] !== filters[key as keyof GameFilterParams]
+    );
+
+    if (hasChanged) {
+      onFilterChange(newFilters);
+    }
+  }, [
+    debouncedSearch, selectedTenantId, selectedLeagueId, selectedSeasonId, selectedTeamId,
+    selectedStatus, debouncedSelectedDate, isActive, filters, onFilterChange,
+    fixedTenantId, fixedLeagueId, fixedSeasonId, fixedTeamId
+  ]);
+
+  // Handle page size change
+  useEffect(() => {
+    const newSize = parseInt(debouncedPageSizeInput, 10);
+    if (!isNaN(newSize) && newSize >= 1 && newSize <= 100 && newSize !== filters.pageSize) {
+      onPageSizeChange(newSize);
+    }
+  }, [debouncedPageSizeInput, onPageSizeChange, filters.pageSize]);
+
+  // Function to reset all filters
+  const handleClearAllFilters = useCallback(() => {
+    setSearch('');
+    setSelectedTenantId(fixedTenantId || '');
+    setSelectedLeagueId(fixedLeagueId || '');
+    setSelectedSeasonId(fixedSeasonId || '');
+    setSelectedTeamId(fixedTeamId || '');
+    setSelectedStatus(undefined);
+    setSelectedDate('');
+    setIsActive(undefined);
+    setPageSizeInput(String(12));
+
+    onFilterChange({
+      ...filters,
+      search: undefined,
+      tenantId: fixedTenantId || undefined,
+      leagueId: fixedLeagueId || undefined,
+      seasonId: fixedSeasonId || undefined,
+      teamId: fixedTeamId || undefined,
+      status: undefined,
+      date: undefined,
+      isActive: undefined,
+      page: 1,
+    });
+    onPageSizeChange(12);
+  }, [filters, onFilterChange, onPageSizeChange, fixedTenantId, fixedLeagueId, fixedSeasonId, fixedTeamId]);
+
+  return (
+    <div className="flex items-center gap-4 w-full">
+      {/* Search Input - always visible */}
+      <div className="flex-grow max-w-sm">
+        <Label htmlFor="gameSearch" className="sr-only">Search Games</Label>
+        <Input
+          id="gameSearch"
+          type="search"
+          placeholder="Search by team or venue name"
+          value={search}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value)}
+        />
+      </div>
+
+      {/* Filter Button and Dialog */}
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogTrigger asChild>
+          <Button variant="outline" className="rounded-md shadow-sm bg-primary-600 hover:bg-primary-700 text-white font-semibold py-2 px-4 transition duration-300 ease-in-out transform hover:scale-105">
+            <FilterIcon className="mr-2 h-4 w-4" />
+            More Filters
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="sm:max-w-[700px] rounded-lg shadow-xl p-6 bg-white">
+          <DialogHeader className="mb-4">
+            <DialogTitle className="text-2xl font-bold text-gray-800">Advanced Game Filters</DialogTitle>
+            <DialogDescription className="text-gray-600">
+              Apply additional filters to refine your game list.
+            </DialogDescription>
+          </DialogHeader>
+          {/* Advanced filter controls */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 py-4">
+
+            {/* Tenant Selection (System Admin only) */}
+            {isSystemAdmin && (
+              <div>
+                <Label htmlFor="tenantId" className="block text-sm font-medium text-gray-700 mb-1">Tenant</Label>
+                <Select
+                  value={selectedTenantId}
+                  onValueChange={(value) => setSelectedTenantId(value === 'clear_selection' ? '' : value)}
+                >
+                  <SelectTrigger className="w-full border-gray-300 rounded-md shadow-sm focus:border-primary-500 focus:ring-primary-500">
+                    <SelectValue placeholder="Select Tenant" />
+                  </SelectTrigger>
+                  <SelectContent className='bg-white rounded-md shadow-lg z-50'>
+                    <SelectItem value="clear_selection">Clear Selection</SelectItem>
+                    {availableTenants?.map(tenant => (
+                      <SelectItem key={tenant.id} value={tenant.id}>{tenant.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
+            {/* League Selection (System Admin, Tenant Admin) */}
+            {(isSystemAdmin || isTenantAdmin) && !fixedLeagueId && (
+              <div>
+                <Label htmlFor="leagueId" className="block text-sm font-medium text-gray-700 mb-1">League</Label>
+                <Select
+                  value={selectedLeagueId}
+                  onValueChange={(value) => setSelectedLeagueId(value === 'clear_selection' ? '' : value)}
+                  disabled={!selectedTenantId && !fixedTenantId}
+                >
+                  <SelectTrigger className="w-full border-gray-300 rounded-md shadow-sm focus:border-primary-500 focus:ring-primary-500">
+                    <SelectValue placeholder="Select League" />
+                  </SelectTrigger>
+                  <SelectContent className='bg-white rounded-md shadow-lg z-50'>
+                    <SelectItem value="clear_selection">Clear Selection</SelectItem>
+                    {availableLeagues?.map(league => (
+                      <SelectItem key={league.id} value={league.id}>{league.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {(!selectedTenantId && isSystemAdmin) && <p className="text-gray-500 text-xs mt-1">Select a tenant to load leagues.</p>}
+                {(selectedTenantId || fixedTenantId) && availableLeagues?.length === 0 && <p className="text-gray-500 text-xs mt-1">No leagues found for this tenant.</p>}
+              </div>
+            )}
+
+            {/* Season Selection (System Admin, Tenant Admin, League Admin) */}
+            {(isSystemAdmin || isTenantAdmin || isLeagueAdmin) && !fixedSeasonId && (
+              <div>
+                <Label htmlFor="seasonId" className="block text-sm font-medium text-gray-700 mb-1">Season</Label>
+                <Select
+                  value={selectedSeasonId}
+                  onValueChange={(value) => setSelectedSeasonId(value === 'clear_selection' ? '' : value)}
+                  disabled={!selectedLeagueId && !fixedLeagueId}
+                >
+                  <SelectTrigger className="w-full border-gray-300 rounded-md shadow-sm focus:border-primary-500 focus:ring-primary-500">
+                    <SelectValue placeholder="Select Season" />
+                  </SelectTrigger>
+                  <SelectContent className='bg-white rounded-md shadow-lg z-50'>
+                    <SelectItem value="clear_selection">Clear Selection</SelectItem>
+                    {availableSeasons?.map(season => (
+                      <SelectItem key={season.id} value={season.id}>{season.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {(!selectedLeagueId && (isSystemAdmin || isTenantAdmin || isLeagueAdmin)) && <p className="text-gray-500 text-xs mt-1">Select a league to load seasons.</p>}
+                {(selectedLeagueId || fixedLeagueId) && availableSeasons?.length === 0 && <p className="text-gray-500 text-xs mt-1">No seasons found for this league.</p>}
+              </div>
+            )}
+
+            {/* Team Selection (System Admin, Tenant Admin, League Admin) */}
+            {(isSystemAdmin || isTenantAdmin || isLeagueAdmin) && !fixedTeamId && (
+              <div>
+                <Label htmlFor="teamId" className="block text-sm font-medium text-gray-700 mb-1">Team</Label>
+                <Select
+                  value={selectedTeamId}
+                  onValueChange={(value) => setSelectedTeamId(value === 'clear_selection' ? '' : value)}
+                  disabled={!selectedLeagueId && !fixedLeagueId}
+                >
+                  <SelectTrigger className="w-full border-gray-300 rounded-md shadow-sm focus:border-primary-500 focus:ring-primary-500">
+                    <SelectValue placeholder="Select Team" />
+                  </SelectTrigger>
+                  <SelectContent className='bg-white rounded-md shadow-lg z-50'>
+                    <SelectItem value="clear_selection">Clear Selection</SelectItem>
+                    {availableTeams?.map(team => (
+                      <SelectItem key={team.id} value={team.id}>{team.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {(!selectedLeagueId && (isSystemAdmin || isTenantAdmin || isLeagueAdmin)) && <p className="text-gray-500 text-xs mt-1">Select a league to load teams.</p>}
+                {(selectedLeagueId || fixedLeagueId) && availableTeams?.length === 0 && <p className="text-gray-500 text-xs mt-1">No teams found for this league.</p>}
+              </div>
+            )}
+
+            {/* Status Select */}
+            <div>
+              <Label htmlFor="gameStatus" className="block text-sm font-medium text-gray-700 mb-1">Game Status</Label>
+              <Select
+                value={selectedStatus || ''}
+                onValueChange={(value: GameStatus) => setSelectedStatus(!value ? undefined : value)}
+              >
+                <SelectTrigger className="w-full border-gray-300 rounded-md shadow-sm focus:border-primary-500 focus:ring-primary-500">
+                  <SelectValue placeholder="Select Status" />
+                </SelectTrigger>
+                <SelectContent className='bg-white rounded-md shadow-lg z-50'>
+                  <SelectItem value="clear_selection">Clear Selection</SelectItem>
+                  {statusOptions.map(option => (
+                    <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Date Input */}
+            <div>
+              <Label htmlFor="gameDate" className="block text-sm font-medium text-gray-700 mb-1">Date</Label>
+              <Input
+                id="gameDate"
+                type="date"
+                value={selectedDate}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSelectedDate(e.target.value)}
+                className="w-full border-gray-300 rounded-md shadow-sm focus:border-primary-500 focus:ring-primary-500"
+              />
+            </div>
+
+            {/* Is Active Switch */}
+            <div className="flex items-center space-x-2 mt-2">
+              <Switch
+                id="gameIsActive"
+                checked={isActive || false}
+                onCheckedChange={setIsActive}
+              />
+              <Label htmlFor="gameIsActive" className="text-sm font-medium text-gray-700">Active Games</Label>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsActive(undefined)}
+                className="ml-2 text-gray-500 hover:bg-gray-100 rounded-md px-2 py-1"
+                disabled={isActive === undefined}
+              >
+                Clear
+              </Button>
+            </div>
+
+            {/* Page Size Control */}
+            <div className="flex items-center space-x-2 mt-4">
+              <Label htmlFor="pageSize" className="text-sm font-medium text-gray-700">Games per page</Label>
+              <Input
+                id="pageSize"
+                type="number"
+                min="1"
+                max="100"
+                value={pageSizeInput}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPageSizeInput(e.target.value)}
+                className="w-20"
+              />
+            </div>
+          </div>
+
+          <DialogFooter className="flex flex-col sm:flex-row sm:justify-end gap-2 mt-6">
+            <Button
+              variant="outline"
+              onClick={handleClearAllFilters}
+              className="bg-red-500 hover:bg-red-600 text-white rounded-md shadow-sm transition duration-300 ease-in-out"
+            >
+              Clear All Filters
+            </Button>
+            <Button
+              type="button"
+              onClick={() => setIsDialogOpen(false)}
+              className="bg-primary-600 hover:bg-primary-700 text-white rounded-md shadow-sm transition duration-300 ease-in-out"
+            >
+              Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
