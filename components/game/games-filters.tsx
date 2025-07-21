@@ -98,8 +98,8 @@ export function GamesFilters({ filters, onFilterChange, onPageSizeChange, fixedT
     }
     try {
       const params = new URLSearchParams();
-      if (idToFetch) params.append('tenantIds', idToFetch);
-      if (fixedLeagueId) params.append('leagueIds', fixedLeagueId);
+      if (idToFetch) params.append('tenantId', idToFetch);
+      if (fixedLeagueId) params.append('leagueId', fixedLeagueId);
       const response = await api.get(`/leagues?${params.toString()}&pageSize=100`); // Assuming endpoint
       setAvailableLeagues(response.data.items);
     } catch (err) {
@@ -119,7 +119,7 @@ export function GamesFilters({ filters, onFilterChange, onPageSizeChange, fixedT
       const params = new URLSearchParams();
       if (idToFetch) params.append('leagueId', idToFetch);
       if (fixedSeasonId) params.append('seasonId', fixedSeasonId);
-      const response = await api.get(`/seasons`, { params: { ...Object.fromEntries(params), take: 100 } });
+      const response = await api.get(`/seasons?${params.toString()}&pageSize=100`);
       setAvailableSeasons(response.data.items);
     } catch (err) {
       toast.error("Failed to fetch seasons.");
@@ -138,7 +138,7 @@ export function GamesFilters({ filters, onFilterChange, onPageSizeChange, fixedT
       const params = new URLSearchParams();
       if (idToFetch) params.append('leagueId', idToFetch);
       if (fixedTeamId) params.append('teamId', fixedTeamId);
-      const response = await api.get(`/teams`, { params: { ...Object.fromEntries(params), take: 100 } });
+      const response = await api.get(`/teams?${params.toString()}&pageSize=100`);
       setAvailableTeams(response.data.items);
     } catch (err) {
       toast.error("Failed to fetch teams.");

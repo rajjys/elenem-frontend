@@ -157,7 +157,7 @@ export default function TenantGamesPage() {
             onPageSizeChange={handlePageSizeChange}
             fixedTenantId={currentTenantId} // Pass fixed tenant ID to filters
           />
-          <Link href="/game/create" passHref>
+          <Link href={buildLink("/game/create")} passHref>
             <Button variant="primary" className='whitespace-nowrap'>Create New Game</Button>
           </Link>
         </div>

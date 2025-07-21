@@ -132,7 +132,7 @@ export default function AdminLeaguesPage() {
           onFilterChange={handleFilterChange}
           onPageSizeChange={handlePageSizeChange}
         />
-        <Link href="/admin/leagues/create" passHref>
+        <Link href="/league/create" passHref>
           <Button variant="primary" className='whitespace-nowrap'>Create New League</Button>
         </Link>
       </div>

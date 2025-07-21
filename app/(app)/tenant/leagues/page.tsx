@@ -12,6 +12,7 @@ import { toast } from 'sonner';
 import { z } from 'zod';
 import { LeagueBasic, PaginatedLeaguesResponseSchema, Role } from '@/schemas';
 import { useContextualLink } from '@/hooks';
+import { Plus, Settings } from 'lucide-react';
 
 // Define the League schema based on common data structures
 // This should match your backend DTO for a single League
@@ -76,7 +77,7 @@ export default function TenantLeaguesPage() {
     try {
       const params = new URLSearchParams();
       if(isSystemAdmin){
-        params.append('tenantIds', currentTenantId); // Use currentTenantId directly
+        params.append('tenantId', currentTenantId); // Use currentTenantId directly
         }
 
       console.log('Fetching leagues with params:', params.toString());
@@ -125,12 +126,16 @@ export default function TenantLeaguesPage() {
 
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold text-gray-800">Leagues</h1>
-        <button
-          onClick={() => router.push('/tenant/leagues/create')}
-          className="flex items-center px-4 py-2 bg-emerald-600 text-white rounded-md shadow-sm hover:bg-emerald-700 transition-colors"
-        >
-          <FiPlusCircle className="mr-2" /> Create New League
-        </button>
+        <div className='flex whitespace-nowrap text-sm gap-3'>
+                    <button onClick={() => router.push('/tenant/settings')}
+                        className="w-full flex items-center justify-center text-gray-800 px-2 py-2 mx-2 border border-gray-200 rounded-md transition-colors">
+                        <Settings className="h-4 w-4 mr-2" />Settings
+                    </button>
+                    <button onClick={() => router.push('/league/create')}
+                        className="w-full flex items-center justify-center bg-emerald-600 text-white py-2 px-2 rounded-md hover:bg-emerald-700 transition-colors">
+                        <Plus className="h-4 w-4 mr-2" />Create New League
+                    </button>
+          </div>
       </div>
 
       {/* Filter and Search Section */}

@@ -183,11 +183,11 @@ export default function TenantDashboard() {
             <section className='flex items-center justify-between'>
                 <h1 className="text-2xl font-bold text-gray-800 mb-6">{league?.name}</h1>
                 <div className='flex whitespace-nowrap text-sm gap-3'>
-                    <button onClick={() => router.push('/tenant/settings')}
+                    <button onClick={() => router.push(buildLink(`/league/edit/${currentLeagueId}`))}
                         className="w-full flex items-center justify-center text-gray-800 px-2 py-2 mx-2 border border-gray-200 rounded-md transition-colors">
-                        <Settings className="h-4 w-4 mr-2" /> Settings
+                        <Settings className="h-4 w-4 mr-2"/> Settings
                     </button>
-                    <button onClick={() => router.push('/tenant/leagues/create')}
+                    <button onClick={() => router.push(buildLink('/game/create'))}
                         className="w-full flex items-center justify-center bg-emerald-600 text-white py-2 px-2 rounded-md hover:bg-emerald-700 transition-colors">
                         <Plus className="h-4 w-4 mr-2" /> Schedule Game
                     </button>

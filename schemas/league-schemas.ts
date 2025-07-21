@@ -163,7 +163,7 @@ export const TieBreakerRuleSchema = z.object({
   order: z.number().int().min(1),
   rule: z.string().min(1, "rule is required"), // e.g., "HEAD_TO_HEAD_POINTS", "GOAL_DIFFERENCE"
   description: z.string().min(1, "Description is required"), // e.g., "Points in head-to-head matches"
-  sort: z.enum(['ASC', 'DESC', 'RANDOM']),
+  sort: z.enum(['asc', 'desc', 'random']),
 });
 
 export const TieBreakerConfigSchema = z.array(TieBreakerRuleSchema);
@@ -176,13 +176,13 @@ export const CreateLeagueSchema = z.object({
   leagueCode: z.string().min(3, 'League code must be at least 3 characters').max(10, 'League code cannot exceed 10 characters').toUpperCase(),
   visibility: z.nativeEnum(LeagueVisibility).default(LeagueVisibility.PUBLIC).optional(),
   gender: z.nativeEnum(Gender),
-  country: z.string().min(2, 'Country is required').max(2), // ISO 2-letter code
+  country: z.string(), // ISO 2-letter code
   region: z.string().max(100, 'Region cannot exceed 100 characters').optional().nullable(),
   city: z.string().max(100, 'City cannot exceed 100 characters').optional().nullable(),
   state: z.string().max(100, 'State cannot exceed 100 characters').optional().nullable(),
   establishedYear: z.number().int().min(1800).max(new Date().getFullYear()).optional().nullable(),
-  logoUrl: z.string().url('Invalid URL format').optional().nullable(),
-  bannerImageUrl: z.string().url('Invalid URL format').optional().nullable(),
+  logoUrl: z.string().optional().nullable(),
+  bannerImageUrl: z.string().optional().nullable(),
   isActive: z.boolean().default(true).optional(),
   ownerId: z.string().cuid().optional().nullable(), // Owner of the league (a GENERAL_USER)
   tenantId: z.string().cuid(), // Required for league creation

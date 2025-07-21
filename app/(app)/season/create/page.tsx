@@ -17,11 +17,11 @@ export default function CreateSeasonPage() {
     // Redirect to the seasons listing page, or the newly created season's detail page
     ///Redirect to season listing based on user role
     const { user: userAuth } = useAuthStore();
-      const currentUserRoles = userAuth?.roles || [];
+    const currentUserRoles = userAuth?.roles || [];
     
-      const isSystemAdmin = currentUserRoles.includes(Role.SYSTEM_ADMIN);
-      const isTenantAdmin = currentUserRoles.includes(Role.TENANT_ADMIN);
-      const isLeagueAdmin = currentUserRoles.includes(Role.LEAGUE_ADMIN);
+    const isSystemAdmin = currentUserRoles.includes(Role.SYSTEM_ADMIN);
+    const isTenantAdmin = currentUserRoles.includes(Role.TENANT_ADMIN);
+    const isLeagueAdmin = currentUserRoles.includes(Role.LEAGUE_ADMIN);
     
     const redirectPath = isSystemAdmin ? "/admin/seasons":
                          isTenantAdmin ? "/tenant/seasons" :

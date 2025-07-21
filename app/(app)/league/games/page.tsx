@@ -1,7 +1,7 @@
 // app/(league)/games/page.tsx
 "use client";
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react'; // Added useMemo
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { api } from '@/services/api';
@@ -16,188 +16,213 @@ import { useContextualLink } from '@/hooks';
 import * as z from 'zod';
 
 export default function LeagueGamesPage() {
-  const router = useRouter();
-  const { user: userAuth } = useAuthStore();
-  const currentUserRoles = userAuth?.roles || [];
-    const ctxTenantId = useSearchParams().get('ctxTenantId'); // Use search params if needed
-    const ctxLeagueId = useSearchParams().get('ctxLeagueId');
+    const router = useRouter();
+    const { user: userAuth } = useAuthStore();
+    const currentUserRoles = userAuth?.roles || [];
+    const searchParams = useSearchParams(); // Get search params once
+
     // Determine current tenant ID based on user roles
     const isSystemAdmin = currentUserRoles.includes(Role.SYSTEM_ADMIN);
     const isTenantAdmin = currentUserRoles.includes(Role.TENANT_ADMIN);
     const isLeagueAdmin = currentUserRoles.includes(Role.LEAGUE_ADMIN);
-    const currentTenantId = isSystemAdmin
-      ? ctxTenantId
-      : isTenantAdmin
-      ? userAuth?.tenantId
-      : null;
-    const currentLeagueId = isSystemAdmin || isTenantAdmin
-      ? ctxLeagueId
-      : isLeagueAdmin
-      ? userAuth?.managingLeagueId
-      : null;
-  const { buildLink } = useContextualLink();
 
-  const [games, setGames] = useState<GameDetails[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [totalItems, setTotalItems] = useState(0);
-  const [totalPages, setTotalPages] = useState(1);
-  const [filters, setFilters] = useState<GameFilterParams>({
-    page: 1,
-    pageSize: 12,
-    sortBy: 'dateTime',
-    sortOrder: 'asc',
-    tenantId: currentTenantId, // Automatically filter by current tenant ID
-    leagueId: currentLeagueId, // Automatically filter by current league ID
-  });
+    const ctxTenantId = searchParams.get('ctxTenantId');
+    const ctxLeagueId = searchParams.get('ctxLeagueId');
 
-  // Update filters when currentLeagueId becomes available
-  useEffect(() => {
-    if (currentLeagueId && filters.leagueId !== currentLeagueId) {
-      setFilters(prev => ({ ...prev, leagueId: currentLeagueId, tenantId: currentTenantId, page: 1 }));
-    }
-  }, [currentLeagueId, currentTenantId, filters.leagueId]);
+    const currentTenantId = useMemo(() => { // Use useMemo to stabilize these values
+        return isSystemAdmin
+            ? ctxTenantId
+            : isTenantAdmin
+            ? userAuth?.tenantId
+            : null;
+    }, [isSystemAdmin, isTenantAdmin, ctxTenantId, userAuth?.tenantId]);
 
+    const currentLeagueId = useMemo(() => { // Use useMemo to stabilize these values
+        return isSystemAdmin || isTenantAdmin
+            ? ctxLeagueId
+            : isLeagueAdmin
+            ? userAuth?.managingLeagueId
+            : null;
+    }, [isSystemAdmin, isTenantAdmin, isLeagueAdmin, ctxLeagueId, userAuth?.managingLeagueId]);
 
-  const fetchGames = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    if (!currentLeagueId) {
-      setLoading(false);
-      setError("League ID not available. Please log in as a League Admin.");
-      return;
-    }
+    const { buildLink } = useContextualLink();
 
-    try {
-      const validatedFilters = GameFilterParamsSchema.parse(filters);
-      const params = new URLSearchParams();
+    const [games, setGames] = useState<GameDetails[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+    const [totalItems, setTotalItems] = useState(0);
+    const [totalPages, setTotalPages] = useState(1);
 
-      Object.entries(validatedFilters).forEach(([key, value]) => {
-        if (value !== undefined && value !== null && value !== '') {
-          if (Array.isArray(value)) {
-            value.forEach(item => params.append(key, String(item)));
-          } else {
-            params.append(key, String(value));
-          }
-        }
-      });
-
-      const response = await api.get(`/games?${params.toString()}`);
-      const validatedData = PaginatedGamesResponseSchema.parse(response.data);
-
-      setGames(validatedData.data);
-      setTotalItems(validatedData.totalItems);
-      setTotalPages(validatedData.totalPages);
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.message || err.message || 'Failed to fetch games.';
-      setError(errorMessage);
-      toast.error('Error fetching games', { description: errorMessage });
-      console.error('Fetch games error:', err);
-    } finally {
-      setLoading(false);
-    }
-  }, [filters, currentLeagueId, currentTenantId]);
-
-  useEffect(() => {
-    // Authorization check for League Admin
-    if (!userAuth) {
-      toast.error("Unauthorized", { description: "You do not have permission to view this page." });
-      //router.push('/dashboard');
-      return;
-    }
-    if (currentLeagueId) { // Only fetch if leagueId is available
-      fetchGames();
-    }
-  }, [fetchGames, userAuth, currentUserRoles, router, currentLeagueId]);
-
-  const handleFilterChange = useCallback((newFilters: GameFilterParams) => {
-    setFilters(prev => ({
-      ...prev,
-      ...newFilters,
-      tenantId: currentTenantId, // Ensure tenantId remains fixed
-      leagueId: currentLeagueId, // Ensure leagueId remains fixed
-      page: 1,
+    // Initialize filters once based on the determined IDs
+    const [filters, setFilters] = useState<GameFilterParams>(() => ({
+        page: 1,
+        pageSize: 12,
+        sortBy: 'dateTime',
+        sortOrder: 'asc',
+        tenantId: currentTenantId || undefined, // Use undefined if null for initial state
+        leagueId: currentLeagueId || undefined, // Use undefined if null for initial state
     }));
-  }, [currentTenantId, currentLeagueId]);
 
-  const handlePageChange = useCallback((newPage: number) => {
-    setFilters(prev => ({ ...prev, page: newPage }));
-  }, []);
+    // This effect now only runs when currentTenantId or currentLeagueId *change their values*
+    // It will ensure initial filters are set correctly or updated if context changes (e.g., user logs in)
+    // The previous separate useEffect for updating filters is no longer needed here.
+    useEffect(() => {
+        // This effect will run on initial render and whenever currentTenantId or currentLeagueId *values* change.
+        // It's crucial that currentTenantId and currentLeagueId are stable (e.g., derived from useMemo as above).
+        setFilters(prev => {
+            // Only update if the values are truly different to prevent unnecessary renders/fetches
+            if (prev.tenantId !== currentTenantId || prev.leagueId !== currentLeagueId) {
+                return {
+                    ...prev,
+                    tenantId: currentTenantId || undefined,
+                    leagueId: currentLeagueId || undefined,
+                    page: 1 // Reset page when context changes
+                };
+            }
+            return prev; // No change needed
+        });
+    }, [currentTenantId, currentLeagueId]);
 
-  const handlePageSizeChange = useCallback((newSize: number) => {
-    setFilters(prev => ({ ...prev, pageSize: newSize, page: 1 }));
-  }, []);
 
-  const getStatusBadge = (status: GameStatus, score?: { home: number; away: number }) => {
-    switch (status) {
-      case GameStatus.IN_PROGRESS:
-        return <Badge variant="destructive" className="animate-pulse">Live</Badge>;
-      case GameStatus.COMPLETED:
-        return <Badge variant="success">Final</Badge>;
-      case GameStatus.SCHEDULED:
-        return <Badge variant="outline">Upcoming</Badge>;
-      case GameStatus.CANCELLED:
-        return <Badge variant="destructive">Cancelled</Badge>;
-      case GameStatus.POSTPONED:
-        return <Badge variant="secondary">Postponed</Badge>;
-      default:
-        return null;
+    const fetchGames = useCallback(async () => {
+        setLoading(true);
+        setError(null);
+
+        // This check is good to prevent fetches if IDs aren't available
+        if (!filters.leagueId) { // Check filters.leagueId instead of currentLeagueId directly here
+            setLoading(false);
+            setError("League ID not available. Please ensure a league is selected or you have appropriate permissions.");
+            return;
+        }
+
+        try {
+            const validatedFilters = GameFilterParamsSchema.parse(filters);
+            const params = new URLSearchParams();
+
+            Object.entries(validatedFilters).forEach(([key, value]) => {
+                if (value !== undefined && value !== null && value !== '') {
+                    if (Array.isArray(value)) {
+                        value.forEach(item => params.append(key, String(item)));
+                    } else {
+                        params.append(key, String(value));
+                    }
+                }
+            });
+
+            const response = await api.get(`/games?${params.toString()}`);
+            const validatedData = PaginatedGamesResponseSchema.parse(response.data);
+
+            setGames(validatedData.data);
+            setTotalItems(validatedData.totalItems);
+            setTotalPages(validatedData.totalPages);
+        } catch (err: any) {
+            const errorMessage = err.response?.data?.message || err.message || 'Failed to fetch games.';
+            setError(errorMessage);
+            toast.error('Error fetching games', { description: errorMessage });
+            console.error('Fetch games error:', err);
+        } finally {
+            setLoading(false);
+        }
+    }, [filters]); // Only depend on filters now. currentLeagueId/currentTenantId are implicitly part of filters.
+
+
+    useEffect(() => {
+        // Authorization check for League Admin
+        if (!userAuth) {
+            toast.error("Unauthorized", { description: "You do not have permission to view this page." });
+            //router.push('/dashboard'); // Consider redirecting here if authentication is strict
+            return;
+        }
+        // This useEffect now *only* triggers fetchGames when filters change.
+        // The leagueId presence check is already handled inside fetchGames.
+        fetchGames();
+    }, [fetchGames, userAuth]); // Keep userAuth as a dependency if userAuth state changes should refetch
+
+    const handleFilterChange = useCallback((newFilters: GameFilterParams) => {
+        setFilters(prev => ({
+            ...prev,
+            ...newFilters,
+            // Ensure tenantId and leagueId are always derived from the context/user auth, not user input
+            tenantId: currentTenantId || undefined,
+            leagueId: currentLeagueId || undefined,
+            page: 1, // Always reset page when filters change
+        }));
+    }, [currentTenantId, currentLeagueId]); // Depend on these stable values
+
+    const handlePageChange = useCallback((newPage: number) => {
+        setFilters(prev => ({ ...prev, page: newPage }));
+    }, []);
+
+    const handlePageSizeChange = useCallback((newSize: number) => {
+        setFilters(prev => ({ ...prev, pageSize: newSize, page: 1 }));
+    }, []);
+
+    const getStatusBadge = (status: GameStatus, score?: { home: number; away: number }) => {
+        switch (status) {
+            case GameStatus.IN_PROGRESS:
+                return <Badge variant="destructive" className="animate-pulse">Live</Badge>;
+            case GameStatus.COMPLETED:
+                return <Badge variant="success">Final</Badge>;
+            case GameStatus.SCHEDULED:
+                return <Badge variant="outline">Upcoming</Badge>;
+            case GameStatus.CANCELLED:
+                return <Badge variant="destructive">Cancelled</Badge>;
+            case GameStatus.POSTPONED:
+                return <Badge variant="secondary">Postponed</Badge>;
+            default:
+                return null;
+        }
+    };
+
+    if (loading && !games.length) {
+        return <LoadingSpinner />;
     }
-  };
 
-  if (loading && !games.length) {
-    return <LoadingSpinner />;
-  }
+    if (error) {
+        return <p className="text-red-500 text-center mt-8">Error: {error}</p>;
+    }
 
-  if (error) {
-    return <p className="text-red-500 text-center mt-8">Error: {error}</p>;
-  }
+    return (
+        <div className="container mx-auto p-6">
+            <div className="flex flex-col space-y-4 mb-4">
+                <div>
+                    <h1 className="text-3xl font-bold tracking-tight text-gray-900">Games</h1>
+                    <p className="text-muted-foreground text-gray-600">View and manage games within your league.</p>
+                </div>
+                <div className="flex justify-between items-center">
+                    <GamesFilters
+                        filters={filters}
+                        onFilterChange={handleFilterChange}
+                        onPageSizeChange={handlePageSizeChange}
+                        fixedTenantId={currentTenantId} // Pass fixed tenant ID
+                        fixedLeagueId={currentLeagueId} // Pass fixed league ID to filters
+                    />
+                    <Link href={buildLink('/game/create')} passHref> {/* Use buildLink here */}
+                        <Button variant="primary" className='whitespace-nowrap'>Create New Game</Button>
+                    </Link>
+                </div>
+            </div>
 
-  return (
-    <div className="container mx-auto p-6">
-      <div className="flex flex-col space-y-4 mb-4">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight text-gray-900">Games</h1>
-          <p className="text-muted-foreground text-gray-600">View and manage games within your league.</p>
-        </div>
-        <div className="flex justify-between items-center">
-          <GamesFilters
-            filters={filters}
-            onFilterChange={handleFilterChange}
-            onPageSizeChange={handlePageSizeChange}
-            fixedTenantId={currentTenantId} // Pass fixed tenant ID
-            fixedLeagueId={currentLeagueId} // Pass fixed league ID to filters
-          />
-          <Link href="/game/create" passHref>
-            <Button variant="primary" className='whitespace-nowrap'>Create New Game</Button>
-          </Link>
-        </div>
-      </div>
+            {games.length === 0 ? (
+                <p className="text-center text-gray-500 mt-8">No games found matching your criteria.</p>
+            ) : (
+                <div className="mt-4">
+                    {games.map((game) => (
+                        <GameCard
+                            key={game.id}
+                            game={game}
+                            buildLink={buildLink}
+                            getStatusBadge={getStatusBadge}
+                        />
+                    ))}
+                </div>
+            )}
 
-      {games.length === 0 ? (
-        <p className="text-center text-gray-500 mt-8">No games found matching your criteria.</p>
-      ) : (
-        <div className="mt-4">
-          {games.map((game) => (
-            <GameCard
-              key={game.id}
-              game={game}
-              buildLink={buildLink}
-              getStatusBadge={getStatusBadge}
-              //ctxTenantId={currentTenantId}
-              //ctxLeagueId={currentLeagueId}
-              //ctxSeasonId={currentSeasonId}
-              //ctxTeamId={currentTeamId}
+            <Pagination
+                currentPage={filters.page || 1}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
             />
-          ))}
         </div>
-      )}
-
-      <Pagination
-        currentPage={filters.page || 1}
-        totalPages={totalPages}
-        onPageChange={handlePageChange}
-      />
-    </div>
-  );
+    );
 }

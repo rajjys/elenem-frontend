@@ -108,7 +108,7 @@ export function TeamsFilters({ filters, onFilterChange, onPageSizeChange, fixedT
 
     try {
       const params = new URLSearchParams();
-      if (idToFetch) params.append('tenantIds', idToFetch);
+      if (idToFetch) params.append('tenantId', idToFetch);
       if (fixedLeagueId) params.append('leagueId', fixedLeagueId); // If league is fixed, fetch only that one
 
       const response = await api.get(`/leagues?${params.toString()}&pageSize=100`); // Assuming endpoint

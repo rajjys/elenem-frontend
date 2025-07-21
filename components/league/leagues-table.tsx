@@ -180,7 +180,7 @@ export function LeaguesTable({ leagues, onSort, sortBy, sortOrder, onDelete }: L
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
                     <DropdownMenuItem asChild>
-                      <Link href={buildLink(`/admin/leagues/edit/${league.id}`)} className="flex items-center">
+                      <Link href={buildLink(`/league/edit/${league.id}`)} className="flex items-center">
                         <Pencil className="mr-2 h-4 w-4" /> View/Edit
                       </Link>
                     </DropdownMenuItem>

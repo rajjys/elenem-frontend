@@ -34,8 +34,13 @@ export const Switch = React.forwardRef<HTMLInputElement, SwitchProps>(
           />
           <div
             className={`w-11 h-6 flex items-center flex-shrink-0 p-1 rounded-full cursor-pointer transition-colors duration-300 ${
-              checked ? 'bg-primary-600' : 'bg-gray-300'
+              checked ? 'bg-gray-400' : 'bg-gray-300'
             } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+            onClick={() => {
+              if (!disabled) {
+                onCheckedChange?.(!checked);
+              }
+            }}
           >
             <div
               className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-300 ${
@@ -43,6 +48,7 @@ export const Switch = React.forwardRef<HTMLInputElement, SwitchProps>(
               }`}
             />
           </div>
+
         </div>
         {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
       </div>

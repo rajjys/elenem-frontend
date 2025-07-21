@@ -1,6 +1,6 @@
 // src/prisma/tenant-schemas.ts
 import * as z from 'zod';
-import { SportType, Role, SportTypeSchema, TenantType, TenantTypeSchema } from './index'; // Assuming SportType and Role are defined in src/prisma/index.ts
+import { SportType, Role, SportTypeSchema, TenantType, TenantTypeSchema, GameStatus } from './index'; // Assuming SportType and Role are defined in src/prisma/index.ts
 
 export interface TenantBasic {
   id: string;
@@ -98,14 +98,15 @@ export const TenantDetailsSchema = z.object({
   })).optional(),
   players: z.array(z.object({
     id: z.string().cuid(),
-    name: z.string(),
+    slug: z.string(),
     isActive: z.boolean(),
     createdAt: z.preprocess((arg) => new Date(arg as string), z.date()),
     updatedAt: z.preprocess((arg) => new Date(arg as string), z.date()),
   })).optional(),
   games: z.array(z.object({
     id: z.string().cuid(),
-    name: z.string(),
+    slug: z.string(),
+    status: z.nativeEnum(GameStatus),
     createdAt: z.preprocess((arg) => new Date(arg as string), z.date()),
     updatedAt: z.preprocess((arg) => new Date(arg as string), z.date()),
   })).optional(),

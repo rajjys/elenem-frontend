@@ -152,7 +152,7 @@ export default function TenantDashboard() {
             try {
               const params = new URLSearchParams();
               if(isSystemAdmin){
-                params.append('tenantIds', currentTenantId); // Use currentTenantId directly
+                params.append('tenantId', currentTenantId); // Use currentTenantId directly
                 }
               const response = await api.get(`/leagues?${params.toString()}`);
               const validatedData = PaginatedLeaguesResponseSchema.parse(response.data);
@@ -201,7 +201,7 @@ export default function TenantDashboard() {
                         className="w-full flex items-center justify-center text-gray-800 px-2 py-2 mx-2 border border-gray-200 rounded-md transition-colors">
                         <Settings className="h-4 w-4 mr-2" /> Settings
                     </button>
-                    <button onClick={() => router.push('/tenant/leagues/create')}
+                    <button onClick={() => router.push('/league/create')}
                         className="w-full flex items-center justify-center bg-emerald-600 text-white py-2 px-2 rounded-md hover:bg-emerald-700 transition-colors">
                         <Plus className="h-4 w-4 mr-2" /> Create New League
                     </button>

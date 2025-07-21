@@ -193,3 +193,6 @@ export const countryNameToCode: Record<string, string> = {
   "Zambia": "ZM",
   "Zimbabwe": "ZW"
 };
+export const countryCodeToName: Record<string, string> = Object.fromEntries(
+  Object.entries(countryNameToCode).map(([name, code]) => [code, name])
+)
