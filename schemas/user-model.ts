@@ -23,6 +23,7 @@ interface BasicTeam {
   id: string;
   externalId: string;
   name: string;
+  leagueId: string;
 }
 
 /**

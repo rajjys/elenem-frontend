@@ -19,3 +19,4 @@ export * from './avatar';
 export * from './stats-card';
 export * from './progress';
 export * from './game-card';
+export * from './skeleton';

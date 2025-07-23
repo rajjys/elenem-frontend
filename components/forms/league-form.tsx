@@ -502,7 +502,7 @@ export function LeagueForm({
                 {tieBreakerRulesFields.map((field, index) => (
                     <div key={field.id} className="flex items-center gap-2 p-2 border rounded-md bg-white">
                         <span className="font-bold text-gray-500">{index + 1}.</span>
-                        <span className="font-mono text-sm text-gray-600 flex-grow">{field.description}</span>
+                        <span className="font-mono text-sm text-gray-600 flex-grow">{field.rule.replace(/_/g, ' ')}</span>
                         <Badge variant="success">{field.sort}</Badge>
                         <Button type="button" variant="ghost" size="sm" onClick={() => removeTieBreakerRule(index)}><XIcon className="h-4 w-4" /></Button>
                     </div>
@@ -514,7 +514,7 @@ export function LeagueForm({
                             <Select value={nextTiebreaker} onValueChange={setNextTiebreaker}>
                                 <SelectTrigger><SelectValue placeholder="Select a tiebreaker rule..." /></SelectTrigger>
                                 <SelectContent>
-                                    {availableTiebreakers.map(tb => <SelectItem key={tb.rule} value={tb.rule}>{tb.description}</SelectItem>)}
+                                    {availableTiebreakers.map(tb => <SelectItem key={tb.rule} value={tb.rule}>{tb.rule.replace(/_/g, ' ')}</SelectItem>)}
                                 </SelectContent>
                             </Select>
                         </div>
