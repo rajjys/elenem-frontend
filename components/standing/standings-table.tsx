@@ -53,7 +53,7 @@ export function StandingsTable({ standings, managingTeamId }: StandingsTableProp
           {standings.map((item) => {
             const isMyTeam = managingTeamId === item.team.id;
             return (
-              <TableRow key={item.team.id} onClick={() => router.push(`/team/dashboard?teamId=${item.team.id}`)}
+              <TableRow key={item.team.id} onClick={() => router.push(`/team/dashboard?ctxTeamId=${item.team.id}`)}
                 className={`cursor-pointer hover:bg-gray-100 ${isMyTeam ? "bg-blue-50 dark:bg-blue-900/20" : ""}`}>
                 <TableCell className="font-medium text-center">{item.rank}</TableCell>
                 <TableCell>

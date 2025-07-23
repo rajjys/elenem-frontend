@@ -115,7 +115,7 @@ export default function AppLayout({
   return (
     <div className={`flex flex-col h-screen bg-gray-100 ${themeClass}`}>
       {/* Navbar is always visible */}
-      <AppLayoutNavbar dashboardLink={dashboardLink} onMobileMenuToggle={toggleMobileMenu} />
+      <AppLayoutNavbar dashboardLink={dashboardLink} onMobileMenuToggle={toggleMobileMenu} handleLogout={handleLogout}/>
       <div className='flex flex-1 overflow-hidden'> {/* This flex container holds sidebar and main content */}
         {/* Sidebar (desktop) */}
         {shouldShowSidebar && (

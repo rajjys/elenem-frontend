@@ -19,17 +19,11 @@ import { useAuthStore } from '@/store/auth.store'
 interface AppLayoutNavbarProps {
   dashboardLink: string;
   onMobileMenuToggle: () => void; // New prop for toggling mobile menu
+  handleLogout: () => void;
 }
 
-export function AppLayoutNavbar({ dashboardLink, onMobileMenuToggle }: AppLayoutNavbarProps) {
-  const router = useRouter()
-  const { user, logout } = useAuthStore()
-
-  const handleLogout = () => {
-    logout() // Call the logout function from the auth store
-    router.push('/logout') // Or call a logout mutation
-  }
-
+export function AppLayoutNavbar({ dashboardLink, onMobileMenuToggle, handleLogout }: AppLayoutNavbarProps) {
+  
   return (
     <header className="bg-white shadow-sm h-16 flex items-center justify-between px-6 sticky top-0 z-30">
       {/* Left Section */}
