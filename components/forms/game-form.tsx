@@ -1,41 +1,35 @@
 // components/forms/game-form.tsx
 "use client";
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { TextArea } from '../ui';
+import { TextArea } from '@/components/ui/';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
-import { api } from '@/services/api'; // Assuming your API service instance
+import { api } from '@/services/api';
 import { useAuthStore } from '@/store/auth.store';
 import { Role } from '@/schemas';
-import { FiChevronDown, FiChevronRight, FiInfo, FiAward, FiCalendar, FiUsers, FiBarChart2, FiImage } from 'react-icons/fi';
+import { FiChevronDown, FiChevronRight, FiAward, FiCalendar, FiUsers, FiBarChart2, FiImage } from 'react-icons/fi';
 
 // --- Zod Schema for Validation ---
-// This schema enforces the logic we discussed: scores are optional, but if one is present, the other is required.
 const createGameSchema = z.object({
-  tenantId: z.string().cuid("Tenant Id is required"), // Optional for League Admin, required for others
-  leagueId: z.string().cuid("League is required."),
-  seasonId: z.string().cuid("Season is required."),
-  homeTeamId: z.string().cuid("Home team is required."),
-  awayTeamId: z.string().cuid("Away team is required."),
-  dateTime: z.string().refine((val) => !isNaN(Date.parse(val)), { message: "Invalid date format" }),
-  homeVenueId: z.string().cuid().optional().nullable(),
+  tenantId: z.string().optional(), // Made optional, will be set from user context for TA/LA
+  leagueId: z.string({ required_error: "League is required." }).min(1, "League is required."),
+  seasonId: z.string({ required_error: "Season is required." }).min(1, "Season is required."),
+  homeTeamId: z.string({ required_error: "Home team is required." }).min(1, "Home team is required."),
+  awayTeamId: z.string({ required_error: "Away team is required." }).min(1, "Away team is required."),
+  dateTime: z.string().refine((val) => val && !isNaN(Date.parse(val)), { message: "A valid date and time is required." }),
+  homeVenueId: z.string().optional().nullable(),
   homeScore: z.coerce.number().int().min(0).optional(),
   awayScore: z.coerce.number().int().min(0).optional(),
   customStats: z.string().optional().refine((val) => {
     if (!val) return true;
-    try {
-      JSON.parse(val);
-      return true;
-    } catch (e) {
-      return false;
-    }
+    try { JSON.parse(val); return true; } catch (e) { return false; }
   }, { message: "Invalid JSON format." }),
   notes: z.string().optional(),
   round: z.string().optional(),
@@ -45,22 +39,15 @@ const createGameSchema = z.object({
   message: "Home and away teams cannot be the same.",
   path: ["awayTeamId"],
 }).refine(data => (data.homeScore !== undefined) === (data.awayScore !== undefined), {
-  message: "Both home and away scores must be provided, or neither.",
+  message: "Provide both scores or neither.",
   path: ["homeScore"],
 });
 
 type CreateGameFormValues = z.infer<typeof createGameSchema>;
 
-// --- Helper Interfaces for Fetched Data ---
-interface BasicDto {
-  id: string;
-  name: string;
-}
-interface TeamDto extends BasicDto {
-    shortCode?: string;
-}
+interface BasicDto { id: string; name: string; }
+interface TeamDto extends BasicDto { shortCode?: string; }
 
-// --- Component Props ---
 interface GameFormProps {
   onSuccess: (gameId: string) => void;
   onCancel: () => void;
@@ -74,12 +61,11 @@ export function GameForm({ onSuccess, onCancel }: GameFormProps) {
   const isTenantAdmin = currentUserRoles.includes(Role.TENANT_ADMIN);
   const isLeagueAdmin = currentUserRoles.includes(Role.LEAGUE_ADMIN);
 
-  // --- State Management ---
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [loading, setLoading] = useState({
       tenants: isSystemAdmin,
       leagues: isTenantAdmin,
-      dependencies: isLeagueAdmin, // For seasons & teams
+      dependencies: false,
   });
   
   const [tenants, setTenants] = useState<BasicDto[]>([]);
@@ -88,7 +74,7 @@ export function GameForm({ onSuccess, onCancel }: GameFormProps) {
   const [teams, setTeams] = useState<TeamDto[]>([]);
 
   const [openSections, setOpenSections] = useState({
-    context: true,
+    context: isSystemAdmin || isTenantAdmin, // REFACTORED: Only open for roles that need selection
     matchup: true,
     details: false,
     scoring: false,
@@ -102,8 +88,7 @@ export function GameForm({ onSuccess, onCancel }: GameFormProps) {
   const form = useForm<CreateGameFormValues>({
     resolver: zodResolver(createGameSchema),
     defaultValues: {
-      tenantId: isSystemAdmin ? '' : user?.tenantId ?? '',
-      leagueId: isLeagueAdmin ? '' : user?.managingLeagueId ?? '',
+      // REFACTORED: Simplified defaults. Logic is now handled in useEffect.
       homeScore: undefined,
       awayScore: undefined,
       dateTime: new Date().toISOString().slice(0,16),
@@ -116,44 +101,44 @@ export function GameForm({ onSuccess, onCancel }: GameFormProps) {
   const watchedTenantId = watch('tenantId');
   const watchedLeagueId = watch('leagueId');
 
-  // --- Data Fetching Hooks ---
+  // --- Data Fetching & Context Initialization ---
+
+  // NEW: Effect to set initial context for Tenant and League Admins
+  useEffect(() => {
+    if (user) {
+        if (isTenantAdmin && user.tenantId) {
+            setValue('tenantId', user.tenantId);
+        }
+        if (isLeagueAdmin && user.tenantId && user.managingLeagueId) {
+            setValue('tenantId', user.tenantId);
+            setValue('leagueId', user.managingLeagueId);
+        }
+    }
+  }, [user, isTenantAdmin, isLeagueAdmin, setValue]);
+
 
   // Fetch Tenants (for System Admin)
   useEffect(() => {
     if (!isSystemAdmin) return;
-    const fetchTenants = async () => {
-      setLoading(prev => ({ ...prev, tenants: true }));
-      try {
-        const response = await api.get('/tenants', { params: { pageSize: 100 } });
-        setTenants(response.data.data);
-      } catch (error) {
-        toast.error('Failed to load tenants.');
-      } finally {
-        setLoading(prev => ({ ...prev, tenants: false }));
-      }
-    };
-    fetchTenants();
+    setLoading(prev => ({ ...prev, tenants: true }));
+    api.get('/tenants', { params: { pageSize: 100 } })
+        .then(response => setTenants(response.data.data))
+        .catch(() => toast.error('Failed to load tenants.'))
+        .finally(() => setLoading(prev => ({ ...prev, tenants: false })));
   }, [isSystemAdmin]);
 
   // Fetch Leagues (for System & Tenant Admins)
   useEffect(() => {
     if (isLeagueAdmin || !watchedTenantId) {
         setLeagues([]);
-        setValue('leagueId', '');
+        if (!isLeagueAdmin) setValue('leagueId', '');
         return;
     };
-    const fetchLeagues = async () => {
-      setLoading(prev => ({ ...prev, leagues: true }));
-      try {
-        const response = await api.get('/leagues', { params: { tenantIds: watchedTenantId, pageSize: 100 } });
-        setLeagues(response.data.data);
-      } catch (error) {
-        toast.error('Failed to load leagues for the selected tenant.');
-      } finally {
-        setLoading(prev => ({ ...prev, leagues: false }));
-      }
-    };
-    fetchLeagues();
+    setLoading(prev => ({ ...prev, leagues: true }));
+    api.get('/leagues', { params: { tenantId: watchedTenantId, pageSize: 100 } })
+        .then(response => setLeagues(response.data.data))
+        .catch(() => toast.error('Failed to load leagues.'))
+        .finally(() => setLoading(prev => ({ ...prev, leagues: false })));
   }, [watchedTenantId, isLeagueAdmin, setValue]);
 
   // Fetch Seasons & Teams (for all admins, once a league is selected)
@@ -166,22 +151,18 @@ export function GameForm({ onSuccess, onCancel }: GameFormProps) {
         setValue('awayTeamId', '');
         return;
     };
-    const fetchDependencies = async () => {
-      setLoading(prev => ({ ...prev, dependencies: true }));
-      try {
-        const [seasonsRes, teamsRes] = await Promise.all([
-          api.get(`/seasons`, { params: { leagueId: watchedLeagueId, pageSize: 100, status: 'ACTIVE' } }),
-          api.get(`/teams`, { params: { leagueId: watchedLeagueId, pageSize: 100 } }),
-        ]);
+    setLoading(prev => ({ ...prev, dependencies: true }));
+    Promise.all([
+        api.get(`/seasons`, { params: { leagueId: watchedLeagueId, pageSize: 100, status: 'ACTIVE' } }),
+        api.get(`/teams`, { params: { leagueId: watchedLeagueId, pageSize: 100 } }),
+    ]).then(([seasonsRes, teamsRes]) => {
         setSeasons(seasonsRes.data.data);
         setTeams(teamsRes.data.data);
-      } catch (error) {
-        toast.error('Failed to load seasons and teams for the selected league.');
-      } finally {
+    }).catch(() => {
+        toast.error('Failed to load seasons and teams.');
+    }).finally(() => {
         setLoading(prev => ({ ...prev, dependencies: false }));
-      }
-    };
-    fetchDependencies();
+    });
   }, [watchedLeagueId, setValue]);
 
   // --- Form Submission ---
@@ -216,43 +197,63 @@ export function GameForm({ onSuccess, onCancel }: GameFormProps) {
       setIsSubmitting(false);
     }
   };
+
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 max-w-4xl mx-auto p-4 sm:p-6 bg-white rounded-lg shadow-sm border">
       <h2 className="text-2xl font-bold text-gray-800 border-b pb-3 mb-4">Create New Game</h2>
 
-      {/* --- Context Selection --- */}
-      <div className="border rounded-lg bg-gray-50/50">
-          <button type="button" className="w-full flex justify-between items-center p-3 font-semibold text-left" onClick={() => toggleSection('context')}>
-              <span><FiAward className="inline mr-2" />Context</span>
-              {openSections.context ? <FiChevronDown /> : <FiChevronRight />}
-          </button>
-          {openSections.context && <div className="p-4 border-t grid grid-cols-1 md:grid-cols-2 gap-4">
-              {isSystemAdmin && (
-                  <Controller name="tenantId" control={control} render={({ field }) => (
-                      <div className="space-y-1">
-                          <Label htmlFor="tenantId">Tenant</Label>
-                          <Select onValueChange={field.onChange} value={field.value} disabled={loading.tenants}>
-                              <SelectTrigger id="tenantId"><SelectValue placeholder="Select a Tenant..." /></SelectTrigger>
-                              <SelectContent>{tenants.map(t => <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>)}</SelectContent>
-                          </Select>
-                          {errors.tenantId && <p className="text-red-500 text-xs">{errors.tenantId.message}</p>}
-                      </div>
-                  )} />
-              )}
-              {(isSystemAdmin || isTenantAdmin) && (
-                  <Controller name="leagueId" control={control} render={({ field }) => (
-                      <div className="space-y-1">
-                          <Label htmlFor="leagueId">League</Label>
-                          <Select onValueChange={field.onChange} value={field.value} disabled={!watchedTenantId || loading.leagues}>
-                              <SelectTrigger id="leagueId"><SelectValue placeholder="Select a League..." /></SelectTrigger>
-                              <SelectContent>{leagues.map(l => <SelectItem key={l.id} value={l.id}>{l.name}</SelectItem>)}</SelectContent>
-                          </Select>
-                          {errors.leagueId && <p className="text-red-500 text-xs">{errors.leagueId.message}</p>}
-                      </div>
-                  )} />
-              )}
-          </div>}
-      </div>
+      {/* NEW: Context Display for Tenant/League Admins */}
+      {(isTenantAdmin || isLeagueAdmin) && (
+        <div className="space-y-4 p-4 border rounded-lg bg-blue-50/50">
+            <h3 className="font-semibold text-gray-700">Creation Context</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <Label>Tenant</Label>
+                    <Input value={user?.tenant?.name ?? 'Loading...'} disabled />
+                </div>
+                {isLeagueAdmin && (
+                    <div>
+                        <Label>League</Label>
+                        <Input value={user?.managingLeague?.name ?? 'Loading...'} disabled />
+                    </div>
+                )}
+            </div>
+        </div>
+      )}
+
+      {/* REFACTORED: Context Selection only for System/Tenant Admins */}
+      {(isSystemAdmin || isTenantAdmin) && (
+        <div className="border rounded-lg bg-gray-50/50">
+            <button type="button" className="w-full flex justify-between items-center p-3 font-semibold text-left" onClick={() => toggleSection('context')}>
+                <span><FiAward className="inline mr-2" />Context Selection</span>
+                {openSections.context ? <FiChevronDown /> : <FiChevronRight />}
+            </button>
+            {openSections.context && <div className="p-4 border-t grid grid-cols-1 md:grid-cols-2 gap-4">
+                {isSystemAdmin && (
+                    <Controller name="tenantId" control={control} render={({ field }) => (
+                        <div className="space-y-1">
+                            <Label htmlFor="tenantId">Tenant</Label>
+                            <Select onValueChange={field.onChange} value={field.value} disabled={loading.tenants}>
+                                <SelectTrigger id="tenantId"><SelectValue placeholder="Select a Tenant..." /></SelectTrigger>
+                                <SelectContent>{tenants.map(t => <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>)}</SelectContent>
+                            </Select>
+                            {errors.tenantId && <p className="text-red-500 text-xs">{errors.tenantId.message}</p>}
+                        </div>
+                    )} />
+                )}
+                <Controller name="leagueId" control={control} render={({ field }) => (
+                    <div className="space-y-1">
+                        <Label htmlFor="leagueId">League</Label>
+                        <Select onValueChange={field.onChange} value={field.value} disabled={!watchedTenantId || loading.leagues}>
+                            <SelectTrigger id="leagueId"><SelectValue placeholder="Select a League..." /></SelectTrigger>
+                            <SelectContent>{leagues.map(l => <SelectItem key={l.id} value={l.id}>{l.name}</SelectItem>)}</SelectContent>
+                        </Select>
+                        {errors.leagueId && <p className="text-red-500 text-xs">{errors.leagueId.message}</p>}
+                    </div>
+                )} />
+            </div>}
+        </div>
+      )}
 
       {/* --- Matchup Selection --- */}
        <div className="border rounded-lg bg-gray-50/50">
@@ -293,9 +294,9 @@ export function GameForm({ onSuccess, onCancel }: GameFormProps) {
               )} />
           </div>}
       </div>
-
-      {/* --- Game Details --- */}
-       <div className="border rounded-lg bg-gray-50/50">
+      
+      {/* Other sections remain the same */}
+      <div className="border rounded-lg bg-gray-50/50">
           <button type="button" className="w-full flex justify-between items-center p-3 font-semibold text-left" onClick={() => toggleSection('details')}>
               <span><FiCalendar className="inline mr-2" />Details</span>
               {openSections.details ? <FiChevronDown /> : <FiChevronRight />}
@@ -311,24 +312,23 @@ export function GameForm({ onSuccess, onCancel }: GameFormProps) {
               <Controller name="round" control={control} render={({ field }) => (
                   <div className="space-y-1">
                       <Label htmlFor="round">Round / Week (Optional)</Label>
-                      <Input id="round" placeholder="e.g., Round 5" {...field} />
+                      <Input id="round" placeholder="e.g., Round 5" {...field} value={field.value ?? ''} />
                       {errors.round && <p className="text-red-500 text-xs">{errors.round.message}</p>}
                   </div>
               )} />
               <Controller name="notes" control={control} render={({ field }) => (
                   <div className="space-y-1 md:col-span-2">
                       <Label htmlFor="notes">Notes (Optional)</Label>
-                      <TextArea id="notes" placeholder="Any specific notes about the game..." {...field} />
+                      <TextArea id="notes" placeholder="Any specific notes..." {...field} value={field.value ?? ''} />
                       {errors.notes && <p className="text-red-500 text-xs">{errors.notes.message}</p>}
                   </div>
               )} />
           </div>}
       </div>
       
-      {/* --- Scoring (for completed games) --- */}
       <div className="border rounded-lg bg-gray-50/50">
           <button type="button" className="w-full flex justify-between items-center p-3 font-semibold text-left" onClick={() => toggleSection('scoring')}>
-              <span><FiBarChart2 className="inline mr-2" />Scoring (Optional: For Completed Games)</span>
+              <span><FiBarChart2 className="inline mr-2" />Scoring (Optional)</span>
               {openSections.scoring ? <FiChevronDown /> : <FiChevronRight />}
           </button>
           {openSections.scoring && <div className="p-4 border-t space-y-4">
@@ -336,29 +336,28 @@ export function GameForm({ onSuccess, onCancel }: GameFormProps) {
                   <Controller name="homeScore" control={control} render={({ field }) => (
                       <div className="space-y-1">
                           <Label htmlFor="homeScore">Home Score</Label>
-                          <Input id="homeScore" type="number" placeholder="e.g., 3" {...field} />
+                          <Input id="homeScore" type="number" placeholder="e.g., 3" {...field} onChange={e => field.onChange(parseInt(e.target.value, 10) || undefined)} />
                           {errors.homeScore && <p className="text-red-500 text-xs">{errors.homeScore.message}</p>}
                       </div>
                   )} />
                   <Controller name="awayScore" control={control} render={({ field }) => (
                       <div className="space-y-1">
                           <Label htmlFor="awayScore">Away Score</Label>
-                          <Input id="awayScore" type="number" placeholder="e.g., 1" {...field} />
+                          <Input id="awayScore" type="number" placeholder="e.g., 1" {...field} onChange={e => field.onChange(parseInt(e.target.value, 10) || undefined)} />
                           {errors.awayScore && <p className="text-red-500 text-xs">{errors.awayScore.message}</p>}
                       </div>
                   )} />
               </div>
               <Controller name="customStats" control={control} render={({ field }) => (
                   <div className="space-y-1">
-                      <Label htmlFor="customStats">Custom Stats (JSON Format)</Label>
-                      <TextArea id="customStats" placeholder='e.g., { "period1": { "home": 1, "away": 0 } }' {...field} rows={4} />
+                      <Label htmlFor="customStats">Custom Stats (JSON)</Label>
+                      <TextArea id="customStats" placeholder='e.g., { "period1": { "home": 1 } }' {...field} rows={4} value={field.value ?? ''} />
                       {errors.customStats && <p className="text-red-500 text-xs">{errors.customStats.message}</p>}
                   </div>
               )} />
           </div>}
       </div>
       
-      {/* --- Media --- */}
       <div className="border rounded-lg bg-gray-50/50">
           <button type="button" className="w-full flex justify-between items-center p-3 font-semibold text-left" onClick={() => toggleSection('media')}>
               <span><FiImage className="inline mr-2" />Media (Optional)</span>
@@ -368,21 +367,20 @@ export function GameForm({ onSuccess, onCancel }: GameFormProps) {
               <Controller name="bannerImageUrl" control={control} render={({ field }) => (
                   <div className="space-y-1">
                       <Label htmlFor="bannerImageUrl">Banner Image URL</Label>
-                      <Input id="bannerImageUrl" placeholder="https://example.com/banner.png" {...field} />
+                      <Input id="bannerImageUrl" placeholder="https://..." {...field} value={field.value ?? ''} />
                       {errors.bannerImageUrl && <p className="text-red-500 text-xs">{errors.bannerImageUrl.message}</p>}
                   </div>
               )} />
               <Controller name="highlightsUrl" control={control} render={({ field }) => (
                   <div className="space-y-1">
                       <Label htmlFor="highlightsUrl">Highlights URL</Label>
-                      <Input id="highlightsUrl" placeholder="https://youtube.com/watch?v=..." {...field} />
+                      <Input id="highlightsUrl" placeholder="https://youtube.com/..." {...field} value={field.value ?? ''} />
                       {errors.highlightsUrl && <p className="text-red-500 text-xs">{errors.highlightsUrl.message}</p>}
                   </div>
               )} />
           </div>}
       </div>
 
-      {/* --- Form Actions --- */}
       <div className="flex justify-end space-x-4 pt-4">
         <Button type="button" variant="ghost" onClick={onCancel} disabled={isSubmitting}>
           Cancel
