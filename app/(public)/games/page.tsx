@@ -4,7 +4,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { GameCard } from "@/components/ui/game-card"; // Assuming you have this
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { api } from '@/services/api';
@@ -13,12 +12,14 @@ import { format, parseISO } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { GameDetails } from '@/schemas';
-import { getStatusBadge } from '@/components/ui';
+import { Avatar, getStatusBadge } from '@/components/ui';
 import { useContextualLink } from '@/hooks';
+import GamePublicCard from '@/components/ui/game-public-card';
 
 
 interface TenantWithGames {
   tenantId: string;
+  logoUrl?: string | null;
   tenantName: string;
   tenantSlug: string;
   games: GameDetails[];
@@ -47,7 +48,7 @@ function GamesPageSkeleton() {
             </div>
             {/* Game List Skeleton */}
             {Array.from({ length: 2 }).map((_, i) => (
-                 <Card key={i} className="overflow-hidden">
+                 <Card key={i} className="overflow-hidden pb-2">
                     <CardHeader>
                         <Skeleton className="h-7 w-1/3" />
                     </CardHeader>
@@ -80,8 +81,8 @@ function DateCarousel({ dates, selectedDate, onDateSelect }: { dates: string[], 
                                 ${isSelected ? 'bg-gray-600 text-gray-200 shadow-md scale-105' : 'bg-card hover:bg-muted'}`}
                         >
                             <span className={`text-xs font-semibold ${isSelected? "text-gray-100" : "text-gray-500"}`}>{format(dateObj, 'EEE', { locale: fr }).charAt(0).toUpperCase() + format(dateObj, 'EEE', { locale: fr }).slice(1)}</span>
-                            <span className={`text-2xl font-bold ${isSelected? "text-yellow-100" : "text-gray-800"}`}>{format(dateObj, 'dd')}</span>
-                            <span className={`text-xs font-semibold ${isSelected? "text-gray-100" : "text-gray-500"}`}>{format(dateObj, 'MMM').charAt(0).toUpperCase() + format(dateObj, 'MMM').slice(1)}</span>
+                            <span className={`text-2xl font-bold ${isSelected? "text-yellow-100" : "text-gray-800"}`}>{format(dateObj, 'dd', { locale: fr })}</span>
+                            <span className={`text-xs font-semibold ${isSelected? "text-gray-100" : "text-gray-500"}`}>{format(dateObj, 'MMM',{ locale: fr }).charAt(0).toUpperCase() + format(dateObj, 'MMM').slice(1)}</span>
                         </button>
                     );
                 })}
@@ -92,7 +93,6 @@ function DateCarousel({ dates, selectedDate, onDateSelect }: { dates: string[], 
 
 
 export default function PublicGamesPage() {
-    const { buildLink } = useContextualLink(); ///To be removed. Simply for compatibility but not needed here
   const [availableDates, setAvailableDates] = useState<string[]>([]);
   const [selectedDate, setSelectedDate] = useState<string>('');
   const [gamesByTenant, setGamesByTenant] = useState<TenantWithGames[]>([]);
@@ -151,7 +151,7 @@ export default function PublicGamesPage() {
   }
 
   return (
-    <div className="bg-gray-50 min-h-screen max-w-2xl mx-auto">
+    <div className="min-h-screen max-w-2xl mx-auto">
       <div className="container mx-auto p-4 sm:p-6 space-y-8">
         <header>
           <h1 className="text-4xl font-bold tracking-tight text-gray-800">Matchs et Résultats: Toutes les Organisations</h1>
@@ -159,7 +159,7 @@ export default function PublicGamesPage() {
         </header>
         <Card className="overflow-hidden shadow-sm">
             <CardHeader>
-                  <CardTitle> Selectionner une date</CardTitle>
+                  <CardTitle className='text-gray-500 text-base px-2'>Selectionner une date</CardTitle>
             </CardHeader>
             <CardContent className="grid gap-4 md:gap-6 grid-cols-1">
                   <DateCarousel dates={availableDates} selectedDate={selectedDate} onDateSelect={setSelectedDate} />
@@ -180,19 +180,20 @@ export default function PublicGamesPage() {
             </div>
         ) : gamesByTenant.length > 0 ? (
           <div className="space-y-8">
-            {gamesByTenant.map(({ tenantId, tenantName, tenantSlug, games }) => (
-              <Card key={tenantId} className="overflow-hidden shadow-sm">
+            {gamesByTenant.map(({ tenantId, tenantName, tenantSlug, logoUrl, games }) => (
+              <Card key={tenantId} className="overflow-hidden shadow-sm pb-2 bg-gray-400">
                 <CardHeader>
                   <CardTitle>
-                    <Link href={`${handler}${tenantSlug}.${ROOT_DOMAIN}`} target="_blank" rel="noopener noreferrer" className="hover:underline">
-                      {tenantName}
+                    <Link href={`${handler}${tenantSlug}.${ROOT_DOMAIN}`} target="_blank" rel="noopener noreferrer" className="flex items-center justify-start space-x-2 text-white">
+                      <Avatar src={logoUrl} name={tenantName} size={35} />
+                      <span>{tenantName}</span>
                     </Link>
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="grid gap-4 md:gap-6 grid-cols-1">
+                <CardContent className="grid gap-2 grid-cols-1">
                   {games.map((game) => (
                     <Link key={game.id} href={`${handler}${tenantSlug}.${ROOT_DOMAIN}/games/${game.slug}`} target="_blank" rel="noopener noreferrer">
-                        <GameCard game={game} getStatusBadge={getStatusBadge} buildLink={buildLink}/>
+                        <GamePublicCard game={game}/>
                     </Link>
                   ))}
                 </CardContent>
