@@ -2,73 +2,120 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { Role } from './schemas'; // Assuming Role enum is imported from Prisma or shared types
-import { verifyJWT } from './utils'; // Your utility to verify JWT
+import { resolveTenantSlugFromHostname, verifyJWT } from './utils'; // Your utility to verify JWT
 import { JwtPayload } from './types';
 
+// Define your root domain from environment variables.
+// Use a fallback for development if NEXT_PUBLIC_ROOT_DOMAIN is not set.
+// For Vercel deployments, this will typically be your production domain.
+// For local development, you might use 'localhost:3000' or similar.
+const ROOT_DOMAIN = process.env.NODE_ENV === 'development' ? 'lvh.me:3000' : 'website.com';
+
 // Define public paths that are accessible to everyone, regardless of authentication status.
+// These are typically paths on the root domain (e.g., website.com/login, website.com/leagues)
 const publicPaths = [
   '/', '/about', '/help', '/explore',
-  '/leagues', '/leagues/', '/leagues/*', // Public league profiles
-  '/teams', '/teams/', '/teams/*',     // Public team profiles
-  '/players', '/players/', '/players/*', // Public player profiles
-  '/seasons', '/seasons/', '/seasons/*', // Public season profiles
+  '/leagues', '/leagues/', '/leagues/*', // Public league profiles on the root domain
+  '/teams', '/teams/', '/teams/*',     // Public team profiles on the root domain
+  '/players', '/players/', '/players/*', // Public player profiles on the root domain
+  '/games', '/games/', '/games/*',     // Public game listings on the root domain
+  'tenant', 'tenant/', 'tenant/*', // Public tenant profiles on the root domain
+  '/seasons', '/seasons/', '/seasons/*', // Public season profiles on the root domain
   '/login', '/register', '/access-denied', '/blog', '/contact', '/pricing', '/features', '/terms', '/privacy'
 ];
 
 export async function middleware(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
-
-  // 1. Allow all public paths to proceed directly.
-  // This also includes Next.js internal paths and API routes.
-  if (
-    publicPaths.some(path => pathname === path || (path.endsWith('/*') && pathname.startsWith(path.slice(0, -1)))) ||
-    pathname.startsWith('/_next') || // Next.js internal files
-    pathname.startsWith('/api/')     // Backend API routes (authentication/authorization handled by backend)
-  ) {
+  const url = request.nextUrl.clone();
+  const hostname = request.headers.get('host');
+  // --- 1. Safety check for hostname ---
+  if (!hostname) {
+    console.warn('Middleware: Hostname not found in request headers.');
     return NextResponse.next();
   }
 
-  // 2. Check for access token for all non-public paths.
+  // --- 2. Determine the tenant slug from the hostname for public-facing subdomains ---
+  console.log("Hostname: ", hostname);
+  console.log("Root Domain: ", ROOT_DOMAIN);
+  const tenantSlug = resolveTenantSlugFromHostname(hostname, ROOT_DOMAIN);
+  console.log("Slug: ",tenantSlug)
+  if (tenantSlug && !['www', 'localhost'].includes(tenantSlug)) {
+    const newPath = url.pathname === '/'
+    ? `/public/public_tenant/${tenantSlug}/`
+    : `/public/public_tenant/${tenantSlug}${url.pathname}/`;
+
+    url.pathname = newPath;
+    console.log("Rewriting to:", url.pathname);
+
+    return NextResponse.rewrite(url);
+  }
+
+  // --- 4. Allow all general public paths on the root domain to proceed directly ---
+  // This also includes Next.js internal paths and API routes.
+  if (
+    publicPaths.some(path => pathname === path || (path.endsWith('/*') && pathname.startsWith(path.slice(0, -1)))) ||
+    pathname.startsWith('/_next') || // Next.js internal files (e.g., _next/static, _next/image)
+    pathname.startsWith('/api/')     // Backend API routes (authentication/authorization handled by backend)
+  ) {
+    console.log(`Middleware: Allowing public path ${pathname} to proceed.`);
+    return NextResponse.next();
+  }
+
+  // --- 5. Check for access token for all non-public (authenticated) paths. ---
   const accessToken = request.cookies.get('accessToken')?.value;
   if (!accessToken) {
     // If no token, redirect to login, preserving the intended destination.
-    const url = request.nextUrl.clone();
-    url.pathname = '/login';
-    url.searchParams.set('redirect', pathname + search);
-    return NextResponse.redirect(url);
+    const redirectUrl = request.nextUrl.clone();
+    redirectUrl.pathname = '/login';
+    redirectUrl.searchParams.set('redirect', pathname + search);
+    console.log(`Middleware: No access token, redirecting to login from ${pathname}.`);
+    return NextResponse.redirect(redirectUrl);
   }
 
-  // 3. Decode JWT to get user roles and details.
-  // Cast the result of verifyJWT to our new CustomJWTPayload type.
-  const user: JwtPayload | null = await verifyJWT(accessToken, process.env.JWT_SECRET || 'your-secret');//Type Error here
+  // --- 6. Decode JWT to get user roles and details. ---
+  // Cast the result of verifyJWT to our JwtPayload type.
+  let user: JwtPayload | null = null;
+  try {
+    user = await verifyJWT(accessToken, process.env.JWT_SECRET || 'your-secret'); // Ensure JWT_SECRET is set
+  } catch (error) {
+    console.error('Middleware: JWT verification failed:', error);
+    // If JWT verification fails, clear cookie and redirect to login.
+    const redirectUrl = request.nextUrl.clone();
+    redirectUrl.pathname = '/login';
+    redirectUrl.searchParams.set('redirect', pathname + search);
+    const response = NextResponse.redirect(redirectUrl);
+    response.cookies.delete('accessToken'); // Clear invalid token
+    return response;
+  }
 
-  // If JWT verification fails, redirect to login.
-  // Now `user.roles` will be correctly typed as `Role[]`.
-  if (!user || !Array.isArray(user.roles) || user.roles.length === 0) { // Added Array.isArray check for robustness
+  // If JWT verification fails or user roles are invalid/empty, redirect to login.
+  if (!user || !Array.isArray(user.roles) || user.roles.length === 0) {
     console.warn('Middleware: Invalid or empty user roles found for authenticated request.');
-    const url = request.nextUrl.clone();
-    url.pathname = '/login';
-    url.searchParams.set('redirect', pathname + search);
-    return NextResponse.redirect(url);
+    const redirectUrl = request.nextUrl.clone();
+    redirectUrl.pathname = '/login';
+    redirectUrl.searchParams.set('redirect', pathname + search);
+    const response = NextResponse.redirect(redirectUrl);
+    response.cookies.delete('accessToken'); // Clear invalid token
+    return response;
   }
 
   // Helper to check if user has a specific role
-  const hasRole = (role: Role) => user.roles.includes(role);
+  const hasRole = (role: Role) => user!.roles.includes(role); // 'user!' because we've checked for null above
 
   // Helper to construct access denied URL
   const redirectToAccessDenied = (reason: string) => {
-    const url = request.nextUrl.clone();
-    url.pathname = '/access-denied';
-    url.searchParams.set('reason', reason);
-    return NextResponse.redirect(url);
+    const accessDeniedUrl = request.nextUrl.clone();
+    accessDeniedUrl.pathname = '/access-denied';
+    accessDeniedUrl.searchParams.set('reason', reason);
+    console.warn(`Middleware: Access denied to ${pathname} for reason: ${reason}`);
+    return NextResponse.redirect(accessDeniedUrl);
   };
 
-  // 4. Role-based access control for protected routes.
+  // --- 7. Role-based access control for protected routes. ---
   // We check from most specific *UI panel* to least specific, allowing higher roles access.
 
   // System Admin routes
   if (pathname.startsWith('/admin')) {
-    // Only SYSTEM_ADMIN can access the platform admin panel. This is the top of the hierarchy.
     if (!hasRole(Role.SYSTEM_ADMIN)) {
       return redirectToAccessDenied('system_admin_only');
     }
@@ -77,7 +124,6 @@ export async function middleware(request: NextRequest) {
 
   // Tenant Admin routes
   if (pathname.startsWith('/tenant')) {
-    // To access the tenant panel, you must be a TENANT_ADMIN or a SYSTEM_ADMIN.
     if (!hasRole(Role.TENANT_ADMIN) && !hasRole(Role.SYSTEM_ADMIN)) {
       return redirectToAccessDenied('tenant_access_required');
     }
@@ -86,8 +132,6 @@ export async function middleware(request: NextRequest) {
 
   // League Admin routes
   if (pathname.startsWith('/league')) {
-    // To access a league panel/layout, you must be a LEAGUE_ADMIN,
-    // or a higher role like TENANT_ADMIN or SYSTEM_ADMIN.
     if (!hasRole(Role.LEAGUE_ADMIN) && !hasRole(Role.TENANT_ADMIN) && !hasRole(Role.SYSTEM_ADMIN)) {
       return redirectToAccessDenied('league_access_required');
     }
@@ -96,7 +140,6 @@ export async function middleware(request: NextRequest) {
 
   // Team Admin routes
   if (pathname.startsWith('/team')) {
-    // Anyone in the management hierarchy can typically view a team's panel.
     if (!hasRole(Role.TEAM_ADMIN) && !hasRole(Role.LEAGUE_ADMIN) && !hasRole(Role.TENANT_ADMIN) && !hasRole(Role.SYSTEM_ADMIN)) {
       return redirectToAccessDenied('team_access_required');
     }
@@ -104,8 +147,6 @@ export async function middleware(request: NextRequest) {
   }
 
   // General authenticated user routes (e.g., /account, /player-dashboard)
-  // This would include PLAYER, REFEREE, and GENERAL_USER roles.
-  // Higher admin roles can also access these if they wish, as they passed authentication.
   const generalUserAuthenticatedPaths = [
     '/account', // Root of authenticated user accounts
     '/account/profile',
@@ -117,10 +158,10 @@ export async function middleware(request: NextRequest) {
     '/referee',
     '/game',
     // Add other paths specific to logged-in general users, players, referees etc.
-    // E.g., '/player-dashboard', '/referee-assignments'
   ];
   if (generalUserAuthenticatedPaths.some(path => pathname === path || pathname.startsWith(path + '/'))) {
-    // Any authenticated user is allowed here, as long as they have *any* role (covered by initial `user.roles.length === 0` check).
+    // Any authenticated user is allowed here, as long as they have *any* role.
+    console.log(`Middleware: Allowing general authenticated user access to ${pathname}.`);
     return NextResponse.next();
   }
 
@@ -140,6 +181,7 @@ export const config = {
     // - _next/image (image optimization files)
     // - favicon.ico (favicon file)
     // - public assets (fonts, images, etc.)
+    // This matcher is broad enough to catch subdomains.
     '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 };

@@ -7,7 +7,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { api } from '@/services/api';
 import { GameDetails, GameFilterParams, PaginatedGamesResponseSchema, GameStatus, GameFilterParamsSchema } from '@/schemas';
 import { GamesFilters } from '@/components/game/games-filters';
-import { Pagination, LoadingSpinner, Button, Badge } from '@/components/ui/';
+import { Pagination, LoadingSpinner, Button, Badge, getStatusBadge } from '@/components/ui/';
 import { GameCard } from '@/components/ui';
 import { toast } from 'sonner';
 import { Role } from '@/schemas';
@@ -58,7 +58,7 @@ export default function LeagueGamesPage() {
         page: 1,
         pageSize: 12,
         sortBy: 'dateTime',
-        sortOrder: 'asc',
+        sortOrder: 'desc',
         tenantId: currentTenantId || undefined, // Use undefined if null for initial state
         leagueId: currentLeagueId || undefined, // Use undefined if null for initial state
     }));
@@ -156,23 +156,6 @@ export default function LeagueGamesPage() {
     const handlePageSizeChange = useCallback((newSize: number) => {
         setFilters(prev => ({ ...prev, pageSize: newSize, page: 1 }));
     }, []);
-
-    const getStatusBadge = (status: GameStatus, score?: { home: number; away: number }) => {
-        switch (status) {
-            case GameStatus.IN_PROGRESS:
-                return <Badge variant="destructive" className="animate-pulse">Live</Badge>;
-            case GameStatus.COMPLETED:
-                return <Badge variant="success">Final</Badge>;
-            case GameStatus.SCHEDULED:
-                return <Badge variant="outline">Upcoming</Badge>;
-            case GameStatus.CANCELLED:
-                return <Badge variant="destructive">Cancelled</Badge>;
-            case GameStatus.POSTPONED:
-                return <Badge variant="secondary">Postponed</Badge>;
-            default:
-                return null;
-        }
-    };
 
     if (loading && !games.length) {
         return <LoadingSpinner />;

@@ -14,7 +14,6 @@ import {
   DropdownMenuSeparator
 } from '@/components/ui/'
 import Link from 'next/link'
-import { useAuthStore } from '@/store/auth.store'
 
 interface AppLayoutNavbarProps {
   dashboardLink: string;

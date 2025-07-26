@@ -8,10 +8,12 @@ import { FiSun, FiMoon, FiMenu, FiX, FiAward } from 'react-icons/fi';
 import { usePathname } from 'next/navigation';
 
 const navLinks = [
-  { label: 'Features', href: '/features' },
-  { label: 'Pricing', href: '/pricing' },
-  { label: 'Explore Leagues', href: '/explore' },
-  { label: 'Blog', href: '/blog' },
+  { label: 'Accueil', href: '/' },
+  { label: 'Matchs', href: '/games' },
+  { label: 'Organisations', href: '/tenants' },
+  { label: 'Actualites', href: '/news' },
+  { Label: 'Classements', href: '/standings' },
+  { label: 'Plus', href: '#'}
 ];
 
 export const PublicHeader = () => {
@@ -31,9 +33,9 @@ export const PublicHeader = () => {
               <span className="text-xl font-bold text-indigo-700 dark:text-indigo-400">ELENEM</span>
             </Link>
             <nav className="hidden md:ml-10 md:flex md:space-x-8">
-              {navLinks.map((link) => (
+              {navLinks.map((link, index) => (
                 <Link
-                  key={link.label}
+                  key={index}
                   href={link.href}
                   className={`text-sm font-medium transition-colors hover:text-indigo-600 dark:hover:text-indigo-400 ${
                     pathname === link.href ? 'text-indigo-600 dark:text-indigo-400' : 'text-gray-600 dark:text-gray-300'

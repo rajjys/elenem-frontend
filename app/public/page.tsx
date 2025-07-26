@@ -13,14 +13,13 @@ const leagues = [
 
 export default function HomePage() {
   const router = useRouter();
-  const ROOT_DOMAIN = (process.env.NODE_ENV === 'development' ) ? 'lvh.me:3000' : "website.com";
-  const handler = (process.env.NODE_ENV === 'development' ) ? 'http://' : 'https://';
+  const ROOT_DOMAIN = (process.env.NODE_ENV === 'development' ) ? 'lvh.me' : "website.com";
   // Function to handle redirection to a specific league's subdomain
   const redirectToLeague = (leagueSlug: string) => {
     console.log("The Slug: ", leagueSlug);
     // Construct the full subdomain URL
     // Ensure this matches your actual domain
-    const leagueUrl = `${handler}${leagueSlug}.${ROOT_DOMAIN}`;
+    const leagueUrl = `http://${leagueSlug}.${ROOT_DOMAIN}:3000`;
     console.log(leagueUrl);
     window.location.href = leagueUrl;
   };
