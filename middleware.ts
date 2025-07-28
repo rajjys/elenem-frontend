@@ -19,9 +19,12 @@ const publicPaths = [
   '/teams', '/teams/', '/teams/*',     // Public team profiles on the root domain
   '/players', '/players/', '/players/*', // Public player profiles on the root domain
   '/games', '/games/', '/games/*',     // Public game listings on the root domain
-  'tenant', 'tenant/', 'tenant/*', // Public tenant profiles on the root domain
+  '/tenants', '/tenants/', '/tenants/*', // Public tenant profiles on the root domain
   '/seasons', '/seasons/', '/seasons/*', // Public season profiles on the root domain
-  '/login', '/register', '/access-denied', '/blog', '/contact', '/pricing', '/features', '/terms', '/privacy'
+  '/login', '/register', '/access-denied', 
+  '/blogs',
+  '/news', '/news/', 'news/*', // Public news articles on the root domain
+   '/contact', '/pricing', '/features', '/terms', '/privacy'
 ];
 
 export async function middleware(request: NextRequest) {

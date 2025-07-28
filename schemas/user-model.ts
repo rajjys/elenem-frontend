@@ -39,6 +39,7 @@ export interface User {
   firstName?: string | null;
   lastName?: string | null;
   phone?: string | null; // Added from backend response
+  profileImageUrl?: string | null;
   avatarUrl?: string | null; // Renamed from profilePictureUrl to match backend
   roles: Role[]; // Array of roles
 
