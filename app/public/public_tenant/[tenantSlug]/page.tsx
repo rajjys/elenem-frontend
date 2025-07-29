@@ -1,6 +1,7 @@
 import React from 'react'
 
-const PublicTenantPage = async({ params } : { params: { tenantSlug: string } }) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const PublicTenantPage = async({ params } : any) => {
   const { tenantSlug } = params;
   return (
     <div>
