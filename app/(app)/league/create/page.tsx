@@ -1,7 +1,6 @@
 // app/(dashboard)/league/create/page.tsx
 "use client";
 
-import React, { useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { LeagueForm } from '@/components/forms/league-form'; // Adjust path as needed
 import { AccessGate } from '@/app/(auth)/AccessGate';

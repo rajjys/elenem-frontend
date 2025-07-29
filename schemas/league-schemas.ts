@@ -1,6 +1,6 @@
 // src/schemas/league-schemas.ts (or a similar location for your Zod schemas)
 import * as z from 'zod';
-import { SportType, LeagueVisibility, Gender, Role, SportTypeSchema, LeagueVisibilitySchema } from '@/schemas'; // Assuming these enums are available or you'll mock them
+import { SportType, LeagueVisibility, Gender, SportTypeSchema, LeagueVisibilitySchema } from '@/schemas'; // Assuming these enums are available or you'll mock them
 
 // Helper schemas for nested objects (similar to your DTOs)
 export const TenantLiteResponseSchema = z.object({
@@ -29,6 +29,7 @@ export type UserLiteResponseDto = z.infer<typeof UserLiteResponseSchema>;
 
 // League Response Schema
 // This one needs special handling for the self-referencing `parentLeague`
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const LeagueBasicSchema: z.ZodSchema<any> = z.lazy(() => z.object({
   id: z.string().cuid(),
   externalId: z.string().uuid(),

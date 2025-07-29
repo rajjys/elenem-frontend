@@ -1,4 +1,5 @@
 // components/layouts/FlyoutMenu.tsx
+'use client'
 import { useClickAway } from "@/hooks";
 import { RefObject, useRef } from "react";
 // Ensure NavLink is imported from the correct path, likely the same directory

@@ -3,7 +3,6 @@
 
 import React, { useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { SeasonForm } from '@/components/forms/season-form'; // Adjust path as needed
 import { AccessGate } from '@/app/(auth)/AccessGate';
 import { Role } from '@/schemas'; // Adjust path to your Role enum
 import { toast } from 'sonner';
@@ -28,7 +27,7 @@ export default function CreateGamePage() {
   const handleSuccess = useCallback((seasonId: string) => {
     toast.success(`Game ${seasonId} created successfully!`);
     router.push(redirectPath); // Example: redirect to admin seasons list
-  }, [router]);
+  }, [router, redirectPath]);
 
   const handleCancel = useCallback(() => {
     router.back(); // Go back to the previous page

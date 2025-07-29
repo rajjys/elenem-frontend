@@ -1,6 +1,6 @@
 // components/ui/modal.tsx
 "use client";
-import React, { Fragment } from 'react';
+import React from 'react';
 import { Button } from './button';
 // For a production app, you'd use a proper modal library like Headless UI Dialog
 // This is a very basic implementation for demonstration.

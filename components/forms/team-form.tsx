@@ -25,7 +25,7 @@ import {
   TeamDetails, // Assuming TeamDetails is an extended type of your form values
   TeamFormValues,
 } from '@/schemas'; // Adjust path as needed for your Zod schemas
-import { countryNameToCode, sanitizeEmptyStrings } from '@/utils';
+import { sanitizeEmptyStrings } from '@/utils';
 
 // Define types for fetched data
 interface TenantBasicDto {
@@ -80,7 +80,7 @@ export const TeamForm: React.FC<TeamFormProps> = ({
   // Determine the schema based on user role and edit mode
   // 1. Dynamically select the schema and default values
 let formSchema: z.ZodTypeAny;
-let defaultValues: any;
+let defaultValues;
 
 if (isEditMode) {
   if (isTeamAdmin) {
@@ -124,7 +124,6 @@ if (isEditMode) {
     watch,
     formState: { errors, isSubmitting },
     reset,
-    control,
   } = useForm({
     resolver: zodResolver(formSchema),
     defaultValues});
@@ -296,11 +295,11 @@ if (isEditMode) {
         toast.success('Team created successfully!');
       }
       onSuccess(response.data.id);
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.message || err.message || "Failed to save team.";
+    } catch (error) {
+      const errorMessage = "Failed to save team.";
       setError(errorMessage);
       toast.error("Error saving team", { description: errorMessage });
-      console.error('Team form submission error:', err);
+      console.error('Team form submission error:', error);
     } finally {
       setLoadingDependencies(false);
     }
@@ -492,9 +491,9 @@ if (isEditMode) {
                 id="country"
                 value={watchedCountry}
                 onChange={(val) => {
-                  const isoCode = countryNameToCode[val] || '';
                   setValue('country', val, { shouldValidate: true });
                   // Clear region when country changes
+                  // eslint-disable-next-line @typescript-eslint/no-unused-expressions
                   watchedRegion && setValue('region', undefined, { shouldValidate: true });
                   setValue('region', undefined, { shouldValidate: true });
                 }}
@@ -729,6 +728,7 @@ if (isEditMode) {
                     JSON.parse(typeof value === 'string' ? value : JSON.stringify(value));
                     return true;
                   } catch (e) {
+                    console.log(e)
                     return "Invalid JSON format.";
                   }
                 }
@@ -743,6 +743,8 @@ if (isEditMode) {
                   setValue('teamProfile', parsed, { shouldValidate: true });
                 } catch (error) {
                   // If invalid JSON, store as string and let validation handle it
+                  console.log(error);
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   setValue('teamProfile', e.target.value as any, { shouldValidate: true });
                 }
               }}

@@ -5,15 +5,14 @@ import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { api } from '@/services/api';
-import { GameDetails, GameFilterParams, PaginatedGamesResponseSchema, GameStatus, GameFilterParamsSchema } from '@/schemas';
+import { GameDetails, GameFilterParams, PaginatedGamesResponseSchema, GameFilterParamsSchema } from '@/schemas';
 import { GamesFilters } from '@/components/game/games-filters';
-import { Pagination, LoadingSpinner, Button, Badge } from '@/components/ui/';
+import { Pagination, LoadingSpinner, Button, getStatusBadge } from '@/components/ui/';
 import { GameCard } from '@/components/ui';
 import { toast } from 'sonner';
 import { Role } from '@/schemas';
 import { useAuthStore } from '@/store/auth.store';
 import { useContextualLink } from '@/hooks';
-import * as z from 'zod';
 
 export default function TenantGamesPage() {
   const router = useRouter();
@@ -79,11 +78,11 @@ export default function TenantGamesPage() {
       setGames(validatedData.data);
       setTotalItems(validatedData.totalItems);
       setTotalPages(validatedData.totalPages);
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.message || err.message || 'Failed to fetch games.';
+    } catch (error) {
+      const errorMessage = 'Failed to fetch games.';
       setError(errorMessage);
       toast.error('Error fetching games', { description: errorMessage });
-      console.error('Fetch games error:', err);
+      console.error('Fetch games error:', error);
     } finally {
       setLoading(false);
     }
@@ -118,23 +117,6 @@ export default function TenantGamesPage() {
     setFilters(prev => ({ ...prev, pageSize: newSize, page: 1 }));
   }, []);
 
-  const getStatusBadge = (status: GameStatus, score?: { home: number; away: number }) => {
-    switch (status) {
-      case GameStatus.IN_PROGRESS:
-        return <Badge variant="destructive" className="animate-pulse">Live</Badge>;
-      case GameStatus.COMPLETED:
-        return <Badge variant="success">Final</Badge>;
-      case GameStatus.SCHEDULED:
-        return <Badge variant="outline">Upcoming</Badge>;
-      case GameStatus.CANCELLED:
-        return <Badge variant="destructive">Cancelled</Badge>;
-      case GameStatus.POSTPONED:
-        return <Badge variant="secondary">Postponed</Badge>;
-      default:
-        return null;
-    }
-  };
-
   if (loading && !games.length) {
     return <LoadingSpinner />;
   }
@@ -167,6 +149,7 @@ export default function TenantGamesPage() {
         <p className="text-center text-gray-500 mt-8">No games found matching your criteria.</p>
       ) : (
         <div className="mt-4">
+          <span hidden>{totalItems} Games</span>
           {games.map((game) => (
             <GameCard
               key={game.id}

@@ -10,6 +10,8 @@ import { useAuthStore } from '@/store/auth.store'; // Assuming this path
 // Import lucide-react icons for sport types
 import {  Volleyball, Trophy, Home, Users, Newspaper, ListOrdered } from 'lucide-react';
 import { Role, SportType } from '@/schemas';
+import Image from 'next/image';
+import UserAvatar from '../users/user-avatar';
 // Define the props interface for PublicHeader
 interface NavLink {
   label: string;
@@ -118,19 +120,11 @@ export const PublicHeader = ({
               <Link href="/" className="flex items-center space-x-2">
                 {/* Logo with dynamic background gradient and fallback icon */}
                 <div className={`rounded-lg p-2 text-white bg-gradient-to-br from-${primaryColor} to-${secondaryColor}`}>
-                  {logoUrl ? (
-                    <img
-                      src={logoUrl}
-                      alt="Logo"
-                      className="h-6 w-6 rounded-md object-contain"
-                      onError={(e) => {
-                        // Hide image and show fallback icon if image fails to load
-                        e.currentTarget.style.display = 'none';
-                        const fallbackIcon = e.currentTarget.nextElementSibling as HTMLElement;
-                        if (fallbackIcon) fallbackIcon.style.display = 'block';
-                      }}
-                    />
-                  ) : null}
+                    <UserAvatar
+                          src={userAuth?.profileImageUrl}
+                          alt={`${userAuth?.firstName} ${userAuth?.lastName} Profile`}
+                          fallbackText={userAuth?.username.charAt(0) || "Logo"}
+                        />
                   {/* Fallback icon, initially hidden */}
                   <FiAward className={`h-6 w-6 ${logoUrl ? 'hidden' : 'block'}`} />
                 </div>
@@ -193,7 +187,19 @@ export const PublicHeader = ({
                   >
                     {/* User Profile Image or Generic Icon */}
                     {userAuth.profileImageUrl ? (
-                      <img src={userAuth.profileImageUrl} alt="Profile" className="h-8 w-8 rounded-full object-cover" />
+                      <Image
+                        src={logoUrl}
+                        alt="Logo"
+                        width={24}
+                        height={24}
+                        className="h-6 w-6 rounded-md object-contain"
+                        onError={(e) => {
+                          // Hide image and show fallback icon if image fails to load
+                          (e.target as HTMLImageElement).style.display = 'none';
+                          const fallbackIcon = (e.target as HTMLImageElement).nextElementSibling as HTMLElement;
+                          if (fallbackIcon) fallbackIcon.style.display = 'block';
+                        }}
+                      />
                     ) : (
                       <FiUser className="h-8 w-8 rounded-full border border-gray-300 p-1" />
                     )}

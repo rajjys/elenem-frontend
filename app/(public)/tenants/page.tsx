@@ -4,7 +4,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,7 +15,7 @@ import { toast } from 'sonner';
 import { useDebounce } from 'use-debounce';
 import { SportType } from '@/schemas';
 import { CountryDropdown } from 'react-country-region-selector';
-import { Building, Search, Shield, Globe, Users } from 'lucide-react';
+import { Building, Search, Shield, Users } from 'lucide-react';
 
 // --- Helper Types ---
 interface Tenant {
@@ -103,7 +103,7 @@ function TenantCard({ tenant }: { tenant: Tenant }) {
     );
 }
 
-function TenantsFilters({ onFilterChange }: { onFilterChange: (filters: any) => void }) {
+function TenantsFilters({ onFilterChange }: { onFilterChange: (filters: {search?: string, sportType?: string, country?: string}) => void }) {
     const [search, setSearch] = useState('');
     const [sportType, setSportType] = useState('');
     const [country, setCountry] = useState('');
@@ -153,7 +153,7 @@ export default function PublicTenantsPage() {
     const [totalPages, setTotalPages] = useState(1);
     const [loading, setLoading] = useState(true);
 
-    const fetchTenants = useCallback((currentPage: number, currentFilters: any) => {
+    const fetchTenants = useCallback((currentPage: number, currentFilters: {search?: string, sportType?: string, country?: string}) => {
         setLoading(true);
         const params = { ...currentFilters, page: currentPage, pageSize: 10 };
         api.get('/public-tenants', { params })

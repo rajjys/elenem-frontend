@@ -1,6 +1,6 @@
 // src/prisma/user-schemas.ts
 import * as z from 'zod';
-import { GenderSchema, Role, RoleSchema, SupportedLanguage, SupportedLanguageSchema, TenantLiteResponseSchema } from '.';// Assuming Role enum is exported from your main prisma.ts or similar
+import { GenderSchema, Role, RoleSchema, SupportedLanguage, SupportedLanguageSchema } from '.';// Assuming Role enum is exported from your main prisma.ts or similar
 
 // --- Enums ---
 

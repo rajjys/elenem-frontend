@@ -1,5 +1,5 @@
 import React from 'react'
-import { Avatar, Card, CardContent, CardHeader, CardTitle, getStatusBadge } from './'
+import { Avatar, Card, CardContent, CardHeader, CardTitle } from './'
 import { GameDetails, GameStatus } from '@/schemas';
 import { Plus } from 'lucide-react';
 import { format } from 'date-fns';
@@ -13,16 +13,13 @@ const GamePublicCard: React.FC<GamePublicCardProps> = ({game}) => {
                       game.status === GameStatus.IN_PROGRESS ? <span className='bg-red-400 py-1 px-2 text-white font-bold rounded-full'>EN COURS</span> : 
                       <span></span>
                 
-    let homeWin : boolean | null = null;
-    if(game.status === GameStatus.COMPLETED && game.homeScore && game.awayScore){
-        homeWin = game.homeScore > game.awayScore;
-    }
+    
     let homeTeamStyle = '';
     let awayTeamStyle = '';
     if(game.status === GameStatus.COMPLETED && game.homeScore && game.awayScore){
-        let winStyle = 'font-bold text-yellow-100';
-        let lossStyle = 'text-gray-300';
-        let drawStyle = 'text-white';
+        const winStyle = 'font-bold text-yellow-100';
+        const lossStyle = 'text-gray-300';
+        const drawStyle = 'text-white';
         homeTeamStyle = game.homeScore > game.awayScore ? winStyle : (game.homeScore < game.awayScore) ? lossStyle : drawStyle;
         awayTeamStyle = game.homeScore < game.awayScore ? winStyle : (game.homeScore > game.awayScore) ? lossStyle : drawStyle;
     }

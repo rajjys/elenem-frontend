@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // Mock Dialog components (simplified for basic functionality)
 import React from "react";
 

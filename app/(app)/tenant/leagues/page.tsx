@@ -4,12 +4,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
-import { FiAward, FiPlusCircle, FiSearch } from 'react-icons/fi';
+import { FiSearch } from 'react-icons/fi';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuthStore } from '@/store/auth.store';
 import { api } from '@/services/api';
 import { toast } from 'sonner';
-import { z } from 'zod';
 import { LeagueBasic, PaginatedLeaguesResponseSchema, Role } from '@/schemas';
 import { useContextualLink } from '@/hooks';
 import { Plus, Settings } from 'lucide-react';
@@ -47,6 +46,7 @@ export default function TenantLeaguesPage() {
   const [error, setError] = useState<string | null>(null);
   const [totalItems, setTotalItems] = useState<number>(0);
   const [totalPages, setTotalPages] = useState<number>(1);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [filters, setFilters] = useState<LeagueFilterParams>({
     page: 1,
     pageSize: 10,
@@ -88,11 +88,11 @@ export default function TenantLeaguesPage() {
       setLeagues(validatedData.data);
       setTotalItems(validatedData.totalItems);
       setTotalPages(validatedData.totalPages);
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.message || err.message || 'Failed to fetch leagues.';
+    } catch (error) {
+      const errorMessage = 'Failed to fetch leagues.';
       setError(errorMessage);
       toast.error('Error fetching leagues', { description: errorMessage });
-      console.error('Fetch leagues error:', err);
+      console.error('Fetch leagues error:', error);
     } finally {
       setLoading(false);
     }
@@ -155,6 +155,7 @@ export default function TenantLeaguesPage() {
         <div className="text-center text-gray-500 text-lg mt-10">No leagues found for this tenant.</div>
       ) : (
         <div className="bg-white p-6 rounded-lg shadow-md">
+          <span hidden>{totalItems} leagues</span>
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">

@@ -6,7 +6,6 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { MultiSelect } from '@/components/ui/multi-select'; // Assuming MultiSelect exists
 import { Switch } from '@/components/ui/switch';
 import { useDebounce } from 'use-debounce'; // Your useDebounce hook
 
@@ -25,7 +24,7 @@ import {
 import { LeagueFilterParams, SportType, LeagueVisibility, Gender } from '@/schemas';
 
 // Icons from Lucide React
-import { Filter as FilterIcon, Search as SearchIcon } from 'lucide-react';
+import { Filter as FilterIcon } from 'lucide-react';
 
 
 interface LeagueFiltersProps {
@@ -78,15 +77,6 @@ export function LeagueFilters({ filters, onFilterChange, onPageSizeChange }: Lea
     { value: 'FR', label: 'France' },
     // ... add more countries (ISO 3166-1 alpha-2)
   ], []);
-
-  // For parentLeagueId, you'd typically fetch available parent leagues.
-  // For now, a mock or empty list.
-  const parentLeagueOptions = useMemo(() => [
-    // { value: 'some-parent-league-id-1', label: 'Premier League (Top)' },
-    // { value: 'some-parent-league-id-2', label: 'NBA (Main)' },
-    // ... actual parent leagues
-  ], []);
-
 
   // Apply filters after debounced search or other changes
   useEffect(() => {

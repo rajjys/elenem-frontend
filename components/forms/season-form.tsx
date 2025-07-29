@@ -1,10 +1,9 @@
 // components/forms/season-form.tsx
 "use client";
 
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -35,6 +34,7 @@ export function SeasonForm({ initialData, onSuccess, onCancel }: SeasonFormProps
   const [loadingInitialData, setLoadingInitialData] = useState(true); // For initial fetches (tenants/leagues)
   const [tenants, setTenants] = useState<TenantBasic[]>([]);
   const [leagues, setLeagues] = useState<LeagueBasic[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [selectedTenantId, setSelectedTenantId] = useState<string | undefined>(undefined);
 
   const isEditMode = !!initialData; // If initialData is provided, it's edit mode
@@ -153,10 +153,10 @@ export function SeasonForm({ initialData, onSuccess, onCancel }: SeasonFormProps
         toast.success('Season created successfully!');
         onSuccess(response.data.id);
       }
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.message || err.message || 'Failed to create season.';
+    } catch (error) {
+      const errorMessage = 'Failed to create season.';
       toast.error('Error', { description: errorMessage });
-      console.error('Season form submission error:', err);
+      console.error('Season form submission error:', error);
     } finally {
       setIsSubmitting(false);
     }

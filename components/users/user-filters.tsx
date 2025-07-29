@@ -53,6 +53,7 @@ export function UserFilters({ filters, onFilterChange, onPageSizeChange }: UserF
   })), []);
 
   // Helper for array comparison (deep comparison for roles)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const arraysEqual = useCallback((a: any[] | undefined, b: any[] | undefined): boolean => {
     if (!a && !b) return true; // Both undefined/null
     if (!a || !b) return false; // One is undefined/null, the other is not

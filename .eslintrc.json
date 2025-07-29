@@ -1,0 +1,30 @@
+{
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:react/recommended",
+    "plugin:react-hooks/recommended",
+    "next/core-web-vitals" // Important for Next.js
+  ],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaFeatures": {
+      "jsx": true
+    },
+    "ecmaVersion": 2021,
+    "sourceType": "module"
+  },
+  "rules": {
+    // Your specific rule overrides, e.g.,
+    "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
+    "@typescript-eslint/no-explicit-any": "error", // Enforce no 'any'
+    "react-hooks/exhaustive-deps": "warn", // You can set this to "error" if preferred
+    "react/no-unescaped-entities": "error",
+    "@next/next/no-img-element": "warn" // Or "error"
+  },
+  "settings": {
+    "react": {
+      "version": "detect"
+    }
+  }
+}

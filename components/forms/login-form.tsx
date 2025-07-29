@@ -6,14 +6,11 @@ import * as z from "zod";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { useAuthStore } from "@/store/auth.store";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Role } from "@/schemas"; // Assuming this path for your frontend types
 
 
 export function LoginForm() {
   const login = useAuthStore((state) => state.login);
-  const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [isSystemAdminLogin, setIsSystemAdminLogin] = useState(false);
 
@@ -59,10 +56,10 @@ export function LoginForm() {
         isSystemAdminLogin ? undefined : data.tenantCode // Pass tenantCode only if not system admin login
       );
       // Redirection is handled by login/page.tsx's useEffect and middleware
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.message || err.message || "Login failed";
+    } catch (error) {
+      const errorMessage = "Login failed";
       setError(errorMessage);
-      console.error("Login error:", err);
+      console.error("Login error:", error);
     }
   }
 
@@ -71,12 +68,12 @@ export function LoginForm() {
       {error && <p className="text-red-500 text-sm">{error}</p>}
       <div>
         <label htmlFor="usernameOrEmail" className="block text-sm font-medium text-gray-700">Username or Email</label>
-        <Input id="usernameOrEmail" type="text" {...form.register("usernameOrEmail")} />
+        <Input id="usernameOrEmail" type="text" autoComplete="username" {...form.register("usernameOrEmail")} />
         {form.formState.errors.usernameOrEmail && <p className="text-red-500 text-xs mt-1">{form.formState.errors.usernameOrEmail.message}</p>}
       </div>
       <div>
         <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
-        <Input id="password" type="password" {...form.register("password")} />
+        <Input id="password" type="password" autoComplete="current-password" {...form.register("password")} />
         {form.formState.errors.password && <p className="text-red-500 text-xs mt-1">{form.formState.errors.password.message}</p>}
       </div>
 
@@ -104,7 +101,7 @@ export function LoginForm() {
           <label htmlFor="tenantCode" className="block text-sm font-medium text-gray-700">Tenant Code</label>
           <Input id="tenantCode" {...form.register("tenantCode")} />
           {form.formState.errors.tenantCode && <p className="text-red-500 text-xs mt-1">{form.formState.errors.tenantCode.message}</p>}<p className="text-gray-500 text-xs mt-1">
-            Example: 'demo-tenant'
+            Example: &lsquo;demo-tenant&lsquo;
           </p>
         </div>
       )}

@@ -88,11 +88,11 @@ export default function LeagueTeamsPage() {
                   setTeams(validatedData.data); //
                   setTotalItems(validatedData.totalItems);
                   setTotalPages(validatedData.totalPages);
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.message || err.message || 'Failed to fetch teams.';
+    } catch (error) {
+      const errorMessage = 'Failed to fetch teams.';
       setError(errorMessage);
       toast.error('Error fetching teams', { description: errorMessage });
-      console.error('Fetch teams error:', err);
+      console.error('Fetch teams error:', error);
     } finally {
       setLoading(false);
     }
@@ -147,10 +147,10 @@ export default function LeagueTeamsPage() {
       await api.delete(`/teams/${teamId}`);
       toast.success('Team deleted successfully.');
       fetchTeams();
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.message || err.message || 'Failed to delete team.';
+    } catch (error) {
+      const errorMessage = 'Failed to delete team.';
       toast.error('Error deleting team', { description: errorMessage });
-      console.error('Delete team error:', err);
+      console.error('Delete team error:', error);
     }
   }, [fetchTeams]);
 
@@ -176,7 +176,7 @@ export default function LeagueTeamsPage() {
           <Button variant="primary" className='whitespace-nowrap'>Create New Team</Button>
         </Link>
       </div>
-
+    <span hidden>{totalItems} Teams</span>
       <TeamsTable
         teams={teams}
         onSort={handleSort}

@@ -41,7 +41,7 @@ export function SeasonsFilters({ filters, onFilterChange, onPageSizeChange, fixe
   const user = useAuthStore((state) => state.user);
   const isSystemAdmin = user?.roles?.includes(Role.SYSTEM_ADMIN);
   const isTenantAdmin = user?.roles?.includes(Role.TENANT_ADMIN);
-  const isLeagueAdmin = user?.roles?.includes(Role.LEAGUE_ADMIN);
+  //const isLeagueAdmin = user?.roles?.includes(Role.LEAGUE_ADMIN);
 
   const [search, setSearch] = useState(filters.search || '');
   const [selectedTenantId, setSelectedTenantId] = useState(fixedTenantId || filters.tenantId || '');

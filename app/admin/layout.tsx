@@ -1,14 +1,8 @@
 // app/admin/layout.tsx or components/layouts/SystemAdminLayout.tsx
 "use client";
 
-import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
-import React, { useState, ReactNode, useEffect, useRef, RefObject } from 'react';
-import {
-    FiHome, FiGrid, FiUsers, FiDollarSign, FiSettings, FiServer, FiShield,
-    FiGlobe, FiHelpCircle, FiFileText, FiSearch, FiSmartphone, FiUser, FiLogOut,
-    FiChevronDown, FiChevronRight, FiMenu, FiX, FiBarChart2, FiSliders, FiBell,
-    FiShoppingBag, FiFilm, FiSpeaker, FiBriefcase, FiZap, FiDatabase, FiMessageSquare, FiAward, FiEdit3, FiBox,
+import React, { ReactNode } from 'react';
+import { FiGrid, FiUsers, FiDollarSign, FiServer, FiShield, FiHelpCircle, FiBarChart2, FiDatabase, FiAward, FiEdit3, FiBox,
     FiVolume2,
     FiPackage,
     FiList,
@@ -22,9 +16,7 @@ import {
     FiMail,
     FiBookOpen,
     FiTv,
-    FiTerminal
 } from 'react-icons/fi';
-import { useAuthStore } from '@/store/auth.store';
 import AppLayout from '@/components/layouts/AppLayout';
 
 interface SystemAdminLayoutProps {

@@ -1,7 +1,7 @@
 import { GameStatus } from "@/schemas";
 import { Badge } from "./badge";
 
-export const getStatusBadge = (status: GameStatus, score?: { home: number; away: number }) => {
+export const getStatusBadge = (status: GameStatus) => {
         switch (status) {
             case GameStatus.IN_PROGRESS:
                 return <Badge variant="destructive" className="animate-pulse">Live</Badge>;

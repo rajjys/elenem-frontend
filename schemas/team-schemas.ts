@@ -1,6 +1,6 @@
 // schemas/team.schemas.ts (new file, or add to your existing prisma/index.ts for shared schemas)
 import * as z from 'zod';
-import { Gender, GenderSchema, SportType, SportTypeSchema, TeamVisibility, TeamVisibilitySchema } from './enums';
+import { GenderSchema, SportTypeSchema, TeamVisibility, TeamVisibilitySchema } from './enums';
 
 // Base schema for common team fields
 export const BaseTeamSchema = z.object({

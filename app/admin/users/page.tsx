@@ -54,11 +54,11 @@ export default function AdminUsersPage() {
       setUsers(validatedData.data);
       setTotalItems(validatedData.totalItems);
       setTotalPages(validatedData.totalPages);
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.message || err.message || 'Failed to fetch users.';
+    } catch (error) {
+      const errorMessage = 'Failed to fetch users.';
       setError(errorMessage);
       toast.error('Error fetching users', { description: errorMessage });
-      console.error('Fetch users error:', err);
+      console.error('Fetch users error:', error);
     } finally {
       setLoading(false);
     }
@@ -101,10 +101,10 @@ type SortableColumn = "firstName" | "lastName" | "username" | "email" | "created
       await api.delete(`/users/${userId}`); // Assuming DELETE /admin/users/:id endpoint
       toast.success('User deleted successfully.');
       fetchUsers(); // Re-fetch users to update the list
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.message || err.message || 'Failed to delete user.';
+    } catch (error) {
+      const errorMessage = 'Failed to delete user.';
       toast.error('Error deleting user', { description: errorMessage });
-      console.error('Delete user error:', err);
+      console.error('Delete user error:', error);
     }
   };
 
@@ -135,6 +135,7 @@ type SortableColumn = "firstName" | "lastName" | "username" | "email" | "created
         <p className="text-red-500 text-center mt-8">Error: {error}</p>
       ) : (
         <>
+          <span hidden>{totalItems}</span>
           <UsersTable
             users={users}
             onSort={handleSort}

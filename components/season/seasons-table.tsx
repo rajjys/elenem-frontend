@@ -49,7 +49,7 @@ export function SeasonsTable({ seasons, onSort, sortBy, sortOrder, onDelete, cur
 
   // Function to build the dashboard link dynamically
   const buildSeasonDashboardLink = (season: SeasonResponseDto) => {
-    let link = `/season/dashboard`;
+  const link = `/season/dashboard`;
     const params = new URLSearchParams();
 
     if (isSystemAdmin) {

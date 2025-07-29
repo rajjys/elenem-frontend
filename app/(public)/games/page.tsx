@@ -5,15 +5,12 @@ import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Button } from "@/components/ui/button";
 import { api } from '@/services/api';
 import { toast } from 'sonner';
 import { format, parseISO } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { GameDetails } from '@/schemas';
-import { Avatar, getStatusBadge } from '@/components/ui';
-import { useContextualLink } from '@/hooks';
+import { Avatar } from '@/components/ui';
 import GamePublicCard from '@/components/ui/game-public-card';
 
 
@@ -140,7 +137,7 @@ export default function PublicGamesPage() {
             const futureOrToday = availableDates.find(d => d >= todayISO) ?? availableDates[0];
             setSelectedDate(futureOrToday);
         }
-    }, [availableDates]);
+    }, [availableDates, todayISO]);
 
   if (loadingDates) {
       return (
@@ -202,8 +199,8 @@ export default function PublicGamesPage() {
           </div>
         ) : (
             <div className="text-center py-16 bg-white rounded-lg border">
-                <h3 className="text-xl font-semibold">No Games Found</h3>
-                <p className="text-muted-foreground mt-2">There are no public games scheduled for {format(parseISO(selectedDate), 'MMMM dd, yyyy')}.</p>
+                <h3 className="text-xl font-semibold">Pas des Matchs Disponible</h3>
+                <p className="text-muted-foreground mt-2">Pas de matchs Disponible a la date selectionnee.</p>
             </div>
         )}
       </div>

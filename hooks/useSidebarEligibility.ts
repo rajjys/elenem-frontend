@@ -1,16 +1,15 @@
 // hooks/useSidebarEligibility.ts
 import { useAuthStore } from '@/store/auth.store'
 import { usePathname, useSearchParams } from 'next/navigation'
-import { Role } from '@/schemas'
 
 export function useSidebarEligibility() {
   const { user } = useAuthStore()
   const pathname = usePathname()
   const searchParams = useSearchParams()
 
-  const ctxTenantId = searchParams.get('ctxTenantId') || user?.tenantId
-  const ctxLeagueId = searchParams.get('ctxLeagueId') || user?.managingLeagueId
-  const ctxTeamId = searchParams.get('ctxTeamId') || user?.managingTeamId
+  const ctxTenantId = searchParams.get('ctxTenantId') || user?.tenantId;
+  const ctxLeagueId = searchParams.get('ctxLeagueId') || user?.managingLeagueId || user?.managingLeague?.id;
+  const ctxTeamId = searchParams.get('ctxTeamId') || user?.managingTeamId;
 
   const routeSection = pathname.split('/')[1] // 'tenant', 'league', 'team', etc.
 
@@ -26,7 +25,6 @@ export function useSidebarEligibility() {
         return []
     }
   })()
-
   const hasRequiredContext = requiredContext.every(Boolean)
 
   return hasRequiredContext

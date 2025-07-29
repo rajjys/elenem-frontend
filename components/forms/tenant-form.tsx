@@ -22,7 +22,6 @@ import {
   TenantType,
  
 } from '@/schemas'; // Import types and schemas, including UserResponseDto and PaginatedResponseDto
-import { init } from 'next/dist/compiled/webpack/webpack';
 
 // Define a union type for form input based on create or update
 type TenantFormValues = 
@@ -144,10 +143,10 @@ export function TenantForm({ initialData, isEditMode = false, onSuccess, onCance
         reset(defaultFormValues); // Reset form for new creation
       }
       onSuccess?.(response.data.id);
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.message || err.message || `Failed to ${isEditMode ? 'update' : 'create'} tenant.`;
+    } catch (error) {
+      const errorMessage =  `Failed to ${isEditMode ? 'update' : 'create'} tenant.`;
       toast.error(`Error ${isEditMode ? 'updating' : 'creating'} tenant`, { description: errorMessage });
-      console.error(`${isEditMode ? 'Update' : 'Create'} tenant error:`, err);
+      console.error(`${isEditMode ? 'Update' : 'Create'} tenant error:`, error);
     }
   };
 
@@ -194,7 +193,7 @@ export function TenantForm({ initialData, isEditMode = false, onSuccess, onCance
         />
         {errors.tenantCode && <p className="text-red-500 text-xs mt-1">{errors.tenantCode.message}</p>}
         <p className="text-gray-500 text-xs mt-1">
-          A unique short code (e.g., 'KBA', 'GSA').
+          A unique short code (e.g., &lsquo;KBA&lsquo;, &lsquo;GSA&lsquo;).
         </p>
       </div>
 
@@ -302,7 +301,7 @@ export function TenantForm({ initialData, isEditMode = false, onSuccess, onCance
           <Input id="state" type="text" {...register('state')} disabled={isSubmitting} />
           {errors.state && <p className="text-red-500 text-xs mt-1">{errors.state.message}</p>}
           <p className="text-gray-500 text-xs mt-1">
-            Consider using the "Region / Province / State" field above for better compatibility.
+            Consider using the &ldquo;Region / Province / State&ldquo; field above for better compatibility.
           </p>
         </div>
       </div>

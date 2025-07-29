@@ -11,12 +11,11 @@ import { useAuthStore } from '@/store/auth.store';
 
 export default function CreateSeasonPage() {
   const router = useRouter();
-
+  const { user: userAuth } = useAuthStore();
   const handleSuccess = useCallback((seasonId: string) => {
     toast.success(`Season ${seasonId} created successfully!`);
     // Redirect to the seasons listing page, or the newly created season's detail page
     ///Redirect to season listing based on user role
-    const { user: userAuth } = useAuthStore();
     const currentUserRoles = userAuth?.roles || [];
     
     const isSystemAdmin = currentUserRoles.includes(Role.SYSTEM_ADMIN);

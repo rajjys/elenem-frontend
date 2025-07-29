@@ -1,9 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // services/api.ts
 import { useAuthStore } from '@/store/auth.store';
 import axios from 'axios';
 
 export const api = axios.create({
-  baseURL: "http://localhost:3333/", // Your backend API URL
+  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:3333/", // Your backend API URL
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json',

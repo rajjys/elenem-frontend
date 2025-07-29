@@ -1,4 +1,5 @@
-import React, { useState, ReactNode, useEffect, useRef, RefObject } from 'react';
+'use client'
+import React, { useState, ReactNode, RefObject } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {FiShield,FiUser, FiLogOut, FiMenu, FiX, FiAward} from 'react-icons/fi'; // Keep these imports as your NavLink/CollapsibleNavLink likely use them
@@ -42,7 +43,6 @@ export default function AppLayout({
   themeColor = 'indigo', // Default theme color
   headerTitle = 'ELENEM Admin', // Default app name (used for sidebar logo if needed, but not main header)
   logoIcon: LogoIcon = FiAward, // Default logo icon (used for sidebar logo if needed)
-  showContextSwitcher = false, // This prop will now be passed to AppLayoutNavbar
 }: AppLayoutProps) {
   const currentPath = usePathname();
   const { user: userAuth, logout } = useAuthStore();
@@ -73,7 +73,7 @@ export default function AppLayout({
                         '/dashboard'; // Default fallback
 
   const shouldShowSidebar = useSidebarEligibility(); // Assuming this hook determines if a sidebar is relevant for the current user/page
-
+  
   const handleLogout = () => {
     logout();
     router.push('/login');

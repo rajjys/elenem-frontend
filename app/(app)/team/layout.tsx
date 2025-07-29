@@ -1,12 +1,9 @@
 // app/team/layout.tsx OR components/layouts/TeamAdminLayout.tsx
 "use client";
-
-import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
-import React, { useState, ReactNode, useEffect, useRef, RefObject } from 'react';
+import React, { ReactNode } from 'react';
 import {
-    FiBarChart2, FiSettings, FiUsers, FiAward, FiCalendar, FiDollarSign, FiMessageSquare, FiImage, FiShoppingBag, FiHelpCircle,
-    FiUser, FiShield, FiLogOut, FiChevronDown, FiChevronRight, FiMenu, FiX, FiList, FiEdit3, FiVideo, FiHeart, FiBell,
+    FiBarChart2, FiUsers, FiAward, FiCalendar, FiDollarSign, FiMessageSquare, FiHelpCircle,
+     FiList, FiBell,
     FiGrid,
     FiEdit,
     FiUserPlus,
@@ -18,14 +15,7 @@ import {
     FiTrendingUp
 } from 'react-icons/fi'; // Example icons
 // --- Reusable NavLink, CollapsibleNavLink, FlyoutMenu Components ---
-import { CollapsibleNavLink, FlyoutMenu, NavLink } from '@/components/layouts';
 import AppLayout from '@/components/layouts/AppLayout';
-
-interface TeamAdminUser {
-    username: string;
-    teamName?: string;
-    avatarInitial?: string;
-}
 
 interface TeamAdminLayoutProps {
     children: ReactNode;
@@ -90,37 +80,7 @@ const teamNavItems = [
 // --- Main Layout Component for Team Admin ---
 
 export default function TeamAdminLayout({ children }: TeamAdminLayoutProps) {
-    const currentPath = usePathname();
-    const router = useRouter();
-    const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-    const [activeFlyoutLabel, setActiveFlyoutLabel] = useState<string | null>(null);
-    const [flyoutPosition, setFlyoutPosition] = useState<{ top: number; left: number } | null>(null);
-    const [currentFlyoutTriggerRef, setCurrentFlyoutTriggerRef] = useState<RefObject<HTMLElement> | null>(null);
-
-    // Placeholder: Replace with actual user data from your auth store
-    const teamAdminUser: TeamAdminUser | null = {
-        username: "CoachJane",
-        teamName: "The Valiant Eagles",
-        avatarInitial: "CJ"
-    };
-
-    const handleLogout = () => {
-        // Call your actual logout function from your auth store
-        router.push('/login');
-    };
-
-    // --- Handlers for sidebar, flyout, and mobile menu ---
-    // These functions are identical to the previous layouts
-    const handleFlyoutToggle = (label: string, targetElement: HTMLElement) => { /* ... */ };
-    const closeFlyout = () => { /* ... */ };
-    const toggleSidebar = () => { /* ... */ };
-    const toggleMobileMenu = () => { /* ... */ };
-    const closeMobileMenu = () => { /* ... */ };
-
-    // (Copy the implementations for the handler functions from the previous response)
-
+    
     return (
         <AppLayout
               navItems={teamNavItems}

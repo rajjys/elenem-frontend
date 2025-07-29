@@ -20,7 +20,7 @@ export const NavLink: React.FC<NavLinkProps> = ({ item, currentPath, isSidebarOp
     // Define color variables based on the themeColor prop
     const primary600 = `var(--color-${themeColor}-600)`;
     const primary50 = `var(--color-${themeColor}-50)`; // Assuming you'll add this to tailwind config
-    const primary700 = `var(--color-${themeColor}-700)`;
+    //const primary700 = `var(--color-${themeColor}-700)`;
 
     return (
         <Link

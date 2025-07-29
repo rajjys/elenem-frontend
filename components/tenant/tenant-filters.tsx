@@ -13,7 +13,7 @@ import { Switch } from '@/components/ui/switch';
 import { useDebounce } from 'use-debounce'; // Your useDebounce hook
 import { TenantType, SportType, TenantFilterParams } from '@/schemas'; // Your Tenant types
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '../ui';
-import { FilterIcon, SearchIcon } from 'lucide-react';
+import { FilterIcon } from 'lucide-react';
 
 // Mock Input component (simplified)
 // Mock enums and types for demonstration (from '@/prisma/')

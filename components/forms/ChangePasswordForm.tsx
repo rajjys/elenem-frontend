@@ -42,8 +42,9 @@ export function ChangePasswordForm() {
       setSuccessMessage("Password changed successfully!");
       form.reset(); // Clear form
       setTimeout(() => setSuccessMessage(null), 3000);
-    } catch (error: any) {
-      setApiError(error.response?.data?.message || "Failed to change password.");
+    } catch (error) {
+      setApiError("Failed to change password.");
+      console.log(error);
     } finally {
       setIsLoading(false);
     }

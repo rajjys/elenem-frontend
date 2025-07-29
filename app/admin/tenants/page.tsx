@@ -3,7 +3,6 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { api } from '@/services/api'; // Your actual API instance
 import { TenantBasic, PaginatedTenantsResponseSchema, TenantFilterParams } from '@/schemas'// Your actual Prisma types and schemas
 import { TenantFilters } from '@/components/tenant/tenant-filters'; // Your new TenantFilters component
@@ -12,10 +11,8 @@ import { Pagination } from '@/components/ui/'; // Your Pagination component
 import { LoadingSpinner } from '@/components/ui/'; // Your LoadingSpinner component
 import { Button } from '@/components/ui/button'; // Your Button component
 import { toast } from 'sonner'; // Your toast notification library (e.g., Sonner)
-import z from 'zod'; // Your Zod library
 
 export default function AdminTenantsPage() {
-  const router = useRouter();
   const [tenants, setTenants] = useState<TenantBasic[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -52,11 +49,11 @@ export default function AdminTenantsPage() {
       setTenants(validatedData.data);
       setTotalItems(validatedData.totalItems);
       setTotalPages(validatedData.totalPages);
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.message || err.message || 'Failed to fetch tenants.';
+    } catch (error) {
+      const errorMessage = 'Failed to fetch tenants.';
       setError(errorMessage);
       toast.error('Error fetching tenants', { description: errorMessage });
-      console.error('Fetch tenants error:', err);
+      console.error('Fetch tenants error:', error);
     } finally {
       setLoading(false);
     }
@@ -105,10 +102,10 @@ export default function AdminTenantsPage() {
       await api.delete(`/tenants/${tenantId}`); // Your actual DELETE API call
       toast.success('Tenant deleted successfully.');
       fetchTenants(); // Re-fetch tenants to update the list
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.message || err.message || 'Failed to delete tenant.';
+    } catch (error) {
+      const errorMessage = 'Failed to delete tenant.';
       toast.error('Error deleting tenant', { description: errorMessage });
-      console.error('Delete tenant error:', err);
+      console.error('Delete tenant error:', error);
     }
   };
 
@@ -134,6 +131,7 @@ export default function AdminTenantsPage() {
         <p className="text-red-500 text-center mt-8">Error: {error}</p>
       ) : (
         <>
+          <span hidden>{totalItems} Tenants</span>
           <TenantsTable
             tenants={tenants}
             onSort={handleSort}

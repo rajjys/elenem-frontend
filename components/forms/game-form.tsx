@@ -29,7 +29,7 @@ const createGameSchema = z.object({
   awayScore: z.coerce.number().int().min(0).optional(),
   customStats: z.string().optional().refine((val) => {
     if (!val) return true;
-    try { JSON.parse(val); return true; } catch (e) { return false; }
+    try { JSON.parse(val); return true; } catch (e) { console.log(e);return false; }
   }, { message: "Invalid JSON format." }),
   notes: z.string().optional(),
   round: z.string().optional(),
@@ -189,9 +189,9 @@ export function GameForm({ onSuccess, onCancel }: GameFormProps) {
       const response = await api.post('/games', payload);
       toast.success('Game created successfully!');
       onSuccess(response.data.id);
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.message;
-      console.error('Error creating game:', err);
+    } catch (error) {
+      const errorMessage = 'Error creating game:';
+      console.error('Error creating game:', error);
       toast.error('Error', { description: errorMessage });
     } finally {
       setIsSubmitting(false);

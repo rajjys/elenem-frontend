@@ -22,3 +22,4 @@ export * from './game-card';
 export * from './skeleton';
 export * from './status-badge';
 export * from './game-public-card';
+export * from './league-logo';

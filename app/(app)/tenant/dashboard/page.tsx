@@ -1,7 +1,6 @@
 'use client';
-import { FiUsers, FiDollarSign, FiAward, FiBarChart2, FiShoppingCart, FiCalendar, FiBox, FiTrendingUp, FiUser, FiActivity, FiList, FiZap, FiFilm, FiSpeaker, FiCreditCard, FiShield, FiSettings, FiAlertTriangle, FiMessageSquare } from 'react-icons/fi';
 import Head from 'next/head';
-import { useParams, useRouter, useSearchParams } from 'next/navigation'; // Or useNavigation from next/navigation for App Router
+import { useRouter, useSearchParams } from 'next/navigation'; // Or useNavigation from next/navigation for App Router
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useAuthStore } from '@/store/auth.store';
@@ -10,9 +9,8 @@ import { api } from '@/services/api';
 import { toast } from 'sonner';
 import { useContextualLink } from '@/hooks';
 import { StatsCard } from '@/components/ui/stats-card';
-import { Building, Building2, Calendar, Crown, Eye, Flag, FlagIcon, MoreVertical, Plus, Settings, ShoppingCart, Target, Ticket, TrendingUp, Trophy, UserPlus, Users } from 'lucide-react';
-import { Avatar, Badge, Button, Card, CardContent, CardHeader, CardTitle, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui';
-import Image from 'next/image';
+import { Building, Building2, Calendar, Crown, Eye, MoreVertical, Plus, Settings, Target, Ticket, TrendingUp, Trophy, UserPlus, Users } from 'lucide-react';
+import { Avatar, Badge, Button, Card, CardContent, CardHeader, CardTitle, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, LoadingSpinner } from '@/components/ui';
 import { capitalize } from '@/utils';
 
 interface UpcomingGame {
@@ -26,18 +24,6 @@ interface UpcomingGame {
     status: string; // e.g., 'Scheduled', 'Postponed'
 }
 
-interface NavItem {
-    label: string;
-    basePath: string;
-    icon: React.ElementType;
-}
-
-interface NavCategory {
-    label: string;
-    icon: React.ElementType;
-    subItems: NavItem[];
-}
-
     const mockUpcomingGames: UpcomingGame[] = [
         { id: '1', homeTeam: "Thunderbolts FC", awayTeam: "Rapid Strikers", league: "Premier League '25", date: "2025-07-07", time: "19:00", venue: "City Arena", status: "Scheduled" },
         { id: '2', homeTeam: "Crimson Knights", awayTeam: "Emerald Dragons", league: "Division A Cup", date: "2025-07-08", time: "14:30", venue: "Park View Stadium", status: "Scheduled" },
@@ -46,59 +32,6 @@ interface NavCategory {
         { id: '5', homeTeam: "Phoenix Rising", awayTeam: "Storm Breakers", league: "Division B League", date: "2025-07-10", time: "16:00", venue: "Training Grounds A", status: "Scheduled" },
     ];
     // Example navItems structure, directly correlating to backend endpoints
-    const navItems: NavCategory[] = [
-        {
-            label: "Overview",
-            icon: FiBarChart2,
-            subItems: [
-                { label: "Dashboard", basePath: "/dashboard", icon: FiBarChart2 },
-                { label: "Analytics", basePath: "/analytics", icon: FiActivity },
-            ],
-        },
-        {
-            label: "Leagues & Seasons",
-            icon: FiAward,
-            subItems: [
-                { label: "All Leagues", basePath: "/leagues", icon: FiList },
-                { label: "Seasons", basePath: "/seasons", icon: FiCalendar },
-            ],
-        },
-        {
-            label: "Teams & Players",
-            icon: FiUsers,
-            subItems: [
-                { label: "All Teams", basePath: "/teams", icon: FiUsers },
-                { label: "Players", basePath: "/players", icon: FiUser },
-                { label: "Transfers", basePath: "/transfers", icon: FiZap },
-            ],
-        },
-        {
-            label: "Games & Ticketing",
-            icon: FiFilm,
-            subItems: [
-                { label: "All Games", basePath: "/games", icon: FiFilm },
-                { label: "Match Events", basePath: "/match-events", icon: FiSpeaker },
-                { label: "Ticket Sales", basePath: "/tickets", icon: FiShoppingCart },
-            ],
-        },
-        {
-            label: "Finance",
-            icon: FiDollarSign,
-            subItems: [
-                { label: "Transactions", basePath: "/finance/transactions", icon: FiCreditCard },
-                { label: "Revenue", basePath: "/finance/revenue", icon: FiTrendingUp },
-            ],
-        },
-        {
-            label: "Settings",
-            icon: FiSettings,
-            subItems: [
-                { label: "Tenant Settings", basePath: "/settings/tenant", icon: FiShield },
-                { label: "User Management", basePath: "/settings/users", icon: FiUsers },
-            ],
-        },
-        // Add more categories as needed for a comprehensive system
-    ];
 
     
 export default function TenantDashboard() {
@@ -130,11 +63,11 @@ export default function TenantDashboard() {
           //console.log(response);
           const validatedTenant = TenantDetailsSchema.parse(response.data);
           setTenant(validatedTenant);
-        } catch (err: any) {
-          const errorMessage = err.response?.data?.message || err.message || "Failed to fetch tenant details.";
+        } catch (error) {
+          const errorMessage = "Failed to fetch tenant details.";
           setError(errorMessage);
           toast.error("Error loading tenant", { description: errorMessage });
-          console.error('Fetch tenant details error:', err);
+          console.error('Fetch tenant details error:', error);
         } finally {
           setLoading(false);
         }
@@ -158,11 +91,11 @@ export default function TenantDashboard() {
               const validatedData = PaginatedLeaguesResponseSchema.parse(response.data);
                 console.log('Fetched leagues:', validatedData.data);
               setLeagues(validatedData.data);
-            } catch (err: any) {
-              const errorMessage = err.response?.data?.message || err.message || 'Failed to fetch leagues.';
+            } catch (error) {
+              const errorMessage = 'Failed to fetch leagues.';
               setError(errorMessage);
               toast.error('Error fetching leagues', { description: errorMessage });
-              console.error('Fetch leagues error:', err);
+              console.error('Fetch leagues error:', error);
             } finally {
               setLoading(false);
             }
@@ -189,6 +122,7 @@ export default function TenantDashboard() {
   { id: 4, action: "League completed", details: "Junior Tennis League finished season", time: "2 hours ago", type: "league" },
   { id: 5, action: "New team registered", details: "Thunder Bolts joined Basketball League", time: "3 hours ago", type: "team" }
 ];
+
     return (
         <div className="min-h-screen">
             <Head>
@@ -209,7 +143,8 @@ export default function TenantDashboard() {
             </section>
                 {/* Key Metrics Section */}
             <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
-                {statCards.map((card, index) => (
+                {loading ? <LoadingSpinner /> : error ? <p className='text-red-500'>{error}</p> :
+                statCards.map((card, index) => (
                     <StatsCard key={index} {...card} />
                 ))}    
             </section>

@@ -1,18 +1,15 @@
 'use client';
-import { FiUsers, FiDollarSign, FiAward, FiBarChart2, FiShoppingCart, FiCalendar, FiBox, FiTrendingUp, FiUser, FiActivity, FiList, FiZap, FiFilm, FiSpeaker, FiCreditCard, FiShield, FiSettings, FiAlertTriangle, FiMessageSquare } from 'react-icons/fi';
 import Head from 'next/head';
-import { useParams, useRouter, useSearchParams } from 'next/navigation'; // Or useNavigation from next/navigation for App Router
+import { useRouter, useSearchParams } from 'next/navigation'; // Or useNavigation from next/navigation for App Router
 import React, { useEffect, useState } from 'react';
-import Link from 'next/link';
 import { useAuthStore } from '@/store/auth.store';
-import { LeagueBasic, LeagueBasicSchema, LeagueDetailsSchema, PaginatedLeaguesResponseSchema, Role, TenantDetails, TenantDetailsSchema } from '@/schemas';
+import { LeagueBasic, LeagueBasicSchema, Role } from '@/schemas';
 import { api } from '@/services/api';
 import { toast } from 'sonner';
 import { useContextualLink } from '@/hooks';
 import { StatsCard } from '@/components/ui/stats-card';
-import { Award, Building, Building2, Calendar, Clock, Crown, Eye, Flag, FlagIcon, MapPin, MoreVertical, Plus, Settings, ShoppingCart, Target, Ticket, TrendingUp, Trophy, UserPlus, Users } from 'lucide-react';
-import { Avatar, Badge, Button, Card, CardContent, CardHeader, CardTitle, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui';
-import { capitalize } from '@/utils';
+import { Award, Building, Calendar, Clock, Eye, MapPin, Plus, Settings, Target, Ticket, TrendingUp, Trophy,  Users } from 'lucide-react';
+import { Avatar, Button, Card, CardContent, CardHeader, CardTitle, LoadingSpinner } from '@/components/ui';
 
 interface UpcomingGame {
     id: string;
@@ -25,18 +22,6 @@ interface UpcomingGame {
     status: string; // e.g., 'Scheduled', 'Postponed'
 }
 
-interface NavItem {
-    label: string;
-    basePath: string;
-    icon: React.ElementType;
-}
-
-interface NavCategory {
-    label: string;
-    icon: React.ElementType;
-    subItems: NavItem[];
-}
-
     const mockUpcomingGames: UpcomingGame[] = [
         { id: '1', homeTeam: "Goma West", awayTeam: "Virunga", league: "Premier League '25", date: "2025-07-07", time: "19:00", venue: "City Arena", status: "Scheduled" },
         { id: '2', homeTeam: "Cyclone", awayTeam: "Barcelone", league: "Division A Cup", date: "2025-07-08", time: "14:30", venue: "Park View Stadium", status: "Scheduled" },
@@ -44,60 +29,7 @@ interface NavCategory {
         { id: '4', homeTeam: "Silverback", awayTeam: "Shem", league: "Premier League '25", date: "2025-07-09", time: "20:00", venue: "National Stadium", status: "Scheduled" },
         { id: '5', homeTeam: "Don Bosco", awayTeam: "Zebre", league: "Division B League", date: "2025-07-10", time: "16:00", venue: "Training Grounds A", status: "Scheduled" },
     ];
-    // Example navItems structure, directly correlating to backend endpoints
-    const navItems: NavCategory[] = [
-        {
-            label: "Overview",
-            icon: FiBarChart2,
-            subItems: [
-                { label: "Dashboard", basePath: "/dashboard", icon: FiBarChart2 },
-                { label: "Analytics", basePath: "/analytics", icon: FiActivity },
-            ],
-        },
-        {
-            label: "Leagues & Seasons",
-            icon: FiAward,
-            subItems: [
-                { label: "All Leagues", basePath: "/leagues", icon: FiList },
-                { label: "Seasons", basePath: "/seasons", icon: FiCalendar },
-            ],
-        },
-        {
-            label: "Teams & Players",
-            icon: FiUsers,
-            subItems: [
-                { label: "All Teams", basePath: "/teams", icon: FiUsers },
-                { label: "Players", basePath: "/players", icon: FiUser },
-                { label: "Transfers", basePath: "/transfers", icon: FiZap },
-            ],
-        },
-        {
-            label: "Games & Ticketing",
-            icon: FiFilm,
-            subItems: [
-                { label: "All Games", basePath: "/games", icon: FiFilm },
-                { label: "Match Events", basePath: "/match-events", icon: FiSpeaker },
-                { label: "Ticket Sales", basePath: "/tickets", icon: FiShoppingCart },
-            ],
-        },
-        {
-            label: "Finance",
-            icon: FiDollarSign,
-            subItems: [
-                { label: "Transactions", basePath: "/finance/transactions", icon: FiCreditCard },
-                { label: "Revenue", basePath: "/finance/revenue", icon: FiTrendingUp },
-            ],
-        },
-        {
-            label: "Settings",
-            icon: FiSettings,
-            subItems: [
-                { label: "Tenant Settings", basePath: "/settings/tenant", icon: FiShield },
-                { label: "User Management", basePath: "/settings/users", icon: FiUsers },
-            ],
-        },
-        // Add more categories as needed for a comprehensive system
-    ];
+
 
     
 export default function TenantDashboard() {
@@ -143,8 +75,8 @@ export default function TenantDashboard() {
           const response = await api.get(`/leagues/${currentLeagueId}`);
           const validatedLeague = LeagueBasicSchema.parse(response.data);
           setLeague(validatedLeague);
-        } catch (err: any) {
-          const errorMessage = err.response?.data?.message || err.message || "Failed to fetch League details.";
+        } catch (err) {
+          const errorMessage = "Failed to fetch League details.";
           setError(errorMessage);
           toast.error("Error loading League", { description: errorMessage });
           console.error('Fetch League details error:', err);
@@ -175,6 +107,8 @@ export default function TenantDashboard() {
   { id: 4, action: "League completed", details: "Junior Tennis League finished season", time: "2 hours ago", type: "league" },
   { id: 5, action: "New team registered", details: "Thunder Bolts joined Basketball League", time: "3 hours ago", type: "team" }
 ];
+    if(loading) return <LoadingSpinner />
+    if(error) return <div className='text-red-500 text-center mt-8'>Error: {error}</div>;
     return (
         <div className="min-h-screen">
             <Head>

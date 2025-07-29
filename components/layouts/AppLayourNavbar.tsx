@@ -1,8 +1,7 @@
 // components/layout/AppLayoutNavbar.tsx
 'use client'
 
-import { Bell, Search, User, LogOut, UserCircle, Settings, Menu } from 'lucide-react' // Import Menu icon
-import { useRouter } from 'next/navigation'
+import { Bell, User, LogOut, UserCircle, Settings, Menu } from 'lucide-react' // Import Menu icon
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import {

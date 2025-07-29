@@ -5,7 +5,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { api } from '@/services/api'; // Your actual API instance
-import { PaginatedTeamsResponseSchema, SortableColumn, TeamDetails, TeamDetailsSchema, TeamFilterParams, TeamFilterParamsSchema } from '@/schemas'; // Your new filter schema
+import { SortableColumn, TeamDetails, TeamFilterParams, TeamFilterParamsSchema } from '@/schemas'; // Your new filter schema
 import { TeamsFilters, TeamsTable } from '@/components/team/'; // Your new TeamsFilters component
 import { Pagination, LoadingSpinner, Button } from '@/components/ui/'; // Your Pagination component
 import { toast } from 'sonner'; // Your toast notification library (e.g., Sonner)
@@ -58,11 +58,11 @@ export default function AdminTeamsPage() {
       setTeams(validatedData.data); //
       setTotalItems(validatedData.totalItems);
       setTotalPages(validatedData.totalPages);
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.message || err.message || 'Failed to fetch teams.';
+    } catch (error) {
+      const errorMessage = 'Failed to fetch teams.';
       setError(errorMessage);
       toast.error('Error fetching teams', { description: errorMessage });
-      console.error('Fetch teams error:', err);
+      console.error('Fetch teams error:', error);
     } finally {
       setLoading(false);
     }
@@ -113,10 +113,10 @@ export default function AdminTeamsPage() {
       await api.delete(`/teams/${teamId}`);
       toast.success('Team deleted successfully.');
       fetchTeams(); // Re-fetch teams to update the list
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.message || err.message || 'Failed to delete team.';
+    } catch (error) {
+      const errorMessage = 'Failed to delete team.';
       toast.error('Error deleting team', { description: errorMessage });
-      console.error('Delete team error:', err);
+      console.error('Delete team error:', error);
     }
   }, [fetchTeams]);
 
@@ -141,7 +141,7 @@ export default function AdminTeamsPage() {
           <Button variant="primary" className='whitespace-nowrap'>Create New Team</Button>
         </Link>
       </div>
-
+      <span hidden>{totalItems} Teams</span>
       <TeamsTable
         teams={teams}
         onSort={handleSort}

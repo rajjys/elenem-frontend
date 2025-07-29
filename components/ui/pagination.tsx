@@ -14,7 +14,7 @@ interface PaginationProps {
 export function Pagination({ currentPage, totalPages, onPageChange }: PaginationProps) {
   const displayPages = 5; // Number of page buttons to display at once
   let startPage = Math.max(1, currentPage - Math.floor(displayPages / 2));
-  let endPage = Math.min(totalPages, startPage + displayPages - 1);
+  const endPage = Math.min(totalPages, startPage + displayPages - 1);
 
   if (endPage - startPage + 1 < displayPages) {
     startPage = Math.max(1, endPage - displayPages + 1);

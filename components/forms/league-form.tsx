@@ -1,7 +1,7 @@
 // components/forms/league-form.tsx
 "use client";
 
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useForm, useFieldArray, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -18,18 +18,11 @@ import {
   UpdateLeagueSchema,
   LeagueDetails,
   UserResponseDto,
-  PaginatedResponseDto,
   SportType,
   LeagueVisibility,
   Gender,
   Role,
-  PointSystemConfig,
-  TieBreakerConfig,
-  PointRule,
-  BonusPointRule,
-  TieBreakerRule,
   TenantBasicDto,
-  PaginatedLeaguesResponseDto
 } from '@/schemas';
 import { api } from '@/services/api';
 import { countryCodeToName, countryNameToCode, sanitizeEmptyStrings } from '@/utils/';
@@ -106,7 +99,6 @@ export function LeagueForm({
     handleSubmit,
     formState: { errors, isSubmitting },
     reset,
-    setValue,
     watch,
     control,
   } = form;
@@ -264,9 +256,10 @@ export function LeagueForm({
         toast.success("League created successfully!");
       }
       onSuccess?.(response.data.id);
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.message || `Failed to ${isEditMode ? 'update' : 'create'} league.`;
+    } catch (error) {
+      const errorMessage = `Failed to ${isEditMode ? 'update' : 'create'} league.`;
       toast.error("Error", { description: errorMessage });
+      console.error("League form submission error:", error);
     }
   };
 

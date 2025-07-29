@@ -19,7 +19,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 
-import { Filter as FilterIcon, Search as SearchIcon } from 'lucide-react';
+import { Filter as FilterIcon } from 'lucide-react';
 import { CountryDropdown } from 'react-country-region-selector';
 
 import { TeamFilterParams } from '@/schemas';
@@ -44,7 +44,7 @@ export function TeamsFilters({ filters, onFilterChange, onPageSizeChange, fixedT
   const user = useAuthStore((state) => state.user);
   const isSystemAdmin = user?.roles?.includes(Role.SYSTEM_ADMIN);
   const isTenantAdmin = user?.roles?.includes(Role.TENANT_ADMIN);
-  const isLeagueAdmin = user?.roles?.includes(Role.LEAGUE_ADMIN);
+  //const isLeagueAdmin = user?.roles?.includes(Role.LEAGUE_ADMIN);
 
   const [search, setSearch] = useState(filters.search || '');
   const [selectedTenantId, setSelectedTenantId] = useState(fixedTenantId || filters.tenantId || '');

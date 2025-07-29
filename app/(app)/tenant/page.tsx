@@ -1,7 +1,6 @@
 'use client'
 import { useContextualLink } from '@/hooks';
 import  Link from 'next/link';
-import router from 'next/navigation';
 import React from 'react'
 
 const TenantPage = () => {

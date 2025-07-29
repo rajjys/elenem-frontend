@@ -9,7 +9,7 @@ import { Role } from '@/schemas'; // Adjust path to your Role enum
 import { LoadingSpinner } from '@/components/ui/loading-spinner'; // Assuming this path
 import { toast } from 'sonner';
 import { api } from '@/services/api'; // Your actual API instance
-import { SeasonBasic, SeasonResponseDto } from '@/schemas/season-schemas'; // Your SeasonBasic type
+import { SeasonResponseDto } from '@/schemas/season-schemas'; // Your SeasonBasic type
 
 export default function EditSeasonPage() {
   const router = useRouter();
@@ -41,11 +41,11 @@ export default function EditSeasonPage() {
           // Or format them to string if your form uses string dates for input type="date"
           
         });
-      } catch (err: any) {
-        const errorMessage = err.response?.data?.message || err.message || 'Failed to fetch season data.';
+      } catch (error) {
+        const errorMessage = 'Failed to fetch season data.';
         setError(errorMessage);
         toast.error('Error loading season', { description: errorMessage });
-        console.error('Fetch season error:', err);
+        console.error('Fetch season error:', error);
       } finally {
         setLoading(false);
       }

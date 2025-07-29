@@ -14,10 +14,11 @@ import {
 } from '@/components/ui/'; // Your UI components
 
 // Your League-specific types from prisma
-import { LeagueBasic, Gender, SportType, LeagueVisibility } from '@/schemas'; // Assuming LeagueBasic is here
+import { LeagueBasic } from '@/schemas'; // Assuming LeagueBasic is here
 
 // Icons from Lucide React
 import { ArrowUpDown, Pencil, Trash, MoreVertical } from 'lucide-react';
+import LeagueLogo from '../ui/league-logo';
 
 
 type SortableColumn = 'name' | 'leagueCode' | 'sportType' | 'country' | 'ownerUsername' | 'createdAt' | 'updatedAt' | 'division' | 'establishedYear';
@@ -114,11 +115,10 @@ export function LeaguesTable({ leagues, onSort, sortBy, sortOrder, onDelete }: L
                 <div className="flex items-center">
                   {league.logoUrl && (
                     <div className="flex-shrink-0 h-10 w-10">
-                      <img
-                        className="h-10 w-10 rounded-full object-cover"
+                      <LeagueLogo
                         src={league.logoUrl}
                         alt={`${league.name} Logo`}
-                        onError={(e) => { e.currentTarget.src = `https://placehold.co/40x40/cccccc/333333?text=${league.name.charAt(0)}`; }}
+                        fallbackText={league.name.charAt(0)}
                       />
                     </div>
                   )}

@@ -3,7 +3,6 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { api } from '@/services/api'; // Your actual API instance
 import { LeagueBasic, PaginatedLeaguesResponseSchema, LeagueFilterParams } from '@/schemas/league-schemas'; // Your actual League types and schemas
 import { LeagueFilters } from '@/components/league/league-filters'; // Your new LeagueFilters component
@@ -12,10 +11,8 @@ import { Pagination } from '@/components/ui/'; // Your Pagination component
 import { LoadingSpinner } from '@/components/ui/loading-spinner'; // Your LoadingSpinner component
 import { Button } from '@/components/ui/button'; // Your Button component
 import { toast } from 'sonner'; // Your toast notification library (e.g., Sonner)
-import z from 'zod'; // Your Zod library
 
 export default function AdminLeaguesPage() {
-  const router = useRouter();
   const [leagues, setLeagues] = useState<LeagueBasic[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -63,11 +60,11 @@ export default function AdminLeaguesPage() {
       setLeagues(validatedData.data);
       setTotalItems(validatedData.totalItems);
       setTotalPages(validatedData.totalPages);
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.message || err.message || 'Failed to fetch leagues.';
+    } catch (error) {
+      const errorMessage = 'Failed to fetch leagues.';
       setError(errorMessage);
       toast.error('Error fetching leagues', { description: errorMessage });
-      console.error('Fetch leagues error:', err);
+      console.error('Fetch leagues error:', error);
     } finally {
       setLoading(false);
     }
@@ -116,10 +113,10 @@ export default function AdminLeaguesPage() {
       await api.delete(`/leagues/${leagueId}`); // Your actual DELETE API call
       toast.success('League deleted successfully.');
       fetchLeagues(); // Re-fetch leagues to update the list
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.message || err.message || 'Failed to delete league.';
+    } catch (error) {
+      const errorMessage = 'Failed to delete league.';
       toast.error('Error deleting league', { description: errorMessage });
-      console.error('Delete league error:', err);
+      console.error('Delete league error:', error);
     }
   }, [fetchLeagues]); // fetchLeagues is a dependency because it's called inside
 
@@ -143,6 +140,7 @@ export default function AdminLeaguesPage() {
         <p className="text-red-500 text-center mt-8">Error: {error}</p>
       ) : (
         <>
+        <span hidden>{totalItems} leagues</span>
           <LeaguesTable
             leagues={leagues}
             onSort={handleSort}

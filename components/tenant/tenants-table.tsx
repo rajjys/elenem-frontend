@@ -1,12 +1,13 @@
 // components/tenant/tenants-table.tsx
 "use client";
 
-import { TenantBasic, TenantDetails } from '@/schemas';
+import { TenantBasic } from '@/schemas';
 import React from 'react';
 import { Button, Table, TableBody, TableCell, TableHead, TableHeader, TableRow, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/';
 import Link from 'next/link';
 import { ArrowUpDown, Pencil, Trash, MoreVertical } from 'lucide-react';
-import { useContextualLink } from '@/hooks/useContextualLink'; // Your custom hook (mocked below)
+import TenantLogo from './tenant-logo';
+//import { useContextualLink } from '@/hooks/useContextualLink'; // Your custom hook (mocked below)
 type SortableColumn = 'name' | 'tenantCode' | 'sportType' | 'country' | 'ownerUsername' | 'createdAt' | 'updatedAt';
 
 interface TenantsTableProps { 
@@ -19,7 +20,7 @@ interface TenantsTableProps {
 }
 
 export function TenantsTable({ tenants, onSort, sortBy, sortOrder, onDelete }: TenantsTableProps) {
-  const { buildLink } = useContextualLink(); // Keep if your real app uses it
+  //const { buildLink } = useContextualLink(); // Keep if your real app uses it
 
   const getSortIndicator = (column: string) => {
     if (sortBy === column) {
@@ -89,11 +90,10 @@ export function TenantsTable({ tenants, onSort, sortBy, sortOrder, onDelete }: T
                 <div className="flex items-center">
                   {tenant.logoUrl && (
                     <div className="flex-shrink-0 h-10 w-10">
-                      <img
-                        className="h-10 w-10 rounded-full object-cover"
+                      <TenantLogo
                         src={tenant.logoUrl}
                         alt={`${tenant.name} Logo`}
-                        onError={(e) => { e.currentTarget.src = `https://placehold.co/40x40/cccccc/333333?text=${tenant.name.charAt(0)}`; }}
+                        fallbackText={tenant.name.charAt(0)}
                       />
                     </div>
                   )}

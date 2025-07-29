@@ -1,4 +1,5 @@
 // components/layouts/CollapsibleNavLink.tsx
+'use client'
 import { useEffect, useRef, useState } from "react";
 import { FiChevronDown, FiChevronRight } from "react-icons/fi";
 // Ensure NavLink is imported from the correct path, likely the same directory
@@ -31,6 +32,7 @@ export const CollapsibleNavLink: React.FC<CollapsibleNavLinkProps> = ({ category
         }
     }, [currentPath, category.subItems, isSidebarOpen]);
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const handleCategoryClick = (event: React.MouseEvent<HTMLButtonElement>) => {
         if (isSidebarOpen) {
             setAccordionOpen(!accordionOpen);

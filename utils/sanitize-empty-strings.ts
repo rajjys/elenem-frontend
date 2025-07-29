@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export function sanitizeEmptyStrings<T extends Record<string, any>>(data: T): T {
   const cleaned: Record<string, any> = {};
 

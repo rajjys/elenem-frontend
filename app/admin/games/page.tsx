@@ -13,7 +13,6 @@ import { toast } from 'sonner'; // Your toast notification library (e.g., Sonner
 import { Role } from '@/schemas'; // Assuming Role enum is here
 import { useAuthStore } from '@/store/auth.store'; // Auth store to get user roles
 import { useContextualLink } from '@/hooks'; // Your useContextualLink hook
-import * as z from 'zod';
 
 export default function AdminGamesPage() {
   const router = useRouter();
@@ -63,11 +62,11 @@ export default function AdminGamesPage() {
       setGames(validatedData.data);
       setTotalItems(validatedData.totalItems);
       setTotalPages(validatedData.totalPages);
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.message || err.message || 'Failed to fetch games.';
+    } catch (error) {
+      const errorMessage = 'Failed to fetch games.';
       setError(errorMessage);
       toast.error('Error fetching games', { description: errorMessage });
-      console.error('Fetch games error:', err);
+      console.error('Fetch games error:', error);
     } finally {
       setLoading(false);
     }
@@ -99,22 +98,24 @@ export default function AdminGamesPage() {
     setFilters(prev => ({ ...prev, pageSize: newSize, page: 1 })); // Reset page to 1
   }, []);
 
+  /*
   const handleDeleteGame = useCallback(async (gameId: string) => {
       const confirmed = window.confirm('Are you sure you want to delete this game? This action cannot be undone.');
       if (!confirmed) {
         return;
       }
-  
       try {
         await api.delete(`/games/${gameId}`);
         toast.success('Game deleted successfully.');
         fetchGames(); // Re-fetch Games to update the list
-      } catch (err: any) {
-        const errorMessage = err.response?.data?.message || err.message || 'Failed to delete game.';
+      } catch (error) {
+        const errorMessage = 'Failed to delete game.';
         toast.error('Error deleting game', { description: errorMessage });
-        console.error('Delete game error:', err);
+        console.error('Delete game error:', error);
       }
     }, [fetchGames]);
+
+*/
   // Function to get status badge (from your original page.tsx)
   const getStatusBadge = (status: GameStatus) => {
     switch (status) {
@@ -167,7 +168,9 @@ export default function AdminGamesPage() {
       {games.length === 0 ? (
         <p className="text-center text-gray-500 mt-8">No games found matching your criteria.</p>
       ) : (
-        <div className="mt-4 gap-4"> {/* Responsive grid for GameCards */}
+        <div className="mt-4 gap-4"> 
+        <span hidden>{totalItems} Games</span>
+        {/* Responsive grid for GameCards */}
           {games.map((game) => (
             <GameCard
               key={game.id}

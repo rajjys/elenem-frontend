@@ -3,20 +3,18 @@
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react'; // Added useMemo
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { api } from '@/services/api';
-import { GameDetails, GameFilterParams, PaginatedGamesResponseSchema, GameStatus, GameFilterParamsSchema } from '@/schemas';
+import { GameDetails, GameFilterParams, PaginatedGamesResponseSchema, GameFilterParamsSchema } from '@/schemas';
 import { GamesFilters } from '@/components/game/games-filters';
-import { Pagination, LoadingSpinner, Button, Badge, getStatusBadge } from '@/components/ui/';
+import { Pagination, LoadingSpinner, Button, getStatusBadge } from '@/components/ui/';
 import { GameCard } from '@/components/ui';
 import { toast } from 'sonner';
 import { Role } from '@/schemas';
 import { useAuthStore } from '@/store/auth.store';
 import { useContextualLink } from '@/hooks';
-import * as z from 'zod';
 
 export default function LeagueGamesPage() {
-    const router = useRouter();
     const { user: userAuth } = useAuthStore();
     const currentUserRoles = userAuth?.roles || [];
     const searchParams = useSearchParams(); // Get search params once
@@ -115,11 +113,11 @@ export default function LeagueGamesPage() {
             setGames(validatedData.data);
             setTotalItems(validatedData.totalItems);
             setTotalPages(validatedData.totalPages);
-        } catch (err: any) {
-            const errorMessage = err.response?.data?.message || err.message || 'Failed to fetch games.';
+        } catch (error) {
+            const errorMessage = 'Failed to fetch games.';
             setError(errorMessage);
             toast.error('Error fetching games', { description: errorMessage });
-            console.error('Fetch games error:', err);
+            console.error('Fetch games error:', error);
         } finally {
             setLoading(false);
         }
@@ -190,6 +188,7 @@ export default function LeagueGamesPage() {
                 <p className="text-center text-gray-500 mt-8">No games found matching your criteria.</p>
             ) : (
                 <div className="mt-4">
+                    <span hidden>{totalItems} Games Found</span>
                     {games.map((game) => (
                         <GameCard
                             key={game.id}

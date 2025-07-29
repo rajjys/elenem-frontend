@@ -47,7 +47,7 @@ export function GamesFilters({ filters, onFilterChange, onPageSizeChange, fixedT
   const isSystemAdmin = user?.roles?.includes(Role.SYSTEM_ADMIN);
   const isTenantAdmin = user?.roles?.includes(Role.TENANT_ADMIN);
   const isLeagueAdmin = user?.roles?.includes(Role.LEAGUE_ADMIN);
-  const isTeamAdmin = user?.roles?.includes(Role.TEAM_ADMIN);
+  //const isTeamAdmin = user?.roles?.includes(Role.TEAM_ADMIN);
 
   const [search, setSearch] = useState(filters.search || '');
   const [selectedTenantId, setSelectedTenantId] = useState(fixedTenantId || filters.tenantId || '');

@@ -12,7 +12,6 @@ import { Button } from '@/components/ui/'; // Your Button component
 import { toast } from 'sonner'; // Your toast notification library (e.g., Sonner)
 import { Role } from '@/schemas';
 import { useAuthStore } from '@/store/auth.store'; // Auth store to get user roles
-import * as z from 'zod'; // Import Zod
 
 export default function AdminSeasonsPage() {
   const router = useRouter();
@@ -56,11 +55,11 @@ export default function AdminSeasonsPage() {
       setSeasons(validatedData.data as SeasonResponseDto[]);
       setTotalItems(validatedData.totalItems);
       setTotalPages(validatedData.totalPages);
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.message || err.message || 'Failed to fetch seasons.';
+    } catch (error) {
+      const errorMessage = 'Failed to fetch seasons.';
       setError(errorMessage);
       toast.error('Error fetching seasons', { description: errorMessage });
-      console.error('Fetch seasons error:', err);
+      console.error('Fetch seasons error:', error);
     } finally {
       setLoading(false);
     }
@@ -111,10 +110,10 @@ export default function AdminSeasonsPage() {
       await api.delete(`/seasons/${seasonId}`); // Assuming DELETE API call
       toast.success('Season deleted successfully.');
       fetchSeasons(); // Re-fetch seasons to update the list
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.message || err.message || 'Failed to delete season.';
+    } catch (error) {
+      const errorMessage = 'Failed to delete season.';
       toast.error('Error deleting season', { description: errorMessage });
-      console.error('Delete season error:', err);
+      console.error('Delete season error:', error);
     }
   }, [fetchSeasons]);
 
@@ -139,7 +138,7 @@ export default function AdminSeasonsPage() {
           <Button variant="primary" className='whitespace-nowrap'>Create New Season</Button>
         </Link>
       </div>
-
+      <span hidden>{totalItems}</span>
       <SeasonsTable
         seasons={seasons}
         onSort={handleSort}

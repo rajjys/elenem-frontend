@@ -1,9 +1,6 @@
 // app/(public)/page.tsx
 'use client'; // This component needs to be a Client Component for useRouter
 
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-
 // Mock data for leagues (in a real app, this would come from an API or database)
 const leagues = [
   { id: 'ligue1', name: 'Ligue 1', description: 'Top French Football League' },
@@ -12,7 +9,6 @@ const leagues = [
 ];
 
 export default function HomePage() {
-  const router = useRouter();
   const ROOT_DOMAIN = (process.env.NODE_ENV === 'development' ) ? 'lvh.me:3000' : "website.com";
   const handler = (process.env.NODE_ENV === 'development' ) ? 'http://' : 'https://';
   // Function to handle redirection to a specific league's subdomain

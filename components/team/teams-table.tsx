@@ -38,7 +38,7 @@ import {
 //   tenant: { id: string; name: string; }; // Assuming tenant info is available
 //   managers?: Array<{ id: string; username: string; }>; // Assuming managers can be displayed
 // }
-import { TeamVisibility, Role, SportType, Gender } from '@/schemas'; // Import enums
+import { Role} from '@/schemas'; // Import enums
 import { TeamDetails } from '@/schemas'; // Adjust path to your DTOs
 import { ArrowUpDown, MoreVertical, Pencil, Trash } from 'lucide-react';
 import Image from 'next/image';
@@ -75,7 +75,7 @@ export function TeamsTable({ teams, onSort, sortBy, sortOrder, onDelete, current
 
   // Function to build the dashboard link dynamically
   const buildTeamDashboardLink = (team: TeamDetails) => {
-    let link = `/team/dashboard`;
+    const link = `/team/dashboard`;
     const params = new URLSearchParams();
 
     if (isSystemAdmin) {

@@ -1,13 +1,10 @@
 // app/league/layout.tsx OR components/layouts/LeagueAdminLayout.tsx
 "use client";
 
-import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
-import React, { useState, ReactNode, useEffect, useRef, RefObject } from 'react';
+import React, { ReactNode } from 'react';
 import {
-    FiBarChart2, FiSettings, FiUsers, FiAward, FiCalendar, FiDollarSign, FiSend, FiImage,
-    FiGift, FiShoppingBag, FiHelpCircle, FiUser, FiShield, FiLogOut, FiChevronDown,
-    FiChevronRight, FiMenu, FiX, FiFileText, FiBriefcase, FiFlag, FiList, FiCheckSquare, FiClipboard, FiEdit3, FiPercent,
+    FiBarChart2, FiSettings, FiUsers, FiAward, FiCalendar, FiDollarSign, FiImage,
+    FiGift, FiUser, FiFileText, FiList, FiCheckSquare,
     FiTrendingUp,
     FiUserCheck,
     FiUserPlus,
@@ -18,8 +15,6 @@ import {
     FiMessageSquare,
     FiFileMinus
 } from 'react-icons/fi'; // Example icons
-import { useAuthStore } from '@/store/auth.store';
-import { MdStadium } from 'react-icons/md';
 import AppLayout from '@/components/layouts/AppLayout';
 
 interface LeagueAdminLayoutProps {

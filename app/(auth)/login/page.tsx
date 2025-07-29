@@ -1,7 +1,7 @@
 // app/(auth)/login/page.tsx
 "use client";
-import { LoginForm } from "@/components/forms/loginForm";
-import { Role, User } from "@/schemas"; // Import Role and User from your new frontend types
+import { LoginForm } from "@/components/forms/login-form";
+import { Role } from "@/schemas"; // Import Role and User from your new frontend types
 import { useAuthStore } from "@/store/auth.store";
 import { useRouter, useSearchParams } from "next/navigation"; // Import useSearchParams
 import { useEffect } from "react";

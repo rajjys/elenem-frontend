@@ -1,6 +1,6 @@
 // schemas/game.schema.ts
-import { record, z } from 'zod';
-import { GameStatus, Role } from '@/schemas/'; // Assuming Prisma enums are available
+import { z } from 'zod';
+import { GameStatus } from '@/schemas/'; // Assuming Prisma enums are available
 
 // --- Base Schemas for Relations ---
 const TeamBasicSchema = z.object({

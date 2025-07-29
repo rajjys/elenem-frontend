@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-empty-object-type */
 // src/components/ui/card.tsx
 import * as React from 'react';
 import { cn } from '@/utils'; // Assuming you have a utility for combining class names

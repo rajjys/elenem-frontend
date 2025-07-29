@@ -187,6 +187,7 @@ export function UserForm({
     }
 
     // Construct the payload for the backend DTO
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const payload: any = {
       username: data.username,
       email: data.email,
@@ -224,10 +225,10 @@ export function UserForm({
         reset(); // Reset form after successful creation
       }
       onSuccess?.(response.data.id);
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.message || err.message || `Failed to ${isEditMode ? 'update' : 'create'} user.`;
+    } catch (error) {
+      const errorMessage = `Failed to ${isEditMode ? 'update' : 'create'} user.`;
       toast.error(`Error ${isEditMode ? 'updating' : 'creating'} user`, { description: errorMessage });
-      console.error(`${isEditMode ? 'Update' : 'Create'} user error:`, err);
+      console.error(`${isEditMode ? 'Update' : 'Create'} user error:`, error);
     }
   }, [isEditMode, userId, onSuccess, reset, user]); // Add userAuth to dependencies
 

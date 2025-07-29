@@ -2,7 +2,7 @@
 "use client";
 
 import React from 'react';
-import { User, Role, UserBasic } from '@/schemas';
+import { UserBasic } from '@/schemas';
 import Link from 'next/link';
 import { ArrowUpDown, Pencil, Trash, MoreVertical } from 'lucide-react';
 import {
@@ -13,6 +13,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/';
+import UserAvatar from './user-avatar';
 
 type SortableColumn = "firstName" | "lastName" | "username" | "email" | "createdAt" | "updatedAt" | "lastLoginAt";
 interface UsersTableProps {
@@ -85,11 +86,10 @@ export function UsersTable({ users, onSort, sortBy, sortOrder, onDelete, onManag
                 <div className="flex items-center">
                   {user.avatarUrl && (
                     <div className="flex-shrink-0 h-10 w-10">
-                      <img
-                        className="h-10 w-10 rounded-full object-cover"
+                      <UserAvatar
                         src={user.avatarUrl}
                         alt={`${user.firstName} ${user.lastName} Profile`}
-                        onError={(e) => { e.currentTarget.src = `https://placehold.co/40x40/cccccc/333333?text=${user.username.charAt(0)}`; }}
+                        fallbackText={user.username.charAt(0)}
                       />
                     </div>
                   )}

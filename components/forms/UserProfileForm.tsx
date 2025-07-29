@@ -78,8 +78,9 @@ export function UserProfileForm() {
       setSuccessMessage("Profile updated successfully!");
       await fetchUser(); // Refresh user data in the store
       setTimeout(() => setSuccessMessage(null), 3000);
-    } catch (error: any) {
-      setApiError(error.response?.data?.message || "Failed to update profile.");
+    } catch (error) {
+      setApiError("Failed to update profile.");
+      console.log(error);
     } finally {
       setIsLoading(false);
     }

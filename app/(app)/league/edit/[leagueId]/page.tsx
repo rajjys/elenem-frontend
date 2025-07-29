@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { LeagueForm } from "@/components/forms/league-form";
 import { api } from "@/services/api";
@@ -30,7 +30,7 @@ export default function EditLeaguePage() {
         setLeague(response.data);
       } catch (error) {
         toast.error("Failed to load league.", { description: "League not found or access denied." });
-        //router.push("/leagues");
+        console.error("Error fetching league:", error);
       } finally {
         setLoading(false);
       }
