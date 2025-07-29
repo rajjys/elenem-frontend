@@ -2,9 +2,11 @@
 // services/api.ts
 import { useAuthStore } from '@/store/auth.store';
 import axios from 'axios';
-
+const isProd = process.env.NODE_ENV === 'production';
 export const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:3333/", // Your backend API URL
+  baseURL: isProd
+    ? process.env.NEXT_PUBLIC_API_URL
+    : "http://localhost:3333/", // Use env var only in prod, localhost in dev
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
