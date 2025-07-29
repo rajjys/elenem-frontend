@@ -1,5 +1,6 @@
 // app/(auth)/login/page.tsx
 "use client";
+export const dynamic = "force-dynamic";
 import { LoginForm } from "@/components/forms/login-form";
 import { Role } from "@/schemas"; // Import Role and User from your new frontend types
 import { useAuthStore } from "@/store/auth.store";
