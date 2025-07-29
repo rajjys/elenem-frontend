@@ -1,11 +1,6 @@
 import React from 'react'
 
-type PublicTenantPageProps = {
-  params: {
-    tenantSlug: string;
-  }
-}
-const PublicTenantPage = async({ params } : PublicTenantPageProps) => {
+const PublicTenantPage = async({ params } : { params: { tenantSlug: string } }) => {
   const { tenantSlug } = params;
   return (
     <div>
