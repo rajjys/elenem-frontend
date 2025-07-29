@@ -1,5 +1,5 @@
 'use client'; // Mark as Client Component since we're using hooks
-
+export const dynamic = "force-dynamic";
 import { useRouter, useSearchParams } from 'next/navigation';
 
 
