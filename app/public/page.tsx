@@ -1,5 +1,5 @@
 // app/(public)/page.tsx
-
+"use client";
 // Mock data for leagues (in a real app, this would come from an API or database)
 const leagues = [
   { id: 'ligue1', name: 'Ligue 1', description: 'Top French Football League' },
