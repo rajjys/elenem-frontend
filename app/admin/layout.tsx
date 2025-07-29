@@ -18,6 +18,7 @@ import { FiGrid, FiUsers, FiDollarSign, FiServer, FiShield, FiHelpCircle, FiBarC
     FiTv,
 } from 'react-icons/fi';
 import AppLayout from '@/components/layouts/AppLayout';
+import { LoadingSpinner } from '@/components/ui';
 
 interface SystemAdminLayoutProps {
     children: ReactNode;
@@ -85,13 +86,15 @@ const systemNavItems = [
 export default function SystemAdminLayout({ children }: SystemAdminLayoutProps) {
 
     return (
+      <React.Suspense fallback={<LoadingSpinner />}>
         <AppLayout
           navItems={systemNavItems}
           themeColor="indigo" // Or 'blue', 'emerald', etc., as defined in tailwind.config.js
           headerTitle="System Admin"
           logoIcon={FiAward}
-        >
-      {children}
-    </AppLayout>
+          >
+            {children}
+        </AppLayout>
+    </React.Suspense>
     );
 }

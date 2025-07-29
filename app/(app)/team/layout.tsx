@@ -16,6 +16,7 @@ import {
 } from 'react-icons/fi'; // Example icons
 // --- Reusable NavLink, CollapsibleNavLink, FlyoutMenu Components ---
 import AppLayout from '@/components/layouts/AppLayout';
+import { LoadingSpinner } from '@/components/ui';
 
 interface TeamAdminLayoutProps {
     children: ReactNode;
@@ -82,6 +83,7 @@ const teamNavItems = [
 export default function TeamAdminLayout({ children }: TeamAdminLayoutProps) {
     
     return (
+      <React.Suspense fallback={<LoadingSpinner />}>
         <AppLayout
               navItems={teamNavItems}
               themeColor="emerald" // Or 'blue', 'emerald', etc., as defined in tailwind.config.js
@@ -89,5 +91,6 @@ export default function TeamAdminLayout({ children }: TeamAdminLayoutProps) {
               logoIcon={FiAward}>
               {children}
             </AppLayout>
+        </React.Suspense>
     );
 }

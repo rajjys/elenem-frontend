@@ -6,6 +6,7 @@ import { FiHome, FiBriefcase, FiUsers, FiSettings, FiHelpCircle, FiAward, FiShar
 
 // Import reusable components and the new hook
 import AppLayout from '@/components/layouts/AppLayout';
+import { LoadingSpinner } from '@/components/ui';
 
 // --- Main Layout ---
 const tenantNavItems = [
@@ -63,14 +64,16 @@ interface TenantAdminLayoutProps {
 export default function TenantAdminLayout({ children }: TenantAdminLayoutProps) {
     
     return (
-    <AppLayout
-        navItems={tenantNavItems}
-        themeColor="blue" // Or 'blue', 'emerald', etc., as defined in tailwind.config.js
-        headerTitle="Tenant Admin"
-        logoIcon={FiAward}
-      >
-      {children}
-    </AppLayout>
+      <React.Suspense fallback={<LoadingSpinner />}>
+        <AppLayout
+            navItems={tenantNavItems}
+            themeColor="blue" // Or 'blue', 'emerald', etc., as defined in tailwind.config.js
+            headerTitle="Tenant Admin"
+            logoIcon={FiAward}
+          >
+          {children}
+        </AppLayout>
+      </React.Suspense>
     );
 }
 

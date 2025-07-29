@@ -61,7 +61,7 @@ export default function LeagueStandingsPage() {
     } finally {
       setLoading(false);
     }
-  }, [userAuth?.managingLeagueId]);
+  }, []);
 
   useEffect(() => {
         fetchStandings(filters);

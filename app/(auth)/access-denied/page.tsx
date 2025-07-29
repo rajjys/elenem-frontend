@@ -1,10 +1,10 @@
 'use client'; // Mark as Client Component since we're using hooks
 export const dynamic = "force-dynamic";
 import { useRouter, useSearchParams } from 'next/navigation';
+import React, { Suspense } from 'react'; // Import Suspense from React
 
-
-
-const AccessDeniedPage = () => {
+// Create a separate component that actually uses useSearchParams
+const AccessDeniedContent = () => {
   const router = useRouter();
   const params = useSearchParams();
   const reason = params.get('reason');
@@ -14,7 +14,6 @@ const AccessDeniedPage = () => {
   if (reason === 'tenant_admin_only') errorMessage = "Only Tenant Admins can access this area.";
   if (reason === 'league_admin_only') errorMessage = "Only League Admins can access this area.";
   if (reason === 'team_admin_only') errorMessage = "Only Team Admins can access this area.";
-
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
@@ -45,7 +44,7 @@ const AccessDeniedPage = () => {
             <p className="text-gray-600 mb-6">
               {errorMessage || `You don't have permission to access this page. If you believe this is an error, please contact your administrator.`}
             </p>
-            
+
             <div className="mt-6 flex flex-col sm:flex-row sm:justify-center gap-3">
               <button
                 onClick={() => router.back()}
@@ -66,8 +65,8 @@ const AccessDeniedPage = () => {
         <div className="mt-8 text-center text-sm text-gray-600">
           <p>
             Need help?{' '}
-            <a 
-              href="mailto:support@yourdomain.com" 
+            <a
+              href="mailto:support@yourdomain.com"
               className="font-medium text-blue-600 hover:text-blue-500"
             >
               Contact support
@@ -76,6 +75,15 @@ const AccessDeniedPage = () => {
         </div>
       </div>
     </div>
+  );
+};
+
+// The main page component that renders the content within Suspense
+const AccessDeniedPage = () => {
+  return (
+    <Suspense fallback={<div>Loading access details...</div>}>
+      <AccessDeniedContent />
+    </Suspense>
   );
 };
 

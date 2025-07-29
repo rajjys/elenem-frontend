@@ -16,6 +16,7 @@ import {
     FiFileMinus
 } from 'react-icons/fi'; // Example icons
 import AppLayout from '@/components/layouts/AppLayout';
+import { LoadingSpinner } from '@/components/ui';
 
 interface LeagueAdminLayoutProps {
     children: ReactNode;
@@ -89,6 +90,7 @@ export default function LeagueAdminLayout({ children }: LeagueAdminLayoutProps) 
     //const router = useRouter();
 
     return (
+      <React.Suspense fallback={<LoadingSpinner />}>
         <AppLayout
               navItems={leagueNavItems}
               themeColor="purple" // Or 'blue', 'emerald', etc., as defined in tailwind.config.js
@@ -96,5 +98,6 @@ export default function LeagueAdminLayout({ children }: LeagueAdminLayoutProps) 
               logoIcon={FiAward}>
               {children}
             </AppLayout>
+      </React.Suspense>
     );
 }
