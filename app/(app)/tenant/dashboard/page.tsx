@@ -177,7 +177,7 @@ export default function TenantDashboard() {
                                     </div>
                                     <div className="flex items-center gap-2">
                                         <Badge variant={league.isActive === true ? 'success' : 'secondary'}>
-                                        {league.isActive === true? "Active" : "inactive"}
+                                        {league.isActive === true? "Active" : "Inactive"}
                                         </Badge>
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
@@ -187,16 +187,16 @@ export default function TenantDashboard() {
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent align="end">
                                                 <DropdownMenuItem>
-                                                <Eye className="mr-2 h-4 w-4" />
-                                                View Details
+                                                  <Eye className="mr-2 h-4 w-4" />
+                                                  View Details
                                                 </DropdownMenuItem>
                                                 <DropdownMenuItem>
-                                                <UserPlus className="mr-2 h-4 w-4" />
-                                                Assign Manager
+                                                  <UserPlus className="mr-2 h-4 w-4" />
+                                                  Assign Manager
                                                 </DropdownMenuItem>
                                                 <DropdownMenuItem>
-                                                <Settings className="mr-2 h-4 w-4" />
-                                                Configure
+                                                  <Settings className="mr-2 h-4 w-4" />
+                                                  Configure
                                                 </DropdownMenuItem>
                                             </DropdownMenuContent>
                                         </DropdownMenu>

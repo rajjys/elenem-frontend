@@ -34,33 +34,47 @@ export default function PublicGamesPage() {
   const handler = (process.env.NODE_ENV === 'development' ) ? 'http://' : 'https://';
 
   // Fetch available dates on initial load
-  useEffect(() => {
-    api.get('/public/games/dates')
-      .then(response => {
-        const dates = response.data;
-        setAvailableDates(dates);
-        if (dates.length > 0) {
+  async function fetchDates() {
+      try {
+          const response = await api.get<string[]>('/public/games/dates');
+          const dates = response.data;
+          setAvailableDates(dates);
+          if (dates.length > 0) {
           // Select today's date if available, otherwise the first available date
           const today = format(new Date(), 'yyyy-MM-dd');
           setSelectedDate(dates.includes(today) ? today : dates[0]);
         }
-      })
-      .catch(() => toast.error("Failed to load game dates."))
-      .finally(() => setLoadingDates(false));
-  }, []);
-
+      }
+      catch(error){
+        toast.error("Failed to load game dates.");
+        console.log(error);
+      }
+      finally{
+          setLoadingDates(false)
+      }
+    }
   // Fetch games when a date is selected
-  const fetchGames = useCallback((date: string) => {
+  const fetchGames = useCallback(async (date: string) => {
     if (!date) return;
     setLoadingGames(true);
-    api.get('/public/games', { params: { date } })
-      .then(response => {
-        setGamesByTenant(response.data);
-      })
-      .catch(() => toast.error(`Failed to load games for ${date}.`))
-      .finally(() => setLoadingGames(false));
+    try {
+      const response = await api.get<TenantWithGames[]>('/public/games', { params: { date } });
+      const tenantsWithGames = response.data;
+      setGamesByTenant(tenantsWithGames);
+    } catch (error) {
+        toast.error(`Failed to load games for ${date}.`);
+        console.log(error);
+    }
+    finally{
+        setLoadingGames(false)
+    }
   }, []);
-  
+
+  useEffect(() => {
+    
+     fetchDates(); 
+  }, []);
+
   useEffect(() => {
       fetchGames(selectedDate);
   }, [selectedDate, fetchGames]);
@@ -89,12 +103,12 @@ export default function PublicGamesPage() {
           <p className="mt-2 text-md text-gray-500">Parcourez les Matchs publics dans toutes les ligues.</p>
         </header>
         <Card className="overflow-hidden shadow-sm">
-            <CardHeader>
-                  <CardTitle className='text-gray-500 text-base px-2'>Selectionner une date</CardTitle>
-            </CardHeader>
-            <CardContent className="grid gap-4 md:gap-6 grid-cols-1">
-                  <DateCarousel dates={availableDates} selectedDate={selectedDate} onDateSelect={setSelectedDate} />
-            </CardContent>
+          <CardHeader>
+            <CardTitle className='text-gray-500 text-base px-2'>Selectionner une date</CardTitle>
+          </CardHeader>
+          <CardContent className="grid gap-4 md:gap-6 grid-cols-1">
+            <DateCarousel dates={availableDates} selectedDate={selectedDate} onDateSelect={setSelectedDate} />
+          </CardContent>
         </Card>
         {loadingGames ? (
             <div className="space-y-8">
