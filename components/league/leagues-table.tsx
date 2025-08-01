@@ -18,7 +18,7 @@ import { LeagueBasic } from '@/schemas'; // Assuming LeagueBasic is here
 
 // Icons from Lucide React
 import { ArrowUpDown, Pencil, Trash, MoreVertical } from 'lucide-react';
-import LeagueLogo from '../ui/league-logo';
+import LeagueLogo from './league-logo';
 
 
 type SortableColumn = 'name' | 'leagueCode' | 'sportType' | 'country' | 'ownerUsername' | 'createdAt' | 'updatedAt' | 'division' | 'establishedYear';

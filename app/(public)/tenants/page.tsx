@@ -59,8 +59,10 @@ function TenantCardSkeleton() {
 
 // --- Main Components ---
 function TenantCard({ tenant }: { tenant: Tenant }) {
-    const ROOT_DOMAIN = (process.env.NODE_ENV === 'development' ) ? 'lvh.me:3000' : "website.com";
-    const protocol = process.env.NODE_ENV === 'production' ? 'https://' : 'http://';
+
+    const ROOT_DOMAIN = process.env.NODE_ENV === 'development' ? 
+                        process.env.NEXT_PUBLIC_HOME_URL_LOCAL : process.env.NEXT_PUBLIC_HOME_URL;
+    const protocol = process.env.NODE_ENV === 'development' ? 'http://' : 'https://';
     const tenantUrl = `${protocol}${tenant.slug}.${ROOT_DOMAIN}`;
     
     return (
@@ -152,7 +154,7 @@ export default function PublicTenantsPage() {
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [loading, setLoading] = useState(true);
-
+    
     const fetchTenants = useCallback((currentPage: number, currentFilters: {search?: string, sportType?: string, country?: string}) => {
         setLoading(true);
         const params = { ...currentFilters, page: currentPage, pageSize: 10 };

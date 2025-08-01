@@ -1,8 +1,9 @@
-import React from 'react'
-import { Avatar, Card, CardContent, CardHeader, CardTitle } from './'
+import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui';
 import { GameDetails, GameStatus } from '@/schemas';
 import { Plus } from 'lucide-react';
 import { format } from 'date-fns';
+import Image from 'next/image';
 
 interface GamePublicCardProps {
     game: GameDetails;
@@ -42,7 +43,16 @@ const GamePublicCard: React.FC<GamePublicCardProps> = ({game}) => {
                 {/*TEAM 1 */}
                 <div className={`flex items-center justify-between w-full pb-2 ${homeTeamStyle}`}>
                     <div className='flex items-center justify-start'>
-                        <Avatar src={game.homeTeam.logoUrl} name={game.homeTeam.shortCode} size={30} />
+                        <Image
+                                                className='h-10 w-10 rounded-full object-cover border border-gray-400'
+                                                src={game.homeTeam.logoUrl || "https://placehold.co/40x40/cccccc/333333?text=${team.name.charAt(0)}"}
+                                                height={60}
+                                                width={60}
+                                                placeholder="blur"
+                                                blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkqAcAAIUAgUW0RjgAAAAASUVORK5CYII="
+                                                alt={`${game.homeTeam.shortCode} Logo`}
+                                                // onError={(e) => { e.currentTarget.src = `https://placehold.co/40x40/cccccc/333333?text=${team.name.charAt(0)}`; }}
+                                              />
                         <span className={`px-2 text-lg`} >{game.homeTeam.shortCode}</span>
                     </div>
                     <span className={`text-lg`}>{GameStatus.COMPLETED && game.homeScore}</span>
@@ -50,7 +60,16 @@ const GamePublicCard: React.FC<GamePublicCardProps> = ({game}) => {
                 {/**TEAM 2 */}
                 <div className={`flex items-center justify-between space-x-2 pb-2 ${awayTeamStyle}`}>
                     <div className='flex items-center justify-start'>
-                        <Avatar src={game.awayTeam.logoUrl} name={game.awayTeam.shortCode} size={30} />
+                        <Image
+                                                className='h-10 w-10 rounded-full object-cover border border-gray-400'
+                                                src={game.awayTeam.logoUrl || "https://placehold.co/40x40/cccccc/333333?text=${team.name.charAt(0)}"}
+                                                height={60}
+                                                width={60}
+                                                placeholder="blur"
+                                                blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkqAcAAIUAgUW0RjgAAAAASUVORK5CYII="
+                                                alt={`${game.awayTeam.shortCode} Logo`}
+                                                // onError={(e) => { e.currentTarget.src = `https://placehold.co/40x40/cccccc/333333?text=${team.name.charAt(0)}`; }}
+                                              />
                         <span className={`px-2 text-lg`}>{game.awayTeam.shortCode}</span>
                     </div>
                     <span className={`text-lg`}>{GameStatus.COMPLETED && game.awayScore}</span>
