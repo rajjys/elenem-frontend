@@ -5,13 +5,13 @@ import axios from 'axios';
 
 // --- TEMPORARY DEBUGGING LOGS ---
 console.log("DEBUG: process.env.NODE_ENV =", process.env.NODE_ENV);
-console.log("DEBUG: NEST_PUBLIC_API_URL (from env) =", process.env.NEST_PUBLIC_API_URL);
+console.log("DEBUG: NEXT_PUBLIC_API_URL (from env) =", process.env.NEXT_PUBLIC_API_URL);
 // --------------------------------
 
 const isProd = process.env.NODE_ENV === 'production';
 export const api = axios.create({
   baseURL: isProd
-    ? process.env.NEST_PUBLIC_API_URL
+    ? process.env.NEXT_PUBLIC_API_URL
     : "http://localhost:3333/", // Use env var only in prod, localhost in dev
   withCredentials: true,
   headers: {
