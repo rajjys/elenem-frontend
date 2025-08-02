@@ -12,7 +12,7 @@ import { Avatar } from '@/components/ui';
 import GamePublicCard from '@/components/game/game-public-card';
 import { format } from 'date-fns';
 import GamesPageSkeleton from '@/components/game/games-page-skeleton';
-import DateCarousel from '@/components/game/date-carousel';
+//import DateCarousel from '@/components/game/date-carousel';
 
 
 interface TenantWithGames {
