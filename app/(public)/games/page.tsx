@@ -38,6 +38,12 @@ export default function PublicGamesPage() {
       try {
           const response = await api.get<string[]>('/public/games/dates');
           const dates = response.data;
+          console.log("Available daes:", dates);
+          if (!dates || dates.length === 0) {
+            toast.error("Aucune date de match disponible.");
+            console.warn("No available dates found.");
+            return;
+          }
           setAvailableDates(dates);
           if (dates.length > 0) {
           // Select today's date if available, otherwise the first available date
