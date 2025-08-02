@@ -12,7 +12,7 @@ import { Avatar } from '@/components/ui';
 import GamePublicCard from '@/components/game/game-public-card';
 import { format } from 'date-fns';
 import GamesPageSkeleton from '@/components/game/games-page-skeleton';
-//import DateCarousel from '@/components/game/date-carousel';
+import DateCarousel from '@/components/game/date-carousel';
 
 
 interface TenantWithGames {
@@ -36,6 +36,7 @@ export default function PublicGamesPage() {
   // Fetch available dates on initial load
   async function fetchDates() {
       try {
+          console.log("Fetching Game Dates...");
           const response = await api.get<string[]>('/public/games/dates');
           const dates = response.data;
           console.log("Available daes:", dates);
@@ -112,7 +113,7 @@ export default function PublicGamesPage() {
             <CardTitle className='text-gray-500 text-base px-2'>Selectionner une date</CardTitle>
           </CardHeader>
           <CardContent className="grid gap-4 md:gap-6 grid-cols-1">
-            
+            <DateCarousel dates={availableDates} selectedDate={selectedDate} onDateSelect={setSelectedDate} />
           </CardContent>
         </Card>
         {loadingGames ? (
