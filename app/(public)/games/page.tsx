@@ -112,7 +112,7 @@ export default function PublicGamesPage() {
             <CardTitle className='text-gray-500 text-base px-2'>Selectionner une date</CardTitle>
           </CardHeader>
           <CardContent className="grid gap-4 md:gap-6 grid-cols-1">
-            <DateCarousel dates={availableDates} selectedDate={selectedDate} onDateSelect={setSelectedDate} />
+            
           </CardContent>
         </Card>
         {loadingGames ? (
