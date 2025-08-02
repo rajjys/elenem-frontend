@@ -71,7 +71,6 @@ export default function PublicGamesPage() {
   }, []);
 
   useEffect(() => {
-    
      fetchDates(); 
   }, []);
 
