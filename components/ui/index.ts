@@ -21,3 +21,4 @@ export * from './progress';
 export * from './game-card';
 export * from './skeleton';
 export * from './status-badge';
+export * from './BlogPostCard';

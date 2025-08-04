@@ -21,7 +21,7 @@ export default function FileUploadTester() {
 
   // The base URL for your NestJS backend.
   // Use a development URL for local testing.
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3333';
+  const API_BASE_URL = 'http://localhost:3333';
 
   // Handles the file selection from the input
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {

@@ -27,22 +27,28 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
     };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      let value = e.target.value;
+    let value = e.target.value;
+    // Don't programmatically set value for file inputs
+    if (e.target.type !== "file") {
       if (restrict === 'uppercase') value = value.toUpperCase();
       if (restrict === 'numeric') value = value.replace(/[^0-9]/g, '');
       if ((type === 'number' || restrict === 'year') && maxCharacters !== undefined) {
         if (value.length > maxCharacters) value = value.slice(0, maxCharacters);
       }
       e.target.value = value;
-      onChange?.(e);
-    };
+    }
+    onChange?.(e);
+  };
 
-    const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-      let value = e.target.value;
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    let value = e.target.value;
+    // Don't programmatically set value for file inputs
+    if (e.target.type !== "file") {
       if (restrict === 'uppercase') { value = value.toUpperCase(); e.target.value = value; }
       if (autoTrim && value.trim() !== value) { value = value.trim(); e.target.value = value; }
-      onBlur?.(e);
-    };
+    }
+    onBlur?.(e);
+  };
 
     const isSearchType = type === 'search';
 
