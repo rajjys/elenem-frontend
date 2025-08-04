@@ -21,6 +21,7 @@ const publicPaths = [
   '/games', '/games/', '/games/*',     // Public game listings on the root domain
   '/tenants', '/tenants/', '/tenants/*', // Public tenant profiles on the root domain
   '/seasons', '/seasons/', '/seasons/*', // Public season profiles on the root domain
+  '/upload', '/upload/', '/upload/*',
   '/login', '/register', '/access-denied', 
   '/blogs',
   '/health', '/health/', '/health/*',
