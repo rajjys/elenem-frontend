@@ -25,7 +25,7 @@ const publicPaths = [
   '/login', '/register', '/access-denied', 
   '/blogs',
   '/health', '/health/', '/health/*',
-  '/news', '/news/', 'news/*', // Public news articles on the root domain
+  '/news', '/news/', '/news/*', // Public news articles on the root domain
    '/contact', '/pricing', '/features', '/terms', '/privacy'
 ];
 

@@ -8,7 +8,7 @@ import { FiSun, FiMoon, FiSearch, FiAward, FiUser, FiChevronDown } from 'react-i
 import { usePathname } from 'next/navigation';
 import { useAuthStore } from '@/store/auth.store'; // Assuming this path
 // Import lucide-react icons for sport types
-import {  Volleyball, Trophy, Home, Users, Newspaper, ListOrdered } from 'lucide-react';
+import {  Volleyball, Trophy, Home, Users, Newspaper} from 'lucide-react';
 import { Role, SportType } from '@/schemas';
 import Image from 'next/image';
 import UserAvatar from '../users/user-avatar';
@@ -53,8 +53,7 @@ const defaultNavLinks: NavLink[] = [
   { label: 'Accueil', href: '/', icon: Home },
   { label: 'Matchs', href: '/games', icon: Trophy }, // This icon will be dynamically updated
   { label: 'Organisations', href: '/tenants', icon: Users },
-  { label: 'Actualites', href: '/news', icon: Newspaper },
-  { label: 'Classements', href: '/standings', icon: ListOrdered },
+  { label: 'Actualites', href: '/news', icon: Newspaper }
 ];
 
 export const PublicHeader = ({
