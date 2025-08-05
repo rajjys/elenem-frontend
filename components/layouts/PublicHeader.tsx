@@ -8,15 +8,37 @@ import { FiSun, FiMoon, FiSearch, FiAward, FiUser, FiChevronDown } from 'react-i
 import { usePathname } from 'next/navigation';
 import { useAuthStore } from '@/store/auth.store'; // Assuming this path
 // Import lucide-react icons for sport types
-import {  Volleyball, Trophy, Home, Users, Newspaper} from 'lucide-react';
+import {  Volleyball, Trophy, Home, Users, Newspaper, ListOrdered} from 'lucide-react';
 import { Role, SportType } from '@/schemas';
 import Image from 'next/image';
 import UserAvatar from '../users/user-avatar';
+
+const hrefIconMap: Record<string, React.ElementType> = {
+  '/': Home,
+  '/games': Trophy, // Gets overridden dynamically
+  '/tenants': Users,
+  '/news': Newspaper,
+  '/standings': ListOrdered,
+};
+
+const extendNavLinksWithIcons = (
+  navLinks: NavLink[],
+  sportType: SportType
+): (NavLink & { icon?: React.ElementType })[] => {
+  return navLinks.map(({ label, href }) => {
+    const icon =
+      href === '/games'
+        ? getSportIcon(sportType)
+        : hrefIconMap[href] || undefined;
+    return { label, href, icon };
+  });
+};
+
+
 // Define the props interface for PublicHeader
 interface NavLink {
   label: string;
   href: string;
-  icon?: React.ElementType; // For the bottom nav and fiba style
 }
 
 interface PublicHeaderProps {
@@ -50,10 +72,10 @@ const getSportIcon = (sportType: PublicHeaderProps['sportType']) => {
 
 // Default navigation links with their corresponding lucide-react icons
 const defaultNavLinks: NavLink[] = [
-  { label: 'Accueil', href: '/', icon: Home },
-  { label: 'Matchs', href: '/games', icon: Trophy }, // This icon will be dynamically updated
-  { label: 'Organisations', href: '/tenants', icon: Users },
-  { label: 'Actualites', href: '/news', icon: Newspaper }
+  { label: 'Accueil', href: '/' },
+  { label: 'Matchs', href: '/games' }, // This icon will be dynamically updated
+  { label: 'Organisations', href: '/tenants' },
+  { label: 'Actualites', href: '/news' }
 ];
 
 export const PublicHeader = ({
@@ -101,12 +123,8 @@ export const PublicHeader = ({
     '/'; // Fallback for non-management users (though button won't show)
 
   // Update the 'Matchs' navLink with the correct sport icon based on sportType prop
-  const updatedNavLinks = navLinks.map(link => {
-    if (link.href === '/games') {
-      return { ...link, icon: getSportIcon(sportType) };
-    }
-    return link;
-  });
+  const updatedNavLinks = extendNavLinksWithIcons(navLinks, sportType);
+
 
   return (
     <>
