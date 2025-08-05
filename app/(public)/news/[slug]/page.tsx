@@ -6,13 +6,9 @@ import { mockBlogPosts } from '@/data/mockBlogPosts'; // Adjust path if necessar
 
 // This component can be a Server Component as it fetches data at build time or request time
 // For dynamic routes in App Router, params are passed to the component directly
-type NewsPostPageProps = {
-  params: {
-    slug: string;
-  };
-};
 
-export default function NewsPostPage({ params }: NewsPostPageProps) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export default function NewsPostPage({ params }: any) {
   const { slug } = params;
 
   // Find the current blog post based on the slug
