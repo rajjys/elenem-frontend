@@ -2,20 +2,14 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
-import { Card } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
 import { api } from '@/services/api';
 import { toast } from 'sonner';
-import { useDebounce } from 'use-debounce';
 import { SportType } from '@/schemas';
-import { CountryDropdown } from 'react-country-region-selector';
-import { Building, Search, Shield, Users } from 'lucide-react';
+import { Building } from 'lucide-react';
+import PublicTenantCard from '@/components/tenant/public-tenant-card';
+import PublicTenantCardSkeleton from '@/components/tenant/public-tenant-card-skeleton';
+import PublicTenantsFilters from '@/components/tenant/public-tenants-filters';
 
 // --- Helper Types ---
 interface Tenant {
@@ -32,120 +26,6 @@ interface Tenant {
     leagues: number;
     teams: number;
   };
-}
-
-// --- Skeleton Components ---
-function TenantCardSkeleton() {
-    return (
-        <Card className="overflow-hidden transition-shadow hover:shadow-lg">
-            <div className="md:flex">
-                <div className="md:w-1/3">
-                    <Skeleton className="h-48 w-full md:h-full" />
-                </div>
-                <div className="md:w-2/3 p-6 flex flex-col">
-                    <Skeleton className="h-7 w-3/4 mb-2" />
-                    <Skeleton className="h-4 w-1/4 mb-4" />
-                    <Skeleton className="h-4 w-full mb-2" />
-                    <Skeleton className="h-4 w-5/6 mb-4" />
-                    <div className="mt-auto flex items-center space-x-6">
-                        <Skeleton className="h-6 w-20" />
-                        <Skeleton className="h-6 w-20" />
-                    </div>
-                </div>
-            </div>
-        </Card>
-    );
-}
-
-// --- Main Components ---
-function TenantCard({ tenant }: { tenant: Tenant }) {
-
-    const ROOT_DOMAIN = process.env.NODE_ENV === 'development' ? 
-                        process.env.NEXT_PUBLIC_HOME_URL_LOCAL : process.env.NEXT_PUBLIC_HOME_URL;
-    const protocol = process.env.NODE_ENV === 'development' ? 'http://' : 'https://';
-    const tenantUrl = `${protocol}${tenant.slug}.${ROOT_DOMAIN}`;
-    
-    return (
-        <Link href={tenantUrl} target="_blank" rel="noopener noreferrer">
-            <Card className="overflow-hidden transition-shadow hover:shadow-xl duration-300 group mb-2">
-                <div className="md:flex">
-                    <div className="md:w-1/3 md:flex-shrink-0">
-                        <div className="relative h-48 w-full md:h-full">
-                            <Image
-                                src={tenant.bannerImageUrl || `https://placehold.co/600x400/eee/ccc?text=${tenant.name}`}
-                                alt={`${tenant.name} banner`}
-                                fill
-                                style={{ objectFit: 'cover' }}
-                                className="transition-transform duration-300 group-hover:scale-105"
-                            />
-                        </div>
-                    </div>
-                    <div className="md:w-2/3 p-6 flex flex-col bg-card">
-                        <h2 className="text-2xl font-bold tracking-tight text-card-foreground group-hover:text-primary">
-                            {tenant.name}
-                        </h2>
-                        <p className="text-sm font-mono text-muted-foreground mb-3">{tenant.tenantCode}</p>
-                        <p className="text-muted-foreground text-sm line-clamp-2 flex-grow">
-                            {tenant.description || 'A leading organization in the world of sports.'}
-                        </p>
-                        <div className="mt-4 pt-4 border-t flex items-center space-x-6 text-sm">
-                            <div className="flex items-center gap-2">
-                                <Shield className="h-5 w-5 text-primary" />
-                                <span>{tenant._count.leagues} Leagues</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <Users className="h-5 w-5 text-primary" />
-                                <span>{tenant._count.teams} Teams</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </Card>
-        </Link>
-    );
-}
-
-function TenantsFilters({ onFilterChange }: { onFilterChange: (filters: {search?: string, sportType?: string, country?: string}) => void }) {
-    const [search, setSearch] = useState('');
-    const [sportType, setSportType] = useState('');
-    const [country, setCountry] = useState('');
-    const [debouncedSearch] = useDebounce(search, 500);
-
-    useEffect(() => {
-        onFilterChange({
-            search: debouncedSearch || undefined,
-            sportType: sportType || undefined,
-            country: country || undefined,
-        });
-    }, [debouncedSearch, sportType, country, onFilterChange]);
-
-    return (
-        <div className="p-4 bg-card border rounded-lg grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
-            <div>
-                <Label htmlFor="search">Search Tenant</Label>
-                <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                    <Input id="search" placeholder="Name or code..." value={search} onChange={e => setSearch(e.target.value)} className="pl-10" />
-                </div>
-            </div>
-            <div>
-                <Label htmlFor="sportType">Sport</Label>
-                <Select value={sportType} onValueChange={setSportType}>
-                    <SelectTrigger id="sportType"><SelectValue placeholder="Tout les sports" /></SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="null">Tout les sports</SelectItem>
-                        {Object.values(SportType).map(type => (
-                            <SelectItem key={type} value={type}>{type.replace('_', ' ')}</SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
-            </div>
-            <div>
-                <Label htmlFor="country">Pays</Label>
-                <CountryDropdown value={country} onChange={setCountry} className="w-full p-2 border rounded-md bg-transparent" />
-            </div>
-        </div>
-    );
 }
 
 export default function PublicTenantsPage() {
@@ -188,13 +68,13 @@ export default function PublicTenantsPage() {
                     <p className="mt-2 text-lg text-muted-foreground">Browse the federations and organizations on our platform.</p>
                 </header>
 
-                <TenantsFilters onFilterChange={setFilters} />
+                <PublicTenantsFilters onFilterChange={setFilters} />
 
                 <div className="space-y-6">
                     {loading && page === 1 ? (
-                        Array.from({ length: 5 }).map((_, i) => <TenantCardSkeleton key={i} />)
+                        Array.from({ length: 5 }).map((_, i) => <PublicTenantCardSkeleton key={i} />)
                     ) : tenants.length > 0 ? (
-                        tenants.map(tenant => <TenantCard key={tenant.id} tenant={tenant} />)
+                        tenants.map(tenant => <PublicTenantCard key={tenant.id} tenant={tenant} />)
                     ) : (
                         <div className="text-center py-16 bg-card rounded-lg border">
                             <h3 className="text-xl font-semibold">No Organizations Found</h3>
