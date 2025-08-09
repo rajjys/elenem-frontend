@@ -2,7 +2,7 @@
 
 export type BlogPost = {
   id: string;
-  tenantSlug: 'eubago' | 'ebabuk' | 'lifnoki'; // Added tenantSlug
+  tenantSlug: 'eubago' | 'eubabuk' | 'lifnoki'; // Added tenantSlug
   title: string;
   content: string;
   author: string;
@@ -67,7 +67,7 @@ export const mockBlogPosts: BlogPost[] = [
   // --- Ebabuk (Bukavu - Basketball) ---
   {
     id: 'b6',
-    tenantSlug: 'ebabuk',
+    tenantSlug: 'eubabuk',
     title: 'Les Jaguars de Bukavu en Course pour le Titre !',
     content: 'Les Jaguars ont démarré la saison de manière fulgurante, avec une série de victoires impressionnantes. Leur cohésion d\'équipe et la forme exceptionnelle de leur meneur de jeu les placent comme de sérieux prétendants au titre local.',
     author: 'Antoine Bukavu',
@@ -77,7 +77,7 @@ export const mockBlogPosts: BlogPost[] = [
   },
   {
     id: 'b7',
-    tenantSlug: 'ebabuk',
+    tenantSlug: 'eubabuk',
     title: 'L\'Importance de la Défense en Zone au Basketball',
     content: 'La défense en zone est une tactique souvent sous-estimée mais cruciale. Nous explorons comment les équipes de Bukavu l\'utilisent pour contrer les attaques adverses et protéger leur panier.',
     author: 'Léo Coach',
@@ -87,7 +87,7 @@ export const mockBlogPosts: BlogPost[] = [
   },
   {
     id: 'b8',
-    tenantSlug: 'ebabuk',
+    tenantSlug: 'eubabuk',
     title: 'Interview avec la Star Montante de Bukavu',
     content: 'Rencontre exclusive avec Sarah Mbuyi, la jeune ailière qui a captivé l\'attention de tous à Bukavu. Elle partage ses aspirations, ses entraînements et la vie d\'une athlète professionnelle.',
     author: 'Chloé Reporter',
@@ -97,7 +97,7 @@ export const mockBlogPosts: BlogPost[] = [
   },
   {
     id: 'b9',
-    tenantSlug: 'ebabuk',
+    tenantSlug: 'eubabuk',
     title: 'Les Blessures les Plus Courantes au Basket et Comment les Éviter',
     content: 'Le basketball est un sport exigeant. Cet article examine les blessures les plus fréquentes et propose des conseils de prévention pour les joueurs de tous niveaux, avec des exemples spécifiques à la ligue de Bukavu.',
     author: 'Dr. Sport',
@@ -107,7 +107,7 @@ export const mockBlogPosts: BlogPost[] = [
   },
   {
     id: 'b10',
-    tenantSlug: 'ebabuk',
+    tenantSlug: 'eubabuk',
     title: 'Comment le Basket-ball Fait Vibrer la Jeunesse de Bukavu',
     content: 'Au-delà du sport, le basketball est un vecteur de développement social pour la jeunesse de Bukavu. Des programmes locaux encouragent la participation et inculquent des valeurs d\'équipe et de discipline.',
     author: 'Éducateur Social',
@@ -199,7 +199,7 @@ export const mockBlogPosts: BlogPost[] = [
   },
   {
     id: 'b13',
-    tenantSlug: 'ebabuk',
+    tenantSlug: 'eubabuk',
     title: 'L\'Évolution du Tir à Trois Points à Bukavu',
     content: 'Le tir à trois points est devenu une arme indispensable. Nous examinons comment les équipes de Bukavu ont adapté leur jeu pour en faire un élément central de leur stratégie.',
     author: 'Analyste Jeu',
@@ -209,7 +209,7 @@ export const mockBlogPosts: BlogPost[] = [
   },
   {
     id: 'b14',
-    tenantSlug: 'ebabuk',
+    tenantSlug: 'eubabuk',
     title: 'Les Défis des Ligues de Basket Amateurs au Kivu',
     content: 'Malgré la passion, les ligues amateurs de basketball au Kivu font face à des défis importants, notamment en termes d\'infrastructures et de financement.',
     author: 'Défenseur Sportif',

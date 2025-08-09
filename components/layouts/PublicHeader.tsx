@@ -19,6 +19,7 @@ const hrefIconMap: Record<string, React.ElementType> = {
   '/tenants': Users,
   '/news': Newspaper,
   '/standings': ListOrdered,
+  '/teams': Users,
 };
 
 const extendNavLinksWithIcons = (
