@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, use } from 'react';
 import Link from 'next/link';
 import { GameDetails, GameStatus } from '@/schemas'; // Assuming GameStatus is a valid import
 import TenantHeroSection from "@/components/public/tenant-hero-section";
@@ -98,8 +98,8 @@ interface Standing {
     points: number;
     form?: string | null;
 }
-const TenantLandingPage = ({ params }: { params: { tenantSlug: string } }) => {
-    const { tenantSlug } = params;
+const TenantLandingPage = ({ params }: { params: Promise<{ tenantSlug: string }> }) => {
+    const { tenantSlug } = use(params);
     const [games, setGames] = useState<GameDetails[]>([]);
     const [loading, setLoading] = useState(true);
     const [tenant, setTenant] = useState<PublicTenantDetails | null>(null);
@@ -315,12 +315,12 @@ const TenantLandingPage = ({ params }: { params: { tenantSlug: string } }) => {
             <div className={`space-y-4 py-6 bg-gradient-to-b from-${primary}-900 to-transparent`} >
                     {mainLeagues.length > 0 ? (
                         <Card className={`shadow-sm max-w-2xl mx-auto`}>
-                            <CardTitle><h2 className="text-2xl font-bold text-gray-700 pl-4 pt-4">Classements {tenant?.name}</h2></CardTitle>
+                            <CardTitle><div className="text-2xl font-bold text-gray-700  text-center pl-4 pt-4">Classements {tenant?.name}</div></CardTitle>
                             <CardContent className="p-6">
                                 <Tabs value={selectedLeagueSlug || ''} onValueChange={setSelectedLeagueSlug} className="w-full">
-                                    <TabsList className="grid w-full grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+                                    <TabsList className="flex justify-between items-center">
                                         {mainLeagues.map((league) => (
-                                            <TabsTrigger key={league.id} value={league.slug} className="text-xs md:text-sm">
+                                            <TabsTrigger key={league.id} value={league.slug} className="text-xs md:text-sm cursor-pointer hover:bg-gray-200 focus:bg-gray-300">
                                                 {league.name}
                                             </TabsTrigger>
                                         ))}
