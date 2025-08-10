@@ -1,0 +1,109 @@
+// Define the Standing type based on the backend response
+
+import Image from "next/image";
+import { Skeleton } from "../ui";
+
+// This is a simplified version for the landing page
+interface Standing {
+    team: {
+        id: string;
+        name: string;
+        shortCode: string;
+        logoUrl?: string | null;
+    };
+    rank: number;
+    points: number;
+    form?: string | null;
+}
+
+// --- StandingsTable Component ---
+interface StandingsTableProps {
+    standings: Standing[];
+    rowsToShow?: number;
+    isLoading: boolean;
+}
+
+const StandingsTable: React.FC<StandingsTableProps> = ({ standings, rowsToShow = 5, isLoading }) => {
+    if (isLoading) {
+        return (
+            <div className="space-y-4">
+                {Array.from({ length: rowsToShow }).map((_, i) => (
+                    <div key={i} className="flex items-center space-x-4">
+                        <Skeleton className="h-8 w-8 rounded-full" />
+                        <div className="space-y-2 flex-grow">
+                            <Skeleton className="h-4 w-3/4" />
+                        </div>
+                        <Skeleton className="h-4 w-12" />
+                        <Skeleton className="h-4 w-12" />
+                    </div>
+                ))}
+            </div>
+        );
+    }
+    
+    if (!standings || standings.length === 0) {
+        return (
+            <div className="text-center py-8 text-muted-foreground">
+                Aucun classement disponible pour cette ligue.
+            </div>
+        );
+    }
+
+    const standingsToDisplay = standings.slice(0, rowsToShow);
+
+    return (
+        <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                    <tr>
+                        <th className="py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            #
+                        </th>
+                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Équipe
+                        </th>
+                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Points
+                        </th>
+                        {/* You can add more columns here if needed */}
+                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Forme
+                        </th>
+                    </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                    {standingsToDisplay.map((standing) => (
+                        <tr key={standing.team.id}>
+                            <td className="py-2 whitespace-nowrap text-sm text-gray-900">
+                                {standing.rank}
+                            </td>
+                            <td className="px-4 py-2 whitespace-nowrap text-sm font-medium text-gray-900">
+                                <div className="flex items-center justify-start space-x-2">
+                                    <Image
+                                      className='h-8 w-8 rounded-full object-cover border border-gray-400 mr-2'
+                                      src={standing.team.logoUrl || "https://placehold.co/40x40/cccccc/333333?text=${team.name.charAt(0)}"}
+                                      height={60}
+                                      width={60}
+                                      placeholder="blur"
+                                      blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkqAcAAIUAgUW0RjgAAAAASUVORK5CYII="
+                                      alt={`${standing.team.shortCode} Logo`}
+                                      // onError={(e) => { e.currentTarget.src = `https://placehold.co/40x40/cccccc/333333?text=${team.name.charAt(0)}`; }}
+                                    />
+                                    {standing.team.name}
+                                </div>
+                            </td>
+                            <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 font-bold">
+                                <span className="pl-4">{standing.points}</span>
+                            </td>
+                            <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {standing.form}
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+        </div>
+    );
+};
+
+export default StandingsTable;

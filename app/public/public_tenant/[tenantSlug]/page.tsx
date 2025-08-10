@@ -8,6 +8,9 @@ import GamePublicCard from '@/components/game/game-public-card'; // Assuming thi
 import { Skeleton } from "@/components/ui/skeleton";
 import { Plus } from 'lucide-react'; // For the "details" icon
 import { api } from '@/services/api';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui';
+import StandingsTable from '@/components/public/standings-table';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 // Define the interface for the game data to ensure type safety.
 // This matches the structure returned by the new public games endpoint.
@@ -66,34 +69,45 @@ import { api } from '@/services/api';
     } | null;
 }
     */
+// Define the interface for the tenant data to ensure type safety.
+interface PublicTenantDetails {
+    id: string;
+    slug: string;
+    name: string;
+    description: string;
+    bannerImageUrl?: string | null;
+    logoUrl?: string | null;
+    leagues: {
+        id: string;
+        name: string;
+        slug: string;
+        parentLeagueId: string | null;
+    }[];
+}
 
-// A simple component to show a loading state for the games section
-const GamesSectionSkeleton = ({ primaryColor }: { primaryColor: string }) => (
-    <div className={`p-4 bg-${primaryColor}-900`}>
-        <div className="flex items-center justify-between mb-4">
-            <Skeleton className="h-8 w-1/4 bg-gray-600" />
-            <Skeleton className="h-8 w-24 rounded-md bg-gray-600 md:block hidden" />
-        </div>
-        {/* Horizontal Carousel Skeleton */}
-        <div className="md:flex md:space-x-4 overflow-hidden hidden">
-            {[...Array(4)].map((_, i) => (
-                <Skeleton key={i} className="h-48 w-full md:w-1/3 lg:w-1/4 rounded-md bg-gray-600 flex-shrink-0" />
-            ))}
-        </div>
-        {/* Mobile Stacked Skeleton */}
-        <div className="space-y-2 md:hidden">
-            {[...Array(4)].map((_, i) => (
-                <Skeleton key={i} className="h-32 w-full rounded-md bg-gray-600" />
-            ))}
-            <Skeleton className="h-8 w-full rounded-md bg-gray-600" />
-        </div>
-    </div>
-);
-
-const LandingPage = ({ params }: { params: { tenantSlug: string } }) => {
+// Define the Standing type based on the backend response
+// This is a simplified version for the landing page
+interface Standing {
+    team: {
+        id: string;
+        name: string;
+        shortCode: string;
+        logoUrl?: string | null;
+    };
+    rank: number;
+    points: number;
+    form?: string | null;
+}
+const TenantLandingPage = ({ params }: { params: { tenantSlug: string } }) => {
     const { tenantSlug } = params;
     const [games, setGames] = useState<GameDetails[]>([]);
     const [loading, setLoading] = useState(true);
+    const [tenant, setTenant] = useState<PublicTenantDetails | null>(null);
+    const [mainLeagues, setMainLeagues] = useState<{ id: string; name: string; slug: string }[]>([]);
+    const [selectedLeagueSlug, setSelectedLeagueSlug] = useState<string | null>(null);
+    const [standings, setStandings] = useState<Standing[]>([]);
+    const [loadingStandings, setLoadingStandings] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
     const themeColors: Record<string, { primary: string; secondary: string }> = {
         eubago: { primary: 'indigo', secondary: 'orange' },
@@ -104,48 +118,129 @@ const LandingPage = ({ params }: { params: { tenantSlug: string } }) => {
     const { primary, secondary } = themeColors[tenantSlug] || themeColors.default;
 
     useEffect(() => {
-        const fetchGames = async () => {
-            setLoading(true);
+  const fetchTenantAndGames = async () => {
+    if (!tenantSlug) return;
+    setLoading(true);
+    try {
+      // Fetch tenant data
+      const tenantResponse = await api.get(`/public-tenants/${tenantSlug}`);
+      setTenant(tenantResponse.data);
+      console.log("Tenant data:", tenantResponse.data);
+      // Identify main leagues
+      const mainLeagues = tenantResponse.data.leagues
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .sort((a: any, b: any) => {
+            if (a.parentLeagueId === null && b.parentLeagueId !== null) return -1;
+            if (a.parentLeagueId !== null && b.parentLeagueId === null) return 1;
+            return 0;
+        })
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .map((league: any) => ({
+            id: league.id,
+            name: league.name,
+            slug: league.slug,
+        }));
+
+      setMainLeagues(mainLeagues);
+
+      // Set default selected league
+      if (mainLeagues.length > 0) {
+        setSelectedLeagueSlug(mainLeagues[0].slug);
+      }
+
+      // Fetch and process games
+      const gamesResponse = await api.get<GameDetails[]>(`/public/games/search`, {
+        params: { tenantSlug },
+      });
+      const fetchedGames = gamesResponse.data;
+
+      const upcomingInProgress = fetchedGames.filter(
+        (game) =>
+          game.status === GameStatus.IN_PROGRESS ||
+          (game.status === GameStatus.SCHEDULED && new Date(game.dateTime) > new Date())
+      );
+
+      const completed = fetchedGames.filter(
+        (game) => game.status === GameStatus.COMPLETED
+      );
+
+      upcomingInProgress.sort(
+        (a, b) => new Date(a.dateTime).getTime() - new Date(b.dateTime).getTime()
+      );
+      completed.sort(
+        (a, b) => new Date(a.dateTime).getTime() - new Date(b.dateTime).getTime()
+      );
+
+      const sortedGames =
+        upcomingInProgress.length > 0
+          ? [...upcomingInProgress].slice(0, 12)
+          : completed.length > 0
+          ? [...completed].slice(0, 12)
+          : [];
+
+      setGames(sortedGames);
+    } catch (error) {
+      setError('Failed to fetch data');
+      console.error(error);
+      setGames([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchTenantAndGames();
+}, [tenantSlug]);
+        // Fetch standings when the selected league changes
+    useEffect(() => {
+        const fetchStandings = async () => {
+            if (!selectedLeagueSlug) {
+                setStandings([]);
+                return;
+            }
+
+            setLoadingStandings(true);
             try {
-                // Using axios to fetch games from the new public endpoint
-                const response = await api.get<GameDetails[]>(
-                    `/public/games/search`, {
-                    params: { tenantSlug }
-                });
-                const fetchedGames = response.data;
-                
-                // Separate games into upcoming/in-progress and completed
-                const upcomingInProgress = fetchedGames.filter(game => 
-                    game.status === GameStatus.IN_PROGRESS ||
-                   (game.status === GameStatus.SCHEDULED && new Date(game.dateTime) > new Date())
-
-                );
-                const completed = fetchedGames.filter(game => 
-                    game.status === GameStatus.COMPLETED
-                );
-                
-                // Sort upcoming games by date ascending
-                upcomingInProgress.sort((a, b) => new Date(a.dateTime).getTime() - new Date(b.dateTime).getTime());
-                
-                // Sort completed games by date descending (most recent first)
-                completed.sort((a, b) => new Date(b.dateTime).getTime() - new Date(a.dateTime).getTime());
-
-                // Combine and limit the number of games to a maximum of 12
-                const sortedGames = upcomingInProgress.length > 0 ? [...upcomingInProgress].slice(0, 12):
-                                    completed.length > 0 ?          [...completed].slice(0, 12)         : [];
-                
-                setGames(sortedGames);
-            } catch (error) {
-                console.error("Failed to fetch games:", error);
-                setGames([]); // Set to empty array on error
+                const standingsResponse = await api.get(`/public/games/standings/${selectedLeagueSlug}`);
+                setStandings(standingsResponse.data);
+            } catch (err) {
+                console.error("Failed to fetch standings:", err);
+                setStandings([]); // Clear standings on error
             } finally {
-                setLoading(false);
+                setLoadingStandings(false);
             }
         };
+        fetchStandings();
+    }, [selectedLeagueSlug]);
 
-        fetchGames();
-    }, [tenantSlug]);
-
+    if (loading) {
+        return (
+            <div className="space-y-8 p-4 md:p-8">
+                <Skeleton className="h-64 w-full rounded-lg" />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <Card>
+                        <CardHeader><Skeleton className="h-8 w-1/2" /></CardHeader>
+                        <CardContent className="space-y-4">
+                             {/* Skeleton for games */}
+                            {Array.from({ length: 3 }).map((_, i) => (
+                                <Skeleton key={i} className="h-20 w-full" />
+                            ))}
+                        </CardContent>
+                    </Card>
+                    <Card>
+                        <CardHeader><Skeleton className="h-8 w-1/2" /></CardHeader>
+                        <CardContent className="space-y-4">
+                            <StandingsTable standings={[]} isLoading={true} />
+                        </CardContent>
+                    </Card>
+                </div>
+            </div>
+        );
+    }
+    if(error) {
+        return <div className='flex h-screen items-center justify-center'>
+            <p className='text-red text-xl'>Une Erreur s&apos;est produite</p>
+        </div>
+    }
     return (
         <div>
             {/* Hero Section */}
@@ -156,13 +251,10 @@ const LandingPage = ({ params }: { params: { tenantSlug: string } }) => {
             />
 
             {/* Games Section */}
-            <div className={`py-8 bg-${primary}-900 text-white`}>
-                <div className="container mx-auto">
-                    {loading ? (
-                        <GamesSectionSkeleton primaryColor={primary} />
-                    ) : (
+            <div className={`py-4 bg-${primary}-900 text-white`}>
+                    
                         <div>
-                            <div className="flex items-center justify-between mb-6">
+                            <div className="flex items-center justify-between px-8 mb-4">
                                 <h2 className="text-2xl font-bold">Matchs</h2>
                                 {/* "Voir Touts les matchs" link for larger screens */}
                                 {games.length > 0 && (
@@ -179,9 +271,9 @@ const LandingPage = ({ params }: { params: { tenantSlug: string } }) => {
                             {games.length > 0 ? (
                                 <>
                                     {/* Carousel for md and lg screens */}
-                                    <div className="hidden md:flex flex-row space-x-4 overflow-x-auto snap-x snap-mandatory">
+                                    <div className="hidden md:flex flex-row overflow-x-auto snap-x snap-mandatory">
                                         {games.map((game) => (
-                                            <div key={game.id} className="w-[calc(100%/3 - 1.33rem)] lg:w-[calc(100%/4)] flex-shrink-0 snap-center">
+                                            <div key={game.id} className="min-w-[calc(100%/2)] lg:min-w-[calc(100%/4)] flex-shrink-0 snap-center">
                                                 <Link href={`/games/${game.slug}`} className="block">
                                                     <GamePublicCard game={game} />
                                                 </Link>
@@ -216,11 +308,48 @@ const LandingPage = ({ params }: { params: { tenantSlug: string } }) => {
                                 </div>
                             )}
                         </div>
+            </div>
+            {/* Video Section */}
+
+            {/* Standings Section */}
+            <div className={`space-y-4 py-6 bg-gradient-to-b from-${primary}-900 to-transparent`} >
+                    {mainLeagues.length > 0 ? (
+                        <Card className={`shadow-sm max-w-2xl mx-auto`}>
+                            <CardTitle><h2 className="text-2xl font-bold text-gray-700 pl-4 pt-4">Classements {tenant?.name}</h2></CardTitle>
+                            <CardContent className="p-6">
+                                <Tabs value={selectedLeagueSlug || ''} onValueChange={setSelectedLeagueSlug} className="w-full">
+                                    <TabsList className="grid w-full grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+                                        {mainLeagues.map((league) => (
+                                            <TabsTrigger key={league.id} value={league.slug} className="text-xs md:text-sm">
+                                                {league.name}
+                                            </TabsTrigger>
+                                        ))}
+                                    </TabsList>
+                                    {mainLeagues.map((league) => (
+                                        <TabsContent key={league.id} value={league.slug} className="mt-6">
+                                            <StandingsTable standings={standings} isLoading={loadingStandings} rowsToShow={5} />
+                                            {/* "Classements Complet" link */}
+                                            {!loadingStandings && standings.length > 0 && (
+                                                <div className="mt-4 flex justify-center">
+                                                    <Link href={`/standings?leagueSlug=${selectedLeagueSlug}`} className="text-sm font-semibold text-blue-500 hover:underline">
+                                                        Classements Complet
+                                                    </Link>
+                                                </div>
+                                            )}
+                                        </TabsContent>
+                                    ))}
+                                </Tabs>
+                            </CardContent>
+                        </Card>
+                    ) : (
+                         <div className="text-center py-16 rounded-lg border">
+                            <h3 className="text-xl font-semibold">Pas de Classements Disponibles</h3>
+                            <p className="mt-2 text-muted-foreground">Aucun classement n&apos;est disponible pour le moment.</p>
+                        </div>
                     )}
                 </div>
-            </div>
         </div>
     );
 };
 
-export default LandingPage;
+export default TenantLandingPage;

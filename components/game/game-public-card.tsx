@@ -44,35 +44,35 @@ const GamePublicCard: React.FC<GamePublicCardProps> = ({game}) => {
                 <div className={`flex items-center justify-between w-full pb-2 ${homeTeamStyle}`}>
                     <div className='flex items-center justify-start'>
                         <Image
-                                                className='h-10 w-10 rounded-full object-cover border border-gray-400'
-                                                src={game.homeTeam.logoUrl || "https://placehold.co/40x40/cccccc/333333?text=${team.name.charAt(0)}"}
-                                                height={60}
-                                                width={60}
-                                                placeholder="blur"
-                                                blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkqAcAAIUAgUW0RjgAAAAASUVORK5CYII="
-                                                alt={`${game.homeTeam.shortCode} Logo`}
-                                                // onError={(e) => { e.currentTarget.src = `https://placehold.co/40x40/cccccc/333333?text=${team.name.charAt(0)}`; }}
-                                              />
-                        <span className={`px-2 text-lg`} >{game.homeTeam.shortCode}</span>
+                           className='h-8 w-8 rounded-full object-cover border border-gray-400'
+                           src={game.homeTeam.logoUrl || "https://placehold.co/40x40/cccccc/333333?text=${team.name.charAt(0)}"}
+                           height={60}
+                           width={60}
+                           placeholder="blur"
+                           blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkqAcAAIUAgUW0RjgAAAAASUVORK5CYII="
+                           alt={`${game.homeTeam.shortCode} Logo`}
+                           // onError={(e) => { e.currentTarget.src = `https://placehold.co/40x40/cccccc/333333?text=${team.name.charAt(0)}`; }}
+                         />
+                        <span className={`px-2 text-sm md:text-base`} >{game.homeTeam.shortCode}</span>
                     </div>
-                    <span className={`text-lg`}>{GameStatus.COMPLETED && game.homeScore}</span>
+                    <span className={`text-sm md:text-base`}>{GameStatus.COMPLETED && game.homeScore}</span>
                 </div>
                 {/**TEAM 2 */}
-                <div className={`flex items-center justify-between space-x-2 pb-2 ${awayTeamStyle}`}>
+                <div className={`flex items-center justify-between space-x-2 ${awayTeamStyle}`}>
                     <div className='flex items-center justify-start'>
                         <Image
-                                                className='h-10 w-10 rounded-full object-cover border border-gray-400'
-                                                src={game.awayTeam.logoUrl || "https://placehold.co/40x40/cccccc/333333?text=${team.name.charAt(0)}"}
-                                                height={60}
-                                                width={60}
-                                                placeholder="blur"
-                                                blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkqAcAAIUAgUW0RjgAAAAASUVORK5CYII="
-                                                alt={`${game.awayTeam.shortCode} Logo`}
-                                                // onError={(e) => { e.currentTarget.src = `https://placehold.co/40x40/cccccc/333333?text=${team.name.charAt(0)}`; }}
-                                              />
-                        <span className={`px-2 text-lg`}>{game.awayTeam.shortCode}</span>
+                          className='h-8 w-8 rounded-full object-cover border border-gray-400'
+                          src={game.awayTeam.logoUrl || "https://placehold.co/40x40/cccccc/333333?text=${team.name.charAt(0)}"}
+                          height={60}
+                          width={60}
+                          placeholder="blur"
+                          blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkqAcAAIUAgUW0RjgAAAAASUVORK5CYII="
+                          alt={`${game.awayTeam.shortCode} Logo`}
+                          // onError={(e) => { e.currentTarget.src = `https://placehold.co/40x40/cccccc/333333?text=${team.name.charAt(0)}`; }}
+                        />
+                        <span className={`px-2 text-sm md:text-base`}>{game.awayTeam.shortCode}</span>
                     </div>
-                    <span className={`text-lg`}>{GameStatus.COMPLETED && game.awayScore}</span>
+                    <span className={`text-sm md:text-base`}>{GameStatus.COMPLETED && game.awayScore}</span>
                 </div>
             </div>
             {/*Game Location Info */}

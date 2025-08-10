@@ -202,7 +202,7 @@ const TenantHeroSection: React.FC<TenantHeroSectionProps> = ({ tenantSlug, prima
             />
           </div>
         {/* Text content below the image */}
-        <div className={`flex h-1/5 flex-col justify-end bg-${primaryColor}-900 p-4 transition-all duration-500 ease-in-out`}>
+        <div className={`flex h-1/5 flex-col z-12 justify-end bg-${primaryColor}-900 p-4 transition-all duration-500 ease-in-out`}>
           <Link href={`/news/${currentPost?.slug}`}>
             <h2 className="text-3xl font-bold text-white transition-all duration-500 ease-in-out hover:text-gray-300">
               {currentPost?.title}
