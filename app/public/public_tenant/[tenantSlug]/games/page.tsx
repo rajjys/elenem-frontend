@@ -106,7 +106,7 @@ export default function PublicGamesPage({ params }: { params: Promise<{ tenantSl
     <div className="min-h-screen max-w-2xl mx-auto">
       <div className="container mx-auto p-4 sm:p-6 space-y-8">
         <header>
-          <h1 className="text-4xl font-bold tracking-tight text-gray-800">Matchs et Résultats: {tenantData?.tenantName}</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-gray-800">Matchs et Résultats: {tenantData?.tenantName}</h1>
           <p className="mt-2 text-md text-gray-500">Parcourez les Matchs publics de: {tenantData?.tenantName}.</p>
         </header>
         <Card className="overflow-hidden shadow-sm">

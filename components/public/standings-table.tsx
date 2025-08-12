@@ -23,7 +23,7 @@ interface StandingsTableProps {
     isLoading: boolean;
 }
 
-const StandingsTable: React.FC<StandingsTableProps> = ({ standings, rowsToShow = 5, isLoading }) => {
+const StandingsTable: React.FC<StandingsTableProps> = ({ standings, rowsToShow = standings.length, isLoading }) => {
     if (isLoading) {
         return (
             <div className="space-y-4">
