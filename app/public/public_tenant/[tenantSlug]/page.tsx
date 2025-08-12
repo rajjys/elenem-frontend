@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, use } from 'react';
 import Link from 'next/link';
-import { GameDetails, GameStatus } from '@/schemas'; // Assuming GameStatus is a valid import
+import { BlogPost, GameDetails, GameStatus } from '@/schemas'; // Assuming GameStatus is a valid import
 import TenantHeroSection from "@/components/public/tenant-hero-section";
 import GamePublicCard from '@/components/game/game-public-card'; // Assuming this is the correct path
 import { Skeleton } from "@/components/ui/skeleton";
@@ -11,7 +11,8 @@ import { api } from '@/services/api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui';
 import StandingsTable from '@/components/public/standings-table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-
+import { mockBlogPosts } from '@/data/mockBlogPosts';
+import VerticalBlogPostCard from '@/components/ui/vertical-blogpost-card';
 // Define the interface for the game data to ensure type safety.
 // This matches the structure returned by the new public games endpoint.
 /* interface GameDetails {
@@ -84,7 +85,6 @@ interface PublicTenantDetails {
         parentLeagueId: string | null;
     }[];
 }
-
 // Define the Standing type based on the backend response
 // This is a simplified version for the landing page
 interface Standing {
@@ -106,8 +106,10 @@ const TenantLandingPage = ({ params }: { params: Promise<{ tenantSlug: string }>
     const [mainLeagues, setMainLeagues] = useState<{ id: string; name: string; slug: string }[]>([]);
     const [selectedLeagueSlug, setSelectedLeagueSlug] = useState<string | null>(null);
     const [standings, setStandings] = useState<Standing[]>([]);
+    const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
     const [loadingStandings, setLoadingStandings] = useState(false);
     const [error, setError] = useState<string | null>(null);
+
 
     const themeColors: Record<string, { primary: string; secondary: string }> = {
         eubago: { primary: 'indigo', secondary: 'orange' },
@@ -157,7 +159,7 @@ const TenantLandingPage = ({ params }: { params: Promise<{ tenantSlug: string }>
       const upcomingInProgress = fetchedGames.filter(
         (game) =>
           game.status === GameStatus.IN_PROGRESS ||
-          (game.status === GameStatus.SCHEDULED && new Date(game.dateTime) > new Date())
+          (game.status === GameStatus.SCHEDULED)
       );
 
       const completed = fetchedGames.filter(
@@ -179,6 +181,9 @@ const TenantLandingPage = ({ params }: { params: Promise<{ tenantSlug: string }>
           : [];
 
       setGames(sortedGames);
+      const recentPosts = getRecentPosts(tenantSlug, mockBlogPosts);
+      setBlogPosts(recentPosts);
+      
     } catch (error) {
       setError('Failed to fetch data');
       console.error(error);
@@ -211,6 +216,13 @@ const TenantLandingPage = ({ params }: { params: Promise<{ tenantSlug: string }>
         };
         fetchStandings();
     }, [selectedLeagueSlug]);
+
+
+    // This function filters and sorts posts for a given tenant.
+    const getRecentPosts = (tenantSlug: string, posts: BlogPost[]) => {
+    const filteredPosts = posts.filter(post => post.tenantSlug === tenantSlug);
+    return filteredPosts.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 10);
+    };
 
     if (loading) {
         return (
@@ -245,7 +257,7 @@ const TenantLandingPage = ({ params }: { params: Promise<{ tenantSlug: string }>
         <div>
             {/* Hero Section */}
             <TenantHeroSection
-                tenantSlug={tenantSlug}
+                blogPosts={blogPosts.slice(0, 5)}
                 primaryColor={primary}
                 secondaryColor={secondary}
             />
@@ -255,7 +267,7 @@ const TenantLandingPage = ({ params }: { params: Promise<{ tenantSlug: string }>
                     
                         <div>
                             <div className="flex items-center justify-between px-8 mb-4">
-                                <h2 className="text-2xl font-bold">Matchs</h2>
+                                <h2 className="text-2xl font-bold pl-56">Matchs</h2>
                                 {/* "Voir Touts les matchs" link for larger screens */}
                                 {games.length > 0 && (
                                     <Link 
@@ -271,9 +283,9 @@ const TenantLandingPage = ({ params }: { params: Promise<{ tenantSlug: string }>
                             {games.length > 0 ? (
                                 <>
                                     {/* Carousel for md and lg screens */}
-                                    <div className="hidden md:flex flex-row overflow-x-auto snap-x snap-mandatory">
+                                    <div className="hidden md:flex flex-row overflow-x-auto snap-x snap-mandatory md:pl-42 lg:pl-56 no-scrollbar">
                                         {games.map((game) => (
-                                            <div key={game.id} className="min-w-[calc(100%/2)] lg:min-w-[calc(100%/4)] flex-shrink-0 snap-center">
+                                            <div key={game.id} className="min-w-[calc(100%/2)] lg:min-w-[calc(100%/3)]">
                                                 <Link href={`/games/${game.slug}`} className="block">
                                                     <GamePublicCard game={game} />
                                                 </Link>
@@ -347,7 +359,30 @@ const TenantLandingPage = ({ params }: { params: Promise<{ tenantSlug: string }>
                             <p className="mt-2 text-muted-foreground">Aucun classement n&apos;est disponible pour le moment.</p>
                         </div>
                     )}
+            </div>
+            {/* Recent News Section */}
+            <div className="space-y-4 py-4 bg-gray-400">
+                
+                <div className='text-white'>
+                    <h2 className="text-2xl font-bold pl-2 md:pl-42 lg:pl-56 pb-4 lg:py-6">Dernières Actus</h2>
+                    {
+                        blogPosts.length > 0 ? (
+                            <div className="flex space-x-4 overflow-x-auto pb-4 pl-2 md:pl-42 lg:pl-56 no-scrollbar">
+                                {blogPosts.slice(0, 10).map((post, index) =>( 
+                                <span key={index} className='flex-shrink-0 w-52'>
+                                    <VerticalBlogPostCard post={post} themeColor={secondary} />
+                                </span>))}
+                            </div>
+                        ) : (
+                            <div className="text-center py-16 rounded-lg border">
+                                <h3 className="text-xl font-semibold">Pas d&apos;informations disponibles</h3>
+                                <p className="mt-2 text-muted-foreground">Aucune actualité n&apos;est disponible pour le moment.</p>
+                            </div>
+                        )
+                    }
                 </div>
+                    
+            </div>
         </div>
     );
 };

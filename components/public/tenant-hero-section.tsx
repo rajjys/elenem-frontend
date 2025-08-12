@@ -1,38 +1,15 @@
 'use client';
-
-import { mockBlogPosts } from '@/data/mockBlogPosts';
+import { BlogPost } from '@/schemas';
 import Link from 'next/link';
 import React, { useState, useEffect, useRef } from 'react';
 
-// Define the BlogPost type based on the provided mock data structure.
-// This should match the type definition in your mockBlogPosts.ts file.
-export type BlogPost = {
-  id: string;
-  tenantSlug: 'eubago' | 'eubabuk' | 'lifnoki';
-  title: string;
-  content: string;
-  author: string;
-  date: string;
-  imageUrl: string;
-  slug: string;
-};
-
-// This function filters and sorts posts for a given tenant.
-const getRecentPosts = (tenantSlug: string, posts: BlogPost[]) => {
-  const filteredPosts = posts.filter(post => post.tenantSlug === tenantSlug);
-  return filteredPosts.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 5);
-};
-
-
 interface TenantHeroSectionProps {
-  tenantSlug: string;
+  blogPosts: BlogPost[];
   primaryColor: string;
   secondaryColor: string;
 }
 
-const TenantHeroSection: React.FC<TenantHeroSectionProps> = ({ tenantSlug, primaryColor, secondaryColor }) => {
-  // State to store the list of blog posts
-  const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
+const TenantHeroSection: React.FC<TenantHeroSectionProps> = ({ primaryColor, secondaryColor, blogPosts }) => {
   // State to track the current index of the displayed blog post
   const [currentPostIndex, setCurrentPostIndex] = useState(0);
   // State to handle the progress of the current timer
@@ -60,22 +37,6 @@ const TenantHeroSection: React.FC<TenantHeroSectionProps> = ({ tenantSlug, prima
     }
   };
 
-  // Effect to fetch blog posts and handle cleanup
-  useEffect(() => {
-    const recentPosts = getRecentPosts(tenantSlug, mockBlogPosts);
-    setBlogPosts(recentPosts);
-    
-    // Cleanup function to clear timers when the component unmounts or tenantSlug changes
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-      if (animationFrameRef.current) {
-        cancelAnimationFrame(animationFrameRef.current);
-      }
-    };
-  }, [tenantSlug]);
-
   // Effect to manage the carousel timer and progress bar animation
   useEffect(() => {
     if (blogPosts.length > 0) {
@@ -99,7 +60,7 @@ const TenantHeroSection: React.FC<TenantHeroSectionProps> = ({ tenantSlug, prima
         setCurrentPostIndex(prevIndex => (prevIndex + 1) % blogPosts.length);
       }, duration);
     }
-  }, [blogPosts, currentPostIndex]);
+  }, [blogPosts.length, currentPostIndex]);
 
   // Handler for manual clicks on progress bars
   const handlePostChange = (index: number) => {

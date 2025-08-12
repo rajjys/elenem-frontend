@@ -33,6 +33,18 @@
 
 @source inline("via-{green,red,orange,blue,indigo,yellow,emerald,pink,purple,violet,gray,gold}-{900}");
 
+/* Utility class for hiding scrollbar while keeping the scroll functionality*/
+@layer utilities {
+  .no-scrollbar {
+    -ms-overflow-style: none;     /* IE and Edge */
+    scrollbar-width: none;        /* Firefox */
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;                /* Chrome, Safari, Opera */
+  }
+}
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
