@@ -9,7 +9,7 @@ import { JwtPayload } from './types';
 // Use a fallback for development if NEXT_PUBLIC_ROOT_DOMAIN is not set.
 // For Vercel deployments, this will typically be your production domain.
 // For local development, you might use 'localhost:3000' or similar.
-const ROOT_DOMAIN = process.env.NODE_ENV === 'development' ? 'lvh.me:3000' : 'website.com';
+const ROOT_DOMAIN = process.env.NODE_ENV === 'development' ? 'lvh.me:3000' : process.env.NEXT_PUBLIC_ROOT_DOMAIN  || 'elenem.site';
 
 // Define public paths that are accessible to everyone, regardless of authentication status.
 // These are typically paths on the root domain (e.g., website.com/login, website.com/leagues)
