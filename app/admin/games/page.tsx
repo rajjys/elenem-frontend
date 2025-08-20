@@ -10,7 +10,7 @@ import { GamesFilters } from '@/components/game/games-filters'; // Your new Game
 import { Pagination, LoadingSpinner, Button, Badge } from '@/components/ui/'; // Your Pagination components
 import { GameCard } from '@/components/ui'; // Your existing GameCard component
 import { toast } from 'sonner'; // Your toast notification library (e.g., Sonner)
-import { Role } from '@/schemas'; // Assuming Role enum is here
+import { Roles } from '@/schemas'; // Assuming Role enum is here
 import { useAuthStore } from '@/store/auth.store'; // Auth store to get user roles
 import { useContextualLink } from '@/hooks'; // Your useContextualLink hook
 
@@ -74,7 +74,7 @@ export default function AdminGamesPage() {
 
   useEffect(() => {
     // Authorization check for System Admin
-    if (!user || !currentUserRoles.includes(Role.SYSTEM_ADMIN)) {
+    if (!user || !currentUserRoles.includes(Roles.SYSTEM_ADMIN)) {
       toast.error("Unauthorized", { description: "You do not have permission to view this page." });
       // router.push('/dashboard'); // Uncomment to redirect
       return;

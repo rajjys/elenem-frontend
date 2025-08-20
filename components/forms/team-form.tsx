@@ -17,7 +17,7 @@ import { FiChevronDown, FiChevronRight, FiInfo, FiMapPin, FiUsers, FiAward, FiSe
 
 import { useAuthStore } from '@/store/auth.store';
 import { api } from '@/services/api';
-import { Role, TeamVisibility } from '@/schemas'; // Assuming these are from your Prisma client
+import { Roles, TeamVisibility } from '@/schemas'; // Assuming these are from your Prisma client
 import {
   CreateTeamFormSchema,
   UpdateTeamByLaFormSchema,
@@ -72,10 +72,10 @@ export const TeamForm: React.FC<TeamFormProps> = ({
 }) => {
   const userAuth = useAuthStore((state) => state.user);
   const currentUserRoles = userAuth?.roles || [];
-  const isSystemAdmin = currentUserRoles.includes(Role.SYSTEM_ADMIN);
-  const isTenantAdmin = currentUserRoles.includes(Role.TENANT_ADMIN);
-  const isLeagueAdmin = currentUserRoles.includes(Role.LEAGUE_ADMIN);
-  const isTeamAdmin = currentUserRoles.includes(Role.TEAM_ADMIN);
+  const isSystemAdmin = currentUserRoles.includes(Roles.SYSTEM_ADMIN);
+  const isTenantAdmin = currentUserRoles.includes(Roles.TENANT_ADMIN);
+  const isLeagueAdmin = currentUserRoles.includes(Roles.LEAGUE_ADMIN);
+  const isTeamAdmin = currentUserRoles.includes(Roles.TEAM_ADMIN);
 
   // Determine the schema based on user role and edit mode
   // 1. Dynamically select the schema and default values

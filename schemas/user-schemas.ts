@@ -1,6 +1,6 @@
 // src/prisma/user-schemas.ts
 import * as z from 'zod';
-import { GenderSchema, Role, RoleSchema, SupportedLanguage, SupportedLanguageSchema } from '.';// Assuming Role enum is exported from your main prisma.ts or similar
+import { GenderSchema, Roles, RoleSchema, SupportedLanguages, SupportedLanguageSchema } from '.';// Assuming Role enum is exported from your main prisma.ts or similar
 
 // --- Enums ---
 
@@ -15,7 +15,7 @@ export const UserBasicSchema = z.object({
   email: z.string().email('Invalid email address'),
   firstName: z.string().min(1, 'First name is required'),
   lastName: z.string().min(1, 'Last name is required'),
-  roles: z.array((RoleSchema)).default([Role.GENERAL_USER]), // User can have multiple roles
+  roles: z.array((RoleSchema)).default([Roles.GENERAL_USER]), // User can have multiple roles
   isActive: z.boolean(),
   avatarUrl: z.string().url().optional().or(z.literal('')).nullable(), // Allowing empty string for optional URL
   profileImageUrl: z.string().url().optional().or(z.literal('')).nullable(), // Allowing empty string for optional URL
@@ -146,7 +146,7 @@ export const UserFilterSchema = z.object({
   managingLeagueId: z.string().cuid().optional().nullable(), // Filter by association as league admin (can be null for unassigned)
   managingTeamId: z.string().cuid().optional().nullable(), // Filter by association as team admin (can be null for unassigned)
   gender: GenderSchema.optional(),
-  preferredLanguage: z.nativeEnum(SupportedLanguage).optional(),
+  preferredLanguage: z.nativeEnum(SupportedLanguages).optional(),
   page: z.number().int().min(1).default(1).optional(),
   pageSize: z.number().int().min(1).max(50).default(10).optional(), // Max 50 per page is a reasonable default limit
   sortBy: z.enum(['firstName', 'lastName', 'email', 'username', 'createdAt', 'updatedAt', 'lastLoginAt']).default('createdAt').optional(),

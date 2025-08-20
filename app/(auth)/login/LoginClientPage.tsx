@@ -2,7 +2,7 @@
 'use client'; // THIS IS CRUCIAL: Marks this as a Client Component
 
 import { LoginForm } from "@/components/forms/login-form";
-import { Role } from "@/schemas";
+import { Roles } from "@/schemas";
 import { useAuthStore } from "@/store/auth.store";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect } from "react"; // Import useEffect and React
@@ -20,13 +20,13 @@ export default function LoginClientPage() {
       } else {
         const userRoles = user.roles || [];
 
-        if (userRoles.includes(Role.SYSTEM_ADMIN)) {
+        if (userRoles.includes(Roles.SYSTEM_ADMIN)) {
           router.push("/admin/dashboard");
-        } else if (userRoles.includes(Role.TENANT_ADMIN)) {
+        } else if (userRoles.includes(Roles.TENANT_ADMIN)) {
           router.push("/tenant/dashboard");
-        } else if (userRoles.includes(Role.LEAGUE_ADMIN)) {
+        } else if (userRoles.includes(Roles.LEAGUE_ADMIN)) {
           router.push("/league/dashboard");
-        } else if (userRoles.includes(Role.TEAM_ADMIN)) {
+        } else if (userRoles.includes(Roles.TEAM_ADMIN)) {
           router.push("/team/dashboard");
         } else {
           router.push("/account/dashboard");

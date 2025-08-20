@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { LeagueForm } from "@/components/forms/league-form";
 import { api } from "@/services/api";
-import { LeagueDetails, Role } from "@/schemas";
+import { LeagueDetails, Roles } from "@/schemas";
 import { toast } from "sonner";
 import { useAuthStore } from "@/store/auth.store";
 import { LoadingSpinner } from "@/components/ui";
@@ -43,9 +43,9 @@ export default function EditLeaguePage() {
       // Redirect to the leagues listing page, or the newly created league's detail page
       ///Redirect to league listing based on user role
       const currentUserRoles = userAuth?.roles || [];
-      const isSystemAdmin = currentUserRoles.includes(Role.SYSTEM_ADMIN);
-      const isTenantAdmin = currentUserRoles.includes(Role.TENANT_ADMIN);
-      const isLeagueAdmin = currentUserRoles.includes(Role.LEAGUE_ADMIN)
+      const isSystemAdmin = currentUserRoles.includes(Roles.SYSTEM_ADMIN);
+      const isTenantAdmin = currentUserRoles.includes(Roles.TENANT_ADMIN);
+      const isLeagueAdmin = currentUserRoles.includes(Roles.LEAGUE_ADMIN)
       const redirectPath = isSystemAdmin ? "/admin/leagues":
                            isTenantAdmin ? "/tenant/leagues" :
                            isLeagueAdmin ? "/league/dashboard":
@@ -78,7 +78,7 @@ export default function EditLeaguePage() {
       <h1 className="text-3xl font-bold text-gray-900 mb-6 text-center">
         Edit League: {league.name}
       </h1>
-      <AccessGate allowedRoles={[Role.SYSTEM_ADMIN, Role.TENANT_ADMIN, Role.LEAGUE_ADMIN]}>
+      <AccessGate allowedRoles={[Roles.SYSTEM_ADMIN, Roles.TENANT_ADMIN, Roles.LEAGUE_ADMIN]}>
         <LeagueForm
             initialData={league}
             isEditMode={true}

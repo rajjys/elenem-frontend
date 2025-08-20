@@ -13,7 +13,7 @@ import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
 import { api } from '@/services/api'; // Your actual API instance
 import { useAuthStore } from '@/store/auth.store'; // Your auth store
-import { LeagueBasic, Role, SeasonResponseDto, TenantBasic } from '@/schemas'; // Assuming Role enum is here
+import { LeagueBasic, Roles, SeasonResponseDto, TenantBasic } from '@/schemas'; // Assuming Role enum is here
 import { CreateSeasonSchema, SeasonStatus, CreateSeasonDto } from '@/schemas/'; // Your new season schemas
 
 interface SeasonFormProps {
@@ -26,9 +26,9 @@ export function SeasonForm({ initialData, onSuccess, onCancel }: SeasonFormProps
   const { user: userAuth } = useAuthStore();
   const currentUserRoles = userAuth?.roles || [];
 
-  const isSystemAdmin = currentUserRoles.includes(Role.SYSTEM_ADMIN);
-  const isTenantAdmin = currentUserRoles.includes(Role.TENANT_ADMIN);
-  const isLeagueAdmin = currentUserRoles.includes(Role.LEAGUE_ADMIN);
+  const isSystemAdmin = currentUserRoles.includes(Roles.SYSTEM_ADMIN);
+  const isTenantAdmin = currentUserRoles.includes(Roles.TENANT_ADMIN);
+  const isLeagueAdmin = currentUserRoles.includes(Roles.LEAGUE_ADMIN);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [loadingInitialData, setLoadingInitialData] = useState(true); // For initial fetches (tenants/leagues)

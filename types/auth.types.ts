@@ -1,6 +1,6 @@
 // src/types/auth.types.ts
 import { JWTPayload } from 'jose';
-import { Role } from '../schemas'; // Assuming Role enum is in your prisma/index.ts
+import { Roles } from '../schemas'; // Assuming Role enum is in your prisma/index.ts
 
 /**
  * Interface representing the custom claims within your JWT payload.
@@ -11,7 +11,7 @@ export interface JwtPayload extends JWTPayload {
   sub: string; // User ID (User.id) - standard JWT claim, often maps to `id`
   username: string;
   email: string;
-  roles: Role[]; // Array of roles
+  roles: Roles[]; // Array of roles
   tenantId: string | null; // Nullable tenant ID
   // Note: 'leagueId' from backend JwtPayload is typically not directly used for access control in JWT,
   // as managingLeagueId implies context. Keeping it out here for simplicity in middleware.

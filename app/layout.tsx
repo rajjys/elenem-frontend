@@ -5,6 +5,7 @@ import "./globals.css";
 // app/layout.tsx (if this is the root layout) or a specific public group layout
 import React, { ReactNode } from 'react';
 import { Inter } from 'next/font/google'; // Example font
+import { Toaster } from "sonner";
 
 const inter = Inter({ subsets: ['latin'] , variable: '--font-inter'});
 /*
@@ -20,6 +21,7 @@ export default function PublicLayout({ children }: { children: ReactNode }) {
     <html lang="en" className={`${inter.variable}`} suppressHydrationWarning>
       <body>
         {children}
+        <Toaster position="top-center" />
         </body>
     </html>
   );

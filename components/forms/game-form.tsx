@@ -13,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { toast } from 'sonner';
 import { api } from '@/services/api';
 import { useAuthStore } from '@/store/auth.store';
-import { Role } from '@/schemas';
+import { Roles } from '@/schemas';
 import { FiChevronDown, FiChevronRight, FiAward, FiCalendar, FiUsers, FiBarChart2, FiImage } from 'react-icons/fi';
 
 // --- Zod Schema for Validation ---
@@ -57,9 +57,9 @@ export function GameForm({ onSuccess, onCancel }: GameFormProps) {
   const { user } = useAuthStore();
   const currentUserRoles = user?.roles || [];
 
-  const isSystemAdmin = currentUserRoles.includes(Role.SYSTEM_ADMIN);
-  const isTenantAdmin = currentUserRoles.includes(Role.TENANT_ADMIN);
-  const isLeagueAdmin = currentUserRoles.includes(Role.LEAGUE_ADMIN);
+  const isSystemAdmin = currentUserRoles.includes(Roles.SYSTEM_ADMIN);
+  const isTenantAdmin = currentUserRoles.includes(Roles.TENANT_ADMIN);
+  const isLeagueAdmin = currentUserRoles.includes(Roles.LEAGUE_ADMIN);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [loading, setLoading] = useState({

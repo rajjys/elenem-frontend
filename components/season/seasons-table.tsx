@@ -13,7 +13,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/'; // Your UI components
 
-import { SeasonResponseDto, SeasonStatus, Role, SeasonSortableColumn } from '@/schemas'; // Your Season DTO
+import { SeasonResponseDto, SeasonStatus, Roles, SeasonSortableColumn } from '@/schemas'; // Your Season DTO
 
 import { ArrowUpDown, Pencil, Trash, MoreVertical } from 'lucide-react';
 
@@ -25,16 +25,16 @@ interface SeasonsTableProps {
   sortOrder: 'asc' | 'desc';
   sortBy: string;
   onDelete: (seasonId: string) => void;
-  currentUserRoles: Role[];
+  currentUserRoles: Roles[];
   currentTenantId?: string | null;
   currentLeagueId?: string | null;
 }
 
 export function SeasonsTable({ seasons, onSort, sortBy, sortOrder, onDelete, currentUserRoles, currentTenantId, currentLeagueId }: SeasonsTableProps) {
   const { buildLink } = useContextualLink();
-  const isSystemAdmin = currentUserRoles.includes(Role.SYSTEM_ADMIN);
-  const isTenantAdmin = currentUserRoles.includes(Role.TENANT_ADMIN);
-  const isLeagueAdmin = currentUserRoles.includes(Role.LEAGUE_ADMIN);
+  const isSystemAdmin = currentUserRoles.includes(Roles.SYSTEM_ADMIN);
+  const isTenantAdmin = currentUserRoles.includes(Roles.TENANT_ADMIN);
+  const isLeagueAdmin = currentUserRoles.includes(Roles.LEAGUE_ADMIN);
 
   const getSortIndicator = (column: string) => {
     if (sortBy === column) {

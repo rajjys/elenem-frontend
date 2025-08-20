@@ -1,13 +1,13 @@
 // src/prisma/tenant-schemas.ts
 import * as z from 'zod';
-import { SportType, Role, SportTypeSchema, TenantType, TenantTypeSchema, GameStatus } from './index'; // Assuming SportType and Role are defined in src/prisma/index.ts
+import { SportType, Roles, SportTypeSchema, TenantTypes, TenantTypeSchema, GameStatus, PublicBusinessProfileResponseDto } from './index'; // Assuming SportType and Role are defined in src/prisma/index.ts
 
 export interface TenantBasic {
   id: string;
   externalId: string;
   name: string;
   tenantCode: string;
-  tenantType: TenantType;
+  tenantType: TenantTypes;
   slug: string;
   logoUrl?: string | null;
   isActive: boolean;
@@ -23,7 +23,7 @@ export interface TenantBasic {
 export interface TenantFilterParams {
   search?: string;
   isActive?: boolean;
-  tenantType?: TenantType;
+  tenantType?: TenantTypes;
   sportType?: SportType;
   country?: string;
   page?: number;
@@ -169,7 +169,7 @@ export const UserResponseDtoSchema = z.object({
   email: z.string().email(),
   firstName: z.string().nullable().optional(),
   lastName: z.string().nullable().optional(),
-  role: z.nativeEnum(Role), // Include role to filter for GENERAL_USER
+  role: z.nativeEnum(Roles), // Include role to filter for GENERAL_USER
 });
 
 export type UserResponseDto = z.infer<typeof UserResponseDtoSchema>;
@@ -182,13 +182,13 @@ export const PaginatedUserResponseDtoSchema = z.object({
   pageSize: z.number(),
 });
 
-export type PaginatedResponseDto = z.infer<typeof PaginatedUserResponseDtoSchema>;
+export type PaginatedUserResponseDto = z.infer<typeof PaginatedUserResponseDtoSchema>;
 // Extend or create a new Zod schema for fetching parameters if necessary for owner dropdown
 export const GetUsersParamsSchema = z.object({
   page: z.number().int().min(1).optional(),
   pageSize: z.number().int().min(1).max(100).optional(),
   search: z.string().optional(),
-  roles: z.array(z.nativeEnum(Role)).optional(),
+  roles: z.array(z.nativeEnum(Roles)).optional(),
   tenantId: z.string().nullable().optional(),
   isActive: z.boolean().optional(),
   isVerified: z.boolean().optional(),
@@ -206,5 +206,20 @@ export const PaginatedTenantsResponseSchema = z.object({
   currentPage: z.number().int().min(1),
   pageSize: z.number().int().min(1),
 });
+
+// The frontend representation of the PublicTenantResponseDto
+export interface PublicTenantResponseDto {
+  id: string;
+  externalId: string;
+  slug: string;
+  name: string;
+  tenantCode: string;
+  sportType: SportType;
+  businessProfile: PublicBusinessProfileResponseDto;
+  _count: {
+    leagues: number;
+    teams: number;
+  };
+}
 
 export type PaginatedTenantsResponseDto = z.infer<typeof PaginatedTenantsResponseSchema>;

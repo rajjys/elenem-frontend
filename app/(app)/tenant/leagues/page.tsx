@@ -9,7 +9,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuthStore } from '@/store/auth.store';
 import { api } from '@/services/api';
 import { toast } from 'sonner';
-import { LeagueBasic, PaginatedLeaguesResponseSchema, Role } from '@/schemas';
+import { LeagueBasic, PaginatedLeaguesResponseSchema, Roles } from '@/schemas';
 import { useContextualLink } from '@/hooks';
 import { Plus, Settings } from 'lucide-react';
 
@@ -57,8 +57,8 @@ export default function TenantLeaguesPage() {
   const currentUserRoles = userAuth?.roles || [];
   const ctxTenantId = useSearchParams().get('ctxTenantId'); // Use search params if needed
   // Determine current tenant ID based on user roles
-      const isSystemAdmin = currentUserRoles.includes(Role.SYSTEM_ADMIN);
-      const isTenantAdmin = currentUserRoles.includes(Role.TENANT_ADMIN);
+      const isSystemAdmin = currentUserRoles.includes(Roles.SYSTEM_ADMIN);
+      const isTenantAdmin = currentUserRoles.includes(Roles.TENANT_ADMIN);
   const currentTenantId = isSystemAdmin
     ? ctxTenantId
     : isTenantAdmin

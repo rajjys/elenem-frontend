@@ -7,7 +7,7 @@ import { useAuthStore } from '@/store/auth.store'; // Assuming this path is corr
 // Import your existing components. Replace these with your actual paths.
 import { CollapsibleNavLink, FlyoutMenu, NavLink } from '.'; // Adjust this import path if needed
 import { useContextualLink, useSidebarEligibility } from '@/hooks';
-import { Role } from '@/schemas'; // Assuming Role enum is here
+import { Roles } from '@/schemas'; // Assuming Role enum is here
 import { AppLayoutNavbar } from './AppLayourNavbar'; // Import the updated Navbar
 
 // Type for a React Icon component
@@ -54,13 +54,13 @@ export default function AppLayout({
   const [flyoutPosition, setFlyoutPosition] = useState<{ top: number; left: number } | null>(null);
   const [currentFlyoutTriggerRef, setCurrentFlyoutTriggerRef] = useState<RefObject<HTMLElement> | null>(null);
 
-  const isSystemAdmin = userAuth?.roles.includes(Role.SYSTEM_ADMIN);
-  const isTenantAdmin = userAuth?.roles.includes(Role.TENANT_ADMIN);
-  const isLeagueAdmin = userAuth?.roles.includes(Role.LEAGUE_ADMIN);
-  const isTeamAdmin   = userAuth?.roles.includes(Role.TEAM_ADMIN);
-  const isPlayer       = userAuth?.roles.includes(Role.PLAYER);
-  const isCoach        = userAuth?.roles.includes(Role.COACH);
-  const isReferee      = userAuth?.roles.includes(Role.REFEREE);
+  const isSystemAdmin = userAuth?.roles.includes(Roles.SYSTEM_ADMIN);
+  const isTenantAdmin = userAuth?.roles.includes(Roles.TENANT_ADMIN);
+  const isLeagueAdmin = userAuth?.roles.includes(Roles.LEAGUE_ADMIN);
+  const isTeamAdmin   = userAuth?.roles.includes(Roles.TEAM_ADMIN);
+  const isPlayer       = userAuth?.roles.includes(Roles.PLAYER);
+  const isCoach        = userAuth?.roles.includes(Roles.COACH);
+  const isReferee      = userAuth?.roles.includes(Roles.REFEREE);
 
   // dashboard link based on user roles
   const dashboardLink = isSystemAdmin ? '/admin/dashboard' :

@@ -21,7 +21,7 @@ import {
 
 import { Filter as FilterIcon } from 'lucide-react';
 
-import { SeasonFilterParams, SeasonStatus, Role } from '@/schemas'; // Your filter schema
+import { SeasonFilterParams, SeasonStatus, Roles } from '@/schemas'; // Your filter schema
 import { useAuthStore } from '@/store/auth.store';
 import { api } from '@/services/api'; // Your API instance
 import { toast } from 'sonner';
@@ -39,8 +39,8 @@ interface LeagueBasicDto { id: string; name: string; tenantId: string; }
 
 export function SeasonsFilters({ filters, onFilterChange, onPageSizeChange, fixedTenantId, fixedLeagueId }: SeasonsFiltersProps) {
   const user = useAuthStore((state) => state.user);
-  const isSystemAdmin = user?.roles?.includes(Role.SYSTEM_ADMIN);
-  const isTenantAdmin = user?.roles?.includes(Role.TENANT_ADMIN);
+  const isSystemAdmin = user?.roles?.includes(Roles.SYSTEM_ADMIN);
+  const isTenantAdmin = user?.roles?.includes(Roles.TENANT_ADMIN);
   //const isLeagueAdmin = user?.roles?.includes(Role.LEAGUE_ADMIN);
 
   const [search, setSearch] = useState(filters.search || '');

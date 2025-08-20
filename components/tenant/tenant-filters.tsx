@@ -11,7 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { useDebounce } from 'use-debounce'; // Your useDebounce hook
-import { TenantType, SportType, TenantFilterParams } from '@/schemas'; // Your Tenant types
+import { TenantTypes, SportType, TenantFilterParams } from '@/schemas'; // Your Tenant types
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '../ui';
 import { FilterIcon } from 'lucide-react';
 
@@ -29,7 +29,7 @@ interface TenantFiltersProps {
 export function TenantFilters({ filters, onFilterChange, onPageSizeChange }: TenantFiltersProps) {
   const [search, setSearch] = useState(filters.search || '');
   const [isActive, setIsActive] = useState<boolean | undefined>(filters.isActive);
-  const [selectedTenantType, setSelectedTenantType] = useState<TenantType | undefined>(filters.tenantType);
+  const [selectedTenantType, setSelectedTenantType] = useState<TenantTypes | undefined>(filters.tenantType);
   const [selectedSportType, setSelectedSportType] = useState<SportType | undefined>(filters.sportType);
   const [selectedCountry, setSelectedCountry] = useState<string | undefined>(filters.country);
   const [pageSizeInput, setPageSizeInput] = useState(String(filters.pageSize || 10));
@@ -40,7 +40,7 @@ export function TenantFilters({ filters, onFilterChange, onPageSizeChange }: Ten
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   // Memoize options for Selects
-  const tenantTypeOptions = useMemo(() => Object.values(TenantType).map(type => ({
+  const tenantTypeOptions = useMemo(() => Object.values(TenantTypes).map(type => ({
     value: type,
     label: type.replace(/_/g, ' ')
   })), []);
@@ -183,7 +183,7 @@ export function TenantFilters({ filters, onFilterChange, onPageSizeChange }: Ten
               <Label htmlFor="tenantType" className="block text-sm font-medium text-gray-700 mb-1">Tenant Type</Label>
               <Select
                 value={selectedTenantType}
-                onValueChange={(value: TenantType) => setSelectedTenantType(!value ? undefined : value)}
+                onValueChange={(value: TenantTypes) => setSelectedTenantType(!value ? undefined : value)}
               >
                 <SelectTrigger className="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
                   <SelectValue placeholder="Select Type" />

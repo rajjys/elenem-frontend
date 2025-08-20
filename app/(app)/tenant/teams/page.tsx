@@ -5,7 +5,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { api } from '@/services/api';
-import { TeamDetails, TeamFilterParams, TeamFilterParamsSchema, Role, SortableColumn } from '@/schemas/';
+import { TeamDetails, TeamFilterParams, TeamFilterParamsSchema, Roles, SortableColumn } from '@/schemas/';
 import { TeamsFilters, TeamsTable } from '@/components/team/';
 import { Pagination, LoadingSpinner, Button } from '@/components/ui/';
 import { toast } from 'sonner';
@@ -18,8 +18,8 @@ export default function TenantTeamsPage() {
   const ctxTenantId = useSearchParams().get('ctxTenantId'); // Use search params if needed
       
       // Determine current tenant ID based on user roles
-      const isSystemAdmin = currentUserRoles.includes(Role.SYSTEM_ADMIN);
-      const isTenantAdmin = currentUserRoles.includes(Role.TENANT_ADMIN);
+      const isSystemAdmin = currentUserRoles.includes(Roles.SYSTEM_ADMIN);
+      const isTenantAdmin = currentUserRoles.includes(Roles.TENANT_ADMIN);
       
       const currentTenantId = isSystemAdmin
       ? ctxTenantId

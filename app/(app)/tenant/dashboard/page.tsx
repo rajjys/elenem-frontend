@@ -4,7 +4,7 @@ import { useRouter, useSearchParams } from 'next/navigation'; // Or useNavigatio
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useAuthStore } from '@/store/auth.store';
-import { LeagueBasic, PaginatedLeaguesResponseSchema, Role, TenantDetails, TenantDetailsSchema } from '@/schemas';
+import { LeagueBasic, PaginatedLeaguesResponseSchema, Roles, TenantDetails, TenantDetailsSchema } from '@/schemas';
 import { api } from '@/services/api';
 import { toast } from 'sonner';
 import { useContextualLink } from '@/hooks';
@@ -46,8 +46,8 @@ export default function TenantDashboard() {
     const ctxTenantId = useSearchParams().get('ctxTenantId'); // Use search params if needed
     
     // Determine current tenant ID based on user roles
-    const isSystemAdmin = currentUserRoles.includes(Role.SYSTEM_ADMIN);
-    const isTenantAdmin = currentUserRoles.includes(Role.TENANT_ADMIN);
+    const isSystemAdmin = currentUserRoles.includes(Roles.SYSTEM_ADMIN);
+    const isTenantAdmin = currentUserRoles.includes(Roles.TENANT_ADMIN);
     
     const currentTenantId = isSystemAdmin
     ? ctxTenantId

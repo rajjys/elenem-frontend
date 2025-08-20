@@ -9,7 +9,7 @@ import { SortableColumn, TeamDetails, TeamFilterParams, TeamFilterParamsSchema }
 import { TeamsFilters, TeamsTable } from '@/components/team/'; // Your new TeamsFilters component
 import { Pagination, LoadingSpinner, Button } from '@/components/ui/'; // Your Pagination component
 import { toast } from 'sonner'; // Your toast notification library (e.g., Sonner)
-import { Role } from '@/schemas';
+import { Roles } from '@/schemas';
 import { useAuthStore } from '@/store/auth.store'; // Auth store to get user roles
 
 export default function AdminTeamsPage() {
@@ -70,7 +70,7 @@ export default function AdminTeamsPage() {
 
   useEffect(() => {
     // Authorization check for System Admin
-    if (!user || !currentUserRoles.includes(Role.SYSTEM_ADMIN)) {
+    if (!user || !currentUserRoles.includes(Roles.SYSTEM_ADMIN)) {
       toast.error("Unauthorized", { description: "You do not have permission to view this page." });
       //router.push('/dashboard'); // Redirect to a suitable page
       return;

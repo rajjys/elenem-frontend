@@ -5,7 +5,7 @@ import React, { useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { SeasonForm } from '@/components/forms/season-form'; // Adjust path as needed
 import { AccessGate } from '@/app/(auth)/AccessGate';
-import { Role } from '@/schemas'; // Adjust path to your Role enum
+import { Roles } from '@/schemas'; // Adjust path to your Role enum
 import { toast } from 'sonner';
 import { useAuthStore } from '@/store/auth.store';
 
@@ -18,9 +18,9 @@ export default function CreateSeasonPage() {
     ///Redirect to season listing based on user role
     const currentUserRoles = userAuth?.roles || [];
     
-    const isSystemAdmin = currentUserRoles.includes(Role.SYSTEM_ADMIN);
-    const isTenantAdmin = currentUserRoles.includes(Role.TENANT_ADMIN);
-    const isLeagueAdmin = currentUserRoles.includes(Role.LEAGUE_ADMIN);
+    const isSystemAdmin = currentUserRoles.includes(Roles.SYSTEM_ADMIN);
+    const isTenantAdmin = currentUserRoles.includes(Roles.TENANT_ADMIN);
+    const isLeagueAdmin = currentUserRoles.includes(Roles.LEAGUE_ADMIN);
     
     const redirectPath = isSystemAdmin ? "/admin/seasons":
                          isTenantAdmin ? "/tenant/seasons" :
@@ -38,7 +38,7 @@ export default function CreateSeasonPage() {
       <h1 className="text-3xl font-bold text-gray-900 mb-6 text-center">Create New Season</h1>
 
       {/* AccessGate to restrict who can access this creation form */}
-      <AccessGate allowedRoles={[Role.SYSTEM_ADMIN, Role.TENANT_ADMIN, Role.LEAGUE_ADMIN]}>
+      <AccessGate allowedRoles={[Roles.SYSTEM_ADMIN, Roles.TENANT_ADMIN, Roles.LEAGUE_ADMIN]}>
         <SeasonForm onSuccess={handleSuccess} onCancel={handleCancel} />
       </AccessGate>
     </div>

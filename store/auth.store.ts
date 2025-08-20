@@ -4,7 +4,12 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { api, setAuthToken } from '@/services/api';
 import Cookies from 'js-cookie';
-import { User } from '@/schemas'; // Import User and Role from your new frontend types
+import { RegisterFormSchema, User } from '@/schemas'; // Import User and Role from your new frontend types
+import z from 'zod';
+
+
+// Define the form schema for validation
+type RegisterFormValues = z.infer<typeof RegisterFormSchema>;
 
 interface AuthTokens {
   accessToken: string;
@@ -14,6 +19,7 @@ interface AuthTokens {
 interface AuthState {
   user: User | null;
   tokens: AuthTokens | null;
+  register: (values: RegisterFormValues) => Promise<void>;
   login: (usernameOrEmail: string, password: string, tenantCode?: string) => Promise<void>;
   logout: () => void;
   fetchUser: () => Promise<void>;
@@ -39,6 +45,16 @@ export const useAuthStore = create<AuthState>()(
           Cookies.remove('accessToken');
           // Cookies.remove('userRole'); // Removed as discussed.
         }
+      },
+      register: async (values) => {
+        const response = await api.post('/auth/register', values);
+
+        const { accessToken, refreshToken, user } = response.data;
+        get().setTokens({ accessToken, refreshToken });
+        set({ user });
+
+        // Optionally: redirect right here or let the caller handle it
+        // router.push('/account/dashboard');
       },
       login: async (usernameOrEmail, password, tenantCode) => {
         const payload = tenantCode ? { usernameOrEmail, password, tenantCode } : { usernameOrEmail, password };

@@ -1,7 +1,7 @@
 /// User Model frontend DTO
 
 import z from "zod";
-import { Gender, Role, SportType } from ".";
+import { Gender, Roles, SportType } from ".";
 
 // Basic Tenant type for nested relations in User
 interface BasicTenant {
@@ -41,7 +41,7 @@ export interface User {
   phone?: string | null; // Added from backend response
   profileImageUrl?: string | null;
   avatarUrl?: string | null; // Renamed from profilePictureUrl to match backend
-  roles: Role[]; // Array of roles
+  roles: Roles[]; // Array of roles
 
   tenantId?: string | null; // The ID of the tenant the user belongs to
   tenant?: BasicTenant | null; // Nested tenant object

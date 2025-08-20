@@ -1,7 +1,7 @@
 import z from "zod";
 
 //
-export enum Role {
+export enum Roles {
   SYSTEM_ADMIN = "SYSTEM_ADMIN",
   TENANT_ADMIN = "TENANT_ADMIN",
   LEAGUE_ADMIN = "LEAGUE_ADMIN",
@@ -24,7 +24,7 @@ export enum GameStatus {
   POSTPONED = 'POSTPONED',
   CANCELLED = 'CANCELLED'
 }
-export enum SupportedLanguage {
+export enum SupportedLanguages {
   ENGLISH = 'ENGLISH',
   FRANCAIS = 'FRANCAIS',
 }
@@ -32,7 +32,7 @@ export enum SupportedLanguage {
 // backend's `/auth/me` endpoint or contained within the JWT payload.
 // Zod schema for Role enum (useful for runtime validation of API responses or form data)
 
-export enum TenantType {
+export enum TenantTypes {
   COMMERCIAL = 'COMMERCIAL',
   NON_PROFIT = 'NON_PROFIT',
   GOVERNMENT = 'GOVERNMENT',
@@ -64,10 +64,10 @@ export enum TeamVisibility {
   PRIVATE = "PRIVATE", // Requires invitation or approval to view
   ARCHIVED = "ARCHIVED" // Old teams, viewable but inactive for new operations
 }
-export const RoleSchema = z.nativeEnum(Role);
+export const RoleSchema = z.nativeEnum(Roles);
 export const SportTypeSchema = z.nativeEnum(SportType);
 export const LeagueVisibilitySchema = z.nativeEnum(LeagueVisibility);
 export const TeamVisibilitySchema = z.nativeEnum(TeamVisibility); ///
-export const TenantTypeSchema = z.nativeEnum(TenantType);
+export const TenantTypeSchema = z.nativeEnum(TenantTypes);
 export const GenderSchema = z.nativeEnum(Gender);
-export const SupportedLanguageSchema = z.nativeEnum(SupportedLanguage);
+export const SupportedLanguageSchema = z.nativeEnum(SupportedLanguages);

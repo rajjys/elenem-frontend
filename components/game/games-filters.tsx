@@ -22,7 +22,7 @@ import {
 import { Filter as FilterIcon } from 'lucide-react';
 
 import { GameFilterParams } from '@/schemas'; // Your GameFilterParams schema
-import { GameStatus, Role } from '@/schemas'; // Prisma enums
+import { GameStatus, Roles } from '@/schemas'; // Prisma enums
 import { useAuthStore } from '@/store/auth.store';
 import { api } from '@/services/api'; // Your API instance
 import { toast } from 'sonner';
@@ -44,9 +44,9 @@ interface TeamBasicDto { id: string; name: string; leagueId: string; tenantId: s
 
 export function GamesFilters({ filters, onFilterChange, onPageSizeChange, fixedTenantId, fixedLeagueId, fixedSeasonId, fixedTeamId }: GamesFiltersProps) {
   const user = useAuthStore((state) => state.user);
-  const isSystemAdmin = user?.roles?.includes(Role.SYSTEM_ADMIN);
-  const isTenantAdmin = user?.roles?.includes(Role.TENANT_ADMIN);
-  const isLeagueAdmin = user?.roles?.includes(Role.LEAGUE_ADMIN);
+  const isSystemAdmin = user?.roles?.includes(Roles.SYSTEM_ADMIN);
+  const isTenantAdmin = user?.roles?.includes(Roles.TENANT_ADMIN);
+  const isLeagueAdmin = user?.roles?.includes(Roles.LEAGUE_ADMIN);
   //const isTeamAdmin = user?.roles?.includes(Role.TEAM_ADMIN);
 
   const [search, setSearch] = useState(filters.search || '');

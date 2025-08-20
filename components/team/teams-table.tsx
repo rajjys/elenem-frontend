@@ -38,7 +38,7 @@ import {
 //   tenant: { id: string; name: string; }; // Assuming tenant info is available
 //   managers?: Array<{ id: string; username: string; }>; // Assuming managers can be displayed
 // }
-import { Role} from '@/schemas'; // Import enums
+import { Roles} from '@/schemas'; // Import enums
 import { TeamDetails } from '@/schemas'; // Adjust path to your DTOs
 import { ArrowUpDown, MoreVertical, Pencil, Trash } from 'lucide-react';
 import Image from 'next/image';
@@ -51,16 +51,16 @@ interface TeamsTableProps {
   sortOrder: 'asc' | 'desc';
   sortBy: string;
   onDelete: (teamId: string) => void;
-  currentUserRoles: Role[];
+  currentUserRoles: Roles[];
   currentTenantId?: string | null;
   currentLeagueId?: string | null;
 }
 
 export function TeamsTable({ teams, onSort, sortBy, sortOrder, onDelete, currentUserRoles, currentTenantId, currentLeagueId }: TeamsTableProps) {
   const { buildLink } = useContextualLink();
-  const isSystemAdmin = currentUserRoles.includes(Role.SYSTEM_ADMIN);
-  const isTenantAdmin = currentUserRoles.includes(Role.TENANT_ADMIN);
-  const isLeagueAdmin = currentUserRoles.includes(Role.LEAGUE_ADMIN);
+  const isSystemAdmin = currentUserRoles.includes(Roles.SYSTEM_ADMIN);
+  const isTenantAdmin = currentUserRoles.includes(Roles.TENANT_ADMIN);
+  const isLeagueAdmin = currentUserRoles.includes(Roles.LEAGUE_ADMIN);
 
   const getSortIndicator = (column: string) => {
     if (sortBy === column) {

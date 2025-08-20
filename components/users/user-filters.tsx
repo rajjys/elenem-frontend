@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Role, Gender, SupportedLanguage, UserFilterParams } from '@/schemas'; // Import all necessary enums and types
+import { Roles, Gender, SupportedLanguages, UserFilterParams } from '@/schemas'; // Import all necessary enums and types
 import { MultiSelect } from '@/components/ui/multi-select'; // Your new multi-select component
 import { Switch } from '@/components/ui/switch';
 import { useDebounce } from 'use-debounce'; // You'll need to install this: npm install use-debounce
@@ -21,11 +21,11 @@ interface UserFiltersProps {
 
 export function UserFilters({ filters, onFilterChange, onPageSizeChange }: UserFiltersProps) {
   const [search, setSearch] = useState(filters.search || '');
-  const [selectedRoles, setSelectedRoles] = useState<Role[]>(filters.roles || []);
+  const [selectedRoles, setSelectedRoles] = useState<Roles[]>(filters.roles || []);
   const [isActive, setIsActive] = useState<boolean | undefined>(filters.isActive);
   const [isVerified, setIsVerified] = useState<boolean | undefined>(filters.isVerified);
   const [selectedGender, setSelectedGender] = useState<Gender | undefined>(filters.gender);
-  const [selectedLanguage, setSelectedLanguage] = useState<SupportedLanguage | undefined>(filters.preferredLanguage);
+  const [selectedLanguage, setSelectedLanguage] = useState<SupportedLanguages | undefined>(filters.preferredLanguage);
   const [pageSizeInput, setPageSizeInput] = useState(String(filters.pageSize || 10));
 
   const [debouncedSearch] = useDebounce(search, 500);
@@ -35,7 +35,7 @@ export function UserFilters({ filters, onFilterChange, onPageSizeChange }: UserF
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   // Memoize role options for MultiSelect
-  const roleOptions = useMemo(() => Object.values(Role).map(role => ({
+  const roleOptions = useMemo(() => Object.values(Roles).map(role => ({
     value: role,
     label: role.replace(/_/g, ' ') // Display "SYSTEM ADMIN" instead of "SYSTEM_ADMIN"
   })), []);
@@ -47,7 +47,7 @@ export function UserFilters({ filters, onFilterChange, onPageSizeChange }: UserF
   })), []);
 
   // Memoize language options
-  const languageOptions = useMemo(() => Object.values(SupportedLanguage).map(lang => ({
+  const languageOptions = useMemo(() => Object.values(SupportedLanguages).map(lang => ({
     value: lang,
     label: lang.charAt(0) + lang.slice(1).toLowerCase()
   })), []);
@@ -180,7 +180,7 @@ export function UserFilters({ filters, onFilterChange, onPageSizeChange }: UserF
               <MultiSelect
                 options={roleOptions}
                 selected={selectedRoles}
-                onChange={(values) => setSelectedRoles(values as Role[])}
+                onChange={(values) => setSelectedRoles(values as Roles[])}
                 placeholder="Select Roles"
                 className="w-full"
               />
@@ -211,7 +211,7 @@ export function UserFilters({ filters, onFilterChange, onPageSizeChange }: UserF
               <Label htmlFor="language" className="block text-sm font-medium text-gray-700 mb-1">Preferred Language</Label>
               <Select
                 value={selectedLanguage}
-                onValueChange={(value: SupportedLanguage) => setSelectedLanguage(!value ? undefined : value)}
+                onValueChange={(value: SupportedLanguages) => setSelectedLanguage(!value ? undefined : value)}
               >
                 <SelectTrigger className="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
                   <SelectValue placeholder="Select Language" />

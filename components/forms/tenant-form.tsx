@@ -16,10 +16,10 @@ import {
   UpdateTenantSchema,
   TenantDetails,
   UserResponseDto,
-  PaginatedResponseDto,
+  PaginatedUserResponseDto,
   SportType,
-  Role,
-  TenantType,
+  Roles,
+  TenantTypes,
  
 } from '@/schemas'; // Import types and schemas, including UserResponseDto and PaginatedResponseDto
 
@@ -49,7 +49,7 @@ export function TenantForm({ initialData, isEditMode = false, onSuccess, onCance
         description: initialData?.description ?? undefined,
         tenantCode: initialData?.tenantCode || '',
         sportType: initialData?.sportType || SportType.FOOTBALL,
-        tenantType: initialData?.tenantType || TenantType.COMMERCIAL,
+        tenantType: initialData?.tenantType || TenantTypes.COMMERCIAL,
         country: initialData?.country || '',
         region: initialData?.region ?? undefined,
         city: initialData?.city ?? undefined,
@@ -65,7 +65,7 @@ export function TenantForm({ initialData, isEditMode = false, onSuccess, onCance
         description: undefined,
         tenantCode: '',
         sportType: SportType.FOOTBALL,
-        tenantType: initialData?.tenantType || TenantType.COMMERCIAL,
+        tenantType: initialData?.tenantType || TenantTypes.COMMERCIAL,
         country: '',
         region: undefined,
         city: undefined,
@@ -97,11 +97,11 @@ export function TenantForm({ initialData, isEditMode = false, onSuccess, onCance
       try {
 
         const params = new URLSearchParams();
-        const roles = [Role.GENERAL_USER];
+        const roles = [Roles.GENERAL_USER];
         roles.forEach(role => params.append('roles', role));
         params.append('tenantId', 'null');
         //console.log('Params: ', params.toString());
-        const response = await api.get<PaginatedResponseDto>(`/users?${params.toString()}`);
+        const response = await api.get<PaginatedUserResponseDto>(`/users?${params.toString()}`);
         setAvailableOwners(response.data.data);
       } catch (error) {
         console.error('Failed to fetch users for owner dropdown:', error);
@@ -222,14 +222,14 @@ export function TenantForm({ initialData, isEditMode = false, onSuccess, onCance
         <Label htmlFor="tenantType" required={!isEditMode}>Tenant Type</Label>
         <Select
           value={watch('tenantType')}
-          onValueChange={(value: TenantType) => setValue('tenantType', value)}
+          onValueChange={(value: TenantTypes) => setValue('tenantType', value)}
           disabled={isSubmitting}
         >
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Select a tenant type" />
           </SelectTrigger>
           <SelectContent>
-            {Object.values(TenantType).map((type) => (
+            {Object.values(TenantTypes).map((type) => (
               <SelectItem key={type} value={type}>
                 {type.replace(/_/g, ' ')}
               </SelectItem>

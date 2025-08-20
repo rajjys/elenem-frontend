@@ -3,12 +3,12 @@
 
 import React from 'react'
 import { useRouter } from 'next/navigation'
-import { Role } from '@/schemas'
+import { Roles } from '@/schemas'
 import { useAuthStore } from '@/store/auth.store'
 import { LoadingSpinner } from '@/components/ui'
 
 interface AccessGateProps {
-  allowedRoles: Role[]
+  allowedRoles: Roles[]
   children: React.ReactNode
 }
 

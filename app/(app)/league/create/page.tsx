@@ -4,7 +4,7 @@
 import { useRouter } from 'next/navigation';
 import { LeagueForm } from '@/components/forms/league-form'; // Adjust path as needed
 import { AccessGate } from '@/app/(auth)/AccessGate';
-import { Role } from '@/schemas'; // Adjust path to your Role enum
+import { Roles } from '@/schemas'; // Adjust path to your Role enum
 import { toast } from 'sonner';
 import { useAuthStore } from '@/store/auth.store';
 
@@ -18,8 +18,8 @@ export default function CreateleaguePage() {
     ///Redirect to league listing based on user role
     const currentUserRoles = userAuth?.roles || [];
     
-    const isSystemAdmin = currentUserRoles.includes(Role.SYSTEM_ADMIN);
-    const isTenantAdmin = currentUserRoles.includes(Role.TENANT_ADMIN);
+    const isSystemAdmin = currentUserRoles.includes(Roles.SYSTEM_ADMIN);
+    const isTenantAdmin = currentUserRoles.includes(Roles.TENANT_ADMIN);
     
     const redirectPath = isSystemAdmin ? "/admin/leagues":
                          isTenantAdmin ? "/tenant/leagues" :
@@ -36,7 +36,7 @@ export default function CreateleaguePage() {
       <h1 className="text-3xl font-bold text-gray-900 mb-6 text-center">Create New league</h1>
       <div>
         {/* AccessGate to restrict who can access this creation form */}
-        <AccessGate allowedRoles={[Role.SYSTEM_ADMIN, Role.TENANT_ADMIN]}>
+        <AccessGate allowedRoles={[Roles.SYSTEM_ADMIN, Roles.TENANT_ADMIN]}>
           <LeagueForm onSuccess={handleSuccess} onCancel={handleCancel} />
         </AccessGate>
       </div>

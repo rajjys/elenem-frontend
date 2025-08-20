@@ -21,7 +21,7 @@ import {
   SportType,
   LeagueVisibility,
   Gender,
-  Role,
+  Roles,
   TenantBasicDto,
 } from '@/schemas';
 import { api } from '@/services/api';
@@ -60,8 +60,8 @@ export function LeagueForm({
   const userAuth = useAuthStore((state) => state.user);
   const currentUserRoles = userAuth?.roles || [];
   const currentUsersTenantId = userAuth?.tenantId;
-  const isSystemAdmin = currentUserRoles.includes(Role.SYSTEM_ADMIN);
-  const isTenantAdmin = currentUserRoles.includes(Role.TENANT_ADMIN);
+  const isSystemAdmin = currentUserRoles.includes(Roles.SYSTEM_ADMIN);
+  const isTenantAdmin = currentUserRoles.includes(Roles.TENANT_ADMIN);
   
   const formSchema = isEditMode ? UpdateLeagueSchema : CreateLeagueSchema;
 
@@ -159,7 +159,7 @@ export function LeagueForm({
     const fetchDependencies = async () => {
         try {
             const [usersRes, leaguesRes] = await Promise.all([
-                api.get('/users', { params: { tenantId, roles: Role.GENERAL_USER, pageSize: 100 } }),
+                api.get('/users', { params: { tenantId, roles: Roles.GENERAL_USER, pageSize: 100 } }),
                 api.get('/leagues', { params: { tenantId, pageSize: 100 } })
             ]);
             setAvailableOwners(usersRes.data.data);

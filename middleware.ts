@@ -1,7 +1,7 @@
 // middleware.ts
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { Role } from './schemas'; // Assuming Role enum is imported from Prisma or shared types
+import { Roles } from './schemas'; // Assuming Role enum is imported from Prisma or shared types
 import { resolveTenantSlugFromHostname, verifyJWT } from './utils'; // Your utility to verify JWT
 import { JwtPayload } from './types';
 
@@ -105,7 +105,7 @@ export async function middleware(request: NextRequest) {
   }
 
   // Helper to check if user has a specific role
-  const hasRole = (role: Role) => user!.roles.includes(role); // 'user!' because we've checked for null above
+  const hasRole = (role: Roles) => user!.roles.includes(role); // 'user!' because we've checked for null above
 
   // Helper to construct access denied URL
   const redirectToAccessDenied = (reason: string) => {
@@ -121,7 +121,7 @@ export async function middleware(request: NextRequest) {
 
   // System Admin routes
   if (pathname.startsWith('/admin')) {
-    if (!hasRole(Role.SYSTEM_ADMIN)) {
+    if (!hasRole(Roles.SYSTEM_ADMIN)) {
       return redirectToAccessDenied('system_admin_only');
     }
     return NextResponse.next();
@@ -129,7 +129,7 @@ export async function middleware(request: NextRequest) {
 
   // Tenant Admin routes
   if (pathname.startsWith('/tenant')) {
-    if (!hasRole(Role.TENANT_ADMIN) && !hasRole(Role.SYSTEM_ADMIN)) {
+    if (!hasRole(Roles.TENANT_ADMIN) && !hasRole(Roles.SYSTEM_ADMIN)) {
       return redirectToAccessDenied('tenant_access_required');
     }
     return NextResponse.next();
@@ -137,7 +137,7 @@ export async function middleware(request: NextRequest) {
 
   // League Admin routes
   if (pathname.startsWith('/league')) {
-    if (!hasRole(Role.LEAGUE_ADMIN) && !hasRole(Role.TENANT_ADMIN) && !hasRole(Role.SYSTEM_ADMIN)) {
+    if (!hasRole(Roles.LEAGUE_ADMIN) && !hasRole(Roles.TENANT_ADMIN) && !hasRole(Roles.SYSTEM_ADMIN)) {
       return redirectToAccessDenied('league_access_required');
     }
     return NextResponse.next();
@@ -145,7 +145,7 @@ export async function middleware(request: NextRequest) {
 
   // Team Admin routes
   if (pathname.startsWith('/team')) {
-    if (!hasRole(Role.TEAM_ADMIN) && !hasRole(Role.LEAGUE_ADMIN) && !hasRole(Role.TENANT_ADMIN) && !hasRole(Role.SYSTEM_ADMIN)) {
+    if (!hasRole(Roles.TEAM_ADMIN) && !hasRole(Roles.LEAGUE_ADMIN) && !hasRole(Roles.TENANT_ADMIN) && !hasRole(Roles.SYSTEM_ADMIN)) {
       return redirectToAccessDenied('team_access_required');
     }
     return NextResponse.next();

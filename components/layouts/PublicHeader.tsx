@@ -9,7 +9,7 @@ import { usePathname } from 'next/navigation';
 import { useAuthStore } from '@/store/auth.store'; // Assuming this path
 // Import lucide-react icons for sport types
 import {  Volleyball, Trophy, Home, Users, Newspaper, ListOrdered} from 'lucide-react';
-import { Role, SportType } from '@/schemas';
+import { Roles, SportType } from '@/schemas';
 import Image from 'next/image';
 import UserAvatar from '../users/user-avatar';
 
@@ -102,13 +102,13 @@ export const PublicHeader = ({
   }, [userAuth, fetchUser]);
 
   // Determine user roles for dashboard access
-  const isSystemAdmin = userAuth?.roles?.includes(Role.SYSTEM_ADMIN);
-  const isTenantAdmin = userAuth?.roles?.includes(Role.TENANT_ADMIN);
-  const isLeagueAdmin = userAuth?.roles?.includes(Role.LEAGUE_ADMIN);
-  const isTeamAdmin = userAuth?.roles?.includes(Role.TEAM_ADMIN);
-  const isPlayer = userAuth?.roles?.includes(Role.PLAYER);
-  const isCoach = userAuth?.roles?.includes(Role.COACH);
-  const isReferee = userAuth?.roles?.includes(Role.REFEREE);
+  const isSystemAdmin = userAuth?.roles?.includes(Roles.SYSTEM_ADMIN);
+  const isTenantAdmin = userAuth?.roles?.includes(Roles.TENANT_ADMIN);
+  const isLeagueAdmin = userAuth?.roles?.includes(Roles.LEAGUE_ADMIN);
+  const isTeamAdmin = userAuth?.roles?.includes(Roles.TEAM_ADMIN);
+  const isPlayer = userAuth?.roles?.includes(Roles.PLAYER);
+  const isCoach = userAuth?.roles?.includes(Roles.COACH);
+  const isReferee = userAuth?.roles?.includes(Roles.REFEREE);
 
   // Check if the user has any management-related role
   const isManagementUser = isSystemAdmin || isTenantAdmin || isLeagueAdmin || isTeamAdmin || isPlayer || isCoach || isReferee;
@@ -189,6 +189,7 @@ export const PublicHeader = ({
                 onClick={toggleTheme}
                 className="rounded-full p-2 text-gray-600 transition-colors hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
                 aria-label="Toggle theme"
+                hidden
               >
                 {theme === 'light' ? <FiMoon className="h-5 w-5" /> : <FiSun className="h-5 w-5" />}
               </button>
@@ -251,7 +252,7 @@ export const PublicHeader = ({
                     Login
                   </Link>
                   <Link href="/register" className={`rounded-md bg-${primaryColor} px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-${primaryColor.replace('-600', '-700')}`}>
-                    Get Started
+                    Register
                   </Link>
                 </div>
               )}

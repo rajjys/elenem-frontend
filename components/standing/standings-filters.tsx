@@ -8,7 +8,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue
 } from '@/components/ui/select';
 import { toast } from 'sonner';
-import { Role } from '@/schemas';
+import { Roles } from '@/schemas';
 import { api } from '@/services/api';
 import { useAuthStore } from '@/store/auth.store';
 
@@ -26,10 +26,10 @@ export function StandingsFilters({ onFiltersChange }: StandingsFiltersProps) {
   const ctxLeagueId = useMemo(() => searchParams.get('ctxLeagueId'), [searchParams]);
   const ctxSeasonId = useMemo(() => searchParams.get('ctxSeasonId'), [searchParams]);
 
-  const isSystemAdmin = userAuth?.roles?.includes(Role.SYSTEM_ADMIN);
-  const isTenantAdmin = userAuth?.roles?.includes(Role.TENANT_ADMIN);
-  const isLeagueAdmin = userAuth?.roles?.includes(Role.LEAGUE_ADMIN);
-  const isTeamAdmin = userAuth?.roles?.includes(Role.TEAM_ADMIN);
+  const isSystemAdmin = userAuth?.roles?.includes(Roles.SYSTEM_ADMIN);
+  const isTenantAdmin = userAuth?.roles?.includes(Roles.TENANT_ADMIN);
+  const isLeagueAdmin = userAuth?.roles?.includes(Roles.LEAGUE_ADMIN);
+  const isTeamAdmin = userAuth?.roles?.includes(Roles.TEAM_ADMIN);
 
   const initialTenantId = useMemo(() => {
     return ctxTenantId ?? (!isSystemAdmin ? userAuth?.tenantId ?? undefined : undefined);

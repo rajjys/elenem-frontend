@@ -5,7 +5,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { SeasonForm } from '@/components/forms/season-form'; // Adjust path as needed
 import { AccessGate } from '@/app/(auth)/AccessGate';
-import { Role } from '@/schemas'; // Adjust path to your Role enum
+import { Roles } from '@/schemas'; // Adjust path to your Role enum
 import { LoadingSpinner } from '@/components/ui/loading-spinner'; // Assuming this path
 import { toast } from 'sonner';
 import { api } from '@/services/api'; // Your actual API instance
@@ -80,7 +80,7 @@ export default function EditSeasonPage() {
       <h1 className="text-3xl font-bold text-gray-900 mb-6 text-center">Edit Season</h1>
 
       {/* AccessGate to restrict who can access this edit form */}
-      <AccessGate allowedRoles={[Role.SYSTEM_ADMIN, Role.TENANT_ADMIN, Role.LEAGUE_ADMIN]}>
+      <AccessGate allowedRoles={[Roles.SYSTEM_ADMIN, Roles.TENANT_ADMIN, Roles.LEAGUE_ADMIN]}>
         <SeasonForm initialData={initialData} onSuccess={handleSuccess} onCancel={handleCancel} />
       </AccessGate>
     </div>

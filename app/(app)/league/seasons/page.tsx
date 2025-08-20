@@ -12,7 +12,7 @@ import { Pagination } from '@/components/ui/pagination';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { Role } from '@/schemas';
+import { Roles } from '@/schemas';
 import { useAuthStore } from '@/store/auth.store';
 
 export default function LeagueSeasonsPage() {
@@ -23,9 +23,9 @@ export default function LeagueSeasonsPage() {
   const ctxLeagueId = useSearchParams().get('ctxLeagueId'); // Use search params if needed
   
   // Determine current tenant ID based on user roles
-        const isSystemAdmin = currentUserRoles.includes(Role.SYSTEM_ADMIN);
-        const isTenantAdmin = currentUserRoles.includes(Role.TENANT_ADMIN);
-        const isLeagueAdmin = currentUserRoles.includes(Role.LEAGUE_ADMIN);
+        const isSystemAdmin = currentUserRoles.includes(Roles.SYSTEM_ADMIN);
+        const isTenantAdmin = currentUserRoles.includes(Roles.TENANT_ADMIN);
+        const isLeagueAdmin = currentUserRoles.includes(Roles.LEAGUE_ADMIN);
 
   const currentTenantId = isSystemAdmin
       ? ctxTenantId

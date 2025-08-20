@@ -16,7 +16,7 @@ import {
   TextArea
 } from "@/components/ui/";
 import { useState, useEffect, useCallback } from "react";
-import { Gender, SupportedLanguage, Role, TenantBasicDto, UserDetail, PaginatedTenantsResponseDto } from "@/schemas"; // Import UserDetail
+import { Gender, SupportedLanguages, Roles, TenantBasicDto, UserDetail, PaginatedTenantsResponseDto } from "@/schemas"; // Import UserDetail
 import { api } from '@/services/api';
 import { toast } from 'sonner';
 import { useAuthStore } from '@/store/auth.store'; // Import useAuthStore
@@ -35,7 +35,7 @@ const userFormSchema = z.object({
   gender: z.nativeEnum(Gender).optional(),
   bio: z.string().max(500, "Bio cannot exceed 500 characters.").optional().or(z.literal('')),
   avatarUrl: z.string().url("Invalid URL").optional().or(z.literal('')),
-  preferredLanguage: z.nativeEnum(SupportedLanguage).optional(),
+  preferredLanguage: z.nativeEnum(SupportedLanguages).optional(),
   timezone: z.string().optional().or(z.literal('')),
   tenantId: z.string().cuid("Invalid Tenant ID").optional().or(z.literal("")),
 });
@@ -58,9 +58,9 @@ export function UserForm({
   const user = useAuthStore((state) => state.user); // Get user from auth store
   const currentUserRoles = user?.roles || [];
   const currentUsersTenantId = user?.tenantId;
-  const isSystemAdmin = currentUserRoles.includes(Role.SYSTEM_ADMIN);
-  const isTenantAdmin = currentUserRoles.includes(Role.TENANT_ADMIN);
-  const isLeagueAdmin = currentUserRoles.includes(Role.LEAGUE_ADMIN);
+  const isSystemAdmin = currentUserRoles.includes(Roles.SYSTEM_ADMIN);
+  const isTenantAdmin = currentUserRoles.includes(Roles.TENANT_ADMIN);
+  const isLeagueAdmin = currentUserRoles.includes(Roles.LEAGUE_ADMIN);
 
   const [loadingForm, setLoadingForm] = useState(true); // Overall loading for form data
   const [loadingTenants, setLoadingTenants] = useState(false);
@@ -203,7 +203,7 @@ export function UserForm({
       preferredLanguage: data.preferredLanguage || undefined,
       timezone: data.timezone || undefined,
       // Roles are handled by backend or default to GENERAL_USER for creation
-      roles: [Role.GENERAL_USER], // Always send GENERAL_USER for creation via this form
+      roles: [Roles.GENERAL_USER], // Always send GENERAL_USER for creation via this form
       tenantId: data.tenantId === "" ? null : data.tenantId, // Convert empty string to null for backend DTO
     };
 
@@ -439,14 +439,14 @@ export function UserForm({
         <Label htmlFor="preferredLanguage">Preferred Language</Label>
         <Select
           value={watch("preferredLanguage") || ""}
-          onValueChange={(value) => setValue("preferredLanguage", value as SupportedLanguage)}
+          onValueChange={(value) => setValue("preferredLanguage", value as SupportedLanguages)}
           disabled={overallLoading}
         >
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Select language (optional)" />
           </SelectTrigger>
           <SelectContent>
-            {Object.values(SupportedLanguage).map((lang) => (
+            {Object.values(SupportedLanguages).map((lang) => (
               <SelectItem key={lang} value={lang}>
                 {lang}
               </SelectItem>

@@ -11,7 +11,7 @@ import { Pagination } from '@/components/ui/pagination';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { Role } from '@/schemas';
+import { Roles } from '@/schemas';
 import { useAuthStore } from '@/store/auth.store';
 export default function TenantSeasonsPage() {
   const router = useRouter();
@@ -81,7 +81,7 @@ export default function TenantSeasonsPage() {
 
   useEffect(() => {
     // Authorization check for Tenant Admin
-    if (!user || !currentUserRoles.includes(Role.TENANT_ADMIN)) {
+    if (!user || !currentUserRoles.includes(Roles.TENANT_ADMIN)) {
       toast.error("Unauthorized", { description: "You do not have permission to view this page." });
       router.push('/dashboard');
       return;

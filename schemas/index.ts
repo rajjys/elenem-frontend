@@ -8,3 +8,5 @@ export * from './team-schemas';
 export * from './season-schemas';
 export * from './game-schemas';
 export * from './blog-post-schema';
+export * from './register-schema';
+export * from './interfaces';

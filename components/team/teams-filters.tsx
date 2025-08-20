@@ -23,7 +23,7 @@ import { Filter as FilterIcon } from 'lucide-react';
 import { CountryDropdown } from 'react-country-region-selector';
 
 import { TeamFilterParams } from '@/schemas';
-import { TeamVisibility, Gender, Role, SportType } from '@/schemas'; // Prisma enums
+import { TeamVisibility, Gender, Roles, SportType } from '@/schemas'; // Prisma enums
 import { useAuthStore } from '@/store/auth.store';
 import { api } from '@/services/api'; // Your API instance
 import { toast } from 'sonner';
@@ -42,8 +42,8 @@ interface LeagueBasicDto { id: string; name: string; tenantId: string; sportType
 
 export function TeamsFilters({ filters, onFilterChange, onPageSizeChange, fixedTenantId, fixedLeagueId }: TeamsFiltersProps) {
   const user = useAuthStore((state) => state.user);
-  const isSystemAdmin = user?.roles?.includes(Role.SYSTEM_ADMIN);
-  const isTenantAdmin = user?.roles?.includes(Role.TENANT_ADMIN);
+  const isSystemAdmin = user?.roles?.includes(Roles.SYSTEM_ADMIN);
+  const isTenantAdmin = user?.roles?.includes(Roles.TENANT_ADMIN);
   //const isLeagueAdmin = user?.roles?.includes(Role.LEAGUE_ADMIN);
 
   const [search, setSearch] = useState(filters.search || '');
