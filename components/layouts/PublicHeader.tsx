@@ -2,16 +2,22 @@
 "use client";
 
 import Link from 'next/link';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useTheme } from '@/components/providers/ThemeProvider';
 import { FiSun, FiMoon, FiSearch, FiAward, FiUser, FiChevronDown } from 'react-icons/fi';
 import { usePathname } from 'next/navigation';
 import { useAuthStore } from '@/store/auth.store'; // Assuming this path
 // Import lucide-react icons for sport types
-import {  Volleyball, Trophy, Home, Users, Newspaper, ListOrdered} from 'lucide-react';
+import {  Volleyball, Trophy, Home, Users, Newspaper, ListOrdered, LayoutDashboard, User, Shield, Settings, LogOut, Goal} from 'lucide-react';
+import {
+  TennisBallIcon,
+  BasketballIcon,
+  SoccerBallIcon,
+} from '@phosphor-icons/react';
 import { Roles, SportType } from '@/schemas';
 import Image from 'next/image';
 import UserAvatar from '../users/user-avatar';
+import { Skeleton } from '../ui';
 
 const hrefIconMap: Record<string, React.ElementType> = {
   '/': Home,
@@ -57,17 +63,17 @@ interface PublicHeaderProps {
 const getSportIcon = (sportType: PublicHeaderProps['sportType']) => {
   switch (sportType) {
     case SportType.FOOTBALL:
-      return Volleyball;
+      return SoccerBallIcon; // Phosphor's accurate football icon
     case SportType.BASKETBALL:
-      return Volleyball;
+      return BasketballIcon; // Phosphor's basketball icon
     case SportType.VOLLEYBALL:
-      return Volleyball;
+      return Volleyball; // Lucide volleyball
     case SportType.TENNIS:
-      return Volleyball;
+      return TennisBallIcon; // Phosphor tennis ball
     case SportType.RUGBY:
-      return Volleyball;
+      return Goal
     default:
-      return Trophy; // Default trophy icon for general sports or if type not matched
+      return SoccerBallIcon; // Lucide trophy as fallback
   }
 };
 
@@ -92,14 +98,46 @@ export const PublicHeader = ({
   const { theme, toggleTheme } = useTheme(); // Hook for theme toggling
   const pathname = usePathname(); // Hook to get current path for active link styling
   const { user: userAuth, logout, fetchUser } = useAuthStore(); // Auth store for user data and actions
+  const [loadingUser, setLoadingUser] = useState(true);
   const [dropdownOpen, setDropdownOpen] = useState(false); // State for user dropdown menu
-
+  const dropdownRef = useRef<HTMLDivElement>(null);
   // Fetch user data on component mount if not already available
   useEffect(() => {
-    if (!userAuth) {
-      fetchUser();
+  const loadUser = async () => {
+    try {
+      await fetchUser(); // your store will update `userAuth`
+    } finally {
+      setLoadingUser(false);
     }
-  }, [userAuth, fetchUser]);
+  };
+
+  if (userAuth === undefined || userAuth === null) {
+    loadUser();
+  } else {
+    setLoadingUser(false);
+  }
+}, [userAuth, fetchUser]);
+  // Close dropdown menu on outside click
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setDropdownOpen(false);
+      }
+    };
+
+    if (dropdownOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [dropdownOpen]);
 
   // Determine user roles for dashboard access
   const isSystemAdmin = userAuth?.roles?.includes(Roles.SYSTEM_ADMIN);
@@ -125,7 +163,6 @@ export const PublicHeader = ({
 
   // Update the 'Matchs' navLink with the correct sport icon based on sportType prop
   const updatedNavLinks = extendNavLinksWithIcons(navLinks, sportType);
-
 
   return (
     <>
@@ -195,9 +232,16 @@ export const PublicHeader = ({
               </button>
 
               {/* User Authentication Section */}
-              {userAuth ? (
+              {loadingUser ? (
+                // ⏳ Skeleton while fetching
+                <div className="flex items-center space-x-2">
+                  <Skeleton className="h-10 w-10 rounded-full" />   {/* avatar placeholder */}
+                  <Skeleton className="hidden md:block h-6 w-32 rounded" /> {/* username placeholder */}
+                </div>
+              ) : 
+               userAuth ? (
                 // If user is logged in
-                <div className="relative">
+                <div className="relative" ref={dropdownRef}>
                   <button
                     onClick={() => setDropdownOpen(!dropdownOpen)}
                     className="flex items-center space-x-2 rounded-full p-2 text-gray-600 transition-colors hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800 focus:outline-none"
@@ -225,21 +269,34 @@ export const PublicHeader = ({
                     {/* Username (hidden on small screens) */}
                     <span className="hidden md:block text-sm font-medium">{userAuth.username || userAuth.email}</span>
                     {/* Dropdown arrow for management users (hidden on small screens) */}
-                    {isManagementUser && <FiChevronDown className="h-4 w-4 hidden md:block" />}
+                    {<FiChevronDown className="h-4 w-4 hidden md:block" />}
                   </button>
 
                   {/* Dropdown Menu for Management Users */}
-                  {dropdownOpen && isManagementUser && (
+                  {dropdownOpen && (
                     <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 dark:bg-gray-700 z-10">
                       <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="user-menu-button">
-                        <Link href={dashboardLink} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-600" role="menuitem">
-                          Admin Dashboard
+                        {isManagementUser && 
+                        <Link href={dashboardLink} onClick={() => setDropdownOpen(false)} className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-600" role="menuitem">
+                          <LayoutDashboard className="w-4 h-4" />
+                          <span className="truncate">Tableau de Bord</span>
                         </Link>
-                        <Link href="/my-account/profile" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-600" role="menuitem">
-                          My Account
+                        }
+                        <Link href="/account/dashboard" onClick={() => setDropdownOpen(false)} className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-600" role="menuitem">
+                          <User className="w-4 h-4" />
+                          <span className="truncate">Mon Espace</span>
                         </Link>
-                        <button onClick={logout} className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-600" role="menuitem">
-                          Logout
+                        <Link href="/account/security" onClick={() => setDropdownOpen(false)} className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-600" role="menuitem">
+                          <Shield className="w-4 h-4" />
+                          <span className="truncate">Securite</span>
+                        </Link>
+                        <Link href="/account/settings" onClick={() => setDropdownOpen(false)} className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-600" role="menuitem">
+                          <Settings className="w-4 h-4" />
+                          <span className="truncate">Parametres</span>
+                        </Link>
+                        <button onClick={logout} className="flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-600" role="menuitem">
+                          <LogOut className="w-4 h-4" />
+                          <span className="truncate">Deconnexion</span>
                         </button>
                       </div>
                     </div>

@@ -9,6 +9,7 @@ import { CollapsibleNavLink, FlyoutMenu, NavLink } from '.'; // Adjust this impo
 import { useContextualLink, useSidebarEligibility } from '@/hooks';
 import { Roles } from '@/schemas'; // Assuming Role enum is here
 import { AppLayoutNavbar } from './AppLayourNavbar'; // Import the updated Navbar
+import { Settings, Shield, User } from 'lucide-react';
 
 // Type for a React Icon component
 type IconType = React.ComponentType<React.SVGProps<SVGSVGElement>>;
@@ -151,15 +152,23 @@ export default function AppLayout({
                 />
               ))}
               <div className="mt-auto pt-4 border-t border-gray-200">
+
                 <NavLink
-                  item={{ label: "My Profile", basePath: "/account/profile", icon: FiUser }}
+                  item={{ label: "My Profile", basePath: "/account/profile", icon: User }}
                   buildLink={buildLink}
                   currentPath={currentPath}
                   isSidebarOpen={isSidebarOpen}
                   onClick={closeFlyout}
                   themeColor={themeColor} />
                 <NavLink
-                  item={{ label: "Security", basePath: "/account/security", icon: FiShield }}
+                  item={{ label: "Security", basePath: "/account/security", icon: Shield }}
+                  buildLink={buildLink}
+                  currentPath={currentPath}
+                  isSidebarOpen={isSidebarOpen}
+                  onClick={closeFlyout}
+                  themeColor={themeColor} />
+                  <NavLink
+                  item={{ label: "Settings", basePath: "/account/settings", icon: Settings }}
                   buildLink={buildLink}
                   currentPath={currentPath}
                   isSidebarOpen={isSidebarOpen}
@@ -206,6 +215,12 @@ export default function AppLayout({
                   />
                 ))}
                 <div className="mt-auto pt-4 border-t border-gray-200">
+                  <NavLink
+                    item={{ label: "Settings", basePath: "/account/settings", icon: FiUser }}
+                    buildLink={buildLink} currentPath={currentPath}
+                    isSidebarOpen={true} onClick={closeMobileMenu}
+                    themeColor={themeColor}
+                  />
                   <NavLink
                     item={{ label: "My Profile", basePath: "/account/profile", icon: FiUser }}
                     buildLink={buildLink} currentPath={currentPath}
