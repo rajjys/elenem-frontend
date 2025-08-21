@@ -21,8 +21,11 @@ export default function PublicLayout({ children }: { children: ReactNode }) {
     <html lang="en" className={`${inter.variable}`} suppressHydrationWarning>
       <body>
         {children}
-        <Toaster position="top-center" />
-        </body>
+        <Toaster position="top-center" 
+                 richColors // ✅ success = green, error = red, etc.
+                 closeButton // ✅ shows an X button on every toast
+        />
+      </body>
     </html>
   );
 }

@@ -9,6 +9,12 @@ import * as z from "zod";
 import { CountryDropdown } from "react-country-region-selector";
 import {
   Button,
+  Card,
+  CardContent,
+  CardTitle,
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
   Form,
   FormControl,
   FormField,
@@ -34,6 +40,7 @@ import {
   RegisterFormSchema,
 } from "@/schemas"; // Assuming you have these schemas/types exported
 import axios from 'axios';
+import { ChevronDown, Eye, EyeOff } from "lucide-react";
 
 // Define the form schema for validation
 type RegisterFormValues = z.infer<typeof RegisterFormSchema>;
@@ -44,7 +51,8 @@ export function RegisterForm() {
   const [loading, setLoading] = useState(false);
   const [tenants, setTenants] = useState<PublicTenantResponseDto[]>([]);
   const [tenantsLoading, setTenantsLoading] = useState(false);
-
+  const [showPassword, setShowPassword] = useState(false);
+  const [showMore, setShowMore] = useState(false);
   // Fetch tenants on component mount
   useEffect(() => {
     const fetchTenants = async () => {
@@ -60,11 +68,11 @@ export function RegisterForm() {
         errorMessage = error.response?.data?.message || errorMessage;
       }
       toast.error(errorMessage);
+      console.log(error);
       } finally {
         setTenantsLoading(false);
       }
     };
-
     fetchTenants();
   }, []);
 
@@ -81,8 +89,8 @@ export function RegisterForm() {
       gender: undefined,
       nationality: "",
       profileImageUrl: "",
-      preferredLanguage: SupportedLanguages.ENGLISH,
-      timezone: "UTC",
+      preferredLanguage: SupportedLanguages.FRANCAIS,
+      timezone: "UTC+2",
       tenantId: "",
     },
   });
@@ -90,7 +98,7 @@ export function RegisterForm() {
   const onSubmit = async (values: RegisterFormValues) => {
     setLoading(true);
     try {
-      await register(values);   // 👈 store does everything (API call + set tokens + set user)
+      await register(values);   // 👈 authStore does everything (API call + set tokens + set user -> login)
       toast.success("Registration successful!");
       router.push("/account/dashboard"); // Redirect to dashboard
     } catch (error) {
@@ -109,10 +117,12 @@ export function RegisterForm() {
   };
 
   return (
-    <div className="container mx-auto max-w-md p-4 space-y-4">
-      <h1 className="text-3xl font-bold text-center">Create Your Account</h1>
-      <Form {...form}>
+    <Card className="container mx-auto max-w-md p-4 space-y-4 mt-4 md:mt-8">
+      <CardTitle><span className="text-3xl font-bold text-center">Create Your Account</span></CardTitle>
+      <CardContent>
+        <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          {/* Mandatory Fields */}
           <div className="space-y-4">
             {/* Functional Identity */}
             <h2 className="text-xl font-semibold">Account Details</h2>
@@ -121,9 +131,9 @@ export function RegisterForm() {
               name="username"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Username</FormLabel>
+                  <FormLabel hidden>Username</FormLabel>
                   <FormControl>
-                    <Input placeholder="username" {...field} />
+                    <Input placeholder="Username" {...field} />
                   </FormControl>
                   <FormMessage name="username"/>
                 </FormItem>
@@ -134,9 +144,9 @@ export function RegisterForm() {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel hidden>Email</FormLabel>
                   <FormControl>
-                    <Input placeholder="email@example.com" {...field} />
+                    <Input placeholder="E-mail" {...field} />
                   </FormControl>
                   <FormMessage name="e_mail"/>
                 </FormItem>
@@ -147,10 +157,23 @@ export function RegisterForm() {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Password</FormLabel>
-                  <FormControl>
-                    <Input type="password" placeholder="••••••••" {...field} />
-                  </FormControl>
+                  <FormLabel hidden>Password</FormLabel>
+                  <div className="relative">
+                    <FormControl>
+                      <Input
+                        type={showPassword ? "text" : "password"}
+                        placeholder="Password"
+                        {...field}
+                      />
+                    </FormControl>
+                    <button
+                      type="button"
+                      className="absolute right-2 top-2 text-gray-500"
+                      onClick={() => setShowPassword((prev) => !prev)}
+                    >
+                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                  </div>
                   <FormMessage name="password"/>
                 </FormItem>
               )}
@@ -166,9 +189,9 @@ export function RegisterForm() {
                 name="firstName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>First Name</FormLabel>
+                    <FormLabel hidden>First Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="John" {...field} />
+                      <Input placeholder="First Name" {...field} />
                     </FormControl>
                     <FormMessage name="first_name"/>
                   </FormItem>
@@ -179,16 +202,30 @@ export function RegisterForm() {
                 name="lastName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Last Name</FormLabel>
+                    <FormLabel hidden>Last Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="Doe" {...field} />
+                      <Input placeholder="Last Name" {...field} />
                     </FormControl>
                     <FormMessage name="last_name"/>
                   </FormItem>
                 )}
               />
             </div>
-            <FormField
+            <Collapsible open={showMore} onOpenChange={setShowMore}>
+              <CollapsibleTrigger asChild>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="w-full flex items-center justify-between"
+                >
+                  More details
+                  <ChevronDown className={`ml-2 h-4 w-4 transition-transform ${showMore ? "rotate-180" : ""}`} />
+                </Button>
+              </CollapsibleTrigger>
+
+              <CollapsibleContent className="space-y-4 mt-4">
+              <div>
+                <FormField
               control={form.control}
               name="phone"
               render={({ field }) => (
@@ -337,6 +374,9 @@ export function RegisterForm() {
               )}
             />
           </div>
+              </CollapsibleContent>
+            </Collapsible>
+          </div>
 
           <div className="flex justify-between items-center mt-6">
             <Button
@@ -353,6 +393,8 @@ export function RegisterForm() {
           </div>
         </form>
       </Form>
-    </div>
+      </CardContent>
+      
+    </Card>
   );
 }

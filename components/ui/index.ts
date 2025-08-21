@@ -24,3 +24,4 @@ export * from './status-badge';
 export * from './BlogPostCard';
 export * from './vertical-blogpost-card';
 export * from './form';
+export * from './collapsible';
