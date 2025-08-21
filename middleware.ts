@@ -26,7 +26,11 @@ const publicPaths = [
   '/blogs',
   '/health', '/health/', '/health/*',
   '/news', '/news/', '/news/*', // Public news articles on the root domain
-   '/contact', '/pricing', '/features', '/terms', '/privacy'
+   '/contact', '/pricing', '/features', '/terms', '/privacy',
+   ///entity creation routes. These are protected by access Gates. Review is needed later
+   '/tenant/create', '/tenant/create/', '/tenant/create/*',
+   '/league/create', '/league/create/', '/league/create/*',
+   '/team/create', '/team/create/', '/team/create/*',
 ];
 
 export async function middleware(request: NextRequest) {

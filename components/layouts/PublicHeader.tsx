@@ -6,7 +6,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useTheme } from '@/components/providers/ThemeProvider';
 import { FiSun, FiMoon, FiSearch, FiAward, FiUser, FiChevronDown } from 'react-icons/fi';
 import { usePathname } from 'next/navigation';
-import { useAuthStore } from '@/store/auth.store'; // Assuming this path
+import { useAuthStore } from '@/store/auth.store';
 // Import lucide-react icons for sport types
 import {  Volleyball, Trophy, Home, Users, Newspaper, ListOrdered, LayoutDashboard, User, Shield, Settings, LogOut, Goal} from 'lucide-react';
 import {

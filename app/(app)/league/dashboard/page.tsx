@@ -37,7 +37,7 @@ export default function TenantDashboard() {
     const userAuth = useAuthStore((state) => state.user);
     const currentUserRoles = userAuth?.roles || [];
     //const [tenant, setTenant] = useState<TenantDetails | null>(null);
-    const [league, setLeague] = useState<LeagueBasic>([]);
+    const [league, setLeague] = useState<LeagueBasic>();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 

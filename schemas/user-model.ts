@@ -9,6 +9,7 @@ interface BasicTenant {
   externalId: string;
   name: string;
   sportType: SportType
+  logoUrl?: string | null; 
 }
 
 // Basic League type for nested relations in User
