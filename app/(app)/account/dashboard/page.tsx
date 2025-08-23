@@ -62,7 +62,7 @@ const GeneralUserDashboard = () => {
   return (
     <div>
       <h1 className="text-xl md:text-2xl lg:text-3xl">
-        Bienvenu 
+        Bienvenue
         <span className="bg-gradient-to-r from-blue-500 via-green-600 to-purple-700 bg-clip-text text-transparent ml-2 pr-2 border-b-2 border-gray-400">
           {userAuth?.firstName}
         </span>

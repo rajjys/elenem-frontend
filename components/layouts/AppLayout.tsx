@@ -71,7 +71,7 @@ export default function AppLayout({
                         isPlayer ? '/player/dashboard' :
                         isCoach ? '/coach/dashboard' :
                         isReferee ? '/referee/dashboard' :
-                        '/dashboard'; // Default fallback
+                        '/account/dashboard'; // Default fallback
 
   const shouldShowSidebar = useSidebarEligibility(); // Assuming this hook determines if a sidebar is relevant for the current user/page
   
