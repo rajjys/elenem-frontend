@@ -1,7 +1,6 @@
 export * from './ChangePasswordForm';
 export * from './UserProfileForm';
 export * from './login-form';
-export * from './tenant-form';
 export * from './user-form';
 export * from './team-form';
 export * from './league-form';

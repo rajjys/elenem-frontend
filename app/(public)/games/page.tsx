@@ -39,10 +39,9 @@ export default function PublicGamesPage() {
           console.log("Fetching Game Dates...");
           const response = await api.get<string[]>('/public/games/dates');
           const dates = response.data;
-          console.log("Available dates:", dates);
           if (!dates || dates.length === 0) {
-            toast.error("Aucune date de match disponible.");
-            console.warn("No available dates found.");
+            toast.info("Aucune date de match disponible.");
+            //console.warn("No available dates found.");
             return;
           }
           setAvailableDates(dates);
