@@ -11,7 +11,7 @@ async rewrites() {
     ];
   },*/
   images: {
-    domains: ["scontent-mba2-1.xx.fbcdn.net", "scontent.fgom1-1.fna.fbcdn.net", "placehold.co", "via.placeholder.com", "eu-central-1-shared-euc1-02.graphassets.com"],
+    domains: ["scontent-mba2-1.xx.fbcdn.net", "scontent.fgom1-1.fna.fbcdn.net", "scontent-jnb2-1.xx.fbcdn.net", "placehold.co", "via.placeholder.com", "eu-central-1-shared-euc1-02.graphassets.com"],
   }
 };
 

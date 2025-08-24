@@ -37,6 +37,7 @@ import {
   Loader2,
   ListTodo,
   User,
+  X,
 } from 'lucide-react';
 import { useAuthStore } from '@/store/auth.store';
 import axios from 'axios';
@@ -152,7 +153,7 @@ export function TenantCreationForm({ onSuccess, onCancel }: TenantFormProps) {
 
       // This is a placeholder for your API call.
       const response = await api.post('/tenants/create', payload);
-      toast.success('Tenant created successfully!');
+      toast.success(`Tenant ${data.tenantCode} created successfully!`);
       onSuccess(response.data.id);
     } catch (error) {
       let errorMessage = "Tenant creation failed. Please try again.";
@@ -407,32 +408,60 @@ export function TenantCreationForm({ onSuccess, onCancel }: TenantFormProps) {
             {renderStepper()}
             {renderStepContent()}
           </div>
-          <div className="flex justify-between p-6 border-t">
-            {currentStep > 0 && (
-              <Button type="button" variant="ghost" onClick={prevStep} className="flex items-center space-x-2">
-                <ChevronLeft size={16} />
-                <span>Back</span>
-              </Button>
-            )}
-            <div className="flex-1" /> {/* Spacer */}
-            {currentStep < steps.length - 1 && (
-              <Button type="button" onClick={nextStep} className="flex items-center space-x-2">
-                <span>Next</span>
-                <ChevronRight size={16} />
-              </Button>
-            )}
-            {currentStep === steps.length - 1 && (
-              <Button type="submit" disabled={isSubmitting} className="flex items-center space-x-2">
-                {isSubmitting ? (
-                  <>
-                    <Loader2 className="animate-spin" size={16} />
-                    <span>Submitting...</span>
-                  </>
-                ) : (
-                  <span>Create Tenant</span>
-                )}
-              </Button>
-            )}
+          <div className="flex items-center justify-between p-6 border-t">
+            {/* Left side: Cancel button */}
+            <Button
+              type="button"
+              variant="danger"
+              onClick={onCancel}
+              className="flex items-center space-x-2"
+            >
+              <X size={16} />
+              <span>Cancel</span>
+            </Button>
+
+            {/* Right side: Step navigation */}
+            <div className="flex items-center space-x-4">
+              {currentStep > 0 && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={prevStep}
+                  className="flex items-center space-x-2"
+                >
+                  <ChevronLeft size={16} />
+                  <span>Back</span>
+                </Button>
+              )}
+
+              {currentStep < steps.length - 1 && (
+                <Button
+                  type="button"
+                  onClick={nextStep}
+                  className="flex items-center space-x-2"
+                >
+                  <span>Next</span>
+                  <ChevronRight size={16} />
+                </Button>
+              )}
+
+              {currentStep === steps.length - 1 && (
+                <Button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="flex items-center space-x-2"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="animate-spin" size={16} />
+                      <span>Submitting...</span>
+                    </>
+                  ) : (
+                    <span>Create Tenant</span>
+                  )}
+                </Button>
+              )}
+            </div>
           </div>
         </form>
       </Card>

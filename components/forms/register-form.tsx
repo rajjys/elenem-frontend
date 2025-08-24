@@ -33,7 +33,7 @@ import { api } from "@/services/api";
 import { useAuthStore } from "@/store/auth.store";
 import {
   //RegisterDto,
-  PublicTenantResponseDto,
+  PublicTenantBasic,
   Gender,
   SupportedLanguages,
   PaginatedResponseDto,
@@ -49,7 +49,7 @@ export function RegisterForm() {
   const router = useRouter();
   const register = useAuthStore((state) => state.register);
   const [loading, setLoading] = useState(false);
-  const [tenants, setTenants] = useState<PublicTenantResponseDto[]>([]);
+  const [tenants, setTenants] = useState<PublicTenantBasic[]>([]);
   const [tenantsLoading, setTenantsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showMore, setShowMore] = useState(false);
@@ -58,7 +58,7 @@ export function RegisterForm() {
     const fetchTenants = async () => {
       setTenantsLoading(true);
       try {
-        const response = await api.get<PaginatedResponseDto<PublicTenantResponseDto>>(
+        const response = await api.get<PaginatedResponseDto<PublicTenantBasic>>(
           "/public-tenants"
         );
         setTenants(response.data.data);

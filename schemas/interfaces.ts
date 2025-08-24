@@ -2,11 +2,11 @@
 export interface PublicBusinessProfileResponseDto {
   id: string;
   name: string;
-  slug?: string;
   description?: string | null;
   bannerImageUrl?: string | null;
   logoUrl?: string | null;
-  country?: string | null;
+  city?: string | null;
+  region?: string | null;
 }
 
 // The paginated response structure

@@ -5,31 +5,14 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Button } from "@/components/ui/button";
 import { api } from '@/services/api';
 import { toast } from 'sonner';
-import { SportType } from '@/schemas';
+import { PublicTenantBasic } from '@/schemas';
 import { Building } from 'lucide-react';
 import PublicTenantCard from '@/components/tenant/public-tenant-card';
 import PublicTenantCardSkeleton from '@/components/tenant/public-tenant-card-skeleton';
 import PublicTenantsFilters from '@/components/tenant/public-tenants-filters';
 
-// --- Helper Types ---
-interface Tenant {
-  id: string;
-  name: string;
-  slug: string;
-  tenantCode: string;
-  description?: string | null;
-  bannerImageUrl?: string | null;
-  logoUrl?: string | null;
-  sportType: SportType;
-  country?: string | null;
-  _count: {
-    leagues: number;
-    teams: number;
-  };
-}
-
 export default function PublicTenantsPage() {
-    const [tenants, setTenants] = useState<Tenant[]>([]);
+    const [tenants, setTenants] = useState<PublicTenantBasic[]>([]);
     const [filters, setFilters] = useState({});
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);

@@ -11,7 +11,7 @@ const variantStyles = {
   default: "text-gray-700 bg-gray-100 hover:bg-gray-200 focus:ring-gray-400",
   primary: "text-white bg-primary-600 hover:bg-primary-700 focus:ring-primary-500", // Uses primary theme
   secondary: "text-primary-700 bg-primary-100 hover:bg-primary-200 focus:ring-primary-500", // Uses primary theme
-  danger: "text-white bg-red-600 hover:bg-red-700 focus:ring-red-500", // Specific red for danger
+  danger: "text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 focus:ring-red-500 font-bold", // Specific red for danger
   outline: "text-primary-700 border border-primary-600 bg-transparent hover:bg-primary-50 focus:ring-primary-500", // Uses primary theme
   ghost: "text-primary-700 bg-transparent hover:bg-primary-100 focus:ring-primary-500", // Uses primary theme
   link: "text-primary-600 underline underline-offset-2 hover:text-primary-800 focus:outline-none focus:ring-0", // Uses primary theme
@@ -29,7 +29,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       <button
         ref={ref}
         type="button"
-        className={`${baseStyles} ${variantStyles[variant]} ${sizeStyles[size]} ${
+        className={`cursor-pointer transition-all duration-500 ease-in-out ${baseStyles} ${variantStyles[variant]} ${sizeStyles[size]} ${
           (isLoading || disabled) ? 'opacity-50 cursor-not-allowed' : ''
         } ${className}`}
         disabled={isLoading || disabled}
