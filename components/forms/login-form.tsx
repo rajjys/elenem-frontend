@@ -7,6 +7,8 @@ import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { useAuthStore } from "@/store/auth.store";
 import { useState } from "react";
+import axios from "axios";
+import { toast } from "sonner";
 
 
 export function LoginForm() {
@@ -57,7 +59,11 @@ export function LoginForm() {
       );
       // Redirection is handled by login/page.tsx's useEffect and middleware
     } catch (error) {
-      const errorMessage = "Login failed";
+      let errorMessage = "Login failed";
+      if (axios.isAxiosError(error)) {
+              errorMessage = error.response?.data?.message || errorMessage;
+            }
+            toast.error(errorMessage);
       setError(errorMessage);
       console.error("Login error:", error);
     }

@@ -92,18 +92,18 @@ const GeneralUserDashboard = () => {
             )}
             {/* General User with tenant OR Tenant Admin */}
             {(isGeneralUser && userAuth?.tenantId) || isTenantAdmin ? (
-              <Card>
+              <Card className='my-6 text-gray-800 bg-gray-200 hover:bg-gray-300 transition-colors rounded-md w-auto max-w-xs text-center'>
                 <CardTitle className="flex items-center">
                   <Image
-                    src={tenant?.logoUrl || `https://placehold.co/40x40/4F46E5/FFFFFF?text=${tenant?.name || 'T'}`}
+                    src={tenant?.businessProfile.logoUrl || `https://placehold.co/40x40/4F46E5/FFFFFF?text=${tenant?.name || 'T'}`}
                     alt="Tenant Logo"
                     width={24}
                     height={24}
                     className="h-6 w-6 rounded-full object-contain"
                   />
-                  <h2 className="text-2xl px-2">{tenant?.name || userAuth?.tenant?.name}</h2>
+                  <span className="text-lg p-2">{tenant?.name || userAuth?.tenant?.name}</span>
                 </CardTitle>
-                <CardContent>
+                <CardContent className='py-4'>
                   <Link href="/tenant/dashboard">Go to Tenant Dashboard</Link>
                 </CardContent>
               </Card>

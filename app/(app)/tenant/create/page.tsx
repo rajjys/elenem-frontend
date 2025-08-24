@@ -3,9 +3,9 @@
 
 import React from 'react'
 import { useRouter } from 'next/navigation'
-import { TenantForm } from '@/components/forms'
 import { AccessGate } from '@/app/(auth)/AccessGate'
 import { Roles } from '@/schemas'
+import { TenantCreationForm } from '@/components/forms/tenant-creation-form'
 
 export default function CreateTenantPage() {
   const router = useRouter()
@@ -24,7 +24,7 @@ export default function CreateTenantPage() {
       <h1 className="text-3xl font-bold text-gray-900 mb-6 text-center">Create New Tenant</h1>
 
       <AccessGate allowedRoles={[Roles.SYSTEM_ADMIN, Roles.GENERAL_USER]}>
-        <TenantForm onSuccess={handleSuccess} onCancel={handleCancel} />
+        <TenantCreationForm onSuccess={handleSuccess} onCancel={handleCancel} />
       </AccessGate>
     </div>
   )
