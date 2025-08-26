@@ -60,7 +60,7 @@ export const TenantDetailsSchema = z.object({
   tenantCode: z.string().min(3, "Tenant code must be at least 3 characters").max(7, "Tenant code must be at most 7 characters").regex(/^[A-Z0-9]+$/, "Tenant code must be uppercase alphanumeric"),
   tenantType: TenantTypeSchema,
   sportType: SportTypeSchema,
-  country: z.string().min(2, "Country is required").max(2, "Country must be a 2-letter ISO code"), // ISO 2-letter code
+  country: z.string().min(2, "Country is required"),//.max(2, "Country must be a 2-letter ISO code"), // ISO 2-letter code
   businessProfile: z.object({
     name: z.string().min(1, 'Business name is required.'),
     description: z.string().optional(),

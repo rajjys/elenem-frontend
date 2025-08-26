@@ -12,6 +12,7 @@ import { StatsCard } from '@/components/ui/stats-card';
 import { Building, Building2, Calendar, Crown, Eye, MoreVertical, Plus, Settings, Target, Ticket, TrendingUp, Trophy, UserPlus, Users } from 'lucide-react';
 import { Avatar, Badge, Button, Card, CardContent, CardHeader, CardTitle, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, LoadingSpinner } from '@/components/ui';
 import { capitalize } from '@/utils';
+import axios from 'axios';
 
 interface UpcomingGame {
     id: string;
@@ -60,14 +61,16 @@ export default function TenantDashboard() {
         setError(null);
         try {
           const response = await api.get(`/tenants/${currentTenantId}`);
-          //console.log(response);
           const validatedTenant = TenantDetailsSchema.parse(response.data);
           setTenant(validatedTenant);
         } catch (error) {
-          const errorMessage = "Failed to fetch tenant details.";
-          setError(errorMessage);
-          toast.error("Error loading tenant", { description: errorMessage });
-          console.error('Fetch tenant details error:', error);
+            let errorMessage = "Failed to fetch tenant details.";
+            if (axios.isAxiosError(error)) {
+                errorMessage = error.response?.data?.message || errorMessage;
+            }
+            setError(errorMessage);
+            toast.error(errorMessage);
+            console.error('Fetch tenant details error:', error);
         } finally {
           setLoading(false);
         }
@@ -89,7 +92,6 @@ export default function TenantDashboard() {
                 }
               const response = await api.get(`/leagues?${params.toString()}`);
               const validatedData = PaginatedLeaguesResponseSchema.parse(response.data);
-                console.log('Fetched leagues:', validatedData.data);
               setLeagues(validatedData.data);
             } catch (error) {
               const errorMessage = 'Failed to fetch leagues.';
@@ -112,8 +114,8 @@ export default function TenantDashboard() {
     const statCards = [
         { title: "Total Leagues", value: tenant?.leagues?.length || 0, description: "Active Leagues Under Management", trend: {isPositive: true, value: 3.6, timespan: "season"}, icon: Trophy, bgColorClass: "bg-blue-400", textColorClass: "text-white", href: buildLink("/tenant/leagues") },
         { title: "Total Teams", value: tenant?.teams?.length || 0, description: "Active Teams in all Leagues", trend: {isPositive: false, value: 2.6, timespan: "season"}, icon: Building, bgColorClass: "bg-green-400", textColorClass: "text-white", href: buildLink("/tenant/teams") },
-        { title: "Total Players", value: mockUpcomingGames.length, description: "Active Players in all Leagues", trend: {isPositive: true, value: 4.8, timespan: "season"}, icon: Calendar, bgColorClass: "bg-orange-400", textColorClass: "text-white", href: buildLink("/tenant/players") },
-        { title: "Tickets Sold (Today)", value: 120, description: "Active Leagues Under Management", trend: {isPositive: true, value: 3.6, timespan: "season"}, icon: Ticket, bgColorClass: "bg-red-400", textColorClass: "text-white", href: buildLink("/tenant/tickets") }, // Keeping mock for now as per request
+        { title: "Total Players", value: 0, description: "Active Players in all Leagues", trend: {isPositive: true, value: 0, timespan: "season"}, icon: Calendar, bgColorClass: "bg-orange-400", textColorClass: "text-white", href: buildLink("/tenant/players") },
+        { title: "Tickets Sold (Today)", value: 0, description: "Active Leagues Under Management", trend: {isPositive: true, value: 0, timespan: "season"}, icon: Ticket, bgColorClass: "bg-red-400", textColorClass: "text-white", href: buildLink("/tenant/tickets") }, // Keeping mock for now as per request
     ]
     const recentActivities = [
   { id: 1, action: "New league created", details: "Professional Volleyball League", time: "5 min ago", type: "league" },
@@ -256,8 +258,7 @@ export default function TenantDashboard() {
                     <CardHeader>
                         <CardTitle className="text-lg font-semibold">Quick Actions</CardTitle>
                     </CardHeader>
-                    <CardContent>
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <CardContent className='pb-4 grid grid-cols-2 md:grid-cols-4 gap-4'>
                         <Button variant="default" className="h-20 flex-col gap-2">
                             <Plus className="h-6 w-6" />
                             <span className="text-sm">Create League</span>
@@ -274,7 +275,6 @@ export default function TenantDashboard() {
                             <TrendingUp className="h-6 w-6" />
                             <span className="text-sm">View Analytics</span>
                         </Button>
-                        </div>
                     </CardContent>
                     </Card>
             </section>    
