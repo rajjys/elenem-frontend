@@ -65,7 +65,7 @@ export function TenantCreationForm({ onSuccess, onCancel }: TenantFormProps) {
       name: '',
       tenantCode: '',
       tenantType: TenantTypes.COMMERCIAL,
-      sportType: SportType.SOCCER,
+      sportType: SportType.FOOTBALL,
       country: '',
       businessProfile: {
         description: '',

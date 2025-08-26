@@ -128,23 +128,6 @@ export const TenantDetailsSchema = z.object({
 
 export type TenantDetails = z.infer<typeof TenantDetailsSchema>;
 
-// DTO for creating a new tenant
-// Schema for the nested BusinessProfile
-export const CreateBusinessProfileSchema = z.object({
-  //name: z.string().min(1, 'Business name is required.'),
-  description: z.string().nullable().optional(),
-  logoUrl: z.string().nullable().optional(), // Use a simple string as requested
-  bannerImageUrl: z.string().nullable().optional(), // Use a simple string as requested
-  //website: z.string().url().optional(),
-  //socialMediaLinks: z.record(z.string()).optional(),
-  //establishedYear: z.number().int().min(1000).max(new Date().getFullYear()).optional(),
-  physicalAddress: z.string().nullable().optional(),
-  city: z.string().nullable().optional(),
-  //state: z.string().optional(),
-  region: z.string().nullable().optional(),
-  //postalCode: z.string().optional(),
-});
-
 // Main Tenant Creation Schema
 export const CreateTenantSchema = z.object({
   name: z.string().min(3, 'Tenant name must be at least 3 characters.').max(100),
@@ -153,7 +136,13 @@ export const CreateTenantSchema = z.object({
   sportType: SportTypeSchema,
   country: z.string().min(1, 'Country is required.'),
   // The nested businessProfile object
-  businessProfile: CreateBusinessProfileSchema,
+  businessProfile: z.object({
+    id: z.string().cuid(),
+    name: z.string(),
+    country: z.string().optional().nullable(),
+    region: z.string().optional().nullable(),
+    city: z.string().optional().nullable(),
+  }),
   // Optional ownerId for SYSTEM_ADMIN
   //isActive: z.boolean().optional().default(true),
   ownerId: z.string().cuid().optional(),

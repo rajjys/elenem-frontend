@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { LeagueForm } from "@/components/forms/league-form";
+import { LeagueForm } from "@/components/forms/league/league-form";
 import { api } from "@/services/api";
 import { LeagueDetails, Roles } from "@/schemas";
 import { toast } from "sonner";

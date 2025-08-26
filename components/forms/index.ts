@@ -3,6 +3,6 @@ export * from './UserProfileForm';
 export * from './login-form';
 export * from './user-form';
 export * from './team-form';
-export * from './league-form';
+export * from './league/league-form';
 export * from './season-form';
 export * from './game-form';

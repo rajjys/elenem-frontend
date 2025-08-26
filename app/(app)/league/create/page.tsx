@@ -2,7 +2,7 @@
 "use client";
 
 import { useRouter } from 'next/navigation';
-import { LeagueForm } from '@/components/forms/league-form'; // Adjust path as needed
+import { LeagueCreationForm } from '@/components/forms';
 import { AccessGate } from '@/app/(auth)/AccessGate';
 import { Roles } from '@/schemas'; // Adjust path to your Role enum
 import { toast } from 'sonner';
@@ -37,7 +37,7 @@ export default function CreateleaguePage() {
       <div>
         {/* AccessGate to restrict who can access this creation form */}
         <AccessGate allowedRoles={[Roles.SYSTEM_ADMIN, Roles.TENANT_ADMIN]}>
-          <LeagueForm onSuccess={handleSuccess} onCancel={handleCancel} />
+          <LeagueCreationForm onSuccess={handleSuccess} onCancel={handleCancel} />
         </AccessGate>
       </div>
     </div>

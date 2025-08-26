@@ -1,7 +1,7 @@
 // src/schemas/league-schemas.ts (or a similar location for your Zod schemas)
 import * as z from 'zod';
 import { SportType, LeagueVisibility, Gender, SportTypeSchema, LeagueVisibilitySchema } from '@/schemas'; // Assuming these enums are available or you'll mock them
-
+import { CreateBusinessProfileSchema } from './common-schemas'
 // Helper schemas for nested objects (similar to your DTOs)
 export const TenantLiteResponseSchema = z.object({
   id: z.string().cuid(),
@@ -14,7 +14,7 @@ export type TenantLiteResponseDto = z.infer<typeof TenantLiteResponseSchema>;
 const LeagueLiteResponseSchema = z.object({
   id: z.string(),
   name: z.string(),
-  leagueCode: z.string(),
+  slug: z.string(),
 });
 export type LeagueLiteResponseDto = z.infer<typeof LeagueLiteResponseSchema>;
 
@@ -27,8 +27,6 @@ export const UserLiteResponseSchema = z.object({
 });
 export type UserLiteResponseDto = z.infer<typeof UserLiteResponseSchema>;
 
-// League Response Schema
-// This one needs special handling for the self-referencing `parentLeague`
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const LeagueBasicSchema: z.ZodSchema<any> = z.lazy(() => z.object({
   id: z.string().cuid(),
@@ -153,11 +151,13 @@ export const PointRuleSchema = z.object({
 export const BonusPointRuleSchema = z.object({
   condition: z.string().min(1, "Condition is required"), // e.g., "CLEAN_SHEET", "SCORED_3_GOALS"
   points: z.number().int(),
+  outcome: z.string(),
 });
 
 export const PointSystemConfigSchema = z.object({
   rules: z.array(PointRuleSchema),
   bonusPoints: z.array(BonusPointRuleSchema).optional(),
+  commonMetrics: z.record(z.string(), z.string()),
 });
 
 export const TieBreakerRuleSchema = z.object({
@@ -170,45 +170,55 @@ export const TieBreakerRuleSchema = z.object({
 export const TieBreakerConfigSchema = z.array(TieBreakerRuleSchema);
 
 
-// NEW: League Schemas
+// Create League Schema
 export const CreateLeagueSchema = z.object({
-  name: z.string().min(1, 'League name is required').max(100, 'League name cannot exceed 100 characters'),
-  description: z.string().max(500, 'Description cannot exceed 500 characters').optional().nullable(),
-  leagueCode: z.string().min(3, 'League code must be at least 3 characters').max(10, 'League code cannot exceed 10 characters').toUpperCase(),
-  visibility: z.nativeEnum(LeagueVisibility).default(LeagueVisibility.PUBLIC).optional(),
+  name: z.string().min(3, { message: "League name must be at least 3 characters." }),
+  tenantId: z.string().cuid({ message: "Invalid Tenant ID." }),
+  parentLeagueId: z.string().cuid().optional().nullable(),
+  division: z.string().default("D1"),
   gender: z.nativeEnum(Gender),
-  country: z.string(), // ISO 2-letter code
-  region: z.string().max(100, 'Region cannot exceed 100 characters').optional().nullable(),
-  city: z.string().max(100, 'City cannot exceed 100 characters').optional().nullable(),
-  state: z.string().max(100, 'State cannot exceed 100 characters').optional().nullable(),
-  establishedYear: z.number().int().min(1800).max(new Date().getFullYear()).optional().nullable(),
-  logoUrl: z.string().optional().nullable(),
-  bannerImageUrl: z.string().optional().nullable(),
-  isActive: z.boolean().default(true).optional(),
-  ownerId: z.string().cuid().optional().nullable(), // Owner of the league (a GENERAL_USER)
-  tenantId: z.string().cuid(), // Required for league creation
-  parentLeagueId: z.string().cuid().optional().nullable(), // For divisions or sub-leagues
-  division: z.string().max(50).optional().nullable(), // e.g., "D1", "Pro League"
-
-  // NEW: Points System & Tiebreakers
-  pointSystemConfig: PointSystemConfigSchema,
-  tieBreakerConfig: TieBreakerConfigSchema,
+  visibility: z.nativeEnum(LeagueVisibility).default(LeagueVisibility.PUBLIC),
+  ownerId: z.string().cuid().optional().nullable(),
+  isActive: z.boolean().default(true),
+  // The business profile is now a required sub-object
+  businessProfile: z.object({
+    //id: z.string().cuid(),
+    //name: z.string().optional().null,
+    //country: z.string().optional().nullable(),
+    region: z.string().optional().nullable(),
+    city: z.string().optional().nullable(),
+  }),
+  // Point system and tiebreakers are optional here as they are configured in a separate step
+  pointSystemConfig: PointSystemConfigSchema.optional(),
+  tieBreakerConfig: TieBreakerConfigSchema.optional(),
 });
+export type CreateLeagueDto = z.infer<typeof CreateLeagueSchema>;
 
-export const UpdateLeagueSchema = CreateLeagueSchema.extend({
-  //id: z.string().cuid(),
+// Update League Schema
+export const UpdateLeagueSchema = CreateLeagueSchema.partial().extend({
+  id: z.string().cuid(),
+  businessProfile: CreateBusinessProfileSchema.partial().optional(),
 });
+export type UpdateLeagueDto = z.infer<typeof UpdateLeagueSchema>;
 
 export const LeagueDetailsSchema = UpdateLeagueSchema.extend({
   id: z.string().cuid(),
+  slug: z.string(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
-  tenant: TenantLiteResponseSchema, // For displaying tenant name
+  tenant: TenantLiteResponseSchema,
   owner: UserLiteResponseSchema.optional().nullable(),
   parentLeague: z.object({
     id: z.string().cuid(),
     name: z.string(),
   }).optional().nullable(),
+  businessProfile: z.object({
+    id: z.string().cuid(),
+    name: z.string(),
+    country: z.string().optional().nullable(),
+    region: z.string().optional().nullable(),
+    city: z.string().optional().nullable(),
+  }),
 });
 
 export type LeagueDetails = z.infer<typeof LeagueDetailsSchema>;
