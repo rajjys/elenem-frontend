@@ -415,6 +415,7 @@ export function TenantCreationForm({ onSuccess, onCancel }: TenantFormProps) {
               variant="danger"
               onClick={onCancel}
               className="flex items-center space-x-2"
+              disabled={isSubmitting}
             >
               <X size={16} />
               <span>Cancel</span>
@@ -428,6 +429,7 @@ export function TenantCreationForm({ onSuccess, onCancel }: TenantFormProps) {
                   variant="ghost"
                   onClick={prevStep}
                   className="flex items-center space-x-2"
+                  disabled={isSubmitting}
                 >
                   <ChevronLeft size={16} />
                   <span>Back</span>
@@ -439,6 +441,7 @@ export function TenantCreationForm({ onSuccess, onCancel }: TenantFormProps) {
                   type="button"
                   onClick={nextStep}
                   className="flex items-center space-x-2"
+                  disabled={isSubmitting}
                 >
                   <span>Next</span>
                   <ChevronRight size={16} />

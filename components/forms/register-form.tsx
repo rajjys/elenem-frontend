@@ -40,7 +40,7 @@ import {
   RegisterFormSchema,
 } from "@/schemas"; // Assuming you have these schemas/types exported
 import axios from 'axios';
-import { ChevronDown, Eye, EyeOff } from "lucide-react";
+import { ChevronDown, Eye, EyeOff, Loader2, X } from "lucide-react";
 
 // Define the form schema for validation
 type RegisterFormValues = z.infer<typeof RegisterFormSchema>;
@@ -381,14 +381,23 @@ export function RegisterForm() {
           <div className="flex justify-between items-center mt-6">
             <Button
               type="button"
-              variant="outline"
+              variant="danger"
               onClick={handleCancel}
               disabled={loading}
+              className="flex items-center space-x-2"
             >
-              Cancel
+              <X size={16} />
+              <span>Cancel</span>
             </Button>
             <Button type="submit" disabled={loading}>
-              {loading ? "Registering..." : "Register"}
+              {loading ? (
+                  <>
+                    <Loader2 className="animate-spin" size={16} />
+                    <span>Registering...</span>
+                  </>
+                ) : (
+                  <span>Register</span>
+                )}
             </Button>
           </div>
         </form>

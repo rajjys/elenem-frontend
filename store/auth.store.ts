@@ -22,7 +22,7 @@ interface AuthState {
   register: (values: RegisterFormValues) => Promise<void>;
   login: (usernameOrEmail: string, password: string, tenantCode?: string) => Promise<void>;
   logout: () => void;
-  fetchUser: () => Promise<void>;
+  fetchUser: () => Promise<User | undefined>;
   setTokens: (tokens: AuthTokens | null) => void;
 }
 
@@ -84,6 +84,7 @@ export const useAuthStore = create<AuthState>()(
         try {
           const response = await api.get('/auth/me');
           set({ user: response.data });
+          return response.data as User;
           // After fetching fresh user data, we rely on the `user.roles` array for client-side logic.
           // No need to set `userRole` cookie here as it's singular and can be misleading.
         } catch (error) {

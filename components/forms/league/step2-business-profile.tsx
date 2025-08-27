@@ -44,7 +44,7 @@ export default function Step2_BusinessProfile() {
         <Input id="description" {...register("businessProfile.description")} />
       </div>
       
-      <div className="grid w-full items-center gap-1.5">
+      <div className="grid w-full items-center gap-1.5 hidden">
         <Label htmlFor="country">Country</Label>
         <Controller
           control={control}

@@ -5,7 +5,7 @@ import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { Loader2, CheckCircle, ChevronRight, ChevronLeft } from 'lucide-react';
+import { Loader2, ChevronRight, ChevronLeft, ListTodo, User, ClipboardList, Eye, X } from 'lucide-react';
 import { api } from '@/services/api';
 import { CreateLeagueSchema, CreateLeagueDto } from '@/schemas/league-schemas';
 import { useAuthStore } from '@/store/auth.store';
@@ -18,10 +18,10 @@ import axios from 'axios';
 
 // Define the steps and their corresponding components
 const steps = [
-  { name: 'Basic Info', component: Step1_BasicInfo },
-  { name: 'Business Profile', component: Step2_BusinessProfile },
-  { name: 'Point System & Rules', component: Step3_Rules },
-  { name: 'Review & Submit', component: Step4_Review },
+  { name: "Basic Info", icon: ListTodo, component: Step1_BasicInfo },
+  { name: "Business Profile", icon: User, component: Step2_BusinessProfile },
+  { name: "Point System & Rules", icon: ClipboardList, component: Step3_Rules },
+  { name: "Review & Submit", icon: Eye, component: Step4_Review },
 ];
 
 interface LeagueFormProps {
@@ -64,34 +64,45 @@ export function LeagueCreationForm({ onSuccess, onCancel } : LeagueFormProps) {
 
   // Function to render the step-by-step guidance
   const renderStepper = () => (
-    <div className="flex justify-between items-center mb-6 w-full text-center">
-      {steps.map((step, index) => {
-        const isCurrent = index === currentStep;
-        const isCompleted = index < currentStep;
-
-        return (
-          <div key={step.name} className="flex flex-col items-center flex-1 relative">
-            <div className="relative z-10 flex items-center justify-center w-8 h-8 rounded-full transition-colors duration-200"
-              style={{
-                backgroundColor: isCompleted ? '#22c55e' : (isCurrent ? '#3b82f6' : '#e5e7eb'),
-                color: isCurrent ? '#fff' : (isCompleted ? '#fff' : '#4b5563')
-              }}>
-              {isCompleted ? (
-                <CheckCircle size={16} />
-              ) : (
-                <span className="font-semibold">{index + 1}</span>
-              )}
+    <div className="flex justify-between items-center mb-6">
+      {steps.map((step, index) => (
+        <React.Fragment key={index}>
+          <div className="space-x-2">
+            <div className="flex items-center justify-center">
+              <div
+                className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300
+                  ${index === currentStep ? "bg-blue-600 text-white shadow-lg" : "bg-gray-200 text-gray-500"}
+                  ${index < currentStep ? "bg-green-500 text-white" : ""}
+                `}
+              >
+                <step.icon size={20} />
+              </div>
             </div>
-            <div className={`mt-2 text-sm transition-colors duration-200 ${isCurrent ? 'text-gray-900 font-medium' : 'text-gray-500'}`}>{step.name}</div>
-            {index < steps.length - 1 && (
-              <div className="absolute top-4 left-1/2 w-[calc(100%+16px)] -translate-x-1/2 -z-10 transition-colors duration-200 h-1 rounded-full"
-                style={{ backgroundColor: isCompleted ? '#22c55e' : '#e5e7eb' }}></div>
-            )}
+            <span
+              className={`text-sm hidden sm:inline-block transition-all duration-300 ${
+                index === currentStep
+                  ? "text-blue-600 font-semibold"
+                  : "text-gray-500"
+              }`}
+            >
+              {step.name}
+            </span>
           </div>
-        );
-      })}
+          {index < steps.length - 1 && (
+            <div className="flex-1 h-1 bg-gray-200 mx-2 rounded-full">
+              <div
+                className={`h-full transition-all duration-300 rounded-full ${
+                  index < currentStep ? "bg-blue-600" : ""
+                }`}
+                style={{ width: index < currentStep ? "100%" : "0" }}
+              />
+            </div>
+          )}
+        </React.Fragment>
+      ))}
     </div>
   );
+
 
   const handleNext = async () => {
     // Determine which fields to validate based on the current step
@@ -152,29 +163,42 @@ export function LeagueCreationForm({ onSuccess, onCancel } : LeagueFormProps) {
           <div className="flex justify-between space-x-4 pt-4 m-2">
             <Button
               type="button"
-              variant="ghost"
+              variant="danger"
               onClick={onCancel}
+              className="flex items-center space-x-2"
               disabled={isSubmitting || loading}
             >
-              Cancel
+              <X size={16} />
+              <span>Cancel</span>
             </Button>
             <div className="flex space-x-4">
               {currentStep > 0 && (
-                <Button type="button" variant="ghost" onClick={handleBack} disabled={isSubmitting || loading} className="flex items-center space-x-2">
+                <Button 
+                  type="button" 
+                  variant="ghost" 
+                  onClick={handleBack} 
+                  disabled={isSubmitting || loading} className="flex items-center space-x-2">
                   <ChevronLeft size={16} />
                   <span>Back</span>
                 </Button>
               )}
 
               {currentStep < steps.length - 1 && (
-                <Button type="button" onClick={handleNext} disabled={isSubmitting || loading} className="flex items-center space-x-2">
+                <Button 
+                  type="button" 
+                  onClick={handleNext} 
+                  disabled={isSubmitting || loading} 
+                  className="flex items-center space-x-2">
                   <span>Next</span>
                   <ChevronRight size={16} />
                 </Button>
               )}
 
               {currentStep === steps.length - 1 && (
-                <Button type="submit" disabled={isSubmitting || loading} className="flex items-center space-x-2">
+                <Button 
+                  type="submit" 
+                  disabled={isSubmitting || loading} 
+                  className="flex items-center space-x-2">
                   {isSubmitting || loading ? (
                     <>
                       <Loader2 className="animate-spin" size={16} />

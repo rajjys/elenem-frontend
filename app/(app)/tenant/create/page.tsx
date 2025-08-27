@@ -10,14 +10,20 @@ import { useAuthStore } from '@/store/auth.store'
 
 export default function CreateTenantPage() {
   const router = useRouter()
-  const { user: userAuth } = useAuthStore();
-  const handleSuccess = (tenantId: string) => {
+  const { user: userAuth, fetchUser } = useAuthStore();
+  const handleSuccess = async (tenantId: string) => {
     //console.log(`Tenant ${tenantId} created successfully.`)
     if(userAuth?.roles.includes(Roles.SYSTEM_ADMIN)){
       router.push(`/tenant/dashboard?ctxTenantId=${tenantId}`) // Redirect to list or dashboard
     }
     else {
-      router.push('/tenant/dashboard') // Redirect to dashboard
+      //The user is a TENANT_ADMIN as creating a tenant/organisation makes you the automatic owner and assigns you the role of TENANT_ADMIN
+      ///The issue is, the front end doenst know yet so we need to fetch the user from backend again
+      //Otherwise we get a 403 Access Denied
+      const updatedUser = await fetchUser();
+      if (updatedUser?.roles.includes(Roles.TENANT_ADMIN)) {
+        router.push('/tenant/dashboard');
+      }
     }
   }
 

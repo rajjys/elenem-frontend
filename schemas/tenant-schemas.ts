@@ -57,15 +57,15 @@ export const TenantDetailsSchema = z.object({
   id: z.string().cuid(),
   externalId: z.string().uuid(),
   name: z.string().min(1, "Tenant name is required").max(100),
-  tenantCode: z.string().min(3, "Tenant code must be at least 3 characters").max(7, "Tenant code must be at most 7 characters").regex(/^[A-Z0-9]+$/, "Tenant code must be uppercase alphanumeric"),
+  tenantCode: z.string().min(3, "Tenant code must be at least 3 characters").max(12, "Tenant code must be at most 12 characters").regex(/^[A-Z0-9]+$/, "Tenant code must be uppercase alphanumeric"),
   tenantType: TenantTypeSchema,
   sportType: SportTypeSchema,
   country: z.string().min(2, "Country is required"),//.max(2, "Country must be a 2-letter ISO code"), // ISO 2-letter code
   businessProfile: z.object({
     name: z.string().min(1, 'Business name is required.'),
     description: z.string().optional(),
-    logoUrl: z.string().url().optional(), // Use a simple string as requested
-    bannerImageUrl: z.string().url().optional(), // Use a simple string as requested
+    logoUrl: z.string().optional().nullable(), // Use a simple string as requested
+    bannerImageUrl: z.string().optional().nullable(), // Use a simple string as requested
     //website: z.string().url().optional(),
     //socialMediaLinks: z.record(z.string()).optional(),
     //establishedYear: z.number().int().min(1000).max(new Date().getFullYear()).optional(),
@@ -136,8 +136,8 @@ export const CreateTenantSchema = z.object({
   country: z.string().min(1, 'Country is required.'),
   // The nested businessProfile object
   businessProfile: z.object({
-    id: z.string().cuid(),
-    name: z.string(),
+    //id: z.string().cuid(),
+    //name: z.string(),
     description: z.string().optional().nullable(),
     country: z.string().optional().nullable(),
     region: z.string().optional().nullable(),
@@ -158,7 +158,7 @@ export type CreateTenantDto = z.infer<typeof CreateTenantSchema>;
 export const UpdateTenantSchema = z.object({
   name: z.string().min(1, "Tenant name is required").max(100),
   description: z.string().nullable().optional(),
-  tenantCode: z.string().min(3, "Tenant code must be at least 3 characters").max(7, "Tenant code must be at most 7 characters").regex(/^[A-Z0-9]+$/, "Tenant code must be uppercase alphanumeric").optional(),
+  tenantCode: z.string().min(3, "Tenant code must be at least 3 characters").max(12, "Tenant code must be at most 12 characters").regex(/^[A-Z0-9]+$/, "Tenant code must be uppercase alphanumeric").optional(),
   tenantType: TenantTypeSchema.optional(),
   sportType: SportTypeSchema.optional(),
   country: z.string().min(2, "Country is required").max(2, "Country must be a 2-letter ISO code").optional(),
