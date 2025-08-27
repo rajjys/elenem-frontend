@@ -67,6 +67,8 @@ export function TeamCreationForm({ onSuccess, onCancel }: TeamCreationFormProps)
 
   // Load Tenants (SYS ADMIN only, for filtering leagues)
   useEffect(() => {
+    
+    setVenues([]) ///placeholder. Will be removed later when venues api is ready
     if (isSystemAdmin) {
       (async () => {
         try {
