@@ -14,7 +14,7 @@ export type TenantLiteResponseDto = z.infer<typeof TenantLiteResponseSchema>;
 const LeagueLiteResponseSchema = z.object({
   id: z.string(),
   name: z.string(),
-  slug: z.string(),
+  slug: z.string().optional(),
 });
 export type LeagueLiteResponseDto = z.infer<typeof LeagueLiteResponseSchema>;
 
@@ -40,16 +40,7 @@ export const LeagueBasicSchema: z.ZodSchema<any> = z.lazy(() => z.object({
   division: z.string(),
   gender: z.nativeEnum(Gender).nullable().optional(),
   name: z.string(),
-  leagueCode: z.string(),
-  slug: z.string(),
-  country: z.string().nullable().optional(),
-  region: z.string().nullable().optional(),
-  city: z.string().nullable().optional(),
-  state: z.string().nullable().optional(),
-  establishedYear: z.number().int().nullable().optional(),
-  description: z.string().nullable().optional(),
-  logoUrl: z.string().nullable().optional(),
-  bannerImageUrl: z.string().nullable().optional(),
+  slug: z.string().optional(),
   isActive: z.boolean(),
   visibility: LeagueVisibilitySchema,
 
@@ -137,7 +128,7 @@ export interface LeagueFilterParams {
   establishedYear?: number;
   page?: number;
   pageSize?: number;
-  sortBy?: 'name' | 'leagueCode' | 'sportType' | 'country' | 'ownerUsername' | 'createdAt' | 'updatedAt' | 'division' | 'establishedYear';
+  sortBy?: 'name' | 'sportType' | 'country' | 'ownerUsername' | 'createdAt' | 'updatedAt' | 'division' | 'establishedYear';
   sortOrder?: 'asc' | 'desc';
 }
 //export type GetLeaguesParams = z.infer<typeof LeagueFilterParamsSchema>;
@@ -157,7 +148,7 @@ export const BonusPointRuleSchema = z.object({
 export const PointSystemConfigSchema = z.object({
   rules: z.array(PointRuleSchema),
   bonusPoints: z.array(BonusPointRuleSchema).optional(),
-  commonMetrics: z.record(z.string(), z.string()),
+  commonMetrics: z.record(z.string(), z.string()).optional(),
 });
 
 export const TieBreakerRuleSchema = z.object({
@@ -175,16 +166,20 @@ export const CreateLeagueSchema = z.object({
   name: z.string().min(3, { message: "League name must be at least 3 characters." }),
   tenantId: z.string().cuid({ message: "Invalid Tenant ID." }),
   parentLeagueId: z.string().cuid().optional().nullable(),
-  division: z.string().default("D1"),
+  division: z.string(),
   gender: z.nativeEnum(Gender),
-  visibility: z.nativeEnum(LeagueVisibility).default(LeagueVisibility.PUBLIC),
+  visibility: z.nativeEnum(LeagueVisibility).optional(),
   ownerId: z.string().cuid().optional().nullable(),
-  isActive: z.boolean().default(true),
+  isActive: z.boolean(),
   // The business profile is now a required sub-object
   businessProfile: z.object({
     //id: z.string().cuid(),
     //name: z.string().optional().null,
     //country: z.string().optional().nullable(),
+    logoUrl: z.string().optional().nullable(),
+    bannerImageUrl: z.string().optional().nullable(),
+    physicalAddress: z.string().optional().nullable(),
+    description: z.string().optional().nullable(),
     region: z.string().optional().nullable(),
     city: z.string().optional().nullable(),
   }),

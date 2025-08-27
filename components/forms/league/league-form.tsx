@@ -1,11 +1,11 @@
 "use client";
 
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { Loader2 } from 'lucide-react';
+import { Loader2, CheckCircle, ChevronRight, ChevronLeft } from 'lucide-react';
 import { api } from '@/services/api';
 import { CreateLeagueSchema, CreateLeagueDto } from '@/schemas/league-schemas';
 import { useAuthStore } from '@/store/auth.store';
@@ -13,7 +13,8 @@ import Step1_BasicInfo from './step1-basic-info';
 import Step2_BusinessProfile from './step2-business-profile';
 import Step3_Rules from './step3-rules';
 import Step4_Review from './step4-review';
-import { Gender, Roles } from '@/schemas';
+import { Gender, LeagueVisibility, Roles } from '@/schemas';
+import axios from 'axios';
 
 // Define the steps and their corresponding components
 const steps = [
@@ -31,58 +32,108 @@ interface LeagueFormProps {
 export function LeagueCreationForm({ onSuccess, onCancel } : LeagueFormProps) {
   const [currentStep, setCurrentStep] = useState(0);
   const [loading, setLoading] = useState(false);
-  const { user } = useAuthStore(); // Assuming user has roles and tenantId
+  const { user } = useAuthStore();
   const isSystemAdmin = user?.roles.includes(Roles.SYSTEM_ADMIN);
 
-  const methods = useForm({
-    resolver: zodResolver(CreateLeagueSchema),
-    defaultValues: useMemo(() => {
-      // Set the tenantId automatically for TENANT_ADMIN
-      const defaultValues = {
-        tenantId: '',
-        name: '',
-        gender: Gender.MALE,
-        businessProfile: {
-        }
-      };
-      if (!isSystemAdmin && user?.tenantId) {
-        defaultValues.tenantId = user.tenantId;
-      }
-      return defaultValues;
-    }, [isSystemAdmin, user])
-  });
+  // Initialize react-hook-form with the full schema
+  const methods = useForm<CreateLeagueDto>({
+  resolver: zodResolver(CreateLeagueSchema),
+  defaultValues: {
+    name: '',
+    division: 'D1',
+    gender: Gender.MALE,
+    visibility: LeagueVisibility.PUBLIC,
+    tenantId: isSystemAdmin ? '' : user?.tenantId || '',
+    isActive: true,
+    businessProfile: {
+      description: '',
+      logoUrl: '',
+      bannerImageUrl: '',
+      physicalAddress: '',
+      city: '',
+      region: '',
+    },
+    pointSystemConfig: {
+      rules: [],
+    },
+    tieBreakerConfig: [],
+  },
+});;
 
-  const { handleSubmit, formState, watch, setValue, getValues } = methods;
-  const { isSubmitting, isValid } = formState;
+  const { handleSubmit, trigger, formState: { isSubmitting } } = methods;
 
-  // Use watch to get the current values and handle dynamic state
-  //const watchedValues = watch();
+  // Function to render the step-by-step guidance
+  const renderStepper = () => (
+    <div className="flex justify-between items-center mb-6 w-full text-center">
+      {steps.map((step, index) => {
+        const isCurrent = index === currentStep;
+        const isCompleted = index < currentStep;
+
+        return (
+          <div key={step.name} className="flex flex-col items-center flex-1 relative">
+            <div className="relative z-10 flex items-center justify-center w-8 h-8 rounded-full transition-colors duration-200"
+              style={{
+                backgroundColor: isCompleted ? '#22c55e' : (isCurrent ? '#3b82f6' : '#e5e7eb'),
+                color: isCurrent ? '#fff' : (isCompleted ? '#fff' : '#4b5563')
+              }}>
+              {isCompleted ? (
+                <CheckCircle size={16} />
+              ) : (
+                <span className="font-semibold">{index + 1}</span>
+              )}
+            </div>
+            <div className={`mt-2 text-sm transition-colors duration-200 ${isCurrent ? 'text-gray-900 font-medium' : 'text-gray-500'}`}>{step.name}</div>
+            {index < steps.length - 1 && (
+              <div className="absolute top-4 left-1/2 w-[calc(100%+16px)] -translate-x-1/2 -z-10 transition-colors duration-200 h-1 rounded-full"
+                style={{ backgroundColor: isCompleted ? '#22c55e' : '#e5e7eb' }}></div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
 
   const handleNext = async () => {
-    // Validate the current step's fields before moving on
-    const isValidStep = await methods.trigger();
-    if (isValidStep) {
-      if (currentStep < steps.length - 1) {
-        setCurrentStep(prev => prev + 1);
-      }
+    // Determine which fields to validate based on the current step
+    let isValid = false;
+    switch (currentStep) {
+      case 0:
+        isValid = await trigger(['name', 'tenantId', 'parentLeagueId', 'division', 'gender', 'visibility', 'ownerId']);
+        break;
+      case 1:
+        isValid = await trigger(['businessProfile.description', 'businessProfile.region', 'businessProfile.city']);
+        break;
+      case 2:
+        isValid = await trigger(['pointSystemConfig', 'tieBreakerConfig']);
+        break;
+      default:
+        isValid = true;
+    }
+
+    if (isValid) {
+      setCurrentStep(prev => prev + 1);
     } else {
-      toast.error("Please fill out all required fields.");
+      toast.error('Please fill out all required fields.');
     }
   };
 
   const handleBack = () => {
-    setCurrentStep(prev => prev > 0 ? prev - 1 : prev);
+    setCurrentStep(prev => prev - 1);
   };
 
   const onSubmit = async (data: CreateLeagueDto) => {
     setLoading(true);
     try {
-      const response = await api.post('/leagues', data);
+      const payload = isSystemAdmin ? data : { ...data, tenantId: user?.tenantId };
+      const response = await api.post('/leagues', payload);
       toast.success('League created successfully!');
-      onSuccess(response.data.id); // Pass the new league data
+      onSuccess(response.data.id);
     } catch (error) {
-      toast.error('Failed to create league.');
-      console.error(error);
+      let errorMessage = "League creation failed. Please try again.";
+      if (axios.isAxiosError(error)) {
+        errorMessage = error.response?.data?.message || errorMessage;
+      }
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -92,38 +143,52 @@ export function LeagueCreationForm({ onSuccess, onCancel } : LeagueFormProps) {
 
   return (
     <FormProvider {...methods}>
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        {/* Render the current step component */}
-        <CurrentStepComponent />
+      <div className="p-4 bg-white rounded-lg shadow-md max-w-2xl mx-auto">
+        {renderStepper()}
 
-        {/* Navigation buttons */}
-        <div className="flex justify-end space-x-4 pt-4 m-2">
-          {currentStep > 0 && (
-            <Button type="button" variant="ghost" onClick={handleBack} disabled={isSubmitting || loading}>
-              Back
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          <CurrentStepComponent />
+
+          <div className="flex justify-between space-x-4 pt-4 m-2">
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={onCancel}
+              disabled={isSubmitting || loading}
+            >
+              Cancel
             </Button>
-          )}
-
-          {currentStep < steps.length - 1 && (
-            <Button type="button" onClick={handleNext} disabled={isSubmitting || loading}>
-              Next
-            </Button>
-          )}
-
-          {currentStep === steps.length - 1 && (
-            <Button type="submit" disabled={isSubmitting || loading}>
-              {isSubmitting || loading ? (
-                <>
-                  <Loader2 className="animate-spin" size={16} />
-                  <span>Submitting...</span>
-                </>
-              ) : (
-                <span>Create League</span>
+            <div className="flex space-x-4">
+              {currentStep > 0 && (
+                <Button type="button" variant="ghost" onClick={handleBack} disabled={isSubmitting || loading} className="flex items-center space-x-2">
+                  <ChevronLeft size={16} />
+                  <span>Back</span>
+                </Button>
               )}
-            </Button>
-          )}
-        </div>
-      </form>
+
+              {currentStep < steps.length - 1 && (
+                <Button type="button" onClick={handleNext} disabled={isSubmitting || loading} className="flex items-center space-x-2">
+                  <span>Next</span>
+                  <ChevronRight size={16} />
+                </Button>
+              )}
+
+              {currentStep === steps.length - 1 && (
+                <Button type="submit" disabled={isSubmitting || loading} className="flex items-center space-x-2">
+                  {isSubmitting || loading ? (
+                    <>
+                      <Loader2 className="animate-spin" size={16} />
+                      <span>Submitting...</span>
+                    </>
+                  ) : (
+                    <span>Create League</span>
+                  )}
+                </Button>
+              )}
+            </div>
+          </div>
+        </form>
+      </div>
     </FormProvider>
   );
 }

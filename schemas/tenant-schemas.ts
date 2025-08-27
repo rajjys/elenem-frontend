@@ -89,7 +89,6 @@ export const TenantDetailsSchema = z.object({
   leagues: z.array(z.object({
     id: z.string().cuid(),
     name: z.string(),
-    leagueCode: z.string(),
     country: z.string().optional(),
     isActive: z.boolean(),
     createdAt: z.preprocess((arg) => new Date(arg as string), z.date()),
@@ -139,9 +138,13 @@ export const CreateTenantSchema = z.object({
   businessProfile: z.object({
     id: z.string().cuid(),
     name: z.string(),
+    description: z.string().optional().nullable(),
     country: z.string().optional().nullable(),
     region: z.string().optional().nullable(),
     city: z.string().optional().nullable(),
+    logoUrl: z.string().optional().nullable(),
+    bannerImageUrl: z.string().optional().nullable(),
+    physicalAddress: z.string().optional().nullable()
   }),
   // Optional ownerId for SYSTEM_ADMIN
   //isActive: z.boolean().optional().default(true),

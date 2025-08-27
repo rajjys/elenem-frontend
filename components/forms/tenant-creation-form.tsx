@@ -122,7 +122,7 @@ export function TenantCreationForm({ onSuccess, onCancel }: TenantFormProps) {
     if (currentStep === 0) {
       isValid = await trigger(['name', 'tenantCode', 'tenantType', 'sportType', 'country']);
     } else if (currentStep === 1) {
-      isValid = await trigger(['businessProfile.description', 'businessProfile.logoUrl', 'businessProfile.bannerImageUrl', 'businessProfile.physicalAddress', 'businessProfile.city', 'businessProfile.region', 'ownerId']);
+      isValid = await trigger(['businessProfile.city', 'businessProfile.region', 'ownerId']);
     }
 
     if (isValid) {

@@ -14,8 +14,7 @@ import { Roles } from '@/schemas';
 export default function Step1_BasicInfo() {
   const { user } = useAuthStore();
   const isSystemAdmin = user?.roles.includes(Roles.SYSTEM_ADMIN);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { register, control, watch, setValue, getValues } = useFormContext();
+  const { register, watch, setValue } = useFormContext();
 
   const [tenants, setTenants] = useState<TenantDetails[]>([]);
   const [parentLeagues, setParentLeagues] = useState([]);

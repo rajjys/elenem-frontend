@@ -21,8 +21,8 @@ export default function CreateleaguePage() {
     const isSystemAdmin = currentUserRoles.includes(Roles.SYSTEM_ADMIN);
     const isTenantAdmin = currentUserRoles.includes(Roles.TENANT_ADMIN);
     
-    const redirectPath = isSystemAdmin ? "/admin/leagues":
-                         isTenantAdmin ? "/tenant/leagues" :
+    const redirectPath = isSystemAdmin ? `/admin/leagues`:
+                         isTenantAdmin ? `/league/dashboard?ctxLeagueId=${leagueId}` :
                          "/leagues"; // Default fallback path  
     router.push(redirectPath); // Example: redirect to admin leagues list
   };
