@@ -21,7 +21,7 @@ import {
 
 import { Filter as FilterIcon } from 'lucide-react';
 
-import { SeasonFilterParams, SeasonStatus, Roles } from '@/schemas'; // Your filter schema
+import { SeasonFilterParams, SeasonStatus, Roles, PaginatedLeaguesResponseDto } from '@/schemas'; // Your filter schema
 import { useAuthStore } from '@/store/auth.store';
 import { api } from '@/services/api'; // Your API instance
 import { toast } from 'sonner';
@@ -76,7 +76,7 @@ export function SeasonsFilters({ filters, onFilterChange, onPageSizeChange, fixe
   const fetchTenants = useCallback(async () => {
     if (!isSystemAdmin) return;
     try {
-      const response = await api.get('/tenants', { params: { take: 1000 } });
+      const response = await api.get('/tenants', { params: { take: 100 } });
       setAvailableTenants(response.data.items);
     } catch (err) {
       toast.error("Failed to fetch tenants.");
@@ -97,8 +97,8 @@ export function SeasonsFilters({ filters, onFilterChange, onPageSizeChange, fixe
       if (idToFetch) params.append('tenantId', idToFetch);
       if (fixedLeagueId) params.append('leagueId', fixedLeagueId);
 
-      const response = await api.get(`/leagues`, { params: { ...Object.fromEntries(params), take: 1000 } });
-      setAvailableLeagues(response.data.items);
+      const response = await api.get<PaginatedLeaguesResponseDto>(`/leagues`, { params: { ...Object.fromEntries(params), take: 100 } });
+      setAvailableLeagues(response.data.data);
     } catch (err) {
       toast.error("Failed to fetch leagues.");
       console.error("Fetch leagues error:", err);

@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { Roles } from '@/schemas';
 import { useAuthStore } from '@/store/auth.store';
+import axios from 'axios';
 export default function TenantSeasonsPage() {
   const router = useRouter();
   const { user } = useAuthStore();
@@ -70,10 +71,12 @@ export default function TenantSeasonsPage() {
       setTotalItems(validatedData.totalItems);
       setTotalPages(validatedData.totalPages);
     } catch (error) {
-      const errorMessage = 'Failed to fetch seasons.';
-      setError(errorMessage);
-      toast.error('Error fetching seasons', { description: errorMessage });
-      console.error('Fetch seasons error:', error);
+      let errorMessage = "Filed to fetch seasons. Please try again later.";
+        if (axios.isAxiosError(error)) {
+            errorMessage = error.response?.data?.message || errorMessage;
+        }
+        setError(errorMessage);
+        toast.error(errorMessage);
     } finally {
       setLoading(false);
     }

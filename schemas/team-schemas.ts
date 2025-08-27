@@ -2,54 +2,90 @@
 import * as z from 'zod';
 import { GenderSchema, SportTypeSchema, TeamVisibility, TeamVisibilitySchema } from './enums';
 
-// Base schema for common team fields
+// 1) Business profile that now carries the media + description
+export const TeamBusinessProfileInput = z.object({
+  description: z.string().optional().or(z.literal("")),
+  logoUrl: z.string().url("Invalid logo URL.").optional().or(z.literal("")),
+  bannerImageUrl: z.string().url("Invalid banner image URL.").optional().or(z.literal("")),
+});
+
+// 2) Base team: drop description/logo/banner from here
 export const BaseTeamSchema = z.object({
   name: z.string().min(2, "Team name must be at least 2 characters long."),
-  shortCode: z.string().min(2, "Short code must be at least 2 characters long.").optional().or(z.literal('')),
-  description: z.string().optional().or(z.literal('')),
-  logoUrl: z.string().url("Invalid logo URL.").optional().or(z.literal('')),
-  bannerImageUrl: z.string().url("Invalid banner image URL.").optional().or(z.literal('')),
-  country: z.string().optional().or(z.literal('')),
-  city: z.string().optional().or(z.literal('')),
-  state: z.string().optional().or(z.literal('')),
-  establishedYear: z.number().int().min(1900, "Year must be 1900 or later.").max(new Date().getFullYear(), "Year cannot be in the future.").optional(),
-  teamProfile: z.record(z.any()).optional(), // For Prisma's Json type
+  shortCode: z.string().min(2, "Short code must be at least 2 characters long.").optional().or(z.literal("")),
+  country: z.string().optional().or(z.literal("")),
+  city: z.string().optional().or(z.literal("")),
+  state: z.string().optional().or(z.literal("")),
+  establishedYear: z.number().int().min(1900, "Year must be 1900 or later.")
+    .max(new Date().getFullYear(), "Year cannot be in the future.").optional(),
+  teamProfile: z.record(z.any()).optional(),
 });
 
-// Schema for creating a team (used by SYSTEM_ADMIN, TENANT_ADMIN, LEAGUE_ADMIN)
+// 3) Create schema: businessProfile moved in; owner/homeVenue live here (step 2)
 export const CreateTeamFormSchema = BaseTeamSchema.extend({
+  // role-scoped; see UI rules below for who picks what
   leagueId: z.string().min(1, "League is required."),
-  tenantId: z.string().min(1, "Tenant is required."), // Only required for SYSTEM_ADMIN on form
-  homeVenueId: z.string().optional().or(z.literal('')),
-  visibility: TeamVisibilitySchema.default(TeamVisibility.PUBLIC),
-  initialTeamAdminId: z.string().optional().or(z.literal('')),
+  // Only for SYS ADMIN UI filtering; not required by backend create (derived from league)
+  tenantId: z.string().optional().or(z.literal("")),
+  businessProfile: TeamBusinessProfileInput,
+  ownerId: z.string().optional().or(z.literal("")),
+  homeVenueId: z.string().optional().or(z.literal("")),
+  visibility: TeamVisibilitySchema,
   isActive: z.boolean().optional(),
-  // This field is not required for creation, but can be set by SYSTEM_ADMIN or TENANT_ADMIN
 });
 
-// Schema for updating a team by League Admin (or higher roles)
+// 4) Update-by-LA schema (unchanged except it no longer carries desc/logo/banner)
 export const UpdateTeamByLaFormSchema = BaseTeamSchema.extend({
-  homeVenueId: z.string().nullable().optional(), // Can be null to unassign
+  homeVenueId: z.string().nullable().optional(),
   visibility: z.nativeEnum(TeamVisibility).optional(),
   isActive: z.boolean().optional(),
 });
 
-// Schema for updating a team profile by Team Admin (restricted fields)
+// 5) Update-by-TA schema: remove desc/logo/banner here too (those belong to business profile flows)
 export const UpdateTeamProfileByTaFormSchema = z.object({
   name: z.string().min(2, "Team name must be at least 2 characters long.").optional(),
-  shortCode: z.string().min(2, "Short code must be at least 2 characters long.").optional().or(z.literal('')),
-  description: z.string().optional().or(z.literal('')),
-  logoUrl: z.string().url("Invalid logo URL.").optional().or(z.literal('')),
-  bannerImageUrl: z.string().url("Invalid banner image URL.").optional().or(z.literal('')),
-  country: z.string().optional().or(z.literal('')),
-  city: z.string().optional().or(z.literal('')),
-  state: z.string().optional().or(z.literal('')),
-  establishedYear: z.number().int().min(1900, "Year must be 1900 or later.").max(new Date().getFullYear(), "Year cannot be in the future.").optional(),
+  shortCode: z.string().min(2, "Short code must be at least 2 characters long.").optional().or(z.literal("")),
+  country: z.string().optional().or(z.literal("")),
+  city: z.string().optional().or(z.literal("")),
+  state: z.string().optional().or(z.literal("")),
+  establishedYear: z.number().int().min(1900).max(new Date().getFullYear()).optional(),
   teamProfile: z.record(z.any()).optional(),
-  // These fields are explicitly excluded or read-only for Team Admins
-  // isActive: z.boolean().optional().refine(() => false, { message: "Not editable by Team Admin." }),
-  // visibility: z.nativeEnum(TeamVisibility).optional().refine(() => false, { message: "Not editable by Team Admin." }),
-  // homeVenueId: z.string().nullable().optional().refine(() => false, { message: "Not editable by Team Admin." }),
+});
+
+// 6) Details schema now includes businessProfile object explicitly
+export const TeamDetailsSchema = BaseTeamSchema.extend({
+  id: z.string().cuid(),
+  externalId: z.string().uuid(),
+  slug: z.string(),
+  homeVenueId: z.string().nullable().optional(),
+  visibility: z.nativeEnum(TeamVisibility).optional(),
+  isActive: z.boolean().optional(),
+  leagueId: z.string().cuid(),
+  tenantId: z.string().cuid(),
+  businessProfile: TeamBusinessProfileInput, // <— now here
+  league: z.object({
+    id: z.string().cuid(),
+    name: z.string(),
+    leagueCode: z.string(),
+    gender: z.any(),
+    division: z.string(),
+  }),
+  tenant: z.object({
+    id: z.string().cuid(),
+    name: z.string(),
+    tenantCode: z.string(),
+    sportType: z.any(),
+  }),
+  managers: z.array(z.object({
+    id: z.string().cuid(),
+    username: z.string(),
+    firstName: z.string().optional(),
+    lastName: z.string().optional()
+  })),
+  homeVenue: z.object({
+    id: z.string().cuid(),
+    name: z.string(),
+  }).optional(),
 });
 
 export type SortableColumn = 'name'| 'shortCode'| 'leagueName'| 'tenantName'| 'country'| 'city'| 'establishedYear'| 'createdAt'| 'updatedAt';
@@ -75,40 +111,6 @@ export const TeamFilterParamsSchema = z.object({
 export type TeamFilterParams = z.infer<typeof TeamFilterParamsSchema>;
 // Union type for form values (for react-hook-form typing)
 export type TeamFormValues = z.infer<typeof CreateTeamFormSchema>
-
-export const TeamDetailsSchema = BaseTeamSchema.extend({
-  id: z.string().cuid(),
-  externalId: z.string().uuid(),
-  slug: z.string(),
-  homeVenueId: z.string().nullable().optional(), // Can be null to unassign
-  visibility: z.nativeEnum(TeamVisibility).optional(),
-  isActive: z.boolean().optional(),
-  leagueId: z.string().cuid(),
-  tenantId: z.string().cuid(),
-  league: z.object({
-    id: z.string().cuid(),
-    name: z.string(),
-    leagueCode: z.string(),
-    gender: GenderSchema,
-    division: z.string()
-  }),
-  tenant: z.object({
-    id: z.string().cuid(),
-    name: z.string(),
-    tenantCode: z.string(),
-    sportType: SportTypeSchema,
-  }),
-  managers:z.array(z.object({
-    id: z.string().cuid(),
-    username: z.string(),
-    firstName: z.string().optional(),
-    lastName: z.string().optional()
-  })),
-  homeVenue : z.object({
-    id: z.string().cuid(),
-    name: z.string(),
-  }),
-});
 
 export type TeamDetails = z.infer<typeof TeamDetailsSchema>;
 
