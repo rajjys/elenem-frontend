@@ -21,9 +21,9 @@ export function TeamCard({ team, leagueId }: TeamCardProps) {
   return (
     <Link href={teamLink} className="block group">
       <div className="bg-white shadow-lg rounded-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
-        {team.bannerImageUrl && !bannerError ? (
+        {team.businessProfile.bannerImageUrl && !bannerError ? (
           <Image
-            src={team.bannerImageUrl}
+            src={team.businessProfile.bannerImageUrl}
             alt={`${team.name} banner`}
             width={600}
             height={128}
@@ -38,9 +38,9 @@ export function TeamCard({ team, leagueId }: TeamCardProps) {
         )}
         <div className="p-4">
           <div className="flex items-center space-x-3 mb-2">
-            {team.logoUrl && !logoError ? (
+            {team.businessProfile.logoUrl && !logoError ? (
               <Image
-                src={team.logoUrl}
+                src={team.businessProfile.logoUrl}
                 alt={`${team.name} logo`}
                 width={48}
                 height={48}
@@ -60,9 +60,9 @@ export function TeamCard({ team, leagueId }: TeamCardProps) {
               {team.name}
             </h3>
           </div>
-          {team.description && (
+          {team.businessProfile.description && (
             <p className="text-sm text-gray-600 line-clamp-2 mb-2">
-              {team.description}
+              {team.businessProfile.description}
             </p>
           )}
           {team.homeVenue && (
