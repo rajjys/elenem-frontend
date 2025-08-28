@@ -4,7 +4,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
-import { FiSearch } from 'react-icons/fi';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuthStore } from '@/store/auth.store';
 import { api } from '@/services/api';
@@ -12,30 +11,10 @@ import { toast } from 'sonner';
 import { LeagueBasic, PaginatedLeaguesResponseSchema, Roles } from '@/schemas';
 import { useContextualLink } from '@/hooks';
 import { Plus, Settings } from 'lucide-react';
+import axios from 'axios';
 
 // Define the League schema based on common data structures
 // This should match your backend DTO for a single League
-
-
-// Define the PaginatedLeaguesResponseSchema as per your backend structure
-
-
-// Define filter parameters
-interface LeagueFilterParams {
-  search?: string;
-  sportType?: string;
-  country?: string;
-  visibility?: 'public' | 'private';
-  isActive?: boolean;
-  gender?: 'male' | 'female' | 'mixed';
-  parentLeagueId?: string;
-  division?: string;
-  establishedYear?: number;
-  page: number;
-  pageSize: number;
-  sortBy?: string;
-  sortOrder?: 'asc' | 'desc';
-}
 
 export default function TenantLeaguesPage() {
   const router = useRouter();
@@ -45,20 +24,12 @@ export default function TenantLeaguesPage() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [totalItems, setTotalItems] = useState<number>(0);
-  const [totalPages, setTotalPages] = useState<number>(1);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [filters, setFilters] = useState<LeagueFilterParams>({
-    page: 1,
-    pageSize: 10,
-    sortBy: 'name',
-    sortOrder: 'asc',
-  });
   const { buildLink } = useContextualLink();
   const currentUserRoles = userAuth?.roles || [];
   const ctxTenantId = useSearchParams().get('ctxTenantId'); // Use search params if needed
   // Determine current tenant ID based on user roles
-      const isSystemAdmin = currentUserRoles.includes(Roles.SYSTEM_ADMIN);
-      const isTenantAdmin = currentUserRoles.includes(Roles.TENANT_ADMIN);
+  const isSystemAdmin = currentUserRoles.includes(Roles.SYSTEM_ADMIN);
+  const isTenantAdmin = currentUserRoles.includes(Roles.TENANT_ADMIN);
   const currentTenantId = isSystemAdmin
     ? ctxTenantId
     : isTenantAdmin
@@ -78,25 +49,27 @@ export default function TenantLeaguesPage() {
       const params = new URLSearchParams();
       if(isSystemAdmin){
         params.append('tenantId', currentTenantId); // Use currentTenantId directly
+        params.append('page', "1");
+        params.append('sortBy', 'name');
+        params.append('SortOrder', 'asc');
         }
-
-      console.log('Fetching leagues with params:', params.toString());
 
       const response = await api.get(`/leagues?${params.toString()}`);
       const validatedData = PaginatedLeaguesResponseSchema.parse(response.data);
 
       setLeagues(validatedData.data);
       setTotalItems(validatedData.totalItems);
-      setTotalPages(validatedData.totalPages);
     } catch (error) {
-      const errorMessage = 'Failed to fetch leagues.';
+      let errorMessage = "Failed to fetch leagues";
+      if (axios.isAxiosError(error)) {
+          errorMessage = error.response?.data?.message || errorMessage;
+      }
       setError(errorMessage);
-      toast.error('Error fetching leagues', { description: errorMessage });
-      console.error('Fetch leagues error:', error);
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
-  }, [currentTenantId]); // Dependency on  and currentTenantId
+  }, [currentTenantId, isSystemAdmin]); // Dependency on  and currentTenantId
 
   useEffect(() => {
     fetchLeagues();
@@ -125,7 +98,7 @@ export default function TenantLeaguesPage() {
       </Head>
 
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-gray-800">Leagues</h1>
+        <h1 className="text-3xl font-bold text-gray-800">{totalItems} Leagues</h1>
         <div className='flex whitespace-nowrap text-sm gap-3'>
                     <button onClick={() => router.push('/tenant/settings')}
                         className="w-full flex items-center justify-center text-gray-800 px-2 py-2 mx-2 border border-gray-200 rounded-md transition-colors">
@@ -136,19 +109,6 @@ export default function TenantLeaguesPage() {
                         <Plus className="h-4 w-4 mr-2" />Create New League
                     </button>
           </div>
-      </div>
-
-      {/* Filter and Search Section */}
-      <div className="bg-white p-4 rounded-lg shadow-md mb-6 flex items-center space-x-4">
-        <FiSearch className="text-gray-400" size={20} />
-        <input
-          type="text"
-          placeholder="Search leagues by name..."
-          className="flex-1 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
-          value={filters.search || ''}
-          //onChange={handleSearchChange}
-        />
-        {/* Add more filter dropdowns here if needed */}
       </div>
 
       {leagues.length === 0 && !loading && !error ? (
@@ -206,37 +166,6 @@ export default function TenantLeaguesPage() {
               </tbody>
             </table>
           </div>
-
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <nav
-              className="flex items-center justify-between pt-4"
-              aria-label="Pagination"
-            >
-              <div className="flex-1 flex justify-between sm:justify-end">
-                <button
-                  //onClick={() => handlePageChange(filters.page - 1)}
-                  disabled={filters.page <= 1}
-                  className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Previous
-                </button>
-                <button
-                 // onClick={() => handlePageChange(filters.page + 1)}
-                  disabled={filters.page >= totalPages}
-                  className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Next
-                </button>
-              </div>
-              <div className="hidden sm:flex sm:items-center">
-                <p className="text-sm text-gray-700">
-                  Page <span className="font-medium">{filters.page}</span> of{' '}
-                  <span className="font-medium">{totalPages}</span>
-                </p>
-              </div>
-            </nav>
-          )}
         </div>
       )}
     </div>

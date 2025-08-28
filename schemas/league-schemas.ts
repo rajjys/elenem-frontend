@@ -126,8 +126,8 @@ export interface LeagueFilterParams {
   parentLeagueId?: string;
   division?: string;
   establishedYear?: number;
-  page?: number;
-  pageSize?: number;
+  page: number;
+  pageSize: number;
   sortBy?: 'name' | 'sportType' | 'country' | 'ownerUsername' | 'createdAt' | 'updatedAt' | 'division' | 'establishedYear';
   sortOrder?: 'asc' | 'desc';
 }
