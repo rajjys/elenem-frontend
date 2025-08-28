@@ -1,7 +1,7 @@
 // app/(tenant)/teams/page.tsx
 "use client";
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { api } from '@/services/api';
@@ -14,9 +14,9 @@ import { useAuthStore } from '@/store/auth.store';
 export default function TenantTeamsPage() {
   const router = useRouter();
   const { user: userAuth } = useAuthStore();
-  const currentUserRoles = userAuth?.roles || [];
+  const currentUserRoles = useMemo(() => userAuth?.roles || [], [userAuth?.roles]);
+
   const ctxTenantId = useSearchParams().get('ctxTenantId'); // Use search params if needed
-      
       // Determine current tenant ID based on user roles
       const isSystemAdmin = currentUserRoles.includes(Roles.SYSTEM_ADMIN);
       const isTenantAdmin = currentUserRoles.includes(Roles.TENANT_ADMIN);
