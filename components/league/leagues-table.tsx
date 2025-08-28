@@ -21,7 +21,7 @@ import { ArrowUpDown, Pencil, Trash, MoreVertical } from 'lucide-react';
 import LeagueLogo from './league-logo';
 
 
-type SortableColumn = 'name' | 'leagueCode' | 'sportType' | 'country' | 'ownerUsername' | 'createdAt' | 'updatedAt' | 'division' | 'establishedYear';
+type SortableColumn = 'name' | 'sportType' | 'country' | 'ownerUsername' | 'createdAt' | 'updatedAt' | 'division' | 'establishedYear';
 
 interface LeaguesTableProps {
   leagues: LeagueBasic[];
@@ -32,7 +32,7 @@ interface LeaguesTableProps {
   // onEdit and onView would typically be handled by Next.js Link directly within the table
 }
 
-export function LeaguesTable({ leagues, onSort, sortBy, sortOrder, onDelete }: LeaguesTableProps) {
+export function LeaguesTable({ leagues, onSort, sortOrder, sortBy, onDelete } : LeaguesTableProps) {
   const { buildLink } = useContextualLink();
 
   const getSortIndicator = (column: string) => {
@@ -57,12 +57,6 @@ export function LeaguesTable({ leagues, onSort, sortBy, sortOrder, onDelete }: L
             <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               <Button variant="ghost" onClick={() => onSort('name')}>
                 Name {getSortIndicator('name')}
-                <ArrowUpDown className="ml-2 h-4 w-4" />
-              </Button>
-            </TableHead>
-            <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              <Button variant="ghost" onClick={() => onSort('leagueCode')}>
-                Code {getSortIndicator('leagueCode')}
                 <ArrowUpDown className="ml-2 h-4 w-4" />
               </Button>
             </TableHead>
@@ -134,9 +128,6 @@ export function LeaguesTable({ leagues, onSort, sortBy, sortOrder, onDelete }: L
                     <div className="text-sm text-gray-500">{league.slug}</div> {/* Display slug or leagueCode as subtitle */}
                   </div>
                 </div>
-              </TableCell>
-              <TableCell className="px-6 py-4 whitespace-nowrap">
-                <div className="text-sm text-gray-900">{league.leagueCode}</div>
               </TableCell>
               <TableCell className="px-6 py-4 whitespace-nowrap">
                 <div className="text-sm text-gray-900">

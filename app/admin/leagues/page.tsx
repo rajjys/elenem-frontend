@@ -91,7 +91,7 @@ export default function AdminLeaguesPage() {
     setFilters(prev => ({ ...prev, pageSize: newSize, page: 1 })); // Reset page to 1
   }, []);
 
-  type SortableColumn = 'name' | 'leagueCode' | 'sportType' | 'country' | 'ownerUsername' | 'createdAt' | 'updatedAt' | 'division' | 'establishedYear';
+  type SortableColumn = 'name' | 'sportType' | 'country' | 'ownerUsername' | 'createdAt' | 'updatedAt' | 'division' | 'establishedYear';
   const handleSort = useCallback((column: SortableColumn) => {
     setFilters(prev => ({
       ...prev,
