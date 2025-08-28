@@ -161,7 +161,7 @@ export default function TenantTeamsPage() {
           onPageSizeChange={handlePageSizeChange}
           fixedTenantId={currentTenantId} // Pass fixed tenant ID to filters
         />
-        <Link href="/tenant/teams/create" passHref>
+        <Link href="/team/create" passHref>
           <Button variant="primary" className='whitespace-nowrap'>Create New Team</Button>
         </Link>
       </div>

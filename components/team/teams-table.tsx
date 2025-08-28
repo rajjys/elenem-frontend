@@ -12,32 +12,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/'; // Your UI components
-
-// Assuming TeamResponseDto is defined in your prisma types or a shared schema file
-// and includes league and tenant relations for display.
-// Example structure:
-// interface TeamResponseDto {
-//   id: string;
-//   name: string;
-//   slug: string;
-//   shortCode?: string;
-//   logoUrl?: string;
-//   bannerImageUrl?: string;
-//   description?: string;
-//   leagueId: string;
-//   tenantId: string;
-//   visibility: TeamVisibility;
-//   country?: string;
-//   city?: string;
-//   state?: string;
-//   isActive: boolean;
-//   establishedYear?: number;
-//   createdAt: string;
-//   updatedAt: string;
-//   league: { id: string; name: string; leagueCode: string; slug: string; tenantId: string; sportType?: SportType; gender?: Gender; division?: string; };
-//   tenant: { id: string; name: string; }; // Assuming tenant info is available
-//   managers?: Array<{ id: string; username: string; }>; // Assuming managers can be displayed
-// }
 import { Roles} from '@/schemas'; // Import enums
 import { TeamDetails } from '@/schemas'; // Adjust path to your DTOs
 import { ArrowUpDown, MoreVertical, Pencil, Trash } from 'lucide-react';
@@ -178,11 +152,11 @@ export function TeamsTable({ teams, onSort, sortBy, sortOrder, onDelete, current
               </TableCell>
               <TableCell className="px-6 py-4 whitespace-nowrap">
                 <div className="flex items-center">
-                  {team.logoUrl && (
+                  {team.businessProfile.logoUrl && (
                     <div className="flex-shrink-0 h-10 w-10">
                       <Image
                         className='h-10 w-10 rounded-full object-cover border border-gray-400'
-                        src={team.logoUrl}
+                        src={team.businessProfile.logoUrl}
                         height={60}
                         width={60}
                         placeholder="blur"

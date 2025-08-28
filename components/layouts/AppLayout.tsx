@@ -77,7 +77,7 @@ export default function AppLayout({
   
   const handleLogout = () => {
     logout();
-    router.push('/login');
+    router.push('/');
   };
 
   const handleFlyoutToggle = (label: string, targetElement: HTMLElement) => {

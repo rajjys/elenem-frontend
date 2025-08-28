@@ -172,7 +172,7 @@ export default function LeagueTeamsPage() {
           fixedTenantId={currentTenantId} // Pass fixed tenant ID
           fixedLeagueId={currentLeagueId} // Pass fixed league ID to filters
         />
-        <Link href="/league/teams/create" passHref>
+        <Link href="/team/create" passHref>
           <Button variant="primary" className='whitespace-nowrap'>Create New Team</Button>
         </Link>
       </div>

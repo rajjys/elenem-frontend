@@ -8,13 +8,13 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 
 const baseStyles = "inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2";
 const variantStyles = {
-  default: "text-gray-700 bg-gray-100 hover:bg-gray-200 focus:ring-gray-400",
-  primary: "text-white bg-primary-600 hover:bg-primary-700 focus:ring-primary-500", // Uses primary theme
-  secondary: "text-primary-700 bg-primary-100 hover:bg-primary-200 focus:ring-primary-500", // Uses primary theme
-  danger: "text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 focus:ring-red-500 font-bold", // Specific red for danger
-  outline: "text-primary-700 border border-primary-600 bg-transparent hover:bg-primary-50 focus:ring-primary-500", // Uses primary theme
-  ghost: "text-primary-700 bg-transparent hover:bg-primary-100 focus:ring-primary-500", // Uses primary theme
-  link: "text-primary-600 underline underline-offset-2 hover:text-primary-800 focus:outline-none focus:ring-0", // Uses primary theme
+  default: "text-slate-700 bg-slate-100 hover:bg-slate-200 focus:ring-slate-400",
+  primary: "text-white bg-blue-600 hover:bg-blue-700 focus:ring-blue-500", // Tailwind blue
+  secondary: "text-blue-700 bg-blue-100 hover:bg-blue-200 focus:ring-blue-500", // Softer blue
+  danger: "text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 focus:ring-red-500 font-semibold",
+  outline: "text-blue-700 border border-blue-600 bg-transparent hover:bg-blue-50 focus:ring-blue-500",
+  ghost: "text-blue-700 bg-transparent hover:bg-blue-100 focus:ring-blue-500",
+  link: "text-blue-600 underline underline-offset-2 hover:text-blue-800 focus:outline-none focus:ring-0",
 }
 
 const sizeStyles = {

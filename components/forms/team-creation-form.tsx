@@ -16,14 +16,15 @@ import {
   TeamVisibility,
   CreateTeamFormSchema,
   TeamFilterParams,
+  TeamDetails,
 } from "@/schemas"; // <- make sure these are exported
-import { CheckCircle, ChevronLeft, ChevronRight, ListTodo, Image as ImageIcon } from "lucide-react";
+import { CheckCircle, ChevronLeft, ChevronRight, ListTodo, Image as ImageIcon, Loader2, X } from "lucide-react";
 import axios from "axios";
 
 type TeamFormValues = z.infer<typeof CreateTeamFormSchema>;
 
 interface TeamCreationFormProps {
-  onSuccess: (teamId: string) => void;
+  onSuccess: (team: TeamDetails) => void;
   onCancel: () => void;
 }
 
@@ -181,9 +182,8 @@ export function TeamCreationForm({ onSuccess, onCancel }: TeamCreationFormProps)
           name: data.name, // keep in sync with team name
         },
       };
-      const res = await api.post("/teams", payload);
-      toast.success(`Team ${data.name} created successfully`);
-      onSuccess(res.data.id);
+      const res = await api.post<TeamDetails>("/teams", payload);
+      onSuccess(res.data);
     } catch (error) {
       let errorMessage = "Team creation failed. Please try again.";
       if (axios.isAxiosError(error)) {
@@ -357,7 +357,6 @@ export function TeamCreationForm({ onSuccess, onCancel }: TeamCreationFormProps)
         );
     }
   };
-
   return (
     <div className="max-w-4xl mx-auto">
       <Card>
@@ -393,20 +392,59 @@ export function TeamCreationForm({ onSuccess, onCancel }: TeamCreationFormProps)
           </div>
 
           <div className="flex items-center justify-between p-6 border-t">
-            <Button type="button" variant="danger" onClick={onCancel}>Cancel</Button>
-            <div className="flex items-center gap-3">
+            {/* Left side: Cancel button */}
+            <Button
+              type="button"
+              variant="danger"
+              onClick={onCancel}
+              className="flex items-center space-x-2"
+              disabled={isSubmitting}
+            >
+              <X size={16} />
+              <span>Cancel</span>
+            </Button>
+
+            {/* Right side: Step navigation */}
+            <div className="flex items-center space-x-4">
               {currentStep > 0 && (
-                <Button type="button" variant="ghost" onClick={prevStep}>
-                  <ChevronLeft size={16} /> Back
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={prevStep}
+                  className="flex items-center space-x-2"
+                  disabled={isSubmitting}
+                >
+                  <ChevronLeft size={16} />
+                  <span>Back</span>
                 </Button>
               )}
-              {currentStep < steps.length - 1 ? (
-                <Button type="button" onClick={nextStep}>
-                  Next <ChevronRight size={16} />
+
+              {currentStep < steps.length - 1 && (
+                <Button
+                  type="button"
+                  onClick={nextStep}
+                  className="flex items-center space-x-2"
+                  disabled={isSubmitting}
+                >
+                  <span>Next</span>
+                  <ChevronRight size={16} />
                 </Button>
-              ) : (
-                <Button type="submit" disabled={isSubmitting}>
-                  {isSubmitting ? "Submitting…" : "Create Team"}
+              )}
+
+              {currentStep === steps.length - 1 && (
+                <Button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="flex items-center space-x-2"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="animate-spin" size={16} />
+                      <span>Submitting...</span>
+                    </>
+                  ) : (
+                    <span>Create Team</span>
+                  )}
                 </Button>
               )}
             </div>

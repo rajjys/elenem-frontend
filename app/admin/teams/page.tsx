@@ -137,7 +137,7 @@ export default function AdminTeamsPage() {
           onPageSizeChange={handlePageSizeChange}
           // No fixedTenantId or fixedLeagueId for System Admin page
         />
-        <Link href="/admin/teams/create" passHref>
+        <Link href="/team/create" passHref>
           <Button variant="primary" className='whitespace-nowrap'>Create New Team</Button>
         </Link>
       </div>

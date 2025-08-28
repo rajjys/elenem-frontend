@@ -85,10 +85,7 @@ const leagueNavItems = [
 ];
 
 export default function LeagueAdminLayout({ children }: LeagueAdminLayoutProps) {
-    //const currentPath = usePathname();
-    //const { user, logout } = useAuthStore();
-    //const router = useRouter();
-
+    
     return (
       <React.Suspense fallback={<LoadingSpinner />}>
         <AppLayout

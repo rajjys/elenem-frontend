@@ -62,10 +62,10 @@ export function LoginForm() {
       let errorMessage = "Login failed";
       if (axios.isAxiosError(error)) {
               errorMessage = error.response?.data?.message || errorMessage;
-            }
-            toast.error(errorMessage);
+      }
+      toast.error(errorMessage);
       setError(errorMessage);
-      console.error("Login error:", error);
+      //console.error("Login error:", error);
     }
   }
 

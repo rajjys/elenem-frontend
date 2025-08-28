@@ -4,35 +4,50 @@
 import React from 'react'
 import { useRouter } from 'next/navigation'
 import { AccessGate } from '@/app/(auth)/AccessGate'
-import { Roles } from '@/schemas'
+import { Roles, TeamDetails } from '@/schemas'
 import { TeamCreationForm } from '@/components/forms'
 import { useAuthStore } from '@/store/auth.store'
+import { toast } from 'sonner'
 
 export default function CreateTeamPage() {
   const router = useRouter()
-  const { user: userAuth, fetchUser } = useAuthStore();
-  const handleSuccess = async (teamId: string) => {
-    //console.log(`Team ${teamId} created successfully.`)
-    if(userAuth?.roles.includes(Roles.SYSTEM_ADMIN)){
-      router.push(`/team/dashboard?ctxTeamId=${teamId}`) // Redirect to list or dashboard
+  const { user: userAuth } = useAuthStore();
+  const roles = userAuth?.roles ?? [];
+  const isSystemAdmin = roles.includes(Roles.SYSTEM_ADMIN);
+  const isTenantAdmin = roles.includes(Roles.TENANT_ADMIN);
+  const isLeagueAdmin = roles.includes(Roles.LEAGUE_ADMIN);
+
+  const handleSuccess = async (team: TeamDetails) => {
+    toast.success(`Team ${team.name} created successfully`);
+    if(isSystemAdmin){
+      //router.push(`/team/dashboard?ctxTenantId=${team.tenantId}&ctxLeagueId=${team.leagueId}&ctxTeamId=${team.id}`); // Redirect to context dashboard
+      router.push('/admin/teams');
+    }
+    else if(isTenantAdmin){
+      //router.push(`/team/dashboard?ctxLeagueId=${team.leagueId}&ctxTeamId=${team.id}`)
+      router.push('/tenant/teams');
+    }
+    else if(isLeagueAdmin){
+      //router.push(`/team/dashboard?ctxTeamId=${team.id}`)
+      router.push('/leagues/teams')
     }
     else {
-      //The user is a team_ADMIN as creating a team/organisation makes you the automatic owner and assigns you the role of team_ADMIN
-      ///The issue is, the front end doenst know yet so we need to fetch the user from backend again
-      //Otherwise we get a 403 Access Denied
-      const updatedUser = await fetchUser();
-      if (updatedUser?.roles.includes(Roles.TEAM_ADMIN)) {
-        router.push('/team/dashboard');
-      }
+      router.push(`/teams`)///Fallback. Won't be necessary
     }
   }
 
   const handleCancel = () => {
-    if(userAuth?.roles.includes(Roles.SYSTEM_ADMIN)){
-      router.push(`/admin/dashboard`) // Redirect to list or dashboard
+    if(isSystemAdmin){
+      router.push(`/admin/teams`); // Redirect to context dashboard
+    }
+    else if(isTenantAdmin){
+      router.push(`/tenant/teams`)
+    }
+    else if(isLeagueAdmin){
+      router.push(`/league/teams`)
     }
     else {
-      router.push('/account/dashboard') // Redirect to dashboard
+      router.push(`/`)  ///Fallback. Won't be necessary
     }
   }
 
@@ -40,7 +55,7 @@ export default function CreateTeamPage() {
     <div className="container mx-auto p-6 max-w-2xl">
       <h1 className="text-3xl font-bold text-gray-900 mb-6 text-center">Create New Team</h1>
 
-      <AccessGate allowedRoles={[Roles.SYSTEM_ADMIN, Roles.GENERAL_USER]}>
+      <AccessGate allowedRoles={[Roles.SYSTEM_ADMIN, Roles.TENANT_ADMIN, Roles.LEAGUE_ADMIN]}>
         <TeamCreationForm onSuccess={handleSuccess} onCancel={handleCancel} />
       </AccessGate>
     </div>

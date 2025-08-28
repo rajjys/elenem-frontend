@@ -5,7 +5,7 @@ import Link from 'next/link';
 import React, { useState, useEffect, useRef } from 'react';
 import { useTheme } from '@/components/providers/ThemeProvider';
 import { FiSun, FiMoon, FiSearch, FiAward, FiUser, FiChevronDown } from 'react-icons/fi';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/auth.store';
 // Import lucide-react icons for sport types
 import {  Volleyball, Trophy, Home, Users, Newspaper, ListOrdered, LayoutDashboard, User, Shield, Settings, LogOut, Goal} from 'lucide-react';
@@ -98,6 +98,7 @@ export const PublicHeader = ({
   const { theme, toggleTheme } = useTheme(); // Hook for theme toggling
   const pathname = usePathname(); // Hook to get current path for active link styling
   const { user: userAuth, logout, fetchUser } = useAuthStore(); // Auth store for user data and actions
+  const router = useRouter();
   const [loadingUser, setLoadingUser] = useState(true);
   const [dropdownOpen, setDropdownOpen] = useState(false); // State for user dropdown menu
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -163,7 +164,10 @@ export const PublicHeader = ({
 
   // Update the 'Matchs' navLink with the correct sport icon based on sportType prop
   const updatedNavLinks = extendNavLinksWithIcons(navLinks, sportType);
-
+  const handleLogout = () => {
+    logout();
+    router.push('/');
+  };
   return (
     <>
       {/* Main Header Section */}
@@ -294,7 +298,7 @@ export const PublicHeader = ({
                           <Settings className="w-4 h-4" />
                           <span className="truncate">Parametres</span>
                         </Link>
-                        <button onClick={logout} className="flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-600" role="menuitem">
+                        <button onClick={handleLogout} className="flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-600" role="menuitem">
                           <LogOut className="w-4 h-4" />
                           <span className="truncate">Deconnexion</span>
                         </button>
