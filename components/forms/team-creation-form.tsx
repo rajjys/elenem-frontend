@@ -14,14 +14,14 @@ import { useAuthStore } from "@/store/auth.store";
 import {
   Roles,
   TeamVisibility,
-  CreateTeamFormSchema,
+  CreateTeamFormSchema as CreateTeamSchema,
   TeamFilterParams,
   TeamDetails,
 } from "@/schemas"; // <- make sure these are exported
 import { CheckCircle, ChevronLeft, ChevronRight, ListTodo, Image as ImageIcon, Loader2, X } from "lucide-react";
 import axios from "axios";
 
-type TeamFormValues = z.infer<typeof CreateTeamFormSchema>;
+type TeamFormValues = z.infer<typeof CreateTeamSchema>;
 
 interface TeamCreationFormProps {
   onSuccess: (team: TeamDetails) => void;
@@ -34,11 +34,11 @@ interface VenueLite { id: string; name: string; }
 interface UserLite { id: string; username: string; email?: string; }
 
 export function TeamCreationForm({ onSuccess, onCancel }: TeamCreationFormProps) {
-  const { user } = useAuthStore();
-  const roles = user?.roles ?? [];
-  const isSystemAdmin = roles.includes(Roles.SYSTEM_ADMIN);
-  const isTenantAdmin = roles.includes(Roles.TENANT_ADMIN);
-  const isLeagueAdmin = roles.includes(Roles.LEAGUE_ADMIN);
+  const { user: userAuth } = useAuthStore();
+  const currentUserRoles = userAuth?.roles ?? [];
+  const isSystemAdmin = currentUserRoles.includes(Roles.SYSTEM_ADMIN);
+  const isTenantAdmin = currentUserRoles.includes(Roles.TENANT_ADMIN);
+  const isLeagueAdmin = currentUserRoles.includes(Roles.LEAGUE_ADMIN);
 
   const [currentStep, setCurrentStep] = useState(0);
   const [isSubmitting, setSubmitting] = useState(false);
@@ -49,7 +49,7 @@ export function TeamCreationForm({ onSuccess, onCancel }: TeamCreationFormProps)
   const [owners, setOwners] = useState<UserLite[]>([]);
 
   const form = useForm<TeamFormValues>({
-    resolver: zodResolver(CreateTeamFormSchema),
+    resolver: zodResolver(CreateTeamSchema),
     defaultValues: {
       name: "",
       shortCode: "",
@@ -57,8 +57,8 @@ export function TeamCreationForm({ onSuccess, onCancel }: TeamCreationFormProps)
       businessProfile: { description: "", logoUrl: "", bannerImageUrl: "" },
       ownerId: "",
       homeVenueId: "",
-      leagueId: isLeagueAdmin ? (user?.managingLeagueId ?? "") : "",
-      tenantId: isTenantAdmin ? (user?.tenantId ?? "") : "",
+      leagueId: isLeagueAdmin ? (userAuth?.managingLeagueId ?? "") : "",
+      tenantId: isTenantAdmin ? (userAuth?.tenantId ?? "") : "",
     },
   });
 
@@ -90,7 +90,7 @@ export function TeamCreationForm({ onSuccess, onCancel }: TeamCreationFormProps)
         if (isLeagueAdmin) return;
         const params: TeamFilterParams = { pageSize: 100 };
         if (isSystemAdmin && selectedTenantId) params.tenantId = selectedTenantId;
-        if (isTenantAdmin) params.tenantId = user?.tenantId;
+        if (isTenantAdmin) params.tenantId = userAuth?.tenantId;
 
         const res = await api.get<{ data: LeagueLite[] }>("/leagues", { params });
         setLeagues(res.data.data);
@@ -103,7 +103,7 @@ export function TeamCreationForm({ onSuccess, onCancel }: TeamCreationFormProps)
       }
     };
     load();
-  }, [isSystemAdmin, isTenantAdmin, isLeagueAdmin, selectedTenantId, user]);
+  }, [isSystemAdmin, isTenantAdmin, isLeagueAdmin, selectedTenantId, userAuth]);
 /*
   // Load Venues in tenant scope (SYS uses selected tenant; others use their tenant)
   useEffect(() => {
@@ -129,7 +129,7 @@ export function TeamCreationForm({ onSuccess, onCancel }: TeamCreationFormProps)
         const params = new URLSearchParams();
         params.append("roles", Roles.GENERAL_USER);
         if (isSystemAdmin && selectedTenantId) params.append("tenantId", selectedTenantId);
-        if (!isSystemAdmin && user?.tenantId) params.append("tenantId", user.tenantId);
+        if (!isSystemAdmin && userAuth?.tenantId) params.append("tenantId", userAuth.tenantId);
         const res = await api.get<{ data: UserLite[] }>("/users", { params });
         setOwners(res.data.data);
       } catch {
@@ -137,7 +137,7 @@ export function TeamCreationForm({ onSuccess, onCancel }: TeamCreationFormProps)
       }
     };
     load();
-  }, [isSystemAdmin, selectedTenantId, user]);
+  }, [isSystemAdmin, selectedTenantId, userAuth]);
 
   // Stepper
   const steps = useMemo(() => ([
@@ -173,7 +173,7 @@ export function TeamCreationForm({ onSuccess, onCancel }: TeamCreationFormProps)
       const payload = {
         name: data.name,
         shortCode: data.shortCode || undefined,
-        leagueId: isLeagueAdmin ? (user?.managingLeagueId as string) : data.leagueId, // enforce role scope
+        leagueId: isLeagueAdmin ? (userAuth?.managingLeagueId as string) : data.leagueId, // enforce role scope
         visibility: data.visibility,
         homeVenueId: data.homeVenueId || undefined,
         ownerId: data.ownerId || undefined,
@@ -234,7 +234,7 @@ export function TeamCreationForm({ onSuccess, onCancel }: TeamCreationFormProps)
               {isLeagueAdmin && (
                 <div className="space-y-2">
                   <Label>League</Label>
-                  <Input value={user?.managingLeagueId ?? user?.managingLeagueId ?? ""} disabled />
+                  <Input value={userAuth?.managingLeagueId ?? userAuth?.managingLeagueId ?? ""} disabled />
                 </div>
               )}
 
@@ -346,7 +346,7 @@ export function TeamCreationForm({ onSuccess, onCancel }: TeamCreationFormProps)
               <div><strong>Name:</strong> {watch("name")}</div>
               <div><strong>Short Code:</strong> {watch("shortCode") || "—"}</div>
               <div><strong>Visibility:</strong> {String(watch("visibility"))}</div>
-              <div><strong>League:</strong> {isLeagueAdmin ? (user?.managingLeague?.name ?? user?.managingLeagueId) : leagues.find(l => l.id === selectedLeagueId)?.name || "—"}</div>
+              <div><strong>League:</strong> {isLeagueAdmin ? (userAuth?.managingLeague?.name ?? userAuth?.managingLeagueId) : leagues.find(l => l.id === selectedLeagueId)?.name || "—"}</div>
               <div><strong>Description:</strong> {watch("businessProfile.description") || "—"}</div>
               <div><strong>Logo:</strong> {watch("businessProfile.logoUrl") || "—"}</div>
               <div><strong>Banner:</strong> {watch("businessProfile.bannerImageUrl") || "—"}</div>

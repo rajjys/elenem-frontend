@@ -7,15 +7,14 @@ const TeamBasicSchema = z.object({
   id: z.string(),
   name: z.string(),
   shortCode: z.string(),
-  logoUrl: z.string().url().nullable(),
-  rank: z.number().optional(),
-  record: z.string().optional(),
+  logoUrl: z.string().nullable().optional(),
+  rank: z.number().optional().nullable(),
+  record: z.string().optional().nullable(),
 });
 
 const LeagueBasicSchema = z.object({
   id: z.string(),
   name: z.string(),
-  leagueCode: z.string(),
 });
 const TenantBasicSchema = z.object({
   id: z.string(),
@@ -41,12 +40,12 @@ export const GameDetailsSchema = z.object({
   week: z.string().optional().nullable(),
   location: z.string().optional().nullable(),
   status: z.nativeEnum(GameStatus),
-  homeScore: z.number().int().nullable(),
-  awayScore: z.number().int().nullable(),
-  notes: z.string().nullable(),
-  round: z.string().nullable(),
-  bannerImageUrl: z.string().url().nullable(),
-  highlightsUrl: z.string().url().nullable(),
+  homeScore: z.number().int().nullable().optional(),
+  awayScore: z.number().int().nullable().optional(),
+  notes: z.string().nullable().optional(),
+  round: z.string().nullable().optional(),
+  bannerImageUrl: z.string().nullable().optional(),
+  highlightsUrl: z.string().nullable().optional(),
   isActive: z.boolean(),
   // Relations
   homeTeamId: z.string(),

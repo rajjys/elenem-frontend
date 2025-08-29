@@ -4,7 +4,7 @@
 import React, { useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { AccessGate } from '@/app/(auth)/AccessGate';
-import { Roles } from '@/schemas'; // Adjust path to your Role enum
+import { GameDetails, Roles } from '@/schemas'; // Adjust path to your Role enum
 import { toast } from 'sonner';
 import { useAuthStore } from '@/store/auth.store';
 import { GameForm } from '@/components/forms';
@@ -24,8 +24,8 @@ export default function CreateGamePage() {
                          isLeagueAdmin ? "/league/games" :
                          "/games"; // Default fallback path  
 
-  const handleSuccess = useCallback((seasonId: string) => {
-    toast.success(`Game ${seasonId} created successfully!`);
+  const handleSuccess = useCallback((game: GameDetails) => {
+    toast.success(`Game ${game.slug} created successfully!`);
     router.push(redirectPath); // Example: redirect to admin seasons list
   }, [router, redirectPath]);
 

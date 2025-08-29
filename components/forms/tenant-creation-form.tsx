@@ -86,13 +86,14 @@ export function TenantCreationForm({ onSuccess, onCancel }: TenantFormProps) {
     trigger,
     formState: { errors },
   } = form;
-  const userRole = userAuth?.roles || [];
+  const currentUserRoles = userAuth?.roles || [];
+  const isSystemAdmin = currentUserRoles.includes(Roles.SYSTEM_ADMIN);
   // Watch for changes on the country field to manage the region dropdown
   const country = watch('country');
 
   // Fetch available owners if the user is a SYSTEM_ADMIN
   useEffect(() => {
-    if (userRole.includes(Roles.SYSTEM_ADMIN)) {
+    if (isSystemAdmin) {
       const fetchOwners = async () => {
         setOwnersLoading(true);
         try {
@@ -113,7 +114,7 @@ export function TenantCreationForm({ onSuccess, onCancel }: TenantFormProps) {
       };
       fetchOwners();
     }
-  }, [userRole]);
+  }, [isSystemAdmin]);
 
   // Handle step navigation
   const nextStep = async () => {
@@ -333,7 +334,7 @@ export function TenantCreationForm({ onSuccess, onCancel }: TenantFormProps) {
                 </div>
 
                 {/* Owner Selection (SYSTEM_ADMIN only) */}
-                {userRole.includes(Roles.SYSTEM_ADMIN) && (
+                {currentUserRoles.includes(Roles.SYSTEM_ADMIN) && (
                   <div className="space-y-2 col-span-1 md:col-span-2">
                     <Label htmlFor="ownerId">Tenant Owner (Optional)</Label>
                     <Select
@@ -380,7 +381,7 @@ export function TenantCreationForm({ onSuccess, onCancel }: TenantFormProps) {
                   <p><strong>Type:</strong> {formData.tenantType}</p>
                   <p><strong>Sport:</strong> {formData.sportType}</p>
                   <p><strong>Country:</strong> {formData.country}</p>
-                  {userRole.includes(Roles.SYSTEM_ADMIN) && (
+                  {currentUserRoles.includes(Roles.SYSTEM_ADMIN) && (
                     <p><strong>Owner:</strong> {formData.ownerId || 'N/A'}</p>
                   )}
                 </div>

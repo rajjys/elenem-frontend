@@ -13,6 +13,7 @@ import { toast } from 'sonner';
 import { Roles } from '@/schemas';
 import { useAuthStore } from '@/store/auth.store';
 import { useContextualLink } from '@/hooks';
+import axios from 'axios';
 
 export default function TenantGamesPage() {
   const router = useRouter();
@@ -71,7 +72,6 @@ export default function TenantGamesPage() {
           }
         }
       });
-      console.log("Params: ", params);
       const response = await api.get(`/games?${params.toString()}`);
       const validatedData = PaginatedGamesResponseSchema.parse(response.data);
 
@@ -79,10 +79,11 @@ export default function TenantGamesPage() {
       setTotalItems(validatedData.totalItems);
       setTotalPages(validatedData.totalPages);
     } catch (error) {
-      const errorMessage = 'Failed to fetch games.';
-      setError(errorMessage);
-      toast.error('Error fetching games', { description: errorMessage });
-      console.error('Fetch games error:', error);
+        let errorMessage = "Tenant creation failed. Please try again.";
+        if (axios.isAxiosError(error)) {
+          errorMessage = error.response?.data?.message || errorMessage;
+        }
+        toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -98,7 +99,7 @@ export default function TenantGamesPage() {
     if (currentTenantId) { // Only fetch if tenantId is available
       fetchGames();
     }
-  }, [fetchGames, userAuth, currentUserRoles, router, currentTenantId]);
+  }, [fetchGames, userAuth, router, currentTenantId]);
 
   const handleFilterChange = useCallback((newFilters: GameFilterParams) => {
     setFilters(prev => ({
