@@ -13,14 +13,14 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/'; // Your UI components
 
-import { SeasonResponseDto, SeasonStatus, Roles, SeasonSortableColumn } from '@/schemas'; // Your Season DTO
+import { SeasonStatus, Roles, SeasonSortableColumn, SeasonDetails } from '@/schemas'; // Your Season DTO
 
 import { ArrowUpDown, Pencil, Trash, MoreVertical } from 'lucide-react';
 
 //type SortableColumn = 'name' | 'startDate' | 'endDate' | 'status' | 'createdAt' | 'updatedAt' | 'leagueName' | 'tenantName';
 
 interface SeasonsTableProps {
-  seasons: SeasonResponseDto[];
+  seasons: SeasonDetails[];
   onSort: (sortBy: SeasonSortableColumn) => void;
   sortOrder: 'asc' | 'desc';
   sortBy: string;
@@ -48,7 +48,7 @@ export function SeasonsTable({ seasons, onSort, sortBy, sortOrder, onDelete, cur
   }
 
   // Function to build the dashboard link dynamically
-  const buildSeasonDashboardLink = (season: SeasonResponseDto) => {
+  const buildSeasonDashboardLink = (season: SeasonDetails) => {
   const link = `/season/dashboard`;
     const params = new URLSearchParams();
 

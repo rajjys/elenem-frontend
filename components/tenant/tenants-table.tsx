@@ -1,4 +1,4 @@
-// components/tenant/tenants-table.tsx
+//components/tenant/tenants-table.tsx
 "use client";
 
 import { TenantBasic } from '@/schemas';

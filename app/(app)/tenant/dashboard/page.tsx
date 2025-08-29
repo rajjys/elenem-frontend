@@ -70,7 +70,6 @@ export default function TenantDashboard() {
             }
             setError(errorMessage);
             toast.error(errorMessage);
-            console.error('Fetch tenant details error:', error);
         } finally {
           setLoading(false);
         }

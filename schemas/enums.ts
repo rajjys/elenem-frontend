@@ -64,6 +64,17 @@ export enum TeamVisibility {
   PRIVATE = "PRIVATE", // Requires invitation or approval to view
   ARCHIVED = "ARCHIVED" // Old teams, viewable but inactive for new operations
 }
+// Enum for Season Status
+export enum SeasonStatus {
+  PLANNING = 'PLANNING',   
+  SCHEDULED = 'SCHEDULED',
+  ACTIVE = 'ACTIVE',
+  PAUSED = 'PAUSED',
+  COMPLETED = 'COMPLETED',
+  CANCELED = 'CANCELED',
+  ARCHIVED = 'ARCHIVED',
+}
+
 export const RoleSchema = z.nativeEnum(Roles);
 export const SportTypeSchema = z.nativeEnum(SportType);
 export const LeagueVisibilitySchema = z.nativeEnum(LeagueVisibility);

@@ -1,16 +1,8 @@
 // prisma/season-schemas.ts
 import * as z from 'zod';
-
-// Enum for Season Status
-export enum SeasonStatus {
-  PLANNING = 'PLANNING',   
-  SCHEDULED = 'SCHEDULED',
-  ACTIVE = 'ACTIVE',
-  PAUSED = 'PAUSED',
-  COMPLETED = 'COMPLETED',
-  CANCELED = 'CANCELED',
-  ARCHIVED = 'ARCHIVED',
-}
+import { LeagueBasicSchema } from './league-schemas';
+import { TenantDetailsSchema } from './tenant-schemas';
+import { SeasonStatus } from './enums';
 
 // Zod schema for creating a new season
 export const CreateSeasonSchema = z.object({
@@ -85,47 +77,25 @@ export type CreateSeasonDto = z.infer<typeof CreateSeasonSchema>;
 export type UpdateSeasonDto = z.infer<typeof UpdateSeasonSchema>;
 export type SeasonSortableColumn = 'name' | "startDate" | "endDate" | "status" | "createdAt" | "updatedAt" | "leagueName" | "tenantName";
 
-// Detailed Season DTO for API responses and table display
-// This should match what your backend /seasons endpoint returns
-export type SeasonResponseDto = {
-  id: string;
-  externalId: string;
-  name: string;
-  slug: string;
-  startDate: string; // ISO string from backend
-  endDate: string;   // ISO string from backend
-  isActive: boolean;
-  description?: string;
-  status: SeasonStatus;
-  createdAt: string;
-  updatedAt: string;
-  deletedAt?: string;
-  leagueId: string;
-  tenantId: string;
-  // Include nested relations for display in the table
-  league: {
-    id: string;
-    name: string;
-    leagueCode: string;
-    tenantId: string;
-  };
-  tenant: {
-    id: string;
-    name: string;
-  };
-  createdBy?: {
-    id: string;
-    username: string;
-  };
-  updatedBy?: {
-    id: string;
-    username: string;
-  };
-};
-
+export const SeasonDetailsSchema = z.object({
+  id: z.string(),
+  externalId: z.string(),
+  name: z.string(),
+  slug: z.string(),
+  startDate: z.string().datetime(), // ISO string
+  endDate: z.string().datetime(),   // ISO string
+  isActive: z.boolean(),
+  description: z.string().optional(),
+  status: z.nativeEnum(SeasonStatus),
+  leagueId: z.string(),
+  tenantId: z.string(),
+  league: LeagueBasicSchema.optional(),
+  tenant: TenantDetailsSchema.optional(),
+});
+export type SeasonDetails = z.infer<typeof SeasonDetailsSchema>;
 // Paginated response schema for seasons
 export const PaginatedSeasonsResponseSchema = z.object({
-  data: z.array(z.any()), // Will be cast to SeasonResponseDto[]
+  data: z.array(SeasonDetailsSchema), // Will be cast to SeasonResponseDto[]
   totalItems: z.number(),
   totalPages: z.number(),
   currentPage: z.number(),

@@ -3,11 +3,6 @@
 import { useAuthStore } from '@/store/auth.store';
 import axios from 'axios';
 
-// --- TEMPORARY DEBUGGING LOGS ---
-console.log("DEBUG: process.env.NODE_ENV =", process.env.NODE_ENV);
-console.log("DEBUG: NEXT_PUBLIC_API_URL (from env) =", process.env.NEXT_PUBLIC_API_URL);
-// --------------------------------
-
 const isProd = process.env.NODE_ENV === 'production';
 export const api = axios.create({
   baseURL: isProd
@@ -18,10 +13,6 @@ export const api = axios.create({
     'Content-Type': 'application/json',
   }
 });
-
-// --- TEMPORARY DEBUGGING LOG ---
-console.log("DEBUG: Axios baseURL set to =", api.defaults.baseURL);
-// -------------------------------
 
 export const setAuthToken = (token: string | null) => {
   if (token) {

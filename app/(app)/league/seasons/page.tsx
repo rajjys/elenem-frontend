@@ -1,11 +1,11 @@
 // app/(league)/seasons/page.tsx
 "use client";
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { api } from '@/services/api';
-import { SeasonResponseDto, SeasonFilterParams, PaginatedSeasonsResponseSchema, SeasonFilterParamsSchema, SeasonSortableColumn } from '@/schemas';
+import { SeasonFilterParams, SeasonFilterParamsSchema, SeasonSortableColumn, SeasonDetails, PaginatedSeasonsResponse } from '@/schemas';
 import { SeasonsFilters } from '@/components/season/seasons-filters';
 import { SeasonsTable } from '@/components/season/seasons-table';
 import { Pagination } from '@/components/ui/pagination';
@@ -14,18 +14,19 @@ import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { Roles } from '@/schemas';
 import { useAuthStore } from '@/store/auth.store';
+import axios from 'axios';
 
 export default function LeagueSeasonsPage() {
   const router = useRouter();
   const { user: userAuth } = useAuthStore();
-  const currentUserRoles = userAuth?.roles || [];
+  const currentUserRoles = useMemo(() => userAuth?.roles || [], [userAuth?.roles]);
   const ctxTenantId = useSearchParams().get('ctxTenantId'); // Use search params if needed
   const ctxLeagueId = useSearchParams().get('ctxLeagueId'); // Use search params if needed
   
   // Determine current tenant ID based on user roles
-        const isSystemAdmin = currentUserRoles.includes(Roles.SYSTEM_ADMIN);
-        const isTenantAdmin = currentUserRoles.includes(Roles.TENANT_ADMIN);
-        const isLeagueAdmin = currentUserRoles.includes(Roles.LEAGUE_ADMIN);
+  const isSystemAdmin = currentUserRoles.includes(Roles.SYSTEM_ADMIN);
+  const isTenantAdmin = currentUserRoles.includes(Roles.TENANT_ADMIN);
+  const isLeagueAdmin = currentUserRoles.includes(Roles.LEAGUE_ADMIN);
 
   const currentTenantId = isSystemAdmin
       ? ctxTenantId
@@ -39,7 +40,7 @@ export default function LeagueSeasonsPage() {
       ? userAuth?.managingLeagueId
       : null;
       
-  const [seasons, setSeasons] = useState<SeasonResponseDto[]>([]);
+  const [seasons, setSeasons] = useState<SeasonDetails[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [totalItems, setTotalItems] = useState(0);
@@ -83,22 +84,21 @@ export default function LeagueSeasonsPage() {
           }
         }
       });
-      console.log("Fetchig params: ", params);
-      const response = await api.get(`/seasons?${params.toString()}`);
-      const validatedData = PaginatedSeasonsResponseSchema.parse(response.data);
-
-      setSeasons(validatedData.data as SeasonResponseDto[]);
-      setTotalItems(validatedData.totalItems);
-      setTotalPages(validatedData.totalPages);
-    } catch (err) {
-      const errorMessage = 'Failed to fetch seasons.';
+      const response = await api.get<PaginatedSeasonsResponse>(`/seasons?${params.toString()}`);
+      setSeasons(response.data.data);
+      setTotalItems(response.data.totalItems);
+      setTotalPages(response.data.totalPages);
+    } catch (error) {
+      let errorMessage = "Failed to fetch Seasons.";
+      if (axios.isAxiosError(error)) {
+          errorMessage = error.response?.data?.message || errorMessage;
+      }
       setError(errorMessage);
-      toast.error('Error fetching seasons', { description: errorMessage });
-      console.error('Fetch seasons error:', err);
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
-  }, [filters, currentLeagueId, currentTenantId]);
+  }, [filters, currentLeagueId ]);
 
   useEffect(() => {
     if (currentLeagueId) { // Only fetch if leagueId is available

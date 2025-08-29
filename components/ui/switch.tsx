@@ -14,7 +14,7 @@ export const Switch = React.forwardRef<HTMLInputElement, SwitchProps>(
     };
 
     return (
-      <div className="mb-4">
+      <div className="">
         {label && (
           <label htmlFor={name} className="block text-sm font-medium text-gray-700 mb-1">
             {label}

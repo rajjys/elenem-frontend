@@ -44,17 +44,17 @@ export async function middleware(request: NextRequest) {
   }
 
   // --- 2. Determine the tenant slug from the hostname for public-facing subdomains ---
-  console.log("Hostname: ", hostname);
-  console.log("Root Domain: ", ROOT_DOMAIN);
+  //console.log("Hostname: ", hostname);
+  //console.log("Root Domain: ", ROOT_DOMAIN);
   const tenantSlug = resolveTenantSlugFromHostname(hostname, ROOT_DOMAIN);
-  console.log("Slug: ",tenantSlug)
+  //console.log("Slug: ",tenantSlug)
   if (tenantSlug && !['www', 'localhost'].includes(tenantSlug)) {
     const newPath = url.pathname === '/'
     ? `/public/public_tenant/${tenantSlug}/`
     : `/public/public_tenant/${tenantSlug}${url.pathname}/`;
 
     url.pathname = newPath;
-    console.log("Rewriting to:", url.pathname);
+    //console.log("Rewriting to:", url.pathname);
 
     return NextResponse.rewrite(url);
   }
@@ -66,7 +66,7 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith('/_next') || // Next.js internal files (e.g., _next/static, _next/image)
     pathname.startsWith('/api/')     // Backend API routes (authentication/authorization handled by backend)
   ) {
-    console.log(`Middleware: Allowing public path ${pathname} to proceed.`);
+    //console.log(`Middleware: Allowing public path ${pathname} to proceed.`);
     return NextResponse.next();
   }
 
@@ -77,7 +77,7 @@ export async function middleware(request: NextRequest) {
     const redirectUrl = request.nextUrl.clone();
     redirectUrl.pathname = '/login';
     redirectUrl.searchParams.set('redirect', pathname + search);
-    console.log(`Middleware: No access token, redirecting to login from ${pathname}.`);
+    //console.log(`Middleware: No access token, redirecting to login from ${pathname}.`);
     return NextResponse.redirect(redirectUrl);
   }
 
@@ -170,7 +170,7 @@ export async function middleware(request: NextRequest) {
   ];
   if (generalUserAuthenticatedPaths.some(path => pathname === path || pathname.startsWith(path + '/'))) {
     // Any authenticated user is allowed here, as long as they have *any* role.
-    console.log(`Middleware: Allowing general authenticated user access to ${pathname}.`);
+    //console.log(`Middleware: Allowing general authenticated user access to ${pathname}.`);
     return NextResponse.next();
   }
 

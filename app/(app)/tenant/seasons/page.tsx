@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { api } from '@/services/api';
-import { SeasonResponseDto, SeasonFilterParams, PaginatedSeasonsResponseSchema, SeasonFilterParamsSchema, SeasonSortableColumn } from '@/schemas';
+import { SeasonFilterParams, SeasonFilterParamsSchema, SeasonSortableColumn, PaginatedSeasonsResponse, SeasonDetails } from '@/schemas';
 import { SeasonsFilters } from '@/components/season/seasons-filters';
 import { SeasonsTable } from '@/components/season/seasons-table';
 import { Pagination } from '@/components/ui/pagination';
@@ -16,12 +16,18 @@ import { useAuthStore } from '@/store/auth.store';
 import axios from 'axios';
 export default function TenantSeasonsPage() {
   const router = useRouter();
-  const { user } = useAuthStore();
-  const currentUserRoles = user?.roles || [];
-  const currentTenantId = user?.tenantId; // Tenant Admin's tenant ID
-  const currentLeagueId = user?.managingLeagueId;
+  const { user: userAuth } = useAuthStore();
+  const currentUserRoles = useMemo(() => userAuth?.roles || [], [userAuth?.roles]);
+  const ctxTenantId = useSearchParams().get('ctxTenantId'); // Use search params if needed
+  const isSystemAdmin = currentUserRoles.includes(Roles.SYSTEM_ADMIN);
+  const isTenantAdmin = currentUserRoles.includes(Roles.TENANT_ADMIN);
+  const currentTenantId = isSystemAdmin
+      ? ctxTenantId
+      : isTenantAdmin 
+      ? userAuth?.tenantId
+      : null;
 
-  const [seasons, setSeasons] = useState<SeasonResponseDto[]>([]);
+  const [seasons, setSeasons] = useState<SeasonDetails[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [totalItems, setTotalItems] = useState(0);
@@ -64,14 +70,12 @@ export default function TenantSeasonsPage() {
         }
       });
 
-      const response = await api.get(`/seasons?${params.toString()}`);
-      const validatedData = PaginatedSeasonsResponseSchema.parse(response.data);
-
-      setSeasons(validatedData.data as SeasonResponseDto[]);
-      setTotalItems(validatedData.totalItems);
-      setTotalPages(validatedData.totalPages);
+      const response = await api.get<PaginatedSeasonsResponse>(`/seasons?${params.toString()}`);
+      setSeasons(response.data.data);
+      setTotalItems(response.data.totalItems);
+      setTotalPages(response.data.totalPages);
     } catch (error) {
-      let errorMessage = "Filed to fetch seasons. Please try again later.";
+      let errorMessage = "Failed to fetch seasons. Please try again later.";
         if (axios.isAxiosError(error)) {
             errorMessage = error.response?.data?.message || errorMessage;
         }
@@ -84,7 +88,7 @@ export default function TenantSeasonsPage() {
 
   useEffect(() => {
     // Authorization check for Tenant Admin
-    if (!user || !currentUserRoles.includes(Roles.TENANT_ADMIN)) {
+    if (!userAuth || !currentUserRoles.includes(Roles.TENANT_ADMIN)) {
       toast.error("Unauthorized", { description: "You do not have permission to view this page." });
       router.push('/dashboard');
       return;
@@ -92,7 +96,7 @@ export default function TenantSeasonsPage() {
     if (currentTenantId) { // Only fetch if tenantId is available
       fetchSeasons();
     }
-  }, [fetchSeasons, user, currentUserRoles, router, currentTenantId]);
+  }, [fetchSeasons, userAuth, currentUserRoles, router, currentTenantId]);
 
   const handleFilterChange = useCallback((newFilters: SeasonFilterParams) => {
     setFilters(prev => ({
@@ -167,7 +171,6 @@ export default function TenantSeasonsPage() {
         onDelete={handleDeleteSeason}
         currentUserRoles={currentUserRoles}
         currentTenantId={currentTenantId}
-        currentLeagueId={currentLeagueId}
       />
       <Pagination
         currentPage={filters.page || 1}

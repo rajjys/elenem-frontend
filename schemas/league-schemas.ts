@@ -39,6 +39,8 @@ export const LeagueBasicSchema: z.ZodSchema<any> = z.lazy(() => z.object({
   parentLeague: LeagueLiteResponseSchema.nullable().optional(),
   division: z.string(),
   gender: z.nativeEnum(Gender).nullable().optional(),
+  currentSeasonId: z.string().cuid().nullable().optional(),
+  busiessProfile: CreateBusinessProfileSchema.optional(),
   name: z.string(),
   slug: z.string().optional(),
   isActive: z.boolean(),
