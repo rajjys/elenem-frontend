@@ -95,7 +95,7 @@ export const SeasonDetailsSchema = z.object({
 export type SeasonDetails = z.infer<typeof SeasonDetailsSchema>;
 // Paginated response schema for seasons
 export const PaginatedSeasonsResponseSchema = z.object({
-  data: z.array(SeasonDetailsSchema), // Will be cast to SeasonResponseDto[]
+  data: z.array(SeasonDetailsSchema), 
   totalItems: z.number(),
   totalPages: z.number(),
   currentPage: z.number(),

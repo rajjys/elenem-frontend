@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { api } from '@/services/api'; // Your actual API instance
-import { SeasonResponseDto, SeasonFilterParams, PaginatedSeasonsResponseSchema, SeasonFilterParamsSchema, SeasonSortableColumn } from '@/schemas'; // Your Season DTOs and schemas
+import { SeasonFilterParams, PaginatedSeasonsResponseSchema, SeasonFilterParamsSchema, SeasonSortableColumn, SeasonDetails } from '@/schemas'; // Your Season DTOs and schemas
 import { SeasonsTable, SeasonsFilters } from '@/components/season/'; // Your new SeasonsTable component
 import { Pagination } from '@/components/ui/'; // Your Pagination component
 import { LoadingSpinner } from '@/components/ui/'; // Your LoadingSpinner component
@@ -15,12 +15,12 @@ import { useAuthStore } from '@/store/auth.store'; // Auth store to get user rol
 
 export default function AdminSeasonsPage() {
   const router = useRouter();
-  const { user } = useAuthStore(); // Get user from auth store
-  const currentUserRoles = user?.roles || [];
-  const currentTenantId = user?.tenantId;
-  const currentLeagueId = user?.managingLeagueId;
+  const { user: userAuth } = useAuthStore(); // Get user from auth store
+  const currentUserRoles = useMemo(() => userAuth?.roles || [], [userAuth?.roles]);
+  const currentTenantId = userAuth?.tenantId;
+  const currentLeagueId = userAuth?.managingLeagueId;
 
-  const [seasons, setSeasons] = useState<SeasonResponseDto[]>([]);
+  const [seasons, setSeasons] = useState<SeasonDetails[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [totalItems, setTotalItems] = useState(0);
@@ -52,7 +52,7 @@ export default function AdminSeasonsPage() {
       const response = await api.get(`/seasons?${params.toString()}`);
       const validatedData = PaginatedSeasonsResponseSchema.parse(response.data);
 
-      setSeasons(validatedData.data as SeasonResponseDto[]);
+      setSeasons(validatedData.data as SeasonDetails[]);
       setTotalItems(validatedData.totalItems);
       setTotalPages(validatedData.totalPages);
     } catch (error) {
@@ -67,13 +67,13 @@ export default function AdminSeasonsPage() {
 
   useEffect(() => {
     // Authorization check for System Admin
-    if (!user || !currentUserRoles.includes(Roles.SYSTEM_ADMIN)) {
+    if (!userAuth || !currentUserRoles.includes(Roles.SYSTEM_ADMIN)) {
       toast.error("Unauthorized", { description: "You do not have permission to view this page." });
       router.push('/dashboard'); // Redirect to a suitable page
       return;
     }
     fetchSeasons();
-  }, [fetchSeasons, user, currentUserRoles, router]);
+  }, [fetchSeasons, userAuth, currentUserRoles, router]);
 
   const handleFilterChange = useCallback((newFilters: SeasonFilterParams) => {
     setFilters(prev => ({
