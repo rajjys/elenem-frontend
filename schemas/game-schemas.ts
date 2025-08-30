@@ -7,9 +7,12 @@ const TeamBasicSchema = z.object({
   id: z.string(),
   name: z.string(),
   shortCode: z.string(),
-  logoUrl: z.string().nullable().optional(),
   rank: z.number().optional().nullable(),
   record: z.string().optional().nullable(),
+  businessProfile: z.object({
+    logoUrl: z.string().nullable().optional(),
+    bannerImageUrl: z.string().nullable().optional(),
+  })
 });
 
 const LeagueBasicSchema = z.object({

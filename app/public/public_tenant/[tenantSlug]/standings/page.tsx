@@ -6,17 +6,22 @@ import { Card, CardContent, CardTitle } from "@/components/ui";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import StandingsTable from "@/components/public/standings-table";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Gender } from "@/schemas";
 
 interface Standing {
   team: {
     id: string;
     name: string;
     shortCode: string;
-    logoUrl?: string | null;
+    businessProfile: {
+      logoUrl: string | null;
+      bannerImageUrl: string | null;
+    }
   };
   rank: number;
   points: number;
   form?: string | null;
+  gamesPlayed: number;
 }
 
 interface PublicTenantDetails {
@@ -35,7 +40,7 @@ interface PublicTenantDetails {
 const TenantStandingsPage = ({ params }: { params: Promise<{ tenantSlug: string }> }) => {
   const { tenantSlug } = use(params);
   const [tenant, setTenant] = useState<PublicTenantDetails | null>(null);
-  const [mainLeagues, setMainLeagues] = useState<{ id: string; name: string; slug: string }[]>([]);
+  const [mainLeagues, setMainLeagues] = useState<{ id: string; name: string; slug: string; division: string; gender: Gender}[]>([]);
   const [selectedLeagueSlug, setSelectedLeagueSlug] = useState<string | null>(null);
   const [standings, setStandings] = useState<Standing[]>([]);
   const [loadingTenant, setLoadingTenant] = useState(true);
@@ -63,6 +68,8 @@ const TenantStandingsPage = ({ params }: { params: Promise<{ tenantSlug: string 
             id: league.id,
             name: league.name,
             slug: league.slug,
+            division: league.division,
+            gender: league.gender,
           }));
 
         setMainLeagues(leagues);
@@ -131,7 +138,7 @@ const TenantStandingsPage = ({ params }: { params: Promise<{ tenantSlug: string 
               <TabsList className="flex justify-between items-center flex-wrap gap-2">
                 {mainLeagues.map((league) => (
                   <TabsTrigger key={league.id} value={league.slug}>
-                    {league.name}
+                    {league.division} - {league.gender === Gender.MALE ? 'M' : league.gender === Gender.FEMALE ? 'F' : 'X'}
                   </TabsTrigger>
                 ))}
               </TabsList>

@@ -45,7 +45,7 @@ const GamePublicCard: React.FC<GamePublicCardProps> = ({game}) => {
                     <div className='flex items-center justify-start'>
                         <Image
                            className='h-8 w-8 rounded-full object-cover border border-gray-400'
-                           src={game.homeTeam.logoUrl || "https://placehold.co/40x40/cccccc/333333?text=${team.name.charAt(0)}"}
+                           src={game.homeTeam.businessProfile.logoUrl || "https://placehold.co/40x40/cccccc/333333?text=${team.name.charAt(0)}"}
                            height={60}
                            width={60}
                            placeholder="blur"
@@ -62,7 +62,7 @@ const GamePublicCard: React.FC<GamePublicCardProps> = ({game}) => {
                     <div className='flex items-center justify-start'>
                         <Image
                           className='h-8 w-8 rounded-full object-cover border border-gray-400'
-                          src={game.awayTeam.logoUrl || "https://placehold.co/40x40/cccccc/333333?text=${team.name.charAt(0)}"}
+                          src={game.awayTeam.businessProfile.logoUrl || "https://placehold.co/40x40/cccccc/333333?text=${team.name.charAt(0)}"}
                           height={60}
                           width={60}
                           placeholder="blur"

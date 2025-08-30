@@ -9,11 +9,15 @@ interface Standing {
         id: string;
         name: string;
         shortCode: string;
-        logoUrl?: string | null;
+        businessProfile: {
+            logoUrl: string | null;
+            bannerImageUrl: string | null;
+        }
     };
     rank: number;
     points: number;
     form?: string | null;
+    gamesPlayed: number;
 }
 
 // --- StandingsTable Component ---
@@ -52,21 +56,24 @@ const StandingsTable: React.FC<StandingsTableProps> = ({ standings, rowsToShow =
     const standingsToDisplay = standings.slice(0, rowsToShow);
 
     return (
-        <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
+        <div className="overflow-x-auto no-scrollbar px-2 md:px-4">
+            <table className="min-w-full divide-y divide-gray-200 font-normal">
                 <thead className="bg-gray-50">
                     <tr>
-                        <th className="py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="py-2 text-left text-xs text-gray-500 uppercase tracking-wider">
                             #
                         </th>
-                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-4 py-2 text-left text-xs text-gray-500 uppercase tracking-wider">
                             Équipe
                         </th>
-                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-4 py-2 text-left text-xs text-gray-500 uppercase tracking-wider">
+                            Matchs
+                        </th>
+                        <th className="px-4 py-2 text-left text-xs font-bold text-gray-900 uppercase tracking-wider">
                             Points
                         </th>
                         {/* You can add more columns here if needed */}
-                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-4 py-2 text-left text-xs text-gray-500 uppercase tracking-wider">
                             Forme
                         </th>
                     </tr>
@@ -81,7 +88,7 @@ const StandingsTable: React.FC<StandingsTableProps> = ({ standings, rowsToShow =
                                 <div className="flex items-center justify-start space-x-2">
                                     <Image
                                       className='h-8 w-8 rounded-full object-cover border border-gray-400 mr-2'
-                                      src={standing.team.logoUrl || "https://placehold.co/40x40/cccccc/333333?text=${team.name.charAt(0)}"}
+                                      src={standing.team.businessProfile.logoUrl || "https://placehold.co/40x40/cccccc/333333?text=${team.name.charAt(0)}"}
                                       height={60}
                                       width={60}
                                       placeholder="blur"
@@ -91,6 +98,9 @@ const StandingsTable: React.FC<StandingsTableProps> = ({ standings, rowsToShow =
                                     />
                                     {standing.team.name}
                                 </div>
+                            </td>
+                            <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
+                                <span className="pl-4">{standing.gamesPlayed}</span>
                             </td>
                             <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 font-bold">
                                 <span className="pl-4">{standing.points}</span>

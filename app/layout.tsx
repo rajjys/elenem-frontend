@@ -1,5 +1,4 @@
 // app/(app)/layout.tsx
-"use client";
 import "./globals.css";
 
 // app/layout.tsx (if this is the root layout) or a specific public group layout
@@ -16,14 +15,23 @@ const poppins = Poppins({
   weight: ['100', '200', '300', '400', '500', '600', '700', '800', '900']
 });
 */
+export const metadata = {
+  title: 'Elenem Systems',
+  description: 'Elenem Systems. Scaling your League Management.',
+  icons: [
+    { rel: 'icon', url: '/favicon.png' },
+    //{ rel: 'icon', url: '/favicon-dark.ico', media: '(prefers-color-scheme: dark)' },
+  ],
+}
 export default function PublicLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" className={`${inter.variable}`} suppressHydrationWarning>
       <body>
         {children}
-        <Toaster position="top-center" 
-                 richColors // ✅ success = green, error = red, etc.
-                 closeButton // ✅ shows an X button on every toast
+        <Toaster 
+            position="top-center" 
+            richColors // ✅ success = green, error = red, etc.
+            closeButton // ✅ shows an X button on every toast
         />
       </body>
     </html>

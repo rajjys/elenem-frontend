@@ -4,7 +4,7 @@
 import Link from 'next/link';
 import React, { useState, useEffect, useRef } from 'react';
 import { useTheme } from '@/components/providers/ThemeProvider';
-import { FiSun, FiMoon, FiSearch, FiAward, FiUser, FiChevronDown } from 'react-icons/fi';
+import { FiSun, FiMoon, FiSearch, FiUser, FiChevronDown } from 'react-icons/fi';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/auth.store';
 // Import lucide-react icons for sport types
@@ -16,7 +16,6 @@ import {
 } from '@phosphor-icons/react';
 import { Roles, SportType } from '@/schemas';
 import Image from 'next/image';
-import UserAvatar from '../users/user-avatar';
 import { Skeleton } from '../ui';
 
 const hrefIconMap: Record<string, React.ElementType> = {
@@ -87,8 +86,8 @@ const defaultNavLinks: NavLink[] = [
 
 export const PublicHeader = ({
   logoUrl = 'https://placehold.co/40x40/4F46E5/FFFFFF?text=Logo', // Default placeholder logo
-  appName = 'ELENEM', // Default application name
-  tenantName, // Optional tenant name
+  //appName = 'ELENEM', // Default application name
+  //tenantName, // Optional tenant name
   sportType = SportType.FOOTBALL,
   navLinks = defaultNavLinks, // Default navigation links
   primaryColor = 'indigo-600', // Default primary color
@@ -177,18 +176,13 @@ export const PublicHeader = ({
             {/* Branding Section (Left) */}
             <div className="flex items-center">
               <Link href="/" className="flex items-center space-x-2">
-                {/* Logo with dynamic background gradient and fallback icon */}
-                <div className={`rounded-lg p-2 text-white bg-gradient-to-br from-${primaryColor} to-${secondaryColor}`}>
-                    <UserAvatar
-                          src={userAuth?.profileImageUrl}
-                          alt={`${userAuth?.firstName} ${userAuth?.lastName} Profile`}
-                          fallbackText={userAuth?.username.charAt(0) || "Logo"}
-                        />
-                  {/* Fallback icon, initially hidden */}
-                  <FiAward className={`h-6 w-6 ${logoUrl ? 'hidden' : 'block'}`} />
-                </div>
-                {/* App or Tenant Name */}
-                <span className={`text-xl font-bold text-${primaryColor} dark:text-${secondaryColor}`}>{tenantName || appName}</span>
+                  <Image
+                    src='/logos/elenem-sport.jpg'
+                    alt='Elenem Logo'
+                    width={120}
+                    height={70}
+                    //fallbackText={userAuth?.username.charAt(0) || "Logo"}
+                  />
               </Link>
             </div>
 
