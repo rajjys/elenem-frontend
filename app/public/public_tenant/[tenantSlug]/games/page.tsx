@@ -35,9 +35,8 @@ export default function PublicGamesPage({ params }: { params: Promise<{ tenantSl
   const handler = (process.env.NODE_ENV === 'development' ) ? 'http://' : 'https://';
 
   // Fetch available dates on initial load
-  async function fetchDates() {
+  const fetchDates = useCallback(async () => {
       try {
-          console.log("Fetching Game Dates...");
           const response = await api.get<string[]>(`/public/games/dates`, { params: { tenantSlug } });
           const dates = response.data;
           if (!dates || dates.length === 0) {
@@ -59,7 +58,7 @@ export default function PublicGamesPage({ params }: { params: Promise<{ tenantSl
       finally{
           setLoadingDates(false)
       }
-    }
+    }, [tenantSlug]);
   // Fetch games when a date is selected
   const fetchGames = useCallback(async (date: string) => {
     if (!date) return;
@@ -80,7 +79,7 @@ export default function PublicGamesPage({ params }: { params: Promise<{ tenantSl
 
   useEffect(() => {
      fetchDates(); 
-  }, []);
+  }, [fetchDates]);
 
   useEffect(() => {
       fetchGames(selectedDate);

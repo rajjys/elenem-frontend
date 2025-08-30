@@ -13,64 +13,8 @@ import StandingsTable from '@/components/public/standings-table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { mockBlogPosts } from '@/data/mockBlogPosts';
 import VerticalBlogPostCard from '@/components/ui/vertical-blogpost-card';
-// Define the interface for the game data to ensure type safety.
-// This matches the structure returned by the new public games endpoint.
-/* interface GameDetails {
-    id: string;
-    slug: string;
-    dateTime: string;
-    location?: string | null;
-    status: GameStatus;
-    homeScore?: number | null;
-    awayScore?: number | null;
-    notes?: string | null;
-    round?: string | null;
-    bannerImageUrl?: string | null;
-    highlightsUrl?: string | null;
-    isActive: boolean;
-    leagueId: string;
-    tenantId: string;
-    homeTeamId: string;
-    awayTeamId: string;
-    homeVenueId?: string | null;
-    homeTeam: {
-        id: string;
-        name: string;
-        slug: string;
-        shortCode: string;
-        logoUrl?: string | null;
-    };
-    awayTeam: {
-        id: string;
-        name: string;
-        slug: string;
-        shortCode: string;
-        logoUrl?: string | null;
-    };
-    league: {
-        id: string;
-        name: string;
-        leagueCode: string;
-    };
-    tenant: {
-        id: string;
-        name: string;
-        tenantCode: string;
-        sportType?: string | null;
-        slug: string;
-    };
-    season: {
-        id: string;
-        name: string;
-    };
-    homeVenue?: {
-        id: string;
-        name: string;
-        address?: string | null;
-    } | null;
-}
-    */
-// Define the interface for the tenant data to ensure type safety.
+
+
 interface PublicTenantDetails {
     id: string;
     slug: string;
@@ -92,11 +36,15 @@ interface Standing {
         id: string;
         name: string;
         shortCode: string;
-        logoUrl?: string | null;
+        businessProfile: {
+            logoUrl: string;
+            bannerImageUrl: string | null; 
+        }
     };
     rank: number;
     points: number;
     form?: string | null;
+    gamesPlayed: number;
 }
 const TenantLandingPage = ({ params }: { params: Promise<{ tenantSlug: string }> }) => {
     const { tenantSlug } = use(params);
