@@ -20,7 +20,7 @@ export default function PublicLayout({ children }: { children: ReactNode }) {
   return (
     
         <ThemeProvider>
-          <div className="flex min-h-screen flex-col bg-gray-50 text-gray-800 dark:bg-gray-900 dark:text-gray-200">
+          <div className="flex min-h-screen flex-col bg-gray-50 text-gray-800">
             <PublicHeader navLinks={navLinks}/>
               <main className="flex-grow">{children}</main>
             <PublicFooter />

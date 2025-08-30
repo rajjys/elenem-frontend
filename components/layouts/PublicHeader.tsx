@@ -90,8 +90,8 @@ export const PublicHeader = ({
   //tenantName, // Optional tenant name
   sportType = SportType.FOOTBALL,
   navLinks = defaultNavLinks, // Default navigation links
-  primaryColor = 'indigo-600', // Default primary color
-  secondaryColor = 'indigo-400', // Default secondary color
+  primaryColor = 'indigo', // Default primary color
+  secondaryColor = 'orange', // Default secondary color
   onSearch, // Optional search handler
 }: PublicHeaderProps) => {
   const { theme, toggleTheme } = useTheme(); // Hook for theme toggling
@@ -170,19 +170,18 @@ export const PublicHeader = ({
   return (
     <>
       {/* Main Header Section */}
-      <header className="sticky top-0 z-50 w-full border-b border-gray-200 bg-white/80 backdrop-blur-lg dark:border-gray-800 dark:bg-gray-900/80">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex h-16 items-center justify-between">
+      <header className="sticky top-0 z-50 w-full border-b border-gray-200 bg-white/80 backdrop-blur-lg">
+          <div className="flex h-14 md:h-16 items-center justify-between mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             {/* Branding Section (Left) */}
             <div className="flex items-center">
               <Link href="/" className="flex items-center space-x-2">
-                  <Image
-                    src='/logos/elenem-sport.jpg'
-                    alt='Elenem Logo'
-                    width={120}
-                    height={70}
-                    //fallbackText={userAuth?.username.charAt(0) || "Logo"}
-                  />
+                <Image
+                  src='/logos/elenem-sport.jpg'
+                  alt='Elenem Logo'
+                  width={120}
+                  height={70}
+                  //fallbackText={userAuth?.username.charAt(0) || "Logo"}
+                />
               </Link>
             </div>
 
@@ -196,8 +195,8 @@ export const PublicHeader = ({
                     key={link.label}
                     href={link.href}
                     className={`flex flex-col items-center justify-center p-2 rounded-md transition-all duration-200
-                      ${isActive ? `text-${primaryColor} dark:text-${secondaryColor} bg-gray-100 dark:bg-gray-800` : 'text-gray-600 dark:text-gray-300'}
-                      hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-${primaryColor} dark:hover:text-${secondaryColor}`}
+                      ${isActive ? `text-${primaryColor}-700 bg-gray-100` : 'text-gray-600'}
+                      hover:bg-gray-100 hover:text-${primaryColor}-700`}
                   >
                     {IconComponent && <IconComponent className="h-6 w-6 mb-1" />} {/* Icon on top */}
                     <span className="text-xs font-medium">{link.label}</span> {/* Text at bottom */}
@@ -212,7 +211,7 @@ export const PublicHeader = ({
               {onSearch && (
                 <button
                   onClick={onSearch}
-                  className="rounded-full p-2 text-gray-600 transition-colors hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
+                  className="rounded-full p-2 text-gray-600 transition-colors hover:bg-gray-100"
                   aria-label="Search"
                 >
                   <FiSearch className="h-5 w-5" />
@@ -222,7 +221,7 @@ export const PublicHeader = ({
               {/* Theme Toggle Button */}
               <button
                 onClick={toggleTheme}
-                className="rounded-full p-2 text-gray-600 transition-colors hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
+                className="rounded-full p-2 text-gray-600 transition-colors hover:bg-gray-100"
                 aria-label="Toggle theme"
                 hidden
               >
@@ -242,7 +241,7 @@ export const PublicHeader = ({
                 <div className="relative" ref={dropdownRef}>
                   <button
                     onClick={() => setDropdownOpen(!dropdownOpen)}
-                    className="flex items-center space-x-2 rounded-full p-2 text-gray-600 transition-colors hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800 focus:outline-none"
+                    className="flex items-center space-x-2 rounded-full p-2 text-gray-600 transition-colors hover:bg-gray-100 focus:outline-none"
                     aria-haspopup="true"
                     aria-expanded={dropdownOpen ? 'true' : 'false'}
                   >
@@ -272,27 +271,27 @@ export const PublicHeader = ({
 
                   {/* Dropdown Menu for Management Users */}
                   {dropdownOpen && (
-                    <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 dark:bg-gray-700 z-10">
+                    <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-10">
                       <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="user-menu-button">
                         {isManagementUser && 
-                        <Link href={dashboardLink} onClick={() => setDropdownOpen(false)} className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-600" role="menuitem">
+                        <Link href={dashboardLink} onClick={() => setDropdownOpen(false)} className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">
                           <LayoutDashboard className="w-4 h-4" />
                           <span className="truncate">Tableau de Bord</span>
                         </Link>
                         }
-                        <Link href="/account/dashboard" onClick={() => setDropdownOpen(false)} className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-600" role="menuitem">
+                        <Link href="/account/dashboard" onClick={() => setDropdownOpen(false)} className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">
                           <User className="w-4 h-4" />
                           <span className="truncate">Mon Espace</span>
                         </Link>
-                        <Link href="/account/security" onClick={() => setDropdownOpen(false)} className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-600" role="menuitem">
+                        <Link href="/account/security" onClick={() => setDropdownOpen(false)} className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">
                           <Shield className="w-4 h-4" />
                           <span className="truncate">Securite</span>
                         </Link>
-                        <Link href="/account/settings" onClick={() => setDropdownOpen(false)} className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-600" role="menuitem">
+                        <Link href="/account/settings" onClick={() => setDropdownOpen(false)} className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">
                           <Settings className="w-4 h-4" />
                           <span className="truncate">Parametres</span>
                         </Link>
-                        <button onClick={handleLogout} className="flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-600" role="menuitem">
+                        <button onClick={handleLogout} className="flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">
                           <LogOut className="w-4 h-4" />
                           <span className="truncate">Deconnexion</span>
                         </button>
@@ -302,22 +301,21 @@ export const PublicHeader = ({
                 </div>
               ) : (
                 // If user is not logged in, show Login/Register buttons (hidden on extra small screens)
-                <div className="hidden sm:flex items-center space-x-4">
-                  <Link href="/login" className={`text-sm font-medium text-gray-600 hover:text-${primaryColor} dark:text-gray-300 dark:hover:text-${secondaryColor}`}>
-                    Login
+                
+                  <Link href='/login' 
+                        className={`inline-flex items-center justify-center space-x-2 px-4 py-2 font-medium text-${primaryColor}-700 
+                                    bg-transparent rounded-full shadow-sm hover:bg-blue-50 
+                                    focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition ease-in-out duration-300 cursor-pointer`}>
+                    <FiUser className="h-7 w-7 p-1 border border-blue-200 rounded-full" />
+                    <span className='hidden md:inline text-sm'>Se Connecter</span>
                   </Link>
-                  <Link href="/register" className={`rounded-md bg-${primaryColor} px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-${primaryColor.replace('-600', '-700')}`}>
-                    Register
-                  </Link>
-                </div>
               )}
             </div>
           </div>
-        </div>
       </header>
 
       {/* Bottom Navigation for Mobile Devices (lg and below) */}
-      <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 dark:bg-gray-900 dark:border-gray-800 lg:hidden">
+      <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 lg:hidden">
         <div className="flex justify-around items-center h-16">
           {updatedNavLinks.map((link) => {
             const IconComponent = link.icon;
@@ -327,8 +325,8 @@ export const PublicHeader = ({
                 key={`bottom-${link.label}`}
                 href={link.href}
                 className={`flex flex-col items-center justify-center p-2 rounded-md transition-colors duration-200
-                  ${isActive ? `text-${primaryColor} dark:text-${secondaryColor}` : 'text-gray-600 dark:text-gray-300'}
-                  hover:text-${primaryColor} dark:hover:text-${secondaryColor}`}
+                  ${isActive ? `text-${primaryColor}-700` : 'text-gray-600'}
+                  hover:text-${primaryColor}-700`}
               >
                 {IconComponent && <IconComponent className="h-6 w-6" />}
                 <span className="text-xs font-medium mt-1">{link.label}</span>

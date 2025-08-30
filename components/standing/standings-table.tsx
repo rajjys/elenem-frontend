@@ -57,7 +57,7 @@ export function StandingsTable({ standings, managingTeamId }: StandingsTableProp
             const isMyTeam = managingTeamId === item.team.id;
             return (
               <TableRow key={item.team.id} onClick={() => router.push(`/team/dashboard?ctxTeamId=${item.team.id}`)}
-                className={`cursor-pointer hover:bg-gray-100 ${isMyTeam ? "bg-blue-50 dark:bg-blue-900/20" : ""}`}>
+                className={`cursor-pointer hover:bg-gray-100 ${isMyTeam ? "bg-blue-50" : ""}`}>
                 <TableCell className="font-medium text-center">{item.rank}</TableCell>
                 <TableCell>
                   <div className="flex items-center gap-3">
