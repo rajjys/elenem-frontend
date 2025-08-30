@@ -9,10 +9,13 @@ import { useAuthStore } from "@/store/auth.store";
 import { useState } from "react";
 import axios from "axios";
 import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
+import Link from "next/link";
 
 
 export function LoginForm() {
   const login = useAuthStore((state) => state.login);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isSystemAdminLogin, setIsSystemAdminLogin] = useState(false);
 
@@ -51,6 +54,7 @@ export function LoginForm() {
 
   async function onSubmit(data: LoginFormValues) {
     setError(null);
+    setLoading(true);
     try {
       await login(
         data.usernameOrEmail,
@@ -61,11 +65,12 @@ export function LoginForm() {
     } catch (error) {
       let errorMessage = "Login failed";
       if (axios.isAxiosError(error)) {
-              errorMessage = error.response?.data?.message || errorMessage;
+        errorMessage = error.response?.data?.message || errorMessage;
       }
       toast.error(errorMessage);
       setError(errorMessage);
-      //console.error("Login error:", error);
+    }finally {
+      setLoading(false);
     }
   }
 
@@ -73,13 +78,13 @@ export function LoginForm() {
     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
       {error && <p className="text-red-500 text-sm">{error}</p>}
       <div>
-        <label htmlFor="usernameOrEmail" className="block text-sm font-medium text-gray-700">Username or Email</label>
-        <Input id="usernameOrEmail" type="text" autoComplete="username" {...form.register("usernameOrEmail")} />
+        <label htmlFor="usernameOrEmail" className="block text-sm font-medium text-gray-700" hidden>Username ou Email</label>
+        <Input id="usernameOrEmail" type="text" autoComplete="username" placeholder="Username or Email" {...form.register("usernameOrEmail")} />
         {form.formState.errors.usernameOrEmail && <p className="text-red-500 text-xs mt-1">{form.formState.errors.usernameOrEmail.message}</p>}
       </div>
       <div>
-        <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
-        <Input id="password" type="password" autoComplete="current-password" {...form.register("password")} />
+        <label htmlFor="password" className="block text-sm font-medium text-gray-700" hidden>Mot de passe</label>
+        <Input id="password" type="password" autoComplete="current-password" placeholder="Password"{...form.register("password")} />
         {form.formState.errors.password && <p className="text-red-500 text-xs mt-1">{form.formState.errors.password.message}</p>}
       </div>
 
@@ -97,22 +102,33 @@ export function LoginForm() {
                 form.setValue("tenantCode", ""); // Reset for re-entry if unchecked
             }
           }}
-          className="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+          className="h-4 w-4 text-indigo-600 border border-gray-300 rounded focus:ring-indigo-500"
         />
-        <label htmlFor="systemAdminLogin" className="text-sm text-gray-700">Login as System Admin (no tenant code)</label>
+        <label htmlFor="systemAdminLogin" className="text-sm text-gray-700">Pas de code d&apos;organisation</label>
       </div>
 
       {!isSystemAdminLogin && (
         <div>
-          <label htmlFor="tenantCode" className="block text-sm font-medium text-gray-700">Tenant Code</label>
-          <Input id="tenantCode" {...form.register("tenantCode")} />
+          <label htmlFor="tenantCode" className="block text-sm font-medium text-gray-700" hidden>Tenant Code</label>
+          <Input id="tenantCode" placeholder="Code d'organisation"{...form.register("tenantCode")} />
           {form.formState.errors.tenantCode && <p className="text-red-500 text-xs mt-1">{form.formState.errors.tenantCode.message}</p>}<p className="text-gray-500 text-xs mt-1">
-            Example: &lsquo;demo-tenant&lsquo;
+            Exemple: LIGUE1
           </p>
         </div>
       )}
-
-      <Button type="submit" className="w-full">Login</Button>
+      <Button type="submit" variant='primary' disabled={loading} className="w-full">{loading ? 
+        (
+         <>
+           <Loader2 className="animate-spin" size={16} />
+           <span className="ml-2">Connexion...</span>
+        </>
+        ) : (
+          <span>Se connecter</span>
+        )}</Button>
+        {/* Need an account? Register */}
+        <div className="mt-4 py-8 border-t border-indigo-200">
+          <p className="text-sm text-gray-600">Vous n&apos;avez pas de compte? <Link href="/register" className="text-indigo-600 hover:text-indigo-500 font-medium">Inscrivez-vous</Link></p>
+        </div>
     </form>
   );
 }

@@ -4,6 +4,7 @@
 import { LoginForm } from "@/components/forms/login-form";
 import { Roles } from "@/schemas";
 import { useAuthStore } from "@/store/auth.store";
+import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect } from "react"; // Import useEffect and React
 
@@ -37,8 +38,18 @@ export default function LoginClientPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-        <h1 className="text-2xl font-bold text-center text-gray-800 mb-6">Login</h1>
+      <div className="bg-white p-4 rounded-lg shadow-md w-full max-w-md">
+        <div className="flex items-center justify-center mb-6 pb-4 border-b border-indigo-200">
+          <Image
+            src='/logos/elenem-sport.png'
+            alt='Elenem Logo'
+            width={180}
+            height={120}
+            //fallbackText={userAuth?.username.charAt(0) || "Logo"}
+          />
+        </div>
+        
+        <h1 className="text-2xl font-bold text-center text-gray-800 mb-6">Se connecter</h1>
         {/* LoginForm is already a client component, so it can be rendered directly here */}
         <LoginForm />
       </div>

@@ -90,8 +90,8 @@ export const PublicHeader = ({
   //tenantName, // Optional tenant name
   sportType = SportType.FOOTBALL,
   navLinks = defaultNavLinks, // Default navigation links
-  primaryColor = 'indigo', // Default primary color
-  secondaryColor = 'orange', // Default secondary color
+  primaryColor = 'blue', // Default primary color
+  //secondaryColor = 'orange', // Default secondary color
   onSearch, // Optional search handler
 }: PublicHeaderProps) => {
   const { theme, toggleTheme } = useTheme(); // Hook for theme toggling
@@ -176,7 +176,7 @@ export const PublicHeader = ({
             <div className="flex items-center">
               <Link href="/" className="flex items-center space-x-2">
                 <Image
-                  src='/logos/elenem-sport.jpg'
+                  src='/logos/elenem-sport.png'
                   alt='Elenem Logo'
                   width={120}
                   height={70}
@@ -194,12 +194,12 @@ export const PublicHeader = ({
                   <Link
                     key={link.label}
                     href={link.href}
-                    className={`flex flex-col items-center justify-center p-2 rounded-md transition-all duration-200
-                      ${isActive ? `text-${primaryColor}-700 bg-gray-100` : 'text-gray-600'}
-                      hover:bg-gray-100 hover:text-${primaryColor}-700`}
+                    className={`flex flex-col items-center justify-center p-2 rounded-md transition-all ease-in-out duration-300
+                      ${isActive ? `text-${primaryColor}-700 bg-${primaryColor}-100 font-bold` : 'text-gray-600'}
+                      hover:bg-${primaryColor}-100  hover:text-${primaryColor}-700`}
                   >
                     {IconComponent && <IconComponent className="h-6 w-6 mb-1" />} {/* Icon on top */}
-                    <span className="text-xs font-medium">{link.label}</span> {/* Text at bottom */}
+                    <span className="text-xs">{link.label}</span> {/* Text at bottom */}
                   </Link>
                 );
               })}
@@ -303,9 +303,9 @@ export const PublicHeader = ({
                 // If user is not logged in, show Login/Register buttons (hidden on extra small screens)
                 
                   <Link href='/login' 
-                        className={`inline-flex items-center justify-center space-x-2 px-4 py-2 font-medium text-${primaryColor}-700 
-                                    bg-transparent rounded-full shadow-sm hover:bg-blue-50 
-                                    focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition ease-in-out duration-300 cursor-pointer`}>
+                        className={`inline-flex items-center justify-center md:space-x-2 md:px-4 md:py-2 font-bold text-${primaryColor}-700 
+                                    bg-transparent rounded-full shadow-sm hover:bg-${primaryColor}-100 
+                                    focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition ease-in-out duration-300`}>
                     <FiUser className="h-7 w-7 p-1 border border-blue-200 rounded-full" />
                     <span className='hidden md:inline text-sm'>Se Connecter</span>
                   </Link>

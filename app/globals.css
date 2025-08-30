@@ -31,6 +31,8 @@
 */
 @source inline("{hover:,}border-{green,red,orange,blue,indigo,yellow,emerald,pink,purple,violet,gray,gold}-{100..900..100}");
 
+@source inline("{hover:,}text-{green,red,orange,blue,indigo,yellow,emerald,pink,purple,violet,gray,gold}-{100..900..100}");
+
 @source inline("via-{green,red,orange,blue,indigo,yellow,emerald,pink,purple,violet,gray,gold}-{900}");
 
 /* Utility class for hiding scrollbar while keeping the scroll functionality*/
@@ -128,13 +130,6 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
 }
 
 body {
