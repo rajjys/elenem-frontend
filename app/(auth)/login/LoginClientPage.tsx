@@ -53,7 +53,6 @@ export default function LoginClientPage() {
             //fallbackText={userAuth?.username.charAt(0) || "Logo"}
           />
         </div>
-        
         <h1 className="text-2xl font-bold text-center text-gray-800 mb-4">Se connecter</h1>
         {/* LoginForm is already a client component, so it can be rendered directly here */}
         <LoginForm />
