@@ -4,7 +4,9 @@
 import { LoginForm } from "@/components/forms/login-form";
 import { Roles } from "@/schemas";
 import { useAuthStore } from "@/store/auth.store";
+import { ArrowLeft } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect } from "react"; // Import useEffect and React
 
@@ -38,8 +40,11 @@ export default function LoginClientPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="bg-white p-4 rounded-lg shadow-md w-full max-w-md">
-        <div className="flex items-center justify-center mb-6 pb-4 border-b border-indigo-200">
+      <div className="relative bg-white p-4 rounded-lg shadow-md w-full max-w-md">
+        <Link href="/" className="absolute top-0 left-0 rounded-full flex items-center text-white text-sm font-medium bg-gray-600/60 hover:bg-gray-600/80 mt-10 ml-8 p-2 transition-all duration-300 ease-in-out">
+          <ArrowLeft className="h-6 w-6" />
+        </Link>
+        <div className="flex items-center justify-center mb-4 pb-4 border-b border-indigo-200">
           <Image
             src='/logos/elenem-sport.png'
             alt='Elenem Logo'
@@ -49,7 +54,7 @@ export default function LoginClientPage() {
           />
         </div>
         
-        <h1 className="text-2xl font-bold text-center text-gray-800 mb-6">Se connecter</h1>
+        <h1 className="text-2xl font-bold text-center text-gray-800 mb-4">Se connecter</h1>
         {/* LoginForm is already a client component, so it can be rendered directly here */}
         <LoginForm />
       </div>

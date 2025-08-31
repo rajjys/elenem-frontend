@@ -12,7 +12,6 @@ import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
 
-
 export function LoginForm() {
   const login = useAuthStore((state) => state.login);
   const [loading, setLoading] = useState(false);
@@ -78,13 +77,13 @@ export function LoginForm() {
     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
       {error && <p className="text-red-500 text-sm">{error}</p>}
       <div>
-        <label htmlFor="usernameOrEmail" className="block text-sm font-medium text-gray-700" hidden>Username ou Email</label>
-        <Input id="usernameOrEmail" type="text" autoComplete="username" placeholder="Username or Email" {...form.register("usernameOrEmail")} />
+        <label htmlFor="usernameOrEmail" className="block text-sm font-medium text-gray-700">Identifiant ou Email</label>
+        <Input id="usernameOrEmail" type="text" autoComplete="username" placeholder="jonathan" {...form.register("usernameOrEmail")} />
         {form.formState.errors.usernameOrEmail && <p className="text-red-500 text-xs mt-1">{form.formState.errors.usernameOrEmail.message}</p>}
       </div>
       <div>
-        <label htmlFor="password" className="block text-sm font-medium text-gray-700" hidden>Mot de passe</label>
-        <Input id="password" type="password" autoComplete="current-password" placeholder="Password"{...form.register("password")} />
+        <label htmlFor="password" className="block text-sm font-medium text-gray-700">Mot de passe</label>
+        <Input id="password" type="password" autoComplete="current-password" placeholder="********"{...form.register("password")} />
         {form.formState.errors.password && <p className="text-red-500 text-xs mt-1">{form.formState.errors.password.message}</p>}
       </div>
 
@@ -109,11 +108,9 @@ export function LoginForm() {
 
       {!isSystemAdminLogin && (
         <div>
-          <label htmlFor="tenantCode" className="block text-sm font-medium text-gray-700" hidden>Tenant Code</label>
-          <Input id="tenantCode" placeholder="Code d'organisation"{...form.register("tenantCode")} />
-          {form.formState.errors.tenantCode && <p className="text-red-500 text-xs mt-1">{form.formState.errors.tenantCode.message}</p>}<p className="text-gray-500 text-xs mt-1">
-            Exemple: LIGUE1
-          </p>
+          <label htmlFor="tenantCode" className="block text-sm font-medium text-gray-700">Code d&apos;organisation</label>
+          <Input id="tenantCode" placeholder="LIGUE1"{...form.register("tenantCode")} />
+          {form.formState.errors.tenantCode && <p className="text-red-500 text-xs mt-1">{form.formState.errors.tenantCode.message}</p>}
         </div>
       )}
       <Button type="submit" variant='primary' disabled={loading} className="w-full">{loading ? 
@@ -127,7 +124,7 @@ export function LoginForm() {
         )}</Button>
         {/* Need an account? Register */}
         <div className="mt-4 py-8 border-t border-indigo-200">
-          <p className="text-sm text-gray-600">Vous n&apos;avez pas de compte? <Link href="/register" className="text-indigo-600 hover:text-indigo-500 font-medium">Inscrivez-vous</Link></p>
+          <p className="text-sm text-gray-600">Vous n&apos;avez pas de compte? <Link href="/register" className="text-indigo-600 hover:text-indigo-500 transition-all duration-300 ease-in-out font-medium pl-2">Inscrivez-vous</Link></p>
         </div>
     </form>
   );
