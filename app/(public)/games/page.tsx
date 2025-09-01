@@ -104,14 +104,14 @@ export default function PublicGamesPage() {
     <div className="min-h-screen max-w-2xl mx-auto">
       <div className="container mx-auto p-4 sm:p-6 space-y-8">
         <header>
-          <h1 className="text-4xl font-bold tracking-tight text-gray-800">Matchs et Résultats: Toutes les Organisations</h1>
-          <p className="mt-2 text-md text-gray-500">Parcourez les Matchs publics dans toutes les ligues.</p>
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-gray-800">Matchs et Résultats: Toutes les Organisations</h1>
+          <p className="mt-2 text-sm md:text-md text-gray-500">Parcourez les Matchs publics dans toutes les ligues.</p>
         </header>
         <Card className="overflow-hidden shadow-sm">
           <CardHeader>
-            <CardTitle className='text-gray-500 text-base px-2'>Selectionner une date</CardTitle>
+            {availableDates.length > 0 && <CardTitle className='text-gray-500 text-base px-2'>Selectionner une date</CardTitle>}
           </CardHeader>
-          <CardContent className="grid gap-4 md:gap-6 grid-cols-1">
+          <CardContent className="grid gap-4 md:gap-4 grid-cols-1">
             <DateCarousel dates={availableDates} selectedDate={selectedDate} onDateSelect={setSelectedDate} />
           </CardContent>
         </Card>
@@ -153,7 +153,9 @@ export default function PublicGamesPage() {
         ) : (
             <div className="text-center py-16 bg-white rounded-lg border">
                 <h3 className="text-xl font-semibold">Pas des Matchs Disponible</h3>
-                <p className="text-muted-foreground mt-2">Pas de matchs Disponible a la date selectionnee.</p>
+                {availableDates.length > 0 && 
+                  <p className="text-muted-foreground mt-2">Pas de matchs Disponible a la date selectionnee.</p>
+                }
             </div>
         )}
       </div>

@@ -7,7 +7,7 @@ function DateCarousel({ dates, selectedDate, onDateSelect }: { dates: string[], 
 
     return (
         <div className="relative">
-            <div className="flex items-center space-x-2 overflow-x-auto pb-4 scrollbar-hide">
+            <div className="flex items-center space-x-2 overflow-x-auto pb-2 no-scrollbar">
                 {dates.map(dateStr => {
                     const dateObj = parseISO(dateStr);
                     const isSelected = dateStr === selectedDate;

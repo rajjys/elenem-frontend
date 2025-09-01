@@ -5,7 +5,6 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Button } from "@/components/ui/button";
 import { api } from '@/services/api';
 import { PublicTenantBasic } from '@/schemas';
-import { Building } from 'lucide-react';
 import PublicTenantCard from '@/components/tenant/public-tenant-card';
 import PublicTenantCardSkeleton from '@/components/tenant/public-tenant-card-skeleton';
 import PublicTenantsFilters from '@/components/tenant/public-tenants-filters';
@@ -44,10 +43,9 @@ export default function PublicTenantsPage() {
     return (
         <div className="bg-gray-50 min-h-screen max-w-3xl mx-auto">
             <div className="container mx-auto p-4 sm:p-6 space-y-8">
-                <header className="text-center">
-                    <Building className="mx-auto h-12 w-12 text-primary" />
-                    <h1 className="mt-4 text-4xl font-bold tracking-tight text-gray-900">Discover Organizations</h1>
-                    <p className="mt-2 text-lg text-muted-foreground">Browse the federations and organizations on our platform.</p>
+                <header>
+                    <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-gray-900">Decouvrir les Organisations</h1>
+                    <p className="mt-2 text-sm md:text-md text-gray-500">Parcourez les fédérations et les organisations sur notre plateforme.</p>
                 </header>
 
                 <PublicTenantsFilters onFilterChange={setFilters} />
@@ -59,18 +57,18 @@ export default function PublicTenantsPage() {
                         tenants.map(tenant => <PublicTenantCard key={tenant.id} tenant={tenant} />)
                     ) : (
                         <div className="text-center py-16 bg-card rounded-lg border">
-                            <h3 className="text-xl font-semibold">No Organizations Found</h3>
-                            <p className="text-muted-foreground mt-2">Try adjusting your filters.</p>
+                            <h3 className="text-xl font-semibold">Aucune Organisation Trouvée</h3>
+                            <p className="text-muted-foreground mt-2">Essayez de modifier vos filtres.</p>
                         </div>
                     )}
                 </div>
 
-                {loading && page > 1 && <div className="text-center"><p>Loading more...</p></div>}
+                {loading && page > 1 && <div className="text-center"><p>Chargement...</p></div>}
 
                 {!loading && page < totalPages && (
                     <div className="text-center pt-8">
                         <Button onClick={handleLoadMore} size="lg">
-                            Load More
+                            Plus
                         </Button>
                     </div>
                 )}
