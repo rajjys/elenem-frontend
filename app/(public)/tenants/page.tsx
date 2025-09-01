@@ -4,7 +4,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Button } from "@/components/ui/button";
 import { api } from '@/services/api';
-import { toast } from 'sonner';
 import { PublicTenantBasic } from '@/schemas';
 import { Building } from 'lucide-react';
 import PublicTenantCard from '@/components/tenant/public-tenant-card';
@@ -27,7 +26,7 @@ export default function PublicTenantsPage() {
                 setTenants(prev => currentPage === 1 ? data : [...prev, ...data]);
                 setTotalPages(newTotalPages);
             })
-            .catch(() => toast.error("Failed to load tenants."))
+            .catch()
             .finally(() => setLoading(false));
     }, []);
 

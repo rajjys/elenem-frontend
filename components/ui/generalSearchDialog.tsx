@@ -74,9 +74,8 @@ export default function GeneralSearchDialog() {
               type="search"
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Rechercher ligue, équipe, ville…"
-              className="pl-9 w-full rounded-xl bg-white dark:bg-slate-900/80 border-slate-300 dark:border-slate-700 focus:ring-blue-500 focus:border-blue-500"
+              className="pl-9 py-1 w-full rounded-md bg-white dark:bg-slate-900/80 border-slate-300 dark:border-slate-700 focus:ring-blue-500 focus:border-blue-500"
             />
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 dark:text-slate-500" />
           </div>
         </div>
 

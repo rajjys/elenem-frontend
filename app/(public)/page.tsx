@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Trophy, Users2, CalendarDays, ShieldCheck, Rocket, Star, ArrowRight,
   Smartphone, Building2, Globe2, ExternalLink, Gamepad2, Network, BookOpen, Terminal
 } from "lucide-react";
@@ -9,19 +9,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useAudienceStore } from "@/store/audience.store";
 import { useRouter } from "next/navigation";
-import { GameDetails } from "@/schemas";
-import { capitalizeFirst, formatDateFr } from "@/utils";
+import { GameDetails, PublicTenantBasic } from "@/schemas";
+import { capitalizeFirst, countryNameToCode, formatDateFr } from "@/utils";
 import { Skeleton } from "@/components/ui";
 import GeneralSearchDialog from "@/components/ui/generalSearchDialog";
-
-// --------------------------------------------------
-// Données de démonstration (à remplacer par des requêtes en direct)
-const demoTenants = [
-  { id: 1, name: "Goma Premier League", sport: "Football", region: "RDC – Nord-Kivu", subdomain: "gpl" },
-  { id: 2, name: "Coupe du Kivu", sport: "Basketball", region: "RDC – Sud-Kivu", subdomain: "kivucup" },
-  { id: 3, name: "Lac Vert Volleyball", sport: "Volleyball", region: "RDC – Goma", subdomain: "lacvert" },
-  { id: 4, name: "Ligue des Jeunes du Rwanda", sport: "Football", region: "Rwanda – Kigali", subdomain: "ryl" },
-];
+import axios from "axios";
 
 const features = [
   { icon: <CalendarDays className="w-5 h-5 text-blue-500"/>, title: "Planification Intelligente", desc: "Vérifications automatiques des conflits, dates d'interdiction et lieux." },
@@ -57,6 +49,7 @@ export default function PublicLandingPage() {
 
   const router = useRouter();
   const [games, setGames] = useState<GameDetails[]>([]);
+  const [tenants, setTenants] = useState<PublicTenantBasic[]>([]);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [Motion, setMotion] = React.useState<any>(null);
 
@@ -108,7 +101,30 @@ export default function PublicLandingPage() {
           };
           fetchGames();
       },[])
-      if (!Motion) return null;  
+      const fetchTenants = useCallback(async (currentFilters: { search?: string, sportType?: string, country?: string, take?: number, pageSize?: number }) => {
+          //setIsLoading(true);
+          try {
+            const params = { ...currentFilters };
+            params.pageSize = 4;
+            const tenantsResponse = await api.get<{ data: PublicTenantBasic[] }>('/public-tenants', { params });
+            setTenants(tenantsResponse.data.data);
+          } catch (error) {
+            let errorMessage = "Failed to fetch Tenants.";
+            if (axios.isAxiosError(error)) {
+              errorMessage = error.response?.data?.message || errorMessage;
+            }
+            //toast.error(errorMessage);
+            console.log(errorMessage)
+          } finally {
+            //setIsLoading(false);
+          }
+        }, []);
+      
+        useEffect(() => {
+          const filters: { search?: string, sportType?: string, country?: string, take?: number } = { take: 4};
+          fetchTenants(filters);
+        }, [fetchTenants]); 
+  if (!Motion) return null;  
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-200">
       {/* Héros */}
@@ -238,17 +254,17 @@ export default function PublicLandingPage() {
           <a className="text-sm text-blue-600 dark:text-blue-400 hover:underline" href="/tenants">Parcourir l&apos;annuaire</a>
         </div>
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {demoTenants.map((t) => (
+          {tenants.map((t) => (
             <Card key={t.id} className="rounded-2xl bg-white dark:bg-slate-900 shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all">
               <CardContent className="p-4">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-400 to-amber-500" />
                   <div>
                     <div className="font-medium leading-tight">{t.name}</div>
-                    <div className="text-xs text-slate-500">{t.sport} • {t.region}</div>
+                    <div className="text-xs text-slate-500">{countryNameToCode[t.sportType]} • {t.country}</div>
                   </div>
                 </div>
-                <div className="mt-3 text-xs text-slate-500">{t.subdomain}.elenem.site</div>
+                <div className="mt-3 text-xs text-slate-500">{t.tenantCode}.elenem.site</div>
               </CardContent>
             </Card>
           ))}

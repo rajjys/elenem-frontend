@@ -52,8 +52,8 @@ export default function PublicGamesPage() {
         }
       }
       catch(error){
-        toast.error("Failed to load game dates.");
-        console.log(error);
+        //toast.error("Failed to load game dates.");
+        console.error(error);
       }
       finally{
           setLoadingDates(false)
@@ -68,8 +68,8 @@ export default function PublicGamesPage() {
       const tenantsWithGames = response.data;
       setGamesByTenant(tenantsWithGames);
     } catch (error) {
-        toast.error(`Failed to load games for ${date}.`);
-        console.log(error);
+        //toast.error(`Failed to load games for ${date}.`);
+        console.error(error);
     }
     finally{
         setLoadingGames(false)

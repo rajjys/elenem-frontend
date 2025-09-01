@@ -225,6 +225,7 @@ export interface PublicTenantBasic {
   externalId: string;
   slug: string;
   name: string;
+  country: string;
   tenantCode: string;
   sportType: SportType;
   businessProfile: PublicBusinessProfileResponseDto;
