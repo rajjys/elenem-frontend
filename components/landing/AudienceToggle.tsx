@@ -29,8 +29,8 @@ export const AudienceToggle = () => {
             onClick={() => toggleIsFan()}
             className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition-colors ${
               active
-                ? "bg-white shadow-md text-slate-800"
-                : "text-slate-600 hover:text-slate-800 hover:bg-white/70"
+                ? "bg-white shadow-md text-blue-600"
+                : "text-slate-600 hover:text-blue-600 hover:bg-white/70"
             }`}
           >
             <span className="hidden lg:inline">{label}</span>

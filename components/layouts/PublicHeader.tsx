@@ -109,14 +109,14 @@ export const PublicHeader = ({
     : isPlayer ? "/player/dashboard"
     : isCoach ? "/coach/dashboard"
     : isReferee ? "/referee/dashboard"
-    : "/";
+    : "/account/dashboard";
 
   //const updatedNavLinks = extendNavLinksWithIcons(navLinks, sportType);
   const handleLogout = () => { logout(); router.push("/"); };
 
   return (
     <>
-      <header className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur-md">
+      <header className="sticky top-0 z-50 w-full border-b border-gray-200 bg-white/95 backdrop-blur-md">
         <div className="mx-auto max-w-8xl px-2 md:px-6 py-1">
           <div className="flex h-14 items-center justify-between gap-4">
             {/* BRAND */}
@@ -152,7 +152,7 @@ export const PublicHeader = ({
             </nav>
             {/* Right area: search + login (visible on all sizes) */}
             <div className="flex items-center gap-2">
-              <AudienceToggle />
+              {pathname === "/" && <AudienceToggle />}
               {loadingUser ? (
                 <div className="flex items-center gap-2">
                   <Skeleton className="h-10 w-10 rounded-full" />

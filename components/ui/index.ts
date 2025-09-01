@@ -25,3 +25,4 @@ export * from './BlogPostCard';
 export * from './vertical-blogpost-card';
 export * from './form';
 export * from './collapsible';
+export * from './generalSearchDialog';
