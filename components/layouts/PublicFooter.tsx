@@ -15,7 +15,7 @@ export const PublicFooter = () => {
                         <ul className="mt-4 space-y-4">
                             <li><Link href="/features" className="text-base text-gray-600 hover:text-gray-900">Features</Link></li>
                             <li><Link href="/pricing" className="text-base text-gray-600 hover:text-gray-900">Pricing</Link></li>
-                            <li><Link href="/explore" className="text-base text-gray-600 hover:text-gray-900">Explore Leagues</Link></li>
+                            <li><Link href="/tenants" className="text-base text-gray-600 hover:text-gray-900">Explore Leagues</Link></li>
                         </ul>
                     </div>
                     {/* Company Links */}

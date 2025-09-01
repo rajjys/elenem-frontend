@@ -24,6 +24,8 @@ const publicPaths = [
   '/upload', '/upload/', '/upload/*',
   '/login', '/register', '/access-denied', 
   '/blogs',
+  '/landing', '/landing/', '/landing/*',
+  '/landing2', '/landin2/', '/landing2*',
   '/health', '/health/', '/health/*',
   '/news', '/news/', '/news/*', // Public news articles on the root domain
    '/contact', '/pricing', '/features', '/terms', '/privacy',

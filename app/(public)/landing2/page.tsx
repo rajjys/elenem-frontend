@@ -1,0 +1,352 @@
+"use client";
+import React from "react";
+import { Trophy, Users2, CalendarDays, ShieldCheck, Rocket, Star, ArrowRight,
+  Smartphone, Building2, Globe2, ExternalLink, Gamepad2, Network, BookOpen, Terminal
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { useAudienceStore } from "@/store/audience.store";
+
+// --------------------------------------------------
+// Données de démonstration (à remplacer par des requêtes en direct)
+// --------------------------------------------------
+const demoGames = [
+  { id: 1, league: "Goma Premier League", home: "Volcans", away: "Cité du Lac", date: "Aujourd'hui 18:30", venue: "Amahoro Arena" },
+  { id: 2, league: "Coupe du Kivu", home: "Panthères", away: "Aigles", date: "Demain 15:00", venue: "Stade de l'Unité" },
+  { id: 3, league: "Super Séries de Bukavu", home: "Rangers", away: "Titans", date: "2 Sept, 19:00", venue: "Terrain ITIG" },
+];
+
+const demoTenants = [
+  { id: 1, name: "Goma Premier League", sport: "Football", region: "RDC – Nord-Kivu", subdomain: "gpl" },
+  { id: 2, name: "Coupe du Kivu", sport: "Basketball", region: "RDC – Sud-Kivu", subdomain: "kivucup" },
+  { id: 3, name: "Lac Vert Volleyball", sport: "Volleyball", region: "RDC – Goma", subdomain: "lacvert" },
+  { id: 4, name: "Ligue des Jeunes du Rwanda", sport: "Football", region: "Rwanda – Kigali", subdomain: "ryl" },
+];
+
+const features = [
+  { icon: <CalendarDays className="w-5 h-5 text-blue-500"/>, title: "Planification Intelligente", desc: "Vérifications automatiques des conflits, dates d'interdiction et lieux." },
+  { icon: <Users2 className="w-5 h-5 text-blue-500"/>, title: "Effectif et Éligibilité", desc: "Fiches de joueurs, transferts, suspensions, limites d'âge." },
+  { icon: <ShieldCheck className="w-5 h-5 text-blue-500"/>, title: "Fair-play", desc: "Affectations des arbitres, rapports de match, flux de travail disciplinaires." },
+  { icon: <Globe2 className="w-5 h-5 text-blue-500"/>, title: "Multi-Locataire", desc: "Sous-domaines de marque avec domaines personnalisés plus tard." },
+  { icon: <Network className="w-5 h-5 text-blue-500"/>, title: "API d'abord", desc: "API JSON claires et webhooks pour l'intégration." },
+  { icon: <Smartphone className="w-5 h-5 text-blue-500"/>, title: "UX Natif Mobile", desc: "Navigation rapide et adaptée aux pouces pour les fans." },
+];
+
+// --------------------------------------------------
+// Petits composants utilitaires
+// --------------------------------------------------
+const Logo = () => (
+  <div className="flex items-center gap-2">
+    <div className="w-8 h-8 rounded-2xl bg-gradient-to-br from-blue-500 to-orange-400" />
+    <span className="font-semibold tracking-tight">Elenem Leagues</span>
+  </div>
+);
+
+function Pill({ children }: { children: React.ReactNode }) {
+  return (
+    <span className="text-xs rounded-full px-2 py-1 bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
+      {children}
+    </span>
+  );
+}
+
+// --------------------------------------------------
+// Composant principal de la page
+// --------------------------------------------------
+export default function PublicLandingDualAudience() {
+  const [query, setQuery] = React.useState("");
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [Motion, setMotion] = React.useState<any>(null);
+
+  React.useEffect(() => {
+    import("framer-motion").then((mod) => setMotion(mod));
+  }, []);
+   const isFan = useAudienceStore((state) => state.isFan);
+  if (!Motion) return null;
+  const heroCopy = isFan
+    ? {
+        eyebrow: "Trouvez votre ligue",
+        title: "Scores, calendriers et classements — tout en un seul endroit",
+        desc: "Recherchez par ligue, équipe ou ville pour accéder directement à l'action. Chaque ligue dispose d'un site dédié avec des données en direct.",
+        primary: "Parcourir les matchs",
+        secondary: "Trouver ma ligue",
+      }
+    : {
+        eyebrow: "Pour les organisateurs",
+        title: "Gérez votre ligue comme un pro",
+        desc: "Système d'exploitation de ligue tout-en-un : calendrier, effectifs, officiels, résultats, médias et un site Web de marque pour chaque ligue.",
+        primary: "Voir les fonctionnalités",
+        secondary: "Commencer gratuitement",
+      };
+
+  return (
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-200">
+      {/* Héros */}
+      <section className="relative">
+        <div className="mx-auto max-w-7xl px-4 pt-10 pb-8 md:pt-14 md:pb-12">
+          <div className="grid md:grid-cols-2 gap-8 items-center">
+            {/* Texte */}
+            <Motion.motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
+              <div className="flex items-center gap-2 mb-3">
+                <Pill>{heroCopy.eyebrow}</Pill>
+                <Badge variant="secondary" className="rounded-full bg-amber-100 text-amber-900 dark:bg-amber-900/70 dark:text-amber-200 border-none">Multi-locataire</Badge>
+              </div>
+              <h1 className="text-3xl md:text-5xl font-semibold tracking-tight leading-tight text-black dark:text-white">
+                {heroCopy.title}
+              </h1>
+              <p className="mt-4 text-slate-600 dark:text-slate-400 max-w-prose">
+                {heroCopy.desc}
+              </p>
+
+              {/* CTAs selon l'audience */}
+              <div className="mt-6 flex flex-wrap gap-3">
+                <Button size="lg" variant="primary" className="">
+                  {heroCopy.primary} <ArrowRight className="ml-2 w-4 h-4" />
+                </Button>
+                <Button size="lg" variant="outline" className="rounded-2xl border-slate-300 dark:border-slate-700 hover:bg-slate-200/50 dark:hover:bg-slate-800">
+                  {heroCopy.secondary}
+                </Button>
+              </div>
+
+              {/* Recherche */}
+              <div className="mt-6">
+                <label className="text-xs uppercase tracking-wider text-slate-500">Recherche rapide</label>
+                <div className="mt-2 flex items-center gap-2">
+                  <div className="flex-1">
+                    <Input
+                      value={query}
+                      type='search'
+                      onChange={(e) => setQuery(e.target.value)}
+                      placeholder="Rechercher ligue, équipe, ville…"
+                      className="pl-9 py-2 rounded-xl bg-white w-full dark:bg-slate-900/80 border-slate-300 dark:border-slate-700 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                  <Button variant='outline' onClick={() => alert(`Aller à : https://${query || "votre-ligue"}.votredomaine.com`)}>
+                    Aller
+                  </Button>
+                </div>
+                <div className="mt-2 text-xs text-slate-500">Astuce : les ligues obtiennent un sous-domaine. Domaines personnalisés pris en charge.</div>
+              </div>
+
+              {/* Signaux de confiance */}
+              <div className="mt-6 flex flex-wrap items-center gap-4 text-sm text-slate-500">
+                <Trophy className="w-4 h-4 text-blue-500" /> Approuvé par les associations régionales
+                <Star className="w-4 h-4 text-blue-500" /> SLA de disponibilité de 99,9 %
+                <Rocket className="w-4 h-4 text-orange-500" /> Lancez un site en quelques minutes
+              </div>
+            </Motion.motion.div>
+
+            {/* Carte de mise en avant (selon l'audience) */}
+            <Motion.motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.05 }}>
+              <Card className="rounded-3xl overflow-hidden shadow-2xl shadow-blue-900/10 border border-slate-200/80 dark:border-slate-800/80">
+                <CardHeader className="border-b border-slate-200/70 dark:border-slate-800">
+                  <CardTitle className="flex items-center gap-2 text-base">
+                    {isFan ? <Gamepad2 className="w-5 h-5 text-blue-500"/> : <Building2 className="w-5 h-5 text-blue-500"/>}
+                    {isFan ? "Matchs populaires" : "Gérez votre ligue"}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-0">
+                  {isFan ? (
+                    <div className="divide-y divide-slate-200/70 dark:divide-slate-800">
+                      {demoGames.map((g) => (
+                        <div key={g.id} className="p-4 flex items-center justify-between hover:bg-slate-100/60 dark:hover:bg-slate-900/40 transition-colors">
+                          <div>
+                            <div className="font-medium">{g.home} vs {g.away}</div>
+                            <div className="text-sm text-slate-500">{g.league} • {g.venue}</div>
+                          </div>
+                          <div className="text-sm text-slate-600 dark:text-slate-300">{g.date}</div>
+                        </div>
+                      ))}
+                      <div className="p-4 text-sm text-right">
+                        <a className="inline-flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:underline" href="#games">Voir le calendrier complet <ArrowRight className="w-4 h-4"/></a>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4">
+                      {features.slice(0,4).map((f, i) => (
+                        <div key={i} className="flex gap-3">
+                          <div className="shrink-0 mt-1">{f.icon}</div>
+                          <div>
+                            <div className="font-medium">{f.title}</div>
+                            <div className="text-sm text-slate-500">{f.desc}</div>
+                          </div>
+                        </div>
+                      ))}
+                      <div className="col-span-full text-sm text-right">
+                        <a className="inline-flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:underline" href="#features">Explorer toutes les fonctionnalités <ArrowRight className="w-4 h-4"/></a>
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </Motion.motion.div>
+          </div>
+        </div>
+
+        {/* Ruban "Propulsé par" */}
+        <div className="absolute left-0 -bottom-3 md:-bottom-4 w-full">
+          <div className="mx-auto max-w-7xl px-4">
+            <div className="rounded-2xl md:rounded-3xl border border-dashed border-blue-200 dark:border-blue-800/50 bg-blue-50/30 dark:bg-blue-950/20 p-3 md:p-4 text-xs flex items-center justify-between">
+              <span className="text-slate-600 dark:text-slate-400">Chaque site de ligue est « Propulsé par Elenem Leagues ».</span>
+              <a href="#product" className="inline-flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:underline">
+                En savoir plus sur le logiciel <ExternalLink className="w-3.5 h-3.5"/>
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Teaser de l'annuaire des ligues */}
+      <section id="tenants" className="mx-auto max-w-7xl px-4 pt-12 md:pt-16">
+        <div className="flex items-end justify-between mb-4">
+          <h2 className="text-xl md:text-2xl font-semibold tracking-tight">Ligues sur Elenem</h2>
+          <a className="text-sm text-blue-600 dark:text-blue-400 hover:underline" href="/tenants">Parcourir l&apos;annuaire</a>
+        </div>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {demoTenants.map((t) => (
+            <Card key={t.id} className="rounded-2xl bg-white dark:bg-slate-900 shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-400 to-amber-500" />
+                  <div>
+                    <div className="font-medium leading-tight">{t.name}</div>
+                    <div className="text-xs text-slate-500">{t.sport} • {t.region}</div>
+                  </div>
+                </div>
+                <div className="mt-3 text-xs text-slate-500">{t.subdomain}.votredomaine.com</div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </section>
+
+      {/* Bandeau des fonctionnalités du produit */}
+      <section id="features" className="mx-auto max-w-7xl px-4 pt-12 md:pt-16">
+        <div className="flex items-end justify-between mb-4">
+          <h2 className="text-xl md:text-2xl font-semibold tracking-tight">Pourquoi les ligues nous choisissent</h2>
+          <a className="text-sm text-blue-600 dark:text-blue-400 hover:underline" href="#product">Voir le produit</a>
+        </div>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {features.map((f, i) => (
+            <Card key={i} className="rounded-2xl bg-white dark:bg-slate-900">
+              <CardContent className="p-4 flex gap-3">
+                <div className="mt-1">{f.icon}</div>
+                <div>
+                  <div className="font-medium">{f.title}</div>
+                  <div className="text-sm text-slate-500">{f.desc}</div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </section>
+
+      {/* Teaser des tarifs */}
+      <section id="pricing" className="mx-auto max-w-7xl px-4 pt-12 md:pt-16">
+        <div className="rounded-3xl border border-blue-200 dark:border-slate-800 p-6 md:p-8 bg-gradient-to-br from-blue-50/50 to-amber-50/50 dark:from-slate-950 dark:to-amber-950/20">
+          <div className="grid md:grid-cols-3 gap-6 items-center">
+            <div className="md:col-span-2">
+              <h3 className="text-lg md:text-xl font-semibold">Tarification simple et transparente</h3>
+              <p className="text-sm text-slate-600 dark:text-slate-400 max-w-prose mt-1">
+                Commencez gratuitement. Mettez à niveau lorsque vous avez besoin de domaines personnalisés, de flux de travail avancés ou de limites d&apos;API plus élevées. Réductions pour les fédérations et les programmes pour jeunes.
+              </p>
+            </div>
+            <div className="flex md:justify-end gap-3">
+              <Button className="rounded-2xl bg-blue-600 text-white hover:bg-blue-700">Comparer les plans</Button>
+              <Button variant="outline" className="rounded-2xl bg-white/50 dark:bg-slate-900/50 border-slate-300 dark:border-slate-700">Parler aux ventes</Button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Développeur / Docs */}
+      <section id="api" className="mx-auto max-w-7xl px-4 pt-12 md:pt-16">
+        <Card className="rounded-3xl overflow-hidden bg-white dark:bg-slate-900">
+          <CardContent className="p-6 md:p-8 grid md:grid-cols-2 gap-6 items-center">
+            <div>
+              <div className="flex items-center gap-2 text-xs text-slate-500 mb-2">
+                <Terminal className="w-4 h-4 text-blue-500"/> API & Webhooks
+              </div>
+              <h3 className="text-lg md:text-xl font-semibold">Développez sur la plateforme Elenem</h3>
+              <p className="text-sm text-slate-600 dark:text-slate-400 max-w-prose mt-1">
+                Accédez aux rencontres, classements, joueurs et médias avec des API REST claires. Mises à jour en temps réel via webhooks. SDK pour TypeScript et Python.
+              </p>
+              <div className="mt-4 flex gap-3">
+                <Button className="rounded-2xl bg-blue-600 text-white hover:bg-blue-700">Obtenir une clé API</Button>
+                <Button variant="outline" className="rounded-2xl border-slate-300 dark:border-slate-700">
+                  <a href="#docs" className="flex items-center"><BookOpen className="mr-2 w-4 h-4"/> Lire la documentation</a>
+                </Button>
+              </div>
+            </div>
+            <div className="rounded-2xl border border-slate-200 dark:border-slate-800 p-4 bg-slate-100/70 dark:bg-slate-900/70">
+              <pre className="text-xs overflow-auto leading-relaxed text-slate-700 dark:text-slate-300">
+                {`GET /v1/tenants/{tenantId}/games?date=today
+                200 OK
+                {
+                "games": [
+                    { "home": "Volcans", "away": "Cité du Lac", "startsAt": "2025-08-31T16:30:00Z" }
+                ]
+                }`}
+              </pre>
+            </div>
+          </CardContent>
+        </Card>
+      </section>
+
+      {/* Pied de page */}
+      <footer id="footer" className="mt-12 md:mt-16 border-t border-slate-200 dark:border-slate-800">
+        <div className="mx-auto max-w-7xl px-4 py-10 grid sm:grid-cols-2 md:grid-cols-4 gap-8 text-sm">
+          <div>
+            <Logo />
+            <p className="text-slate-500 mt-3">Le logiciel qui alimente les ligues et fédérations indépendantes en Afrique et au-delà.</p>
+          </div>
+          <div>
+            <div className="font-medium mb-2">Explorer</div>
+            <ul className="space-y-1 text-slate-600 dark:text-slate-400">
+              <li><a href="#games" className="hover:underline">Matchs</a></li>
+              <li><a href="#tenants" className="hover:underline">Ligues</a></li>
+              <li><a href="#news" className="hover:underline">Actualités</a></li>
+            </ul>
+          </div>
+          <div>
+            <div className="font-medium mb-2">Produit</div>
+            <ul className="space-y-1 text-slate-600 dark:text-slate-400">
+              <li><a href="#features" className="hover:underline">Fonctionnalités</a></li>
+              <li><a href="#pricing" className="hover:underline">Tarifs</a></li>
+              <li><a href="#api" className="hover:underline">API</a></li>
+              <li><a href="#docs" className="hover:underline">Docs</a></li>
+            </ul>
+          </div>
+          <div>
+            <div className="font-medium mb-2">Entreprise</div>
+            <ul className="space-y-1 text-slate-600 dark:text-slate-400">
+              <li><a href="#about" className="hover:underline">À propos</a></li>
+              <li><a href="#contact" className="hover:underline">Contact</a></li>
+              <li><a href="#legal" className="hover:underline">Légal</a></li>
+              <li><a href="#terms" className="hover:underline">Conditions</a></li>
+            </ul>
+          </div>
+        </div>
+        <div className="mx-auto max-w-7xl px-4 pb-6 text-xs text-slate-500 flex flex-col md:flex-row gap-2 md:items-center md:justify-between">
+          <div>© {new Date().getFullYear()} Elenem. Tous droits réservés.</div>
+          <div className="opacity-80">Conçu pour mobile • Prêt pour PWA</div>
+        </div>
+      </footer>
+
+      {/* Barre de navigation inférieure mobile */}
+      <div className="fixed md:hidden bottom-3 left-0 right-0">
+        <div className="mx-auto max-w-md px-4">
+          <div className="rounded-2xl shadow-lg bg-white/80 dark:bg-slate-900/80 backdrop-blur border border-slate-200 dark:border-slate-800 flex justify-around py-2 text-xs">
+            <a href="#games" className="flex flex-col items-center gap-1 text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"><CalendarDays className="w-4 h-4"/>Matchs</a>
+            <a href="#tenants" className="flex flex-col items-center gap-1 text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"><Users2 className="w-4 h-4"/>Ligues</a>
+            <a href="#features" className="flex flex-col items-center gap-1 text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"><ShieldCheck className="w-4 h-4"/>Fonctionnalités</a>
+            <a href="#pricing" className="flex flex-col items-center gap-1 text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"><Trophy className="w-4 h-4"/>Tarifs</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+

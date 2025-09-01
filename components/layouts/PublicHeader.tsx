@@ -1,145 +1,98 @@
 // components/layouts/PublicHeader.tsx
 "use client";
 
-import Link from 'next/link';
-import React, { useState, useEffect, useRef } from 'react';
-import { useTheme } from '@/components/providers/ThemeProvider';
-import { FiSun, FiMoon, FiSearch, FiUser, FiChevronDown } from 'react-icons/fi';
-import { usePathname, useRouter } from 'next/navigation';
-import { useAuthStore } from '@/store/auth.store';
-// Import lucide-react icons for sport types
-import {  Volleyball, Trophy, Home, Users, Newspaper, ListOrdered, LayoutDashboard, User, Shield, Settings, LogOut, Goal} from 'lucide-react';
-import {
-  TennisBallIcon,
-  BasketballIcon,
-  SoccerBallIcon,
-} from '@phosphor-icons/react';
-import { Roles, SportType } from '@/schemas';
-import Image from 'next/image';
-import { Skeleton } from '../ui';
+import Link from "next/link";
+import React, { useState, useEffect, useRef } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import Image from "next/image";
+import { FiUser, FiChevronDown } from "react-icons/fi";
+import { Users, LayoutDashboard, User, Shield, Settings, LogOut,
+  Calendar,
+  ShieldCheck,
+  CreditCard
+} from "lucide-react";
 
+import { Roles, SportType } from "@/schemas";
+import { useAuthStore } from "@/store/auth.store";
+import { Skeleton } from "../ui";
+import { AudienceToggle } from "../landing/AudienceToggle";
+
+interface NavLink { label: string; href: string; }
+interface PublicHeaderProps {
+  logoUrl?: string;
+  sportType?: SportType;
+  navLinks?: NavLink[];
+  primaryColor?: string;
+  onSearch?: () => void;
+}
+
+/*
 const hrefIconMap: Record<string, React.ElementType> = {
-  '/': Home,
-  '/games': Trophy, // Gets overridden dynamically
-  '/tenants': Users,
-  '/news': Newspaper,
-  '/standings': ListOrdered,
-  '/teams': Users,
+  "/": Home,
+  "/games": Trophy,
+  "/tenants": Users,
+  "/news": Newspaper,
+  "/standings": ListOrdered,
+  "/teams": Users,
 };
 
-const extendNavLinksWithIcons = (
-  navLinks: NavLink[],
-  sportType: SportType
-): (NavLink & { icon?: React.ElementType })[] => {
-  return navLinks.map(({ label, href }) => {
-    const icon =
-      href === '/games'
-        ? getSportIcon(sportType)
-        : hrefIconMap[href] || undefined;
+const getSportIcon = (sportType?: SportType) => {
+  switch (sportType) {
+    case SportType.FOOTBALL: return SoccerBallIcon;
+    case SportType.BASKETBALL: return BasketballIcon;
+    case SportType.VOLLEYBALL: return Volleyball;
+    case SportType.TENNIS: return TennisBallIcon;
+    case SportType.RUGBY: return Goal;
+    default: return Trophy;
+  }
+};
+
+const extendNavLinksWithIcons = (navLinks: NavLink[], sportType?: SportType) =>
+  navLinks.map(({ label, href }) => {
+    const icon = href === "/games" ? getSportIcon(sportType) : hrefIconMap[href] || undefined;
     return { label, href, icon };
   });
-};
+*/
+export const PublicHeader = ({
+  logoUrl = "/logos/elenem-sport.png",
+  //sportType = SportType.FOOTBALL,
+  ///primaryColor = "blue",
+ // onSearch,
+}: PublicHeaderProps) => {
+  const pathname = usePathname();
+  const router = useRouter();
+  const { user: userAuth, logout, fetchUser } = useAuthStore();
+  const [loadingUser, setLoadingUser] = useState(true);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
-
-// Define the props interface for PublicHeader
-interface NavLink {
-  label: string;
-  href: string;
-}
-
-interface PublicHeaderProps {
-  logoUrl?: string; // URL for the branding logo
-  appName?: string; // Default app name
-  tenantName?: string; // Tenant-specific name, overrides appName if provided
-  sportType?: SportType;
-  navLinks?: NavLink[]; // Array of navigation links
-  primaryColor?: string; // Tailwind color class for primary branding, e.g., 'indigo-600'
-  secondaryColor?: string; // Tailwind color class for secondary branding, e.g., 'indigo-400'
-  onSearch?: () => void; // Function to call when search button is clicked
-}
-
-// Helper function to get sport-specific icon from lucide-react
-const getSportIcon = (sportType: PublicHeaderProps['sportType']) => {
-  switch (sportType) {
-    case SportType.FOOTBALL:
-      return SoccerBallIcon; // Phosphor's accurate football icon
-    case SportType.BASKETBALL:
-      return BasketballIcon; // Phosphor's basketball icon
-    case SportType.VOLLEYBALL:
-      return Volleyball; // Lucide volleyball
-    case SportType.TENNIS:
-      return TennisBallIcon; // Phosphor tennis ball
-    case SportType.RUGBY:
-      return Goal
-    default:
-      return SoccerBallIcon; // Lucide trophy as fallback
-  }
-};
-
-// Default navigation links with their corresponding lucide-react icons
-const defaultNavLinks: NavLink[] = [
-  { label: 'Accueil', href: '/' },
-  { label: 'Matchs', href: '/games' }, // This icon will be dynamically updated
-  { label: 'Organisations', href: '/tenants' },
-  { label: 'Actualites', href: '/news' }
+  const navLinks = [
+  { label: 'Matchs', href: '/games'},
+  { label: 'Ligues', href: '/tenants'},
+  { label: 'Actualités', href: '/news'},
+  { separator: true },
+  { label: 'Fonctionnalités', href: '/features'},
+  { label: 'Tarifs', href: '/pricing' },
+  { label: 'API', href: '/api' },
+  { label: 'Documentation', href: '/docs' },
 ];
 
-export const PublicHeader = ({
-  logoUrl = 'https://placehold.co/40x40/4F46E5/FFFFFF?text=Logo', // Default placeholder logo
-  //appName = 'ELENEM', // Default application name
-  //tenantName, // Optional tenant name
-  sportType = SportType.FOOTBALL,
-  navLinks = defaultNavLinks, // Default navigation links
-  primaryColor = 'blue', // Default primary color
-  //secondaryColor = 'orange', // Default secondary color
-  onSearch, // Optional search handler
-}: PublicHeaderProps) => {
-  const { theme, toggleTheme } = useTheme(); // Hook for theme toggling
-  const pathname = usePathname(); // Hook to get current path for active link styling
-  const { user: userAuth, logout, fetchUser } = useAuthStore(); // Auth store for user data and actions
-  const router = useRouter();
-  const [loadingUser, setLoadingUser] = useState(true);
-  const [dropdownOpen, setDropdownOpen] = useState(false); // State for user dropdown menu
-  const dropdownRef = useRef<HTMLDivElement>(null);
-  // Fetch user data on component mount if not already available
   useEffect(() => {
-  const loadUser = async () => {
-    try {
-      await fetchUser(); // your store will update `userAuth`
-    } finally {
-      setLoadingUser(false);
-    }
-  };
+    const loadUser = async () => {
+      try { await fetchUser(); } finally { setLoadingUser(false); }
+    };
+    if (userAuth === undefined || userAuth === null) loadUser();
+    else setLoadingUser(false);
+  }, [userAuth, fetchUser]);
 
-  if (userAuth === undefined || userAuth === null) {
-    loadUser();
-  } else {
-    setLoadingUser(false);
-  }
-}, [userAuth, fetchUser]);
-  // Close dropdown menu on outside click
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
-        setDropdownOpen(false);
-      }
+    const onDoc = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) setDropdownOpen(false);
     };
-
-    if (dropdownOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-    } else {
-      document.removeEventListener("mousedown", handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    if (dropdownOpen) document.addEventListener("mousedown", onDoc);
+    return () => document.removeEventListener("mousedown", onDoc);
   }, [dropdownOpen]);
 
-  // Determine user roles for dashboard access
   const isSystemAdmin = userAuth?.roles?.includes(Roles.SYSTEM_ADMIN);
   const isTenantAdmin = userAuth?.roles?.includes(Roles.TENANT_ADMIN);
   const isLeagueAdmin = userAuth?.roles?.includes(Roles.LEAGUE_ADMIN);
@@ -147,189 +100,126 @@ export const PublicHeader = ({
   const isPlayer = userAuth?.roles?.includes(Roles.PLAYER);
   const isCoach = userAuth?.roles?.includes(Roles.COACH);
   const isReferee = userAuth?.roles?.includes(Roles.REFEREE);
-
-  // Check if the user has any management-related role
   const isManagementUser = isSystemAdmin || isTenantAdmin || isLeagueAdmin || isTeamAdmin || isPlayer || isCoach || isReferee;
 
-  // Determine the appropriate dashboard link based on user's highest role
-  const dashboardLink = isSystemAdmin ? '/admin/dashboard' :
-    isTenantAdmin ? '/tenant/dashboard' :
-    isLeagueAdmin ? '/league/dashboard' :
-    isTeamAdmin ? '/team/dashboard' :
-    isPlayer ? '/player/dashboard' :
-    isCoach ? '/coach/dashboard' :
-    isReferee ? '/referee/dashboard' :
-    '/'; // Fallback for non-management users (though button won't show)
+  const dashboardLink = isSystemAdmin ? "/admin/dashboard"
+    : isTenantAdmin ? "/tenant/dashboard"
+    : isLeagueAdmin ? "/league/dashboard"
+    : isTeamAdmin ? "/team/dashboard"
+    : isPlayer ? "/player/dashboard"
+    : isCoach ? "/coach/dashboard"
+    : isReferee ? "/referee/dashboard"
+    : "/";
 
-  // Update the 'Matchs' navLink with the correct sport icon based on sportType prop
-  const updatedNavLinks = extendNavLinksWithIcons(navLinks, sportType);
-  const handleLogout = () => {
-    logout();
-    router.push('/');
-  };
+  //const updatedNavLinks = extendNavLinksWithIcons(navLinks, sportType);
+  const handleLogout = () => { logout(); router.push("/"); };
+
   return (
     <>
-      {/* Main Header Section */}
-      <header className="sticky top-0 z-50 w-full border-b border-gray-200 bg-white/80 backdrop-blur-lg">
-          <div className="flex h-14 md:h-16 items-center justify-between mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            {/* Branding Section (Left) */}
-            <div className="flex items-center">
-              <Link href="/" className="flex items-center space-x-2">
-                <Image
-                  src='/logos/elenem-sport.png'
-                  alt='Elenem Logo'
-                  width={120}
-                  height={70}
-                  //fallbackText={userAuth?.username.charAt(0) || "Logo"}
-                />
+      <header className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur-md">
+        <div className="mx-auto max-w-8xl px-2 md:px-6 py-1">
+          <div className="flex h-14 items-center justify-between gap-4">
+            {/* BRAND */}
+            <div className="flex items-center gap-3">
+              <Link href="/" className="flex items-center gap-3">
+                <Image src={logoUrl} alt="Elenem" width={120} height={48} className="object-contain" />
               </Link>
             </div>
-
-            {/* Desktop Navigation (Middle) - Hidden on smaller screens */}
-            <nav className="hidden lg:flex lg:ml-10 lg:space-x-8 flex-grow justify-center">
-              {updatedNavLinks.map((link) => {
-                const IconComponent = link.icon;
+            {/* Desktop nav */}
+            <nav className="hidden lg:flex lg:items-center lg:gap-6 text-sm">
+              {navLinks.map((link, index) => {
+                if (link.separator) {
+                  return (
+                    <span key={`sep-${index}`} className="h-5 w-px bg-slate-300/70 dark:bg-slate-700" />
+                  );
+                }
                 const isActive = pathname === link.href;
+
                 return (
                   <Link
-                    key={link.label}
-                    href={link.href}
-                    className={`flex flex-col items-center justify-center p-2 rounded-md transition-all ease-in-out duration-300
-                      ${isActive ? `text-${primaryColor}-700 bg-${primaryColor}-100 font-bold` : 'text-gray-600'}
-                      hover:bg-${primaryColor}-100  hover:text-${primaryColor}-700`}
+                    key={link.href}
+                    href={link.href || "/"}
+                    className={`flex items-center gap-2 px-3 py-2 rounded-md transition-colors duration-200 ${
+                      isActive
+                        ? 'font-semibold text-sky-700 bg-sky-50'
+                        : 'text-slate-600 dark:text-slate-600 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-sky-50'
+                    }`}
                   >
-                    {IconComponent && <IconComponent className="h-6 w-6 mb-1" />} {/* Icon on top */}
-                    <span className="text-xs">{link.label}</span> {/* Text at bottom */}
+                    <span>{link.label}</span>
                   </Link>
                 );
               })}
             </nav>
-
-            {/* Right Section: Search, Theme Toggle, User/Auth Controls */}
-            <div className="flex items-center space-x-2 sm:space-x-4">
-              {/* Search Button */}
-              {onSearch && (
-                <button
-                  onClick={onSearch}
-                  className="rounded-full p-2 text-gray-600 transition-colors hover:bg-gray-100"
-                  aria-label="Search"
-                >
-                  <FiSearch className="h-5 w-5" />
-                </button>
-              )}
-
-              {/* Theme Toggle Button */}
-              <button
-                onClick={toggleTheme}
-                className="rounded-full p-2 text-gray-600 transition-colors hover:bg-gray-100"
-                aria-label="Toggle theme"
-                hidden
-              >
-                {theme === 'light' ? <FiMoon className="h-5 w-5" /> : <FiSun className="h-5 w-5" />}
-              </button>
-
-              {/* User Authentication Section */}
+            {/* Right area: search + login (visible on all sizes) */}
+            <div className="flex items-center gap-2">
+              <AudienceToggle />
               {loadingUser ? (
-                // ⏳ Skeleton while fetching
-                <div className="flex items-center space-x-2">
-                  <Skeleton className="h-10 w-10 rounded-full" />   {/* avatar placeholder */}
-                  <Skeleton className="hidden md:block h-6 w-32 rounded" /> {/* username placeholder */}
+                <div className="flex items-center gap-2">
+                  <Skeleton className="h-10 w-10 rounded-full" />
                 </div>
-              ) : 
-               userAuth ? (
-                // If user is logged in
+              ) : userAuth ? (
                 <div className="relative" ref={dropdownRef}>
-                  <button
-                    onClick={() => setDropdownOpen(!dropdownOpen)}
-                    className="flex items-center space-x-2 rounded-full p-2 text-gray-600 transition-colors hover:bg-gray-100 focus:outline-none"
-                    aria-haspopup="true"
-                    aria-expanded={dropdownOpen ? 'true' : 'false'}
-                  >
-                    {/* User Profile Image or Generic Icon */}
+                  <button onClick={() => setDropdownOpen(!dropdownOpen)} className="flex items-center gap-2 rounded-full px-3 py-1.5 border border-gray-100 hover:bg-gray-50">
                     {userAuth.profileImageUrl ? (
-                      <Image
-                        src={logoUrl}
-                        alt="Logo"
-                        width={24}
-                        height={24}
-                        className="h-6 w-6 rounded-md object-contain"
-                        onError={(e) => {
-                          // Hide image and show fallback icon if image fails to load
-                          (e.target as HTMLImageElement).style.display = 'none';
-                          const fallbackIcon = (e.target as HTMLImageElement).nextElementSibling as HTMLElement;
-                          if (fallbackIcon) fallbackIcon.style.display = 'block';
-                        }}
-                      />
+                      <Image src={userAuth.profileImageUrl} alt={userAuth.username} width={28} height={28} className="rounded-full object-cover" />
                     ) : (
-                      <FiUser className="h-8 w-8 rounded-full border border-gray-300 p-1" />
+                      <FiUser className="w-6 h-6 p-1 rounded-full border border-gray-200" />
                     )}
-                    {/* Username (hidden on small screens) */}
-                    <span className="hidden md:block text-sm font-medium">{userAuth.username || userAuth.email}</span>
-                    {/* Dropdown arrow for management users (hidden on small screens) */}
-                    {<FiChevronDown className="h-4 w-4 hidden md:block" />}
+                    <span className="hidden sm:inline text-sm font-medium">{userAuth.username || userAuth.email}</span>
+                    <FiChevronDown className="w-4 h-4" />
                   </button>
 
-                  {/* Dropdown Menu for Management Users */}
                   {dropdownOpen && (
-                    <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-10">
-                      <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="user-menu-button">
-                        {isManagementUser && 
-                        <Link href={dashboardLink} onClick={() => setDropdownOpen(false)} className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">
-                          <LayoutDashboard className="w-4 h-4" />
-                          <span className="truncate">Tableau de Bord</span>
+                    <div className="absolute right-0 mt-2 w-52 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-40">
+                      <div className="py-1">
+                        {isManagementUser && (
+                          <Link href={dashboardLink} onClick={() => setDropdownOpen(false)} className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                            <LayoutDashboard className="w-4 h-4" /> Tableau de Bord
+                          </Link>
+                        )}
+                        <Link href="/account/dashboard" onClick={() => setDropdownOpen(false)} className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                          <User className="w-4 h-4" /> Mon Espace
                         </Link>
-                        }
-                        <Link href="/account/dashboard" onClick={() => setDropdownOpen(false)} className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">
-                          <User className="w-4 h-4" />
-                          <span className="truncate">Mon Espace</span>
+                        <Link href="/account/security" onClick={() => setDropdownOpen(false)} className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                          <Shield className="w-4 h-4" /> Sécurité
                         </Link>
-                        <Link href="/account/security" onClick={() => setDropdownOpen(false)} className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">
-                          <Shield className="w-4 h-4" />
-                          <span className="truncate">Securite</span>
+                        <Link href="/account/settings" onClick={() => setDropdownOpen(false)} className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                          <Settings className="w-4 h-4" /> Paramètres
                         </Link>
-                        <Link href="/account/settings" onClick={() => setDropdownOpen(false)} className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">
-                          <Settings className="w-4 h-4" />
-                          <span className="truncate">Parametres</span>
-                        </Link>
-                        <button onClick={handleLogout} className="flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">
-                          <LogOut className="w-4 h-4" />
-                          <span className="truncate">Deconnexion</span>
+                        <button onClick={handleLogout} className="flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                          <LogOut className="w-4 h-4" /> Déconnexion
                         </button>
                       </div>
                     </div>
                   )}
                 </div>
               ) : (
-                // If user is not logged in, show Login/Register buttons (hidden on extra small screens)
-                
-                  <Link href='/login' 
-                        className={`inline-flex items-center justify-center md:space-x-2 md:px-4 md:py-2 font-bold text-${primaryColor}-700 
-                                    bg-transparent rounded-full shadow-sm hover:bg-${primaryColor}-100 
-                                    focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition ease-in-out duration-300`}>
-                    <FiUser className="h-7 w-7 p-1 border border-blue-200 rounded-full" />
-                    <span className='hidden md:inline text-sm'>Se Connecter</span>
-                  </Link>
+                // LOGIN always visible (mobile & desktop)
+                <Link href="/login" className="inline-flex items-center gap-2 px-3 py-2 rounded-full border border-gray-200 hover:bg-gray-50">
+                  <FiUser className="w-5 h-5 p-1 rounded-full border border-gray-200" />
+                  <span className="hidden sm:inline text-sm font-semibold text-sky-700">Se connecter</span>
+                </Link>
               )}
             </div>
           </div>
+        </div>
       </header>
 
-      {/* Bottom Navigation for Mobile Devices (lg and below) */}
-      <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 lg:hidden">
-        <div className="flex justify-around items-center h-16">
-          {updatedNavLinks.map((link) => {
-            const IconComponent = link.icon;
+      {/* Bottom nav only for small screens */}
+      <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-200 lg:hidden">
+        <div className="flex items-center justify-around h-16">
+          {[
+              { label: "Matchs", href: "/games", icon: Calendar},
+              { label: "Ligues", href: "/tenants", icon: Users },
+              { label: "Fonctionnalités", href: "/features", icon: ShieldCheck },
+              { label: "Tarifs", href: "/pricing", icon: CreditCard},
+            ].map((link) => {
+            const Icon = link.icon;
             const isActive = pathname === link.href;
             return (
-              <Link
-                key={`bottom-${link.label}`}
-                href={link.href}
-                className={`flex flex-col items-center justify-center p-2 rounded-md transition-colors duration-200
-                  ${isActive ? `text-${primaryColor}-700` : 'text-gray-600'}
-                  hover:text-${primaryColor}-700`}
-              >
-                {IconComponent && <IconComponent className="h-6 w-6" />}
-                <span className="text-xs font-medium mt-1">{link.label}</span>
+              <Link key={link.href} href={link.href || "/"} className={`flex flex-col items-center gap-1 text-xs ${isActive ? "text-sky-600" : "text-gray-600"}`}>
+                {Icon && <Icon className="w-5 h-5" />}
+                <span>{link.label}</span>
               </Link>
             );
           })}
@@ -338,3 +228,4 @@ export const PublicHeader = ({
     </>
   );
 };
+export default PublicHeader;
