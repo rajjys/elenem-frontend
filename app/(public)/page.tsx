@@ -25,16 +25,6 @@ const features = [
   { icon: <Smartphone className="w-5 h-5 text-blue-500"/>, title: "UX Natif Mobile", desc: "Navigation rapide et adaptée aux pouces pour les fans." },
 ];
 
-// --------------------------------------------------
-// Petits composants utilitaires
-// --------------------------------------------------
-const Logo = () => (
-  <div className="flex items-center gap-2">
-    <div className="w-8 h-8 rounded-2xl bg-gradient-to-br from-blue-500 to-orange-400" />
-    <span className="font-semibold tracking-tight">Elenem Leagues</span>
-  </div>
-);
-
 function Pill({ children }: { children: React.ReactNode }) {
   return (
     <span className="text-xs rounded-full px-2 py-1 bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
@@ -331,7 +321,7 @@ export default function PublicLandingPage() {
       </section>
 
       {/* CTA Développeur / Docs */}
-      <section id="api" className="mx-auto max-w-7xl px-4 pt-12 md:pt-16">
+      <section id="api" className="mx-auto max-w-7xl px-4 py-12 md:py-16">
         <Card className="rounded-3xl overflow-hidden bg-white dark:bg-slate-900">
           <CardContent className="p-6 md:p-8 grid md:grid-cols-2 gap-6 items-center">
             <div>
@@ -363,55 +353,14 @@ export default function PublicLandingPage() {
           </CardContent>
         </Card>
       </section>
-
-      {/* Pied de page */}
-      <footer id="footer" className="mt-12 md:mt-16 border-t border-slate-200 dark:border-slate-800">
-        <div className="mx-auto max-w-7xl px-4 py-10 grid sm:grid-cols-2 md:grid-cols-4 gap-8 text-sm">
-          <div>
-            <Logo />
-            <p className="text-slate-500 mt-3">Le logiciel qui alimente les ligues et fédérations indépendantes en Afrique et au-delà.</p>
-          </div>
-          <div>
-            <div className="font-medium mb-2">Explorer</div>
-            <ul className="space-y-1 text-slate-600 dark:text-slate-400">
-              <li><a href="#games" className="hover:underline">Matchs</a></li>
-              <li><a href="#tenants" className="hover:underline">Ligues</a></li>
-              <li><a href="#news" className="hover:underline">Actualités</a></li>
-            </ul>
-          </div>
-          <div>
-            <div className="font-medium mb-2">Produit</div>
-            <ul className="space-y-1 text-slate-600 dark:text-slate-400">
-              <li><a href="#features" className="hover:underline">Fonctionnalités</a></li>
-              <li><a href="#pricing" className="hover:underline">Tarifs</a></li>
-              <li><a href="#api" className="hover:underline">API</a></li>
-              <li><a href="#docs" className="hover:underline">Docs</a></li>
-            </ul>
-          </div>
-          <div>
-            <div className="font-medium mb-2">Entreprise</div>
-            <ul className="space-y-1 text-slate-600 dark:text-slate-400">
-              <li><a href="#about" className="hover:underline">À propos</a></li>
-              <li><a href="#contact" className="hover:underline">Contact</a></li>
-              <li><a href="#legal" className="hover:underline">Légal</a></li>
-              <li><a href="#terms" className="hover:underline">Conditions</a></li>
-            </ul>
-          </div>
-        </div>
-        <div className="mx-auto max-w-7xl px-4 pb-6 text-xs text-slate-500 flex flex-col md:flex-row gap-2 md:items-center md:justify-between">
-          <div>© {new Date().getFullYear()} Elenem. Tous droits réservés.</div>
-          <div className="opacity-80">Conçu pour mobile • Prêt pour PWA</div>
-        </div>
-      </footer>
-
       {/* Barre de navigation inférieure mobile */}
       <div className="fixed md:hidden bottom-3 left-0 right-0">
         <div className="mx-auto max-w-md px-4">
           <div className="rounded-2xl shadow-lg bg-white/80 dark:bg-slate-900/80 backdrop-blur border border-slate-200 dark:border-slate-800 flex justify-around py-2 text-xs">
-            <a href="#games" className="flex flex-col items-center gap-1 text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"><CalendarDays className="w-4 h-4"/>Matchs</a>
-            <a href="#tenants" className="flex flex-col items-center gap-1 text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"><Users2 className="w-4 h-4"/>Ligues</a>
-            <a href="#features" className="flex flex-col items-center gap-1 text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"><ShieldCheck className="w-4 h-4"/>Fonctionnalités</a>
-            <a href="#pricing" className="flex flex-col items-center gap-1 text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"><Trophy className="w-4 h-4"/>Tarifs</a>
+            <Link href="/games" className="flex flex-col items-center gap-1 text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"><CalendarDays className="w-4 h-4"/>Matchs</Link>
+            <Link href="/tenants" className="flex flex-col items-center gap-1 text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"><Users2 className="w-4 h-4"/>Ligues</Link>
+            <Link href="/features" className="flex flex-col items-center gap-1 text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"><ShieldCheck className="w-4 h-4"/>Fonctionnalités</Link>
+            <Link href="/pricing" className="flex flex-col items-center gap-1 text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"><Trophy className="w-4 h-4"/>Tarifs</Link>
           </div>
         </div>
       </div>

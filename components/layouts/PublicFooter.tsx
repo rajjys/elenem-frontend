@@ -1,61 +1,51 @@
 // components/layouts/PublicFooter.tsx
+import Image from 'next/image';
 import Link from 'next/link';
-import { FiAward } from 'react-icons/fi';
 import React from 'react';
 
 export const PublicFooter = () => {
+    const logoUrl = "/logos/elenem-sport.png";
     const currentYear = new Date().getFullYear();
     return (
-        <footer className="border-t border-gray-200 bg-white ">
-            <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-                <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
-                    {/* Product Links */}
-                    <div>
-                        <h3 className="text-sm font-semibold uppercase tracking-wider text-gray-500">Product</h3>
-                        <ul className="mt-4 space-y-4">
-                            <li><Link href="/features" className="text-base text-gray-600 hover:text-gray-900">Features</Link></li>
-                            <li><Link href="/pricing" className="text-base text-gray-600 hover:text-gray-900">Pricing</Link></li>
-                            <li><Link href="/tenants" className="text-base text-gray-600 hover:text-gray-900">Explore Leagues</Link></li>
-                        </ul>
-                    </div>
-                    {/* Company Links */}
-                    <div>
-                        <h3 className="text-sm font-semibold uppercase tracking-wider text-gray-500">Company</h3>
-                        <ul className="mt-4 space-y-4">
-                            <li><Link href="/about" className="text-base text-gray-600 hover:text-gray-900">About</Link></li>
-                            <li><Link href="/blog" className="text-base text-gray-600 hover:text-gray-900">Blog</Link></li>
-                            <li><Link href="/contact" className="text-base text-gray-600 hover:text-gray-900">Contact</Link></li>
-                        </ul>
-                    </div>
-                    {/* Resources Links */}
-                     <div>
-                        <h3 className="text-sm font-semibold uppercase tracking-wider text-gray-500">Resources</h3>
-                        <ul className="mt-4 space-y-4">
-                            <li><Link href="/help" className="text-base text-gray-600 hover:text-gray-900">Help Center</Link></li>
-                            <li>{/* Add other resources like API docs if public */}</li>
-                        </ul>
-                    </div>
-                    {/* Legal Links */}
-                    <div>
-                        <h3 className="text-sm font-semibold uppercase tracking-wider text-gray-500">Legal</h3>
-                        <ul className="mt-4 space-y-4">
-                            <li><Link href="/privacy" className="text-base text-gray-600 hover:text-gray-900">Privacy</Link></li>
-                            <li><Link href="/terms" className="text-base text-gray-600 hover:text-gray-900">Terms</Link></li>
-                        </ul>
-                    </div>
-                </div>
-                <div className="mt-12 border-t border-gray-200 pt-8">
-                    <div className="flex flex-col items-center justify-between sm:flex-row">
-                        <div className="flex items-center space-x-2">
-                             <div className="rounded-lg bg-indigo-600 p-2 text-white"><FiAward className="h-6 w-6" /></div>
-                            <span className="text-xl font-bold text-indigo-700">ELENEM</span>
-                        </div>
-                        <p className="mt-4 text-base text-gray-500 sm:mt-0">
-                            &copy; {currentYear} ELENEM. All rights reserved.
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </footer>
+        <footer id="footer" className="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-200 border-t border-gray-200 dark:border-gray-700">
+        <div className="mx-auto max-w-7xl px-4 py-10 grid sm:grid-cols-2 md:grid-cols-4 gap-8 text-sm">
+          <div>
+            <Link href="/" className="flex items-center gap-3">
+                <Image src={logoUrl} alt="Elenem Logo" width={120} height={48} className="object-contain" />
+            </Link>
+            <p className="text-slate-500 mt-3">Le logiciel qui alimente les ligues et fédérations indépendantes en Afrique et au-delà.</p>
+          </div>
+          <div>
+            <div className="font-medium mb-2">Explorer</div>
+            <ul className="space-y-1 text-slate-600 dark:text-slate-400">
+              <li><Link href="/games" className="hover:underline">Matchs</Link></li>
+              <li><Link href="/tenants" className="hover:underline">Ligues</Link></li>
+              <li><Link href="/news" className="hover:underline">Actualités</Link></li>
+            </ul>
+          </div>
+          <div>
+            <div className="font-medium mb-2">Produit</div>
+            <ul className="space-y-1 text-slate-600 dark:text-slate-400">
+              <li><Link href="/features" className="hover:underline">Fonctionnalités</Link></li>
+              <li><Link href="/pricing" className="hover:underline">Tarifs</Link></li>
+              <li><Link href="/api" className="hover:underline">API</Link></li>
+              <li><Link href="/docs" className="hover:underline">Docs</Link></li>
+            </ul>
+          </div>
+          <div>
+            <div className="font-medium mb-2">Entreprise</div>
+            <ul className="space-y-1 text-slate-600 dark:text-slate-400">
+              <li><Link href="/about" className="hover:underline">À propos</Link></li>
+              <li><Link href="/contact" className="hover:underline">Contact</Link></li>
+              <li><Link href="/legal" className="hover:underline">Légal</Link></li>
+              <li><Link href="/terms" className="hover:underline">Conditions</Link></li>
+            </ul>
+          </div>
+        </div>
+        <div className="mx-auto max-w-7xl px-4 pb-6 text-xs text-slate-500 flex flex-col md:flex-row gap-2 md:items-center md:justify-between">
+          <div>© {currentYear} Elenem. Tous droits réservés.</div>
+          <div className="opacity-80">Conçu pour mobile • Prêt pour PWA</div>
+        </div>
+      </footer>
     );
 };
