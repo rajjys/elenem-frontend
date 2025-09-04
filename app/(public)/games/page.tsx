@@ -101,15 +101,15 @@ export default function PublicGamesPage() {
   }
 
   return (
-    <div className="min-h-screen max-w-2xl mx-auto">
-      <div className="container mx-auto p-4 sm:p-6 space-y-8">
+    <div className="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-200">
+      <div className="container mx-auto min-h-screen max-w-2xl p-4 sm:p-6 space-y-8">
         <header>
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-gray-800">Matchs et Résultats: Toutes les Organisations</h1>
-          <p className="mt-2 text-sm md:text-md text-gray-500">Parcourez les Matchs publics dans toutes les ligues.</p>
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight ">Matchs et Résultats: Toutes les Organisations</h1>
+          <p className="mt-2 text-sm md:text-md ">Parcourez les Matchs publics dans toutes les ligues.</p>
         </header>
         <Card className="overflow-hidden shadow-sm">
           <CardHeader>
-            {availableDates.length > 0 && <CardTitle className='text-gray-500 text-base px-2'>Selectionner une date</CardTitle>}
+            {availableDates.length > 0 && <CardTitle className='text-base px-2 text-slate-800'>Selectionner une date</CardTitle>}
           </CardHeader>
           <CardContent className="grid gap-4 md:gap-4 grid-cols-1">
             <DateCarousel dates={availableDates} selectedDate={selectedDate} onDateSelect={setSelectedDate} />
@@ -131,10 +131,10 @@ export default function PublicGamesPage() {
         ) : gamesByTenant.length > 0 ? (
           <div className="space-y-8">
             {gamesByTenant.map(({ tenantId, tenantName, tenantSlug, logoUrl, games }) => (
-              <Card key={tenantId} className="overflow-hidden shadow-sm pb-2 bg-gray-400">
+              <Card key={tenantId} className="overflow-hidden shadow-sm pb-2 bg-slate-200 dark:bg-slate-800">
                 <CardHeader>
                   <CardTitle>
-                    <Link href={`${handler}${tenantSlug}.${ROOT_DOMAIN}`} target="_blank" rel="noopener noreferrer" className="flex items-center justify-start space-x-2 text-white">
+                    <Link href={`${handler}${tenantSlug}.${ROOT_DOMAIN}`} target="_blank" rel="noopener noreferrer" className="flex items-center justify-start space-x-2 text-slate-800 dark:text-slate-200">
                       <Avatar src={logoUrl} name={tenantName} size={35} />
                       <span>{tenantName}</span>
                     </Link>

@@ -53,22 +53,24 @@ const GamePublicCard: React.FC<GamePublicCardProps> = ({ game }) => {
   const awayWin = game.status === GameStatus.COMPLETED && awayScore !== null && awayScore > (homeScore ?? 0);
 
   return (
-    <Card className="rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition bg-white">
-      <CardHeader className="flex flex-col items-start gap-1 px-4 border-b border-gray-100">
+    <Card className="rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition bg-white hover:bg-gray-100 transition-colors duration-300 ease-in-out">
+      <CardHeader className="flex flex-col items-start gap-1 px-4 border-b border-gray-100 space-y-1">
         <div className="flex items-center justify-between w-full text-xs text-gray-500">
           <span>{game.round || game.league.name}</span>
           {statusBadge}
         </div>
-        <div className="text-sm text-gray-700 font-medium">{gameDate}</div>
+        <div className="text-sm text-gray-700 font-medium flex justify-start gap-4">
+            <span>{gameDate}</span>
+            {game.homeVenue?.name && <span>•</span>}
+            {game.homeVenue?.name && (
+          <div className="text-xs text-gray-500 mt-2">{game.homeVenue.name}</div>
+        )}
+        </div>
       </CardHeader>
 
       <CardContent className="space-y-2">
         {renderTeam(game.homeTeam.businessProfile.logoUrl, game.homeTeam.shortCode, homeScore, homeWin)}
         {renderTeam(game.awayTeam.businessProfile.logoUrl, game.awayTeam.shortCode, awayScore, awayWin)}
-
-        {game.homeVenue?.name && (
-          <div className="text-xs text-gray-500 mt-2">{game.homeVenue.name}</div>
-        )}
       </CardContent>
     </Card>
   );
