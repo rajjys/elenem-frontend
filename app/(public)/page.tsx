@@ -21,7 +21,7 @@ const features = [
   { icon: <Users2 className="w-5 h-5 text-blue-500"/>, title: "Effectif et Éligibilité", desc: "Fiches de joueurs, transferts, suspensions, limites d'âge." },
   { icon: <ShieldCheck className="w-5 h-5 text-blue-500"/>, title: "Fair-play", desc: "Affectations des arbitres, rapports de match, flux de travail disciplinaires." },
   { icon: <Globe2 className="w-5 h-5 text-blue-500"/>, title: "Multi-Locataire", desc: "Sous-domaines de marque avec domaines personnalisés plus tard." },
-  { icon: <Network className="w-5 h-5 text-blue-500"/>, title: "API d'abord", desc: "API JSON claires et webhooks pour l'intégration." },
+  { icon: <Network className="w-5 h-5 text-blue-500"/>, title: "API Prioritaire", desc: "API JSON claires et webhooks pour l'intégration." },
   { icon: <Smartphone className="w-5 h-5 text-blue-500"/>, title: "UX Natif Mobile", desc: "Navigation rapide et adaptée aux pouces pour les fans." },
 ];
 
@@ -165,7 +165,7 @@ export default function PublicLandingPage() {
 
             {/* Carte de mise en avant (selon l'audience) */}
             <Motion.motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.05 }}>
-              <Card className="rounded-3xl overflow-hidden shadow-2xl shadow-blue-900/10 border border-slate-200/80 dark:border-slate-800/80">
+              <Card className="rounded-2xl overflow-hidden shadow-2xl shadow-blue-900/10 border border-slate-200/80 dark:border-slate-800/80">
                 <CardHeader className="border-b border-slate-200/70 dark:border-slate-800 text-gray-700">
                   <CardTitle className="flex items-center gap-2 text-base">
                     {isFan ? <Gamepad2 className="w-5 h-5 text-blue-500"/> : <Building2 className="w-5 h-5 text-blue-500"/>}
@@ -255,30 +255,34 @@ export default function PublicLandingPage() {
           <a className="text-sm text-blue-600 dark:text-blue-400 hover:underline" href="/tenants">Parcourir l&apos;annuaire</a>
         </div>
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {tenants.map((t) => (
-            <Link key={t.id} href={t.businessProfile.website || `https://${t.tenantCode.toLowerCase()}.elenem.site`} className="block" >
-              <Card
-                className="rounded-2xl bg-white dark:bg-slate-900 shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all">
+          {tenants.map((t) => {
+            const ROOT_DOMAIN = process.env.NODE_ENV === 'development' ? 
+                        process.env.NEXT_PUBLIC_HOME_URL_LOCAL : process.env.NEXT_PUBLIC_HOME_URL;
+            const protocol = process.env.NODE_ENV === 'development' ? 'http://' : 'https://';
+            const tenantUrl = t.businessProfile.website || `${protocol}${t.slug}.${ROOT_DOMAIN}`;
+            console.log(t.country);
+            return <Link key={t.id} href={tenantUrl} className="block" >
+              <Card className="rounded-2xl bg-white dark:bg-slate-900 shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all">
                 <CardContent className="p-4">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-400 to-amber-500" />
                     <div>
                       <div className="font-medium leading-tight">{t.name}</div>
                       <div className="text-xs text-slate-500">
-                        {countryNameToCode[t.sportType]} • {t.country}
+                        {countryNameToCode[t.country]} • {capitalizeFirst(t.sportType)}
                       </div>
                     </div>
                   </div>
                   <div className="mt-3 text-xs text-slate-500 flex items-center">
                     <span>
-                      {t.businessProfile.website || `https://${t.tenantCode.toLowerCase()}.elenem.site`}
+                      {tenantUrl}
                     </span>
                     <ExternalLink className="ml-1 w-3.5 h-3.5" />
                   </div>
                 </CardContent>
               </Card>
             </Link>
-          ))}
+            })}
         </div>
       </section>
       {/* Bandeau des fonctionnalités du produit */}

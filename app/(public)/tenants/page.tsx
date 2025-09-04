@@ -47,9 +47,7 @@ export default function PublicTenantsPage() {
                     <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-gray-900">Decouvrir les Organisations</h1>
                     <p className="mt-2 text-sm md:text-md text-gray-500">Parcourez les fédérations et les organisations sur notre plateforme.</p>
                 </header>
-
                 <PublicTenantsFilters onFilterChange={setFilters} />
-
                 <div className="space-y-6">
                     {loading && page === 1 ? (
                         Array.from({ length: 5 }).map((_, i) => <PublicTenantCardSkeleton key={i} />)
@@ -62,7 +60,6 @@ export default function PublicTenantsPage() {
                         </div>
                     )}
                 </div>
-
                 {loading && page > 1 && <div className="text-center"><p>Chargement...</p></div>}
 
                 {!loading && page < totalPages && (
