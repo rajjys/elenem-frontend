@@ -6,7 +6,7 @@ import { Check } from "lucide-react";
 const plans = [
   {
     name: "Gratuit",
-    price: "0 €",
+    price: "0 $",
     tagline: "Commencer gratuitement",
     features: [
       "Site web PWA (sous-domaine .elenem.app)",
@@ -20,7 +20,7 @@ const plans = [
   },
   {
     name: "Pro",
-    price: "250 € / mois",
+    price: "50 $ / mois",
     tagline: "Pour ligues régionales et semi-pro",
     features: [
       "Nom de domaine personnalisé (SSL inclus)",
@@ -34,7 +34,7 @@ const plans = [
   },
   {
     name: "Élite",
-    price: "750 € / mois",
+    price: "250 $ / mois",
     tagline: "Pour divisions nationales",
     features: [
       "Accès à l’application mobile Elenem (multi-ligues)",

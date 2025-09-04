@@ -14,6 +14,7 @@ import { capitalizeFirst, countryNameToCode, formatDateFr } from "@/utils";
 import { Skeleton } from "@/components/ui";
 import GeneralSearchDialog from "@/components/ui/generalSearchDialog";
 import axios from "axios";
+import Link from "next/link";
 
 const features = [
   { icon: <CalendarDays className="w-5 h-5 text-blue-500"/>, title: "Planification Intelligente", desc: "Vérifications automatiques des conflits, dates d'interdiction et lieux." },
@@ -175,13 +176,13 @@ export default function PublicLandingPage() {
             {/* Carte de mise en avant (selon l'audience) */}
             <Motion.motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.05 }}>
               <Card className="rounded-3xl overflow-hidden shadow-2xl shadow-blue-900/10 border border-slate-200/80 dark:border-slate-800/80">
-                <CardHeader className="border-b border-slate-200/70 dark:border-slate-800">
+                <CardHeader className="border-b border-slate-200/70 dark:border-slate-800 text-gray-700">
                   <CardTitle className="flex items-center gap-2 text-base">
                     {isFan ? <Gamepad2 className="w-5 h-5 text-blue-500"/> : <Building2 className="w-5 h-5 text-blue-500"/>}
                     {isFan ? "Matchs populaires" : "Gérez votre ligue"}
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="p-0">
+                <CardContent className="p-0 text-gray-800">
                     {isFan ? (
                       <div className="divide-y divide-slate-200/70 dark:divide-slate-800">
                         {games.length === 0 ? (
@@ -190,26 +191,37 @@ export default function PublicLandingPage() {
                             <div key={`skeleton-${i}`} className="p-4 flex items-center justify-between">
                               <div className="flex flex-col gap-2">
                                 <Skeleton className="h-4 w-40" />
-                                <Skeleton className="h-3 w-32" />
+                                <Pill><Skeleton className="h-3 w-32" /></Pill>
                               </div>
                               <Skeleton className="h-3 w-20" />
                             </div>
                           ))
                         ) : (
                           games.map((g) => (
-                            <div key={g.id} className="p-4 flex items-center justify-between hover:bg-slate-100/60 dark:hover:bg-slate-900/40 transition-colors">
-                              <div>
-                                <div className="font-medium">{g.homeTeam.name} vs {g.awayTeam.name}</div>
-                                <div className="text-xs text-slate-600 rounded-full"><span className="bg-amber-100 text-amber-900 px-1 rounded-full border border-gray-100">{capitalizeFirst(g.tenant.tenantCode)}</span> • <span>Freedom Stadium</span></div>
+                            <Link href={`${g.tenant.businessProfile?.website || `https://${g.tenant.tenantCode}.elenem.site`}/games/${g.slug}`} key={g.id} className="block">
+                              <div
+                                key={g.id}
+                                className="p-4 flex items-center justify-between hover:bg-slate-100/60 dark:hover:bg-slate-300/40 transition-colors duration-300 ease-in-out"
+                              >
+                                <div>
+                                  <div className="font-medium">
+                                    {g.homeTeam.name} vs {g.awayTeam.name}
+                                  </div>
+                                  <div className="text-xs text-slate-600 rounded-full pt-1">
+                                    <Pill>{capitalizeFirst(g.tenant.tenantCode)}</Pill> • <span>Freedom Stadium</span>
+                                  </div>
+                                </div>
+                                <div className="text-sm text-slate-600 dark:text-slate-700">
+                                  {formatDateFr(g.dateTime)}
+                                </div>
                               </div>
-                              <div className="text-sm text-slate-600 dark:text-slate-300">{formatDateFr(g.dateTime)}</div>
-                            </div>
+                            </Link>
                           ))
                         )}
                         <div className="p-4 text-sm text-right">
-                          <a className="inline-flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:underline" href="#games">
+                          <Link className="inline-flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:underline" href="/games">
                             Voir le calendrier complet <ArrowRight className="w-4 h-4" />
-                          </a>
+                          </Link>
                         </div>
                       </div>
                     ) : (
@@ -239,14 +251,13 @@ export default function PublicLandingPage() {
           <div className="mx-auto max-w-7xl px-4">
             <div className="rounded-2xl md:rounded-3xl border border-dashed border-blue-200 dark:border-blue-800/50 bg-blue-50/30 dark:bg-blue-950/20 p-3 md:p-4 text-xs flex items-center justify-between">
               <span className="text-slate-600 dark:text-slate-400">Chaque site de ligue est « Propulsé par Elenem Leagues ».</span>
-              <a href="#product" className="inline-flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:underline">
+              <a href="/features" className="inline-flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:underline">
                 En savoir plus sur le logiciel <ExternalLink className="w-3.5 h-3.5"/>
               </a>
             </div>
           </div>
         </div>
       </section>
-
       {/* Teaser de l'annuaire des ligues */}
       <section id="tenants" className="mx-auto max-w-7xl px-4 pt-12 md:pt-16">
         <div className="flex items-end justify-between mb-4">
@@ -255,27 +266,36 @@ export default function PublicLandingPage() {
         </div>
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {tenants.map((t) => (
-            <Card key={t.id} className="rounded-2xl bg-white dark:bg-slate-900 shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-400 to-amber-500" />
-                  <div>
-                    <div className="font-medium leading-tight">{t.name}</div>
-                    <div className="text-xs text-slate-500">{countryNameToCode[t.sportType]} • {t.country}</div>
+            <Link key={t.id} href={t.businessProfile.website || `https://${t.tenantCode.toLowerCase()}.elenem.site`} className="block" >
+              <Card
+                className="rounded-2xl bg-white dark:bg-slate-900 shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all">
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-400 to-amber-500" />
+                    <div>
+                      <div className="font-medium leading-tight">{t.name}</div>
+                      <div className="text-xs text-slate-500">
+                        {countryNameToCode[t.sportType]} • {t.country}
+                      </div>
+                    </div>
                   </div>
-                </div>
-                <div className="mt-3 text-xs text-slate-500">{t.tenantCode}.elenem.site</div>
-              </CardContent>
-            </Card>
+                  <div className="mt-3 text-xs text-slate-500 flex items-center">
+                    <span>
+                      {t.businessProfile.website || `https://${t.tenantCode.toLowerCase()}.elenem.site`}
+                    </span>
+                    <ExternalLink className="ml-1 w-3.5 h-3.5" />
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
           ))}
         </div>
       </section>
-
       {/* Bandeau des fonctionnalités du produit */}
       <section id="features" className="mx-auto max-w-7xl px-4 pt-12 md:pt-16">
         <div className="flex items-end justify-between mb-4">
           <h2 className="text-xl md:text-2xl font-semibold tracking-tight">Pourquoi les ligues nous choisissent</h2>
-          <a className="text-sm text-blue-600 dark:text-blue-400 hover:underline" href="#product">Voir le produit</a>
+          <a className="text-sm text-blue-600 dark:text-blue-400 hover:underline" href="/features">Voir le produit</a>
         </div>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {features.map((f, i) => (
@@ -303,7 +323,7 @@ export default function PublicLandingPage() {
               </p>
             </div>
             <div className="flex md:justify-end gap-3">
-              <Button className="rounded-2xl bg-blue-600 text-white hover:bg-blue-700">Comparer les plans</Button>
+              <Button className="rounded-2xl bg-blue-600 text-white hover:bg-blue-700" variant="primary">Comparer les plans</Button>
               <Button variant="outline" className="rounded-2xl bg-white/50 dark:bg-slate-900/50 border-slate-300 dark:border-slate-700">Parler aux ventes</Button>
             </div>
           </div>
@@ -323,9 +343,9 @@ export default function PublicLandingPage() {
                 Accédez aux rencontres, classements, joueurs et médias avec des API REST claires. Mises à jour en temps réel via webhooks. SDK pour TypeScript et Python.
               </p>
               <div className="mt-4 flex gap-3">
-                <Button className="rounded-2xl bg-blue-600 text-white hover:bg-blue-700">Obtenir une clé API</Button>
+                <Button className="rounded-2xl bg-blue-600 text-white hover:bg-blue-700" variant="primary">Obtenir une clé API</Button>
                 <Button variant="outline" className="rounded-2xl border-slate-300 dark:border-slate-700">
-                  <a href="#docs" className="flex items-center"><BookOpen className="mr-2 w-4 h-4"/> Lire la documentation</a>
+                  <Link href="#docs" className="flex items-center"><BookOpen className="mr-2 w-4 h-4"/> Lire la documentation</Link>
                 </Button>
               </div>
             </div>

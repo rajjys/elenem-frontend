@@ -19,6 +19,7 @@ import { TenantDetails } from "@/schemas";
 import Image from "next/image";
 import { toast } from "sonner";
 import axios from "axios";
+import Link from "next/link";
 
 export default function GeneralSearchDialog() {
   const [query, setQuery] = useState("");
@@ -92,9 +93,9 @@ export default function GeneralSearchDialog() {
             ))
           ) : tenants.length > 0 ? (
             tenants.map((tenant) => (
-              <a
+              <Link
                 key={tenant.id}
-                href={`https://${tenant.tenantCode}.elenem.site`}
+                href={tenant.businessProfile.website || `https://${tenant.tenantCode.toLowerCase()}.elenem.site`}
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -116,12 +117,12 @@ export default function GeneralSearchDialog() {
                     <div className="min-w-0 flex-1 overflow-hidden">
                       <div className="font-medium leading-tight truncate">{tenant.name}</div>
                       <div className="text-xs text-slate-500 truncate">
-                        {tenant.tenantCode}.elenem.site
+                        {tenant.businessProfile.website || `https://${tenant.tenantCode.toLowerCase()}.elenem.site`}
                       </div>
                     </div>
                   </CardContent>
                 </Card>
-              </a>
+              </Link>
             ))
           ) : debouncedQuery ? (
             <p className="text-center text-slate-500 dark:text-slate-400 mt-8">

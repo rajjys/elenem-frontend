@@ -7,6 +7,7 @@ export interface PublicBusinessProfileResponseDto {
   logoUrl?: string | null;
   city?: string | null;
   region?: string | null;
+  website?: string | null;
 }
 
 // The paginated response structure

@@ -66,7 +66,7 @@ export const TenantDetailsSchema = z.object({
     description: z.string().optional(),
     logoUrl: z.string().optional().nullable(), // Use a simple string as requested
     bannerImageUrl: z.string().optional().nullable(), // Use a simple string as requested
-    //website: z.string().url().optional(),
+    website: z.string().optional().nullable(),
     //socialMediaLinks: z.record(z.string()).optional(),
     //establishedYear: z.number().int().min(1000).max(new Date().getFullYear()).optional(),
     physicalAddress: z.string().optional(),
@@ -144,7 +144,7 @@ export const CreateTenantSchema = z.object({
     city: z.string().optional().nullable(),
     logoUrl: z.string().optional().nullable(),
     bannerImageUrl: z.string().optional().nullable(),
-    physicalAddress: z.string().optional().nullable()
+    physicalAddress: z.string().optional().nullable(),
   }),
   // Optional ownerId for SYSTEM_ADMIN
   //isActive: z.boolean().optional().default(true),
