@@ -1,102 +1,77 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui';
+import { Card, CardContent, CardHeader } from '@/components/ui';
 import { GameDetails, GameStatus } from '@/schemas';
-import { Plus } from 'lucide-react';
-import { format } from 'date-fns';
+import { formatDateFr } from '@/utils';
 import Image from 'next/image';
 
 interface GamePublicCardProps {
-    game: GameDetails;
+  game: GameDetails;
 }
-const GamePublicCard: React.FC<GamePublicCardProps> = ({game}) => {
-    
-    const gameProgress = game.status === GameStatus.COMPLETED ? <span className=''>TERMINE</span> :
-                      game.status === GameStatus.IN_PROGRESS ? <span className='bg-red-400 py-1 px-2 text-white font-bold rounded-full'>EN COURS</span> : 
-                      <span></span>
-                
-    
-    let homeTeamStyle = '';
-    let awayTeamStyle = '';
-    if(game.status === GameStatus.COMPLETED && game.homeScore && game.awayScore){
-        const winStyle = 'font-bold text-yellow-100';
-        const lossStyle = 'text-gray-300';
-        const drawStyle = 'text-white';
-        homeTeamStyle = game.homeScore > game.awayScore ? winStyle : (game.homeScore < game.awayScore) ? lossStyle : drawStyle;
-        awayTeamStyle = game.homeScore < game.awayScore ? winStyle : (game.homeScore > game.awayScore) ? lossStyle : drawStyle;
-    }
 
-    const timeOnly = format(new Date(game.dateTime), 'HH:mm');
+const GamePublicCard: React.FC<GamePublicCardProps> = ({ game }) => {
+  const gameDate = formatDateFr(game.dateTime);
+
+  // Status badge
+  const statusBadge =
+    game.status === GameStatus.COMPLETED ? (
+      <span className="px-2 py-1 text-xs rounded-full bg-gray-200 text-gray-800">Terminé</span>
+    ) : game.status === GameStatus.IN_PROGRESS ? (
+      <span className="px-2 py-1 text-xs rounded-full bg-red-500 text-white">En cours</span>
+    ) : (
+      <span className="px-2 py-1 text-xs rounded-full bg-blue-500 text-white">Programmé</span>
+    );
+
+  // Team row
+  const renderTeam = (
+    logo: string | null | undefined,
+    name: string,
+    score: number | null | undefined,
+    highlight: boolean
+  ) => (
+    <div className="flex items-center justify-between w-full py-1">
+      <div className="flex items-center gap-2">
+        <Image
+          src={logo || `https://placehold.co/40x40?text=${name.charAt(0)}`}
+          alt={`${name} Logo`}
+          width={28}
+          height={28}
+          className="rounded-full border border-gray-300"
+        />
+        <span className={`text-sm font-medium ${highlight ? 'text-gray-900 font-semibold' : 'text-gray-600'}`}>
+          {name}
+        </span>
+      </div>
+      {score !== null && <span className={`text-sm font-bold ${highlight ? 'text-gray-900' : 'text-gray-500'}`}>{score}</span>}
+    </div>
+  );
+
+  const homeScore = game.homeScore ?? null;
+  const awayScore = game.awayScore ?? null;
+
+  // Decide highlights if completed
+  const homeWin = game.status === GameStatus.COMPLETED && homeScore !== null && homeScore > (awayScore ?? 0);
+  const awayWin = game.status === GameStatus.COMPLETED && awayScore !== null && awayScore > (homeScore ?? 0);
 
   return (
-    <Card className="m-2 pb-2 rounded-md bg-gray-600 text-gray-100">
-        <CardHeader className='text-xs pb-2 px-4'>
-            <CardTitle className='flex items-center justify-between'>
-                <span>{game.round || game.league.name}</span>
-                {gameProgress}
-                </CardTitle>
-        </CardHeader>
-        <CardContent className='flex items-ceter justify-between space-x-4'>
-          {/* Game Section */}
-          <div className='flex justify-between grow'>
-            {/*Game Info */}
-            <div className='w-full'>
-                {/*TEAM 1 */}
-                <div className={`flex items-center justify-between w-full pb-2 ${homeTeamStyle}`}>
-                    <div className='flex items-center justify-start'>
-                        <Image
-                           className='h-8 w-8 rounded-full object-cover border border-gray-400'
-                           src={game.homeTeam.businessProfile.logoUrl || "https://placehold.co/40x40/cccccc/333333?text=${team.name.charAt(0)}"}
-                           height={60}
-                           width={60}
-                           placeholder="blur"
-                           blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkqAcAAIUAgUW0RjgAAAAASUVORK5CYII="
-                           alt={`${game.homeTeam.shortCode} Logo`}
-                           // onError={(e) => { e.currentTarget.src = `https://placehold.co/40x40/cccccc/333333?text=${team.name.charAt(0)}`; }}
-                         />
-                        <span className={`px-2 text-sm md:text-base`} >{game.homeTeam.shortCode}</span>
-                    </div>
-                    <span className={`text-sm md:text-base`}>{GameStatus.COMPLETED && game.homeScore}</span>
-                </div>
-                {/**TEAM 2 */}
-                <div className={`flex items-center justify-between space-x-2 ${awayTeamStyle}`}>
-                    <div className='flex items-center justify-start'>
-                        <Image
-                          className='h-8 w-8 rounded-full object-cover border border-gray-400'
-                          src={game.awayTeam.businessProfile.logoUrl || "https://placehold.co/40x40/cccccc/333333?text=${team.name.charAt(0)}"}
-                          height={60}
-                          width={60}
-                          placeholder="blur"
-                          blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkqAcAAIUAgUW0RjgAAAAASUVORK5CYII="
-                          alt={`${game.awayTeam.shortCode} Logo`}
-                          // onError={(e) => { e.currentTarget.src = `https://placehold.co/40x40/cccccc/333333?text=${team.name.charAt(0)}`; }}
-                        />
-                        <span className={`px-2 text-sm md:text-base`}>{game.awayTeam.shortCode}</span>
-                    </div>
-                    <span className={`text-sm md:text-base`}>{GameStatus.COMPLETED && game.awayScore}</span>
-                </div>
-            </div>
-            {/*Game Location Info */}
-            <div className='text-xs flex items-center justify-center'>
-                {game.homeVenue?.name}
-            </div>
-          </div>
-          {/*Actions Section */}
-          <div className='text-xs flex items-center justify-center border-l border-gray-500 px-2 md:px-4'>
-            { game.status === GameStatus.SCHEDULED ? (
-                <span className='bg-gray-900 text-white py-2 px-4 rounded-sm'>{timeOnly}</span>) : 
-                ( game.status === GameStatus.IN_PROGRESS ? 
-                    <span className='bg-red-400 text-white p-2 rounded-sm'>En cours</span> : 
-                    <div className='flex bg-gray-400 text-yellow-100 py-2 px-2 md:px-4 rounded-sm'>
-                        <Plus className='h-4 w-4'/>
-                        <span >Details</span>
-                    </div>
-                    
-                )
-            }
-          </div>
-        </CardContent>
-    </Card>
-  )
-}
+    <Card className="rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition bg-white">
+      <CardHeader className="flex flex-col items-start gap-1 px-4 border-b border-gray-100">
+        <div className="flex items-center justify-between w-full text-xs text-gray-500">
+          <span>{game.round || game.league.name}</span>
+          {statusBadge}
+        </div>
+        <div className="text-sm text-gray-700 font-medium">{gameDate}</div>
+      </CardHeader>
 
-export default GamePublicCard
+      <CardContent className="space-y-2">
+        {renderTeam(game.homeTeam.businessProfile.logoUrl, game.homeTeam.shortCode, homeScore, homeWin)}
+        {renderTeam(game.awayTeam.businessProfile.logoUrl, game.awayTeam.shortCode, awayScore, awayWin)}
+
+        {game.homeVenue?.name && (
+          <div className="text-xs text-gray-500 mt-2">{game.homeVenue.name}</div>
+        )}
+      </CardContent>
+    </Card>
+  );
+};
+
+export default GamePublicCard;
