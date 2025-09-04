@@ -33,6 +33,12 @@ const publicPaths = [
    '/tenant/create', '/tenant/create/', '/tenant/create/*',
    '/league/create', '/league/create/', '/league/create/*',
    '/team/create', '/team/create/', '/team/create/*',
+   '/api', '/api/', '/api/*',
+   '/terms', '/terms/', '/terms/*',
+   '/legal', '/legal/', '/legal/*',
+   '/about', '/about/', '/about/*',
+   '/docs', '/docs/', '/docs/*',
+   '/contact', '/contact/', '/contact/*',
 ];
 
 export async function middleware(request: NextRequest) {

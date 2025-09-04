@@ -13,10 +13,11 @@ interface Standing {
     id: string;
     name: string;
     shortCode: string;
+    slug: string;
     businessProfile: {
       logoUrl: string | null;
       bannerImageUrl: string | null;
-    }
+    },
   };
   rank: number;
   points: number;

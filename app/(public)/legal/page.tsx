@@ -7,5 +7,4 @@ const LegalPage = () => {
     </div>
   )
 }
-
 export default LegalPage

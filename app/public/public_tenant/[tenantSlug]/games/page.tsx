@@ -131,7 +131,7 @@ export default function PublicGamesPage({ params }: { params: Promise<{ tenantSl
             </div>
         ) : tenantData ? (
           <div className="space-y-8">
-              <Card className="overflow-hidden shadow-sm bg-gray-400">
+              <Card className="overflow-hidden shadow-sm bg-gray-400 pb-2">
                 <CardHeader>
                   <CardTitle className='text-white text-center font-semibold text-lg'>
                     Matchs du {selectedDate ? format(new Date(selectedDate), 'dd MMMM yyyy', { locale: fr }) : 'Sélectionnez une date'}

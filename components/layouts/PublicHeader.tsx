@@ -217,7 +217,7 @@ export const PublicHeader = ({
             const Icon = link.icon;
             const isActive = pathname === link.href;
             return (
-              <Link key={link.href} href={link.href || "/"} className={`flex flex-col items-center gap-1 text-xs ${isActive ? "text-sky-600" : "text-gray-600"}`}>
+              <Link key={link.href} href={link.href} className={`flex flex-col items-center gap-1 text-xs ${isActive ? "text-sky-600" : "text-gray-600"}`}>
                 {Icon && <Icon className="w-5 h-5" />}
                 <span>{link.label}</span>
               </Link>

@@ -118,7 +118,7 @@ const TenantLandingPage = ({ params }: { params: Promise<{ tenantSlug: string }>
         (a, b) => new Date(a.dateTime).getTime() - new Date(b.dateTime).getTime()
       );
       completed.sort(
-        (a, b) => new Date(a.dateTime).getTime() - new Date(b.dateTime).getTime()
+        (a, b) => new Date(b.dateTime).getTime() - new Date(a.dateTime).getTime()
       );
 
       const sortedGames =
@@ -231,7 +231,7 @@ const TenantLandingPage = ({ params }: { params: Promise<{ tenantSlug: string }>
                             {games.length > 0 ? (
                                 <>
                                     {/* Carousel for md and lg screens */}
-                                    <div className="hidden md:flex flex-row overflow-x-auto snap-x snap-mandatory md:pl-42 lg:pl-56 no-scrollbar">
+                                    <div className="hidden md:flex flex-row gap-4 overflow-x-auto snap-x snap-mandatory md:pl-42 lg:pl-56 no-scrollbar">
                                         {games.map((game) => (
                                             <div key={game.id} className="min-w-[calc(100%/2)] lg:min-w-[calc(100%/3)]">
                                                 <Link href={`/games/${game.slug}`} className="block">

@@ -1,29 +1,27 @@
 // app/(app)/layout.tsx
 // app/layout.tsx (if this is the root layout) or a specific public group layout
 import React, { ReactNode } from 'react';
-import { ThemeProvider } from '@/components/providers/ThemeProvider'; // Adjust path
-import { PublicHeader } from '@/components/layouts/';
+import { PublicTenantHeader } from '@/components/layouts';
+import { SportType } from '@/schemas';
 
-interface NavLink {
-  label: string;
-  href: string;
-}
-
-const navLinks: NavLink[] = [
-  { label: 'Accueil', href: '/' },
-  { label: 'Matchs', href: '/games' },
-  { label: 'Classements', href: '/standings' },
-  { label: 'Equipes', href: '/teams' },
-];
 export default function PublicLayout({ children }: { children: ReactNode }) {
+
+const tenant = {
+          businessProfile: {
+            logoUrl: "https://cdn.nba.com/logos/leagues/logo-nba.svg",
+            theme: {
+              primaryColor: "orange",
+              secondaryColor: "blue"
+            },
+          },
+          sportType: SportType.FOOTBALL,
+          slug: "nba"
+        }
   return (
-    
-        <ThemeProvider>
           <div className="flex min-h-screen flex-col bg-gray-50 text-gray-800">
-            <PublicHeader navLinks={navLinks} />
+            <PublicTenantHeader tenant={tenant}/>
               <main className="flex-grow">{children}</main>
             { /*<PublicFooter />*/ }
           </div>
-        </ThemeProvider>
   );
 }

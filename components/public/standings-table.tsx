@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { Skeleton } from "../ui";
+import Link from "next/link";
 
 // This is a simplified version for the landing page
 interface Standing {
@@ -9,6 +10,7 @@ interface Standing {
         id: string;
         name: string;
         shortCode: string;
+        slug: string;
         businessProfile: {
             logoUrl: string | null;
             bannerImageUrl: string | null;
@@ -85,7 +87,7 @@ const StandingsTable: React.FC<StandingsTableProps> = ({ standings, rowsToShow =
                                 {standing.rank}
                             </td>
                             <td className="px-4 py-2 whitespace-nowrap text-sm font-medium text-gray-900">
-                                <div className="flex items-center justify-start space-x-2">
+                                <Link href={`/teams/${standing.team.slug}`} className="flex items-center justify-start space-x-2 group">
                                     <Image
                                       className='h-8 w-8 rounded-full object-cover border border-gray-400 mr-2'
                                       src={standing.team.businessProfile.logoUrl || "https://placehold.co/40x40/cccccc/333333?text=${team.name.charAt(0)}"}
@@ -96,8 +98,8 @@ const StandingsTable: React.FC<StandingsTableProps> = ({ standings, rowsToShow =
                                       alt={`${standing.team.shortCode} Logo`}
                                       // onError={(e) => { e.currentTarget.src = `https://placehold.co/40x40/cccccc/333333?text=${team.name.charAt(0)}`; }}
                                     />
-                                    {standing.team.name}
-                                </div>
+                                    <span className="group-hover:text-orange-900 transition-colors duration-300 ease-in-out">{standing.team.name}</span>
+                                </Link>
                             </td>
                             <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
                                 <span className="pl-4">{standing.gamesPlayed}</span>

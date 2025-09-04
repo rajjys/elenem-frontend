@@ -7,6 +7,7 @@ const TeamBasicSchema = z.object({
   id: z.string(),
   name: z.string(),
   shortCode: z.string(),
+  slug: z.string(),
   rank: z.number().optional().nullable(),
   record: z.string().optional().nullable(),
   businessProfile: z.object({
