@@ -39,7 +39,8 @@ interface Standing {
         businessProfile: {
             logoUrl: string;
             bannerImageUrl: string | null; 
-        }
+        },
+        slug: string;
     };
     rank: number;
     points: number;
@@ -75,7 +76,6 @@ const TenantLandingPage = ({ params }: { params: Promise<{ tenantSlug: string }>
       // Fetch tenant data
       const tenantResponse = await api.get(`/public-tenants/${tenantSlug}`);
       setTenant(tenantResponse.data);
-      console.log("Tenant data:", tenantResponse.data);
       // Identify main leagues
       const mainLeagues = tenantResponse.data.leagues
         // eslint-disable-next-line @typescript-eslint/no-explicit-any

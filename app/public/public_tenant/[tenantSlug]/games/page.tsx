@@ -40,7 +40,7 @@ export default function PublicGamesPage({ params }: { params: Promise<{ tenantSl
           const response = await api.get<string[]>(`/public/games/dates`, { params: { tenantSlug } });
           const dates = response.data;
           if (!dates || dates.length === 0) {
-            toast.error("Aucune date de match disponible.");
+            //toast.error("Aucune date de match disponible.");
             console.warn("No available dates found.");
             return;
           }
@@ -52,7 +52,7 @@ export default function PublicGamesPage({ params }: { params: Promise<{ tenantSl
         }
       }
       catch(error){
-        toast.error("Failed to load game dates.");
+        //toast.error("Failed to load game dates.");
         console.warn(error);
       }
       finally{
