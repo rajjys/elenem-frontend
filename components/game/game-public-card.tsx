@@ -3,7 +3,6 @@ import { Card, CardContent, CardHeader } from '@/components/ui';
 import { GameDetails, GameStatus } from '@/schemas';
 import { formatDateFr } from '@/utils';
 import Image from 'next/image';
-import Link from 'next/link';
 
 interface GamePublicCardProps {
   game: GameDetails;
@@ -28,10 +27,9 @@ const GamePublicCard: React.FC<GamePublicCardProps> = ({ game }) => {
     name: string,
     score: number | null | undefined,
     highlight: boolean,
-    slug: string
   ) => (
     <div className="flex items-center justify-between w-full py-1">
-      <Link href={`/teams/${slug}`} className="flex items-center gap-2 group">
+      <div  className="flex items-center gap-2">
         <Image
           src={logo || `https://placehold.co/40x40?text=${name.charAt(0)}`}
           alt={`${name} Logo`}
@@ -39,10 +37,10 @@ const GamePublicCard: React.FC<GamePublicCardProps> = ({ game }) => {
           height={28}
           className="rounded-full border border-gray-300"
         />
-        <span className={`text-sm font-medium group-hover:text-orange-900 transition-colors duration-300 ease-in-out ${highlight ? 'text-gray-900 font-semibold' : 'text-gray-600'}`}>
+        <span className={`text-sm font-medium ${highlight ? 'text-gray-900 font-semibold' : 'text-gray-600'}`}>
           {name}
         </span>
-      </Link>
+      </div>
       {score !== null && <span className={`text-sm font-bold ${highlight ? 'text-gray-900' : 'text-gray-500'}`}>{score}</span>}
     </div>
   );
@@ -72,8 +70,8 @@ const GamePublicCard: React.FC<GamePublicCardProps> = ({ game }) => {
       </CardHeader>
 
       <CardContent className="space-y-2">
-        {renderTeam(game.homeTeam.businessProfile.logoUrl, game.homeTeam.shortCode, homeScore, homeWin, game.homeTeam.slug)}
-        {renderTeam(game.awayTeam.businessProfile.logoUrl, game.awayTeam.shortCode, awayScore, awayWin, game.awayTeam.slug)}
+        {renderTeam(game.homeTeam.businessProfile.logoUrl, game.homeTeam.shortCode, homeScore, homeWin )}
+        {renderTeam(game.awayTeam.businessProfile.logoUrl, game.awayTeam.shortCode, awayScore, awayWin )}
       </CardContent>
     </Card>
   );
