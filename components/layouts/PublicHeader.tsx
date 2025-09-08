@@ -9,7 +9,8 @@ import { FiUser, FiChevronDown } from "react-icons/fi";
 import { Users, LayoutDashboard, User, Shield, Settings, LogOut,
   Calendar,
   ShieldCheck,
-  CreditCard
+  CreditCard,
+  Home
 } from "lucide-react";
 
 import { Roles, SportType } from "@/schemas";
@@ -209,6 +210,7 @@ export const PublicHeader = ({
       <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-200 lg:hidden">
         <div className="flex items-center justify-around h-16">
           {[
+              { label: "Accueil", href: "/", icon: Home},
               { label: "Matchs", href: "/games", icon: Calendar},
               { label: "Ligues", href: "/tenants", icon: Users },
               { label: "Fonctionnalités", href: "/features", icon: ShieldCheck },

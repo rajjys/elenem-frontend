@@ -37,7 +37,7 @@ export default function PublicGamesPage() {
   async function fetchDates() {
       try {
           console.log("Fetching Game Dates...");
-          const response = await api.get<string[]>('/public/games/dates');
+          const response = await api.get<string[]>('/public-games/dates');
           const dates = response.data;
           if (!dates || dates.length === 0) {
             toast.info("Aucune date de match disponible.");
@@ -64,7 +64,7 @@ export default function PublicGamesPage() {
     if (!date) return;
     setLoadingGames(true);
     try {
-      const response = await api.get<TenantWithGames[]>('/public/games', { params: { date } });
+      const response = await api.get<TenantWithGames[]>('/public-games', { params: { date } });
       const tenantsWithGames = response.data;
       setGamesByTenant(tenantsWithGames);
     } catch (error) {

@@ -75,7 +75,7 @@ export default function PublicLandingPage() {
             //setLoading(true);
             try {
               // Fetch and process games
-              const gamesResponse = await api.get<GameDetails[]>(`/public/games/search`, {
+              const gamesResponse = await api.get<GameDetails[]>(`/public-games/search`, {
                 params: { take: 3 },
               });
               const fetchedGames = gamesResponse.data;

@@ -97,7 +97,7 @@ const TenantStandingsPage = ({ params }: { params: Promise<{ tenantSlug: string 
 
       setLoadingStandings(true);
       try {
-        const response = await api.get(`/public/games/standings/${selectedLeagueSlug}`);
+        const response = await api.get(`/public-games/standings/${selectedLeagueSlug}`);
         setStandings(response.data);
       } catch (err) {
         console.error("Failed to fetch standings:", err);

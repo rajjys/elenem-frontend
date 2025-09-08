@@ -19,6 +19,9 @@ interface Team {
   businessProfile?: {
     logoUrl?: string | null;
   };
+  league: {
+    slug: string;
+  }
 }
 
 export default function PublicTeamsPage({ params }: { params: Promise<{ tenantSlug: string }> }) {
@@ -34,7 +37,12 @@ export default function PublicTeamsPage({ params }: { params: Promise<{ tenantSl
   const fetchLeagues = useCallback(async () => {
     try {
       const res = await api.get<PaginatedLeaguesResponseDto>("/public-leagues", { params: { tenantSlug } });
-      setLeagues(res.data.data);
+      const sortedLeagues = res.data.data.sort((a: LeagueBasic, b: LeagueBasic) => {
+            if (a.parentLeagueId === null && b.parentLeagueId !== null) return -1;
+            if (a.parentLeagueId !== null && b.parentLeagueId === null) return 1;
+            return 0;
+        })
+      setLeagues(sortedLeagues);
     } catch (err) {
       console.error(err);
       //toast.error("Impossible de charger les ligues.");
@@ -44,13 +52,14 @@ export default function PublicTeamsPage({ params }: { params: Promise<{ tenantSl
   const fetchTeams = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await api.get<{data: Team[]}>("/public-teams", {
+      const res = await api.get("/public-teams", {
         params: {
           tenantSlug,
           q: search || undefined,
           leagueSlug: selectedLeague || undefined,
         },
       });
+      console.log(res.data.data);
       setTeams(res.data.data);
     } catch (err) {
       console.error(err);
@@ -69,7 +78,7 @@ export default function PublicTeamsPage({ params }: { params: Promise<{ tenantSl
   }, [fetchTeams]);
 
   return (
-    <div className="min-h-screen max-w-3xl mx-auto">
+    <div className="min-h-screen max-w-6xl mx-auto">
       <div className="container mx-auto p-4 sm:p-6 space-y-8">
         <header>
           <h1 className="text-2xl font-bold tracking-tight text-gray-800">
@@ -80,12 +89,16 @@ export default function PublicTeamsPage({ params }: { params: Promise<{ tenantSl
           </p>
         </header>
         {/* Filters */}
-        <div className="flex flex-col sm:flex-row justify-between gap-4">
-          <Input
-            placeholder="Rechercher une équipe..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
+        <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex-grow">
+            <Input
+              placeholder="Rechercher une équipe..."
+              type="search"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full py-2 pl-10 rounded-full border border-gray-300"
+            />
+          </div>
           <Select
             value={selectedLeague}
             onValueChange={(val) => setSelectedLeague(val === "all" ? undefined : val)}
@@ -103,7 +116,6 @@ export default function PublicTeamsPage({ params }: { params: Promise<{ tenantSl
             </SelectContent>
           </Select>
         </div>
-
         {/* Teams List */}
         {loading ? (
           <div className="grid gap-4">
@@ -120,32 +132,35 @@ export default function PublicTeamsPage({ params }: { params: Promise<{ tenantSl
             ))}
           </div>
         ) : teams.length > 0 ? (
-          <div className="grid gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {teams.map((team) => (
-              <Card key={team.slug} className="overflow-hidden hover:shadow-md transition">
-                <CardContent className="flex items-center justify-between p-4">
-                  <div className="flex items-center gap-4">
-                    {team.businessProfile?.logoUrl ? (
-                      <Image
-                        src={team.businessProfile.logoUrl}
-                        alt={team.name}
-                        height={30}
-                        width={30}
-                        className="h-12 w-12 rounded-full object-cover"
-                      />
-                    ) : (
-                      <div className="h-12 w-12 rounded-full bg-gray-200" />
-                    )}
-                    <div>
-                      <h3 className="font-semibold">{team.name}</h3>
-                      <p className="text-sm text-gray-500">{team.shortName}</p>
+              <Link href={`/teams/${team.league.slug}/${team.slug}`} key={team.slug}>
+                <Card key={team.slug} className="overflow-hidden hover:shadow-md transition bg-gray-200 hover:bg-gray-50">
+                  <CardContent className="flex items-center justify-between p-3">
+                    <div className="flex items-center gap-4">
+                      {team.businessProfile?.logoUrl ? (
+                        <Image
+                          src={team.businessProfile.logoUrl}
+                          alt={team.name}
+                          height={30}
+                          width={30}
+                          className="h-8 w-8 rounded-full object-cover"
+                        />
+                      ) : (
+                        <div className="h-8 w-8 rounded-full bg-gray-200" />
+                      )}
+                      <div>
+                        <h3 className="font-semibold">{team.name}</h3>
+                        <p className="text-sm text-gray-500">{team.shortName}</p>
+                      </div>
                     </div>
-                  </div>
-                  <Link href={`/teams/${team.slug}`}>
-                    <ArrowRight className="text-gray-500 hover:text-gray-800" />
-                  </Link>
-                </CardContent>
-              </Card>
+                    <div>
+                      <ArrowRight className="h-4 w-4 text-gray-600" />
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
+              
             ))}
           </div>
         ) : (

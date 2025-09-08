@@ -99,7 +99,7 @@ const TenantLandingPage = ({ params }: { params: Promise<{ tenantSlug: string }>
       }
 
       // Fetch and process games
-      const gamesResponse = await api.get<GameDetails[]>(`/public/games/search`, {
+      const gamesResponse = await api.get<GameDetails[]>(`/public-games/search`, {
         params: { tenantSlug },
       });
       const fetchedGames = gamesResponse.data;
@@ -153,7 +153,7 @@ const TenantLandingPage = ({ params }: { params: Promise<{ tenantSlug: string }>
 
             setLoadingStandings(true);
             try {
-                const standingsResponse = await api.get(`/public/games/standings/${selectedLeagueSlug}`);
+                const standingsResponse = await api.get(`/public-games/standings/${selectedLeagueSlug}`);
                 setStandings(standingsResponse.data);
             } catch (err) {
                 console.error("Failed to fetch standings:", err);

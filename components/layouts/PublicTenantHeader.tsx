@@ -62,6 +62,7 @@ export const PublicTenantHeader: React.FC<TenantHeaderProps> = ({ tenant }) => {
   ];
 
   const moreLinks: NavLink[] = [
+    { label: "Playoff", href: "/playoff"},
     { label: "Joueurs", href: "/players" },
     { label: "Statistiques", href: "/stats" },
     { label: "Actualités", href: "/news" },
@@ -69,6 +70,8 @@ export const PublicTenantHeader: React.FC<TenantHeaderProps> = ({ tenant }) => {
     { label: "Photos", href: "/photos" },
     { label: "Compétitions", href: "/competitions" },
     { label: "Historique", href: "/history" },
+    { label: "A Propos", href: "/about" },
+    { label: "Contact", href: "/contact" },
   ];
 
   const primaryColor = tenant.businessProfile.theme?.primaryColor || "#0284c7"; // default sky-600

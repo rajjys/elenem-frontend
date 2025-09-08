@@ -31,13 +31,13 @@ export default function PublicGamesPage({ params }: { params: Promise<{ tenantSl
   const [loadingDates, setLoadingDates] = useState(true);
   const [loadingGames, setLoadingGames] = useState(false);
   
-  const ROOT_DOMAIN = process.env.NODE_ENV === 'development' ? process.env.NEXT_PUBLIC_HOME_URL_LOCAL : process.env.NEXT_PUBLIC_HOME_URL;
-  const handler = (process.env.NODE_ENV === 'development' ) ? 'http://' : 'https://';
+  //const ROOT_DOMAIN = process.env.NODE_ENV === 'development' ? process.env.NEXT_PUBLIC_HOME_URL_LOCAL : process.env.NEXT_PUBLIC_HOME_URL;
+  //const handler = (process.env.NODE_ENV === 'development' ) ? 'http://' : 'https://';
 
   // Fetch available dates on initial load
   const fetchDates = useCallback(async () => {
       try {
-          const response = await api.get<string[]>(`/public/games/dates`, { params: { tenantSlug } });
+          const response = await api.get<string[]>(`/public-games/dates`, { params: { tenantSlug } });
           const dates = response.data;
           if (!dates || dates.length === 0) {
             //toast.error("Aucune date de match disponible.");
@@ -64,7 +64,7 @@ export default function PublicGamesPage({ params }: { params: Promise<{ tenantSl
     if (!date) return;
     setLoadingGames(true);
     try {
-      const response = await api.get<TenantWithGames[]>('/public/games', { params: { date, tenantSlug } });
+      const response = await api.get<TenantWithGames[]>('/public-games', { params: { date, tenantSlug } });
       const tenantsWithGames = response.data;
       const onlyTenant = tenantsWithGames[0];
       setTenantdata(onlyTenant);
@@ -139,7 +139,7 @@ export default function PublicGamesPage({ params }: { params: Promise<{ tenantSl
                 </CardHeader>
                 <CardContent className="grid gap-2 grid-cols-1">
                   {tenantData.games.map((game) => (
-                    <Link key={game.id} href={`${handler}${tenantSlug}.${ROOT_DOMAIN}/games/${game.slug}`} target="_blank" rel="noopener noreferrer">
+                    <Link key={game.id} href={`/games/${game.slug}`} target="_blank" rel="noopener noreferrer">
                         <GamePublicCard game={game}/>
                     </Link>
                   ))}
