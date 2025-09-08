@@ -11,6 +11,7 @@ import GamePublicCard from "@/components/game/game-public-card";
 import DateCarousel from "@/components/game/date-carousel";
 import { GameDetails } from "@/schemas";
 import Image from "next/image";
+import { ArrowRight } from "lucide-react";
 
 interface TeamPublicDto {
   id: string;
@@ -128,7 +129,6 @@ const fetchStandings = useCallback(async () => {
         const standingsResponse = await api.get<Standing[]>(`/public-games/standings/${leagueSlug}`,
           { params: { teamSlug }}
         );
-        console.log(standingsResponse.data[0]);
         setStandings(standingsResponse.data[0]);
     } catch (err) {
         console.error("Failed to fetch standings:", err);
@@ -214,7 +214,12 @@ const fetchStandings = useCallback(async () => {
         {/* Team Stats */}
         <Card className="py-2">
           <CardHeader>
-            <CardTitle className="text-gray-700">Statistiques de l&apos;équipe</CardTitle>
+            <CardTitle className="px-2 flex justify-between pb-1">
+              <span className="text-gray-700">Statistiques de l&apos;équipe</span>
+              <Link href='/standings' className="flex justify-center items-center text-gray-500 hover:text-gray-700 transition-colors duration-300 ease-in-out">
+                Classememnts <ArrowRight className="h-4 w-4"/>
+              </Link>
+            </CardTitle>
           </CardHeader>
           <CardContent className="">
             {
@@ -245,7 +250,6 @@ const fetchStandings = useCallback(async () => {
                 </div>
               </div>
             }
-            
           </CardContent>
         </Card>
 
@@ -271,7 +275,7 @@ const fetchStandings = useCallback(async () => {
             ) : games.length > 0 ? (
               <div className="grid gap-4 mt-4">
                 {games.map((game) => (
-                  <Link key={game.id} href={`/games/${game.slug}`}>
+                  <Link key={game.id} href={`/games/${game.league.slug}/${game.slug}`}>
                     <GamePublicCard game={game} />
                   </Link>
                 ))}

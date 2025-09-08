@@ -19,6 +19,7 @@ const TeamBasicSchema = z.object({
 const LeagueBasicSchema = z.object({
   id: z.string(),
   name: z.string(),
+  slug: z.string()
 });
 const TenantBasicSchema = z.object({
   id: z.string(),
