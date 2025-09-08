@@ -13,6 +13,8 @@ import StandingsTable from '@/components/public/standings-table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { mockBlogPosts } from '@/data/mockBlogPosts';
 import VerticalBlogPostCard from '@/components/ui/vertical-blogpost-card';
+import axios from 'axios';
+import { toast } from 'sonner';
 
 
 interface PublicTenantDetails {
@@ -137,8 +139,13 @@ const TenantLandingPage = ({ params }: { params: Promise<{ tenantSlug: string }>
             try {
                 const standingsResponse = await api.get(`/public-games/standings/${selectedLeagueSlug}`);
                 setStandings(standingsResponse.data);
-            } catch (err) {
-                console.error("Failed to fetch standings:", err);
+            } catch (error) {
+                let errorMessage = "Failed to load Standings"
+                if(axios.isAxiosError(error)){
+                    errorMessage = error.response?.data?.message || errorMessage;
+                }
+                toast.error(errorMessage);
+                console.error("Failed to fetch standings:", error);
                 setStandings([]); // Clear standings on error
             } finally {
                 setLoadingStandings(false);
