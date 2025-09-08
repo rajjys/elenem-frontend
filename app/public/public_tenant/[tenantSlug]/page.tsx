@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, use } from 'react';
 import Link from 'next/link';
-import { BlogPost, GameDetails, GameStatus } from '@/schemas'; // Assuming GameStatus is a valid import
+import { BlogPost, GameDetails, GameStatus, Standing } from '@/schemas'; // Assuming GameStatus is a valid import
 import TenantHeroSection from "@/components/public/tenant-hero-section";
 import GamePublicCard from '@/components/game/game-public-card'; // Assuming this is the correct path
 import { Skeleton } from "@/components/ui/skeleton";
@@ -28,24 +28,6 @@ interface PublicTenantDetails {
         slug: string;
         parentLeagueId: string | null;
     }[];
-}
-// Define the Standing type based on the backend response
-// This is a simplified version for the landing page
-interface Standing {
-    team: {
-        id: string;
-        name: string;
-        shortCode: string;
-        businessProfile: {
-            logoUrl: string;
-            bannerImageUrl: string | null; 
-        },
-        slug: string;
-    };
-    rank: number;
-    points: number;
-    form?: string | null;
-    gamesPlayed: number;
 }
 const TenantLandingPage = ({ params }: { params: Promise<{ tenantSlug: string }> }) => {
     const { tenantSlug } = use(params);
@@ -234,7 +216,7 @@ const TenantLandingPage = ({ params }: { params: Promise<{ tenantSlug: string }>
                                     <div className="hidden md:flex flex-row gap-4 overflow-x-auto snap-x snap-mandatory md:pl-42 lg:pl-56 no-scrollbar">
                                         {games.map((game) => (
                                             <div key={game.id} className="min-w-[calc(100%/2)] lg:min-w-[calc(100%/3)]">
-                                                <Link href={`/games/${game.slug}`} className="block">
+                                                <Link href={`/games/${game.league.slug}/${game.slug}`} className="block">
                                                     <GamePublicCard game={game} />
                                                 </Link>
                                             </div>
@@ -245,7 +227,7 @@ const TenantLandingPage = ({ params }: { params: Promise<{ tenantSlug: string }>
                                     <div className="space-y-4 md:hidden">
                                         {games.slice(0, 4).map((game) => (
                                             <div key={game.id}>
-                                                <Link href={`/games/${game.slug}`} className="block">
+                                                <Link href={`/games/${game.league.slug}/${game.slug}`} className="block">
                                                     <GamePublicCard game={game} />
                                                 </Link>
                                             </div>

@@ -142,7 +142,7 @@ export default function PublicGamesPage() {
                 </CardHeader>
                 <CardContent className="grid gap-2 grid-cols-1">
                   {games.map((game) => (
-                    <Link key={game.id} href={`${handler}${tenantSlug}.${ROOT_DOMAIN}/games/${game.slug}`} target="_blank" rel="noopener noreferrer">
+                    <Link key={game.id} href={`${handler}${tenantSlug}.${ROOT_DOMAIN}/games/${game.league.slug}/${game.slug}`} target="_blank" rel="noopener noreferrer">
                         <GamePublicCard game={game}/>
                     </Link>
                   ))}

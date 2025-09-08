@@ -6,24 +6,7 @@ import { Card, CardContent, CardTitle } from "@/components/ui";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import StandingsTable from "@/components/public/standings-table";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Gender } from "@/schemas";
-
-interface Standing {
-  team: {
-    id: string;
-    name: string;
-    shortCode: string;
-    slug: string;
-    businessProfile: {
-      logoUrl: string | null;
-      bannerImageUrl: string | null;
-    },
-  };
-  rank: number;
-  points: number;
-  form?: string | null;
-  gamesPlayed: number;
-}
+import { Gender, Standing } from "@/schemas";
 
 interface PublicTenantDetails {
   id: string;
