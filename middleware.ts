@@ -22,6 +22,7 @@ const publicPaths = [
   '/tenants', '/tenants/', '/tenants/*', // Public tenant profiles on the root domain
   '/seasons', '/seasons/', '/seasons/*', // Public season profiles on the root domain
   '/upload', '/upload/', '/upload/*',
+  '/upload2', '/upload2/', '/upload2/*',
   '/login', '/register', '/access-denied', 
   '/blogs',
   '/landing', '/landing/', '/landing/*',

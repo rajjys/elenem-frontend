@@ -1,7 +1,7 @@
 'use client';
 import Head from 'next/head';
 import { useRouter, useSearchParams } from 'next/navigation'; // Or useNavigation from next/navigation for App Router
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useAuthStore } from '@/store/auth.store';
 import { LeagueBasic, PaginatedLeaguesResponseSchema, Roles, TenantDetails, TenantDetailsSchema } from '@/schemas';
@@ -56,7 +56,7 @@ export default function TenantDashboard() {
     ? userAuth?.tenantId
     : null;
     //Fetch tenant-specific data if needed, e.g., tenant name, logo, etc.
-    const fetchTenantDetails = async () => {
+    const fetchTenantDetails = useCallback(async () => {
         setLoading(true);
         setError(null);
         try {
@@ -73,9 +73,9 @@ export default function TenantDashboard() {
         } finally {
           setLoading(false);
         }
-      };
-      const fetchLeagues = async () => {
-
+      }, [currentTenantId]);
+      
+      const fetchLeagues = useCallback(async () => {
         if (!currentTenantId) {
               setError("Tenant ID is not available.");
               setLoading(false);
@@ -100,14 +100,14 @@ export default function TenantDashboard() {
             } finally {
               setLoading(false);
             }
-      };
+      }, [currentTenantId, isSystemAdmin]);
     useEffect(() => {
         // Fetch tenant-specific data if needed, e.g., tenant name, logo, etc.
         if (currentTenantId) {
             fetchTenantDetails();
             fetchLeagues();
         }
-    }, [currentTenantId]);
+    }, [currentTenantId, fetchLeagues, fetchTenantDetails]);
     
     // Dynamically generate stat cards based on tenant data
     const statCards = [
@@ -130,20 +130,15 @@ export default function TenantDashboard() {
                 <title>Tenant Dashboard - ELENEM Sports</title>
             </Head>  
             <section className='flex items-center justify-between'>
-                <h1 className="text-2xl font-bold text-gray-800 mb-6">{tenant?.name}</h1>
+                <h1 className="text-2xl font-bold text-gray-800 mb-4">{tenant?.name}</h1>
                 <div className='flex whitespace-nowrap text-sm gap-3'>
-                    <button onClick={() => router.push('/tenant/settings')}
-                        className="w-full flex items-center justify-center text-gray-800 px-2 py-2 mx-2 border border-gray-200 rounded-md transition-colors">
-                        <Settings className="h-4 w-4 mr-2" /> Settings
-                    </button>
-                    <button onClick={() => router.push('/league/create')}
-                        className="w-full flex items-center justify-center bg-emerald-600 text-white py-2 px-2 rounded-md hover:bg-emerald-700 transition-colors">
-                        <Plus className="h-4 w-4 mr-2" /> Create New League
-                    </button>
+                    <Link href='/league/create' className="w-full flex items-center justify-center bg-emerald-600 text-white py-2 px-2 rounded-md hover:bg-emerald-700 transition-colors">
+                        <Plus className="h-4 w-4 mr-2" /> Creer un Ligue
+                    </Link>
                 </div>
             </section>
                 {/* Key Metrics Section */}
-            <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
+            <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-4">
                 {loading ? <LoadingSpinner /> : error ? <p className='text-red-500'>{error}</p> :
                 statCards.map((card, index) => (
                     <StatsCard key={index} {...card} />
@@ -154,16 +149,16 @@ export default function TenantDashboard() {
                 <div className="lg:col-span-2">
                     <Card className="shadow-elevated">
                         <CardHeader className="flex flex-row items-center justify-between">
-                            <CardTitle className="text-lg font-semibold">Your Leagues</CardTitle>
+                            <CardTitle className="text-lg font-semibold">Vos ligues</CardTitle>
                             <Button variant="default" size="sm" onClick={() => router.push(buildLink('/tenant/leagues'))}>
                                 <Eye className="h-4 w-4 mr-2" />
-                                    View All
+                                    Voir Plus
                             </Button>
                         </CardHeader>
-                        <CardContent className="space-y-4">
+                        <CardContent className="">
                         {leagues?.map((league: LeagueBasic) => (
-                        <Link href={buildLink('/league/dashboard', { ctxLeagueId: league.id })} className='m-1' key={league.id}>
-                            <div className="p-4 border border-gray-200 rounded-lg hover:bg-gray-200/30 transition-colors">
+                        <Link href={buildLink('/league/dashboard', { ctxLeagueId: league.id })} key={league.id}>
+                            <div className="p-2 border border-gray-200 rounded-lg hover:bg-gray-200/30 transition-colors">
                                 <div className="flex items-center justify-between mb-3">
                                     <div className="flex items-center gap-3">
                                         <Avatar src={league.logoUrl} name={league.name} size={50} className="mr-2" />
@@ -189,7 +184,7 @@ export default function TenantDashboard() {
                                             <DropdownMenuContent align="end">
                                                 <DropdownMenuItem>
                                                   <Eye className="mr-2 h-4 w-4" />
-                                                  View Details
+                                                  Details
                                                 </DropdownMenuItem>
                                                 <DropdownMenuItem>
                                                   <UserPlus className="mr-2 h-4 w-4" />
@@ -197,7 +192,7 @@ export default function TenantDashboard() {
                                                 </DropdownMenuItem>
                                                 <DropdownMenuItem>
                                                   <Settings className="mr-2 h-4 w-4" />
-                                                  Configure
+                                                  Configurer
                                                 </DropdownMenuItem>
                                             </DropdownMenuContent>
                                         </DropdownMenu>
@@ -207,7 +202,7 @@ export default function TenantDashboard() {
                                     <div className="grid grid-cols-3 gap-4 text-sm">
                                     <div className="flex items-center gap-1 text-muted-foreground">
                                         <Building2 className="h-3 w-3" />
-                                        <span className='text-gray-500'>{league.teams?.length} Teams</span>
+                                        <span className='text-gray-500'>{league.teams?.length} Equipes</span>
                                     </div>
                                     <div className="flex items-center gap-1 text-muted-foreground">
                                         <Crown className="h-3 w-3" />
@@ -219,12 +214,11 @@ export default function TenantDashboard() {
                                     </div>
                                     </div>
                                 </div>
-                            </Link>
+                        </Link>
                         ))}
                     </CardContent>
                     </Card>
                 </div>
-
                 {/* Recent Activity */}
                 <div>
                     <Card className="shadow-elevated">

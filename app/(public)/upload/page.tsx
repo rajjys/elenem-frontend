@@ -5,6 +5,7 @@ import axios from 'axios';
 import { Button } from '@/components/ui/button'; // Assuming shadcn/ui buttons
 import { Input } from '@/components/ui/input'; // Assuming shadcn/ui input
 import { Progress } from '@/components/ui/progress'; // Assuming shadcn/ui progress
+import { toast } from 'sonner';
 
 // Note: You will need to install axios if you don't have it already:
 // npm install axios
@@ -87,6 +88,7 @@ export default function FileUploadTester() {
         console.error('Upload failed:', error);
         setErrorMessage('An unexpected error occurred.');
       }
+      toast.error(errorMessage)
     }
   };
 

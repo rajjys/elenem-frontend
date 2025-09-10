@@ -80,7 +80,7 @@ export const PublicTenantHeader: React.FC<TenantHeaderProps> = ({ tenant }) => {
   return (
     <>
       <header
-        className={`w-full border-b border-${secondaryColor}-400 bg-white/95 backdrop-blur-md z-50 transition-transform duration-300
+        className={`w-full border-b border-${secondaryColor}-200 bg-white/95 backdrop-blur-md z-50 transition-transform duration-300
         ${scrollDir === "down" ? "-translate-y-full" : "translate-y-0"}
         md:sticky md:top-0`}
       >
