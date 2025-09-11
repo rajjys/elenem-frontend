@@ -5,7 +5,7 @@ import React from 'react'
 import { useRouter } from 'next/navigation'
 import { AccessGate } from '@/app/(auth)/AccessGate'
 import { Roles } from '@/schemas'
-import { TenantCreationForm } from '@/components/forms/tenant-creation-form'
+import { TenantCreationForm } from '@/components/forms/tenant/tenant-form'
 import { useAuthStore } from '@/store/auth.store'
 
 export default function CreateTenantPage() {
