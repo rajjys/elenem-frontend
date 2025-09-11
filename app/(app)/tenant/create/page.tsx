@@ -37,8 +37,8 @@ export default function CreateTenantPage() {
   }
 
   return (
-    <div className="container mx-auto p-6 max-w-2xl">
-      <h1 className="text-3xl font-bold text-gray-900 mb-6 text-center">Create New Tenant</h1>
+    <div className="container mx-auto max-w-2xl">
+      <h1 className="text-3xl font-bold text-gray-900 text-center">Create New Tenant</h1>
 
       <AccessGate allowedRoles={[Roles.SYSTEM_ADMIN, Roles.GENERAL_USER]}>
         <TenantCreationForm onSuccess={handleSuccess} onCancel={handleCancel} />

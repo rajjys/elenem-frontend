@@ -144,6 +144,8 @@ export const CreateTenantSchema = z.object({
     city: z.string().optional().nullable(),
     logoUrl: z.string().optional().nullable(),
     bannerImageUrl: z.string().optional().nullable(),
+    logoAssetId: z.string().optional().nullable(),
+    bannerAssetId: z.string().nullable().optional(),
     physicalAddress: z.string().optional().nullable(),
   }),
   // Optional ownerId for SYSTEM_ADMIN

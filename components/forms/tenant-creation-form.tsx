@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -38,9 +38,12 @@ import {
   ListTodo,
   User,
   X,
+  Trash,
+  Camera,
 } from 'lucide-react';
 import { useAuthStore } from '@/store/auth.store';
 import axios from 'axios';
+import Image from 'next/image';
 
 
 // Define a type for the full form data
@@ -57,6 +60,17 @@ export function TenantCreationForm({ onSuccess, onCancel }: TenantFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [availableOwners, setAvailableOwners] = useState<UserResponseDto[]>([]);
   const [ownersLoading, setOwnersLoading] = useState(false);
+  const logoInputRef = useRef<HTMLInputElement | null>(null);
+  const bannerInputRef = useRef<HTMLInputElement | null>(null);
+
+  const [logoPreview, setLogoPreview] = useState<string | null>(null);
+  const [bannerPreview, setBannerPreview] = useState<string | null>(null);
+
+  const [uploadingLogo, setUploadingLogo] = useState(false);
+  const [uploadingBanner, setUploadingBanner] = useState(false);
+  const [logoProgress, setLogoProgress] = useState(0);
+  const [bannerProgress, setBannerProgress] = useState(0);
+
 
   // Initialize react-hook-form with the full schema
   const form = useForm<TenantFormValues>({
@@ -69,8 +83,8 @@ export function TenantCreationForm({ onSuccess, onCancel }: TenantFormProps) {
       country: '',
       businessProfile: {
         description: '',
-        logoUrl: '',
-        bannerImageUrl: '',
+        logoAssetId: null,
+        bannerAssetId: null,
         physicalAddress: '',
         city: '',
         region: '',
@@ -91,30 +105,25 @@ export function TenantCreationForm({ onSuccess, onCancel }: TenantFormProps) {
   // Watch for changes on the country field to manage the region dropdown
   const country = watch('country');
 
-  // Fetch available owners if the user is a SYSTEM_ADMIN
-  useEffect(() => {
-    if (isSystemAdmin) {
-      const fetchOwners = async () => {
-        setOwnersLoading(true);
-        try {
-          // The roles filter ensures we only get valid owners.
-          const params = new URLSearchParams();
-          params.append('roles', Roles.GENERAL_USER )
-          const response = await api.get<PaginatedResponseDto<UserResponseDto>>(
-            '/users',
-            { params }
-          );
-          setAvailableOwners(response.data.data);
-        } catch (error) {
-          console.error('Failed to fetch available owners:', error);
-          toast.error('Failed to load available owners.');
-        } finally {
-          setOwnersLoading(false);
-        }
-      };
-      fetchOwners();
-    }
-  }, [isSystemAdmin]);
+  // Fetch available owners if the user is a SYSTEM_ADMIN 
+  useEffect(() => { 
+    if (isSystemAdmin) { 
+      const fetchOwners = async () => { 
+        setOwnersLoading(true); 
+        try { // The roles filter ensures we only get valid owners. 
+          const params = new URLSearchParams(); 
+          params.append('roles', Roles.GENERAL_USER );
+          const response = await api.get<PaginatedResponseDto<UserResponseDto>>( '/users', { params } ); 
+          setAvailableOwners(response.data.data); 
+        } catch (error) { 
+            console.error('Failed to fetch available owners:', error); 
+            toast.error('Failed to load available owners.'); 
+        } finally { 
+          setOwnersLoading(false); 
+          } 
+      }; 
+        fetchOwners(); } 
+      }, [isSystemAdmin]);
 
   // Handle step navigation
   const nextStep = async () => {
@@ -134,6 +143,75 @@ export function TenantCreationForm({ onSuccess, onCancel }: TenantFormProps) {
   const prevStep = () => {
     setCurrentStep(prev => prev - 1);
   };
+
+  async function uploadAndConfirm(file: File, field: 'logo' | 'banner') {
+  const setUploading = field === 'logo' ? setUploadingLogo : setUploadingBanner;
+  const setProgress = field === 'logo' ? setLogoProgress : setBannerProgress;
+  const setPreview = field === 'logo' ? setLogoPreview : setBannerPreview;
+  const setAssetId = (id: string | null) => {
+    if (field === 'logo') setValue('businessProfile.logoAssetId', id);
+    else setValue('businessProfile.bannerAssetId', id);
+    // validate that field
+    trigger(`businessProfile.${field}AssetId`);
+  };
+
+  setUploading(true);
+  setProgress(0);
+
+  try {
+    // 1) Get presign from your backend
+    const presignResp = await api.post('/uploads/presign', {
+      fileName: file.name,
+      contentType: file.type || 'application/octet-stream',
+      size: file.size,
+      // you could pass usageType/role here if you want
+    });
+    const presign = presignResp.data;
+    console.log(presign);
+    // support common field names (robust)
+    const uploadUrl =
+      presign.presignedUrl ?? presign.url ?? presign.uploadUrl ?? presign.signedUrl;
+    const assetId = presign.assetId ?? presign.id;
+
+    if (!uploadUrl) throw new Error('No upload URL returned from presign.');
+
+    // 2) Upload to S3 (axios so we get progress)
+    await axios.put(uploadUrl, file, {
+      headers: { 'Content-Type': file.type || 'application/octet-stream' },
+      onUploadProgress: (e) => {
+        if (e.total) setProgress(Math.round((e.loaded / e.total) * 100));
+      },
+    });
+
+    // 3) Confirm on backend (we expect backend to update MediaAsset -> ACTIVE and return it)
+    if (!assetId) throw new Error('presign response missing assetId.');
+
+    const confirmResp = await api.post('/uploads/confirm', { assetId });
+    const asset = confirmResp.data;
+    // 4) update form (id) + preview (url)
+    setAssetId(asset.id);
+    setPreview(asset.url ?? null);
+    toast.success('Upload successful');
+    return asset;
+  } catch (err) {
+    console.error('upload error', err);
+    toast.error('Upload failed — please try again.');
+    // clear partial state on failure
+    if (field === 'logo') {
+      setValue('businessProfile.logoAssetId', null);
+      setLogoPreview(null);
+      setLogoProgress(0);
+    } else {
+      setValue('businessProfile.bannerAssetId', null);
+      setBannerPreview(null);
+      setBannerProgress(0);
+    }
+    throw err;
+  } finally {
+    setUploading(false);
+  }
+}
+
 
   // Handle form submission
   const onSubmit: SubmitHandler<TenantFormValues> = async (data) => {
@@ -216,10 +294,6 @@ export function TenantCreationForm({ onSuccess, onCancel }: TenantFormProps) {
       case 0:
         return (
           <>
-            <CardHeader className="text-center">
-              <CardTitle>Tenant Details</CardTitle>
-              <CardDescription>Enter the basic information for your new tenant.</CardDescription>
-            </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Tenant Name */}
@@ -286,84 +360,189 @@ export function TenantCreationForm({ onSuccess, onCancel }: TenantFormProps) {
       case 1:
         return (
           <>
-            <CardHeader className="text-center">
-              <CardTitle>Business Profile</CardTitle>
-              <CardDescription>Add optional details to describe your organization.</CardDescription>
-            </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Description */}
-                <div className="space-y-2 col-span-1 md:col-span-2">
-                  <Label htmlFor="businessProfile.description">Description (Optional)</Label>
-                  <Input id="businessProfile.description" {...register('businessProfile.description')} />
-                </div>
+              <div className="grid grid-cols-1 gap-6">
+                {/* Banner and Logo Area */}
+                <div className="relative col-span-1">
+                  {/* Banner */}
+                  <div className="relative w-full h-48 bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center">
+                    {bannerPreview ? (
+                      <Image src={bannerPreview} alt="Banner preview" width={736} height={480} className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="text-gray-400">No banner yet — upload one</div>
+                    )}
+                    {/* Banner overlay controls */}
+                    <div className="absolute top-3 right-3 flex items-center space-x-2">
+                      <button
+                        type="button"
+                        onClick={() => bannerInputRef.current?.click()}
+                        className="bg-white p-2 rounded-full shadow hover:bg-gray-50 cursor-pointer"
+                      >
+                        <span className="sr-only">Upload banner</span>
+                        {/* use your icon component */}
+                        <Camera className="w-5 h-5" />
+                      </button>
+                      {bannerPreview && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setBannerPreview(null);
+                            setValue('businessProfile.bannerAssetId', null);
+                          }}
+                          className="bg-white p-2 rounded-full shadow hover:bg-gray-50"
+                        >
+                          <span className="sr-only">Remove banner</span>
+                          <Image src="/icons/trash.svg" width={8} height={8} className="w-4 h-4" alt="" />
+                        </button>
+                      )}
+                    </div>
 
-                {/* Logo URL */}
-                <div className="space-y-2">
-                  <Label htmlFor="logoUrl">Logo URL (Optional)</Label>
-                  <Input id="businessProfile.logoUrl" {...register('businessProfile.logoUrl')} />
-                </div>
-
-                {/* Banner Image URL */}
-                <div className="space-y-2">
-                  <Label htmlFor="bannerImageUrl">Banner Image URL (Optional)</Label>
-                  <Input id="businessProfile.bannerImageUrl" {...register('businessProfile.bannerImageUrl')} />
-                </div>
-
-                {/* Street Address */}
-                <div className="space-y-2 col-span-1 md:col-span-2">
-                  <Label htmlFor="businessProfile.physicalAddress">Street Address (Optional)</Label>
-                  <Input id="businessProfile.physicalAddress" {...register('businessProfile.physicalAddress')} />
-                </div>
-
-                {/* City */}
-                <div className="space-y-2">
-                  <Label htmlFor="businessProfile.city">City (Optional)</Label>
-                  <Input id="businessProfile.city" {...register('businessProfile.city')} />
-                </div>
-
-                {/* Region */}
-                <div className="space-y-2">
-                  <Label htmlFor="businessProfile.region">Region (Optional)</Label>
-                  <RegionDropdown
-                    country={country}
-                    value={watch('businessProfile.region') || ''}
-                    onChange={(val) => setValue('businessProfile.region', val)}
-                    className="w-full h-10 px-3 py-2 text-sm border rounded-md border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-
-                {/* Owner Selection (SYSTEM_ADMIN only) */}
-                {currentUserRoles.includes(Roles.SYSTEM_ADMIN) && (
-                  <div className="space-y-2 col-span-1 md:col-span-2">
-                    <Label htmlFor="ownerId">Tenant Owner (Optional)</Label>
-                    <Select
-                      onValueChange={(value) => setValue('ownerId', value === 'null' ? undefined : value)}
-                      value={watch('ownerId') || 'null'}
-                      disabled={ownersLoading}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select an owner (optional)" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="null">No Owner</SelectItem>
-                        {availableOwners.map((owner) => (
-                          <SelectItem key={owner.id} value={owner.id}>
-                            {owner.username} ({owner.firstName} {owner.lastName})
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    {errors.ownerId && <p className="text-red-500 text-xs">{errors.ownerId.message}</p>}
-                    <p className="text-gray-500 text-xs mt-1">
-                      Assign an existing GENERAL_USER or SYSTEM_ADMIN as the primary owner.
-                    </p>
+                    {/* Uploading banner overlay */}
+                    {uploadingBanner && (
+                      <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+                        <div className="text-white">
+                          Uploading... {bannerProgress}%
+                        </div>
+                      </div>
+                    )}
                   </div>
-                )}
+
+                  {/* Logo overlaying the banner */}
+                  <div className="absolute left-2 -bottom-10">
+                    <div className="relative w-28 h-28 rounded-full border-4 border-white shadow-md overflow-hidden bg-gray-100">
+                      {logoPreview ? (
+                        <Image src={logoPreview} alt="Logo preview" width={80} height={80} className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-gray-400">Logo</div>
+                      )}
+
+                      {/* Logo overlay controls */}
+                      <div className="absolute bottom-1 right-1 flex space-x-2 z-50">
+                        <button
+                          type="button"
+                          onClick={() => logoInputRef.current?.click()}
+                          className="bg-white p-2 rounded-full shadow hover:bg-gray-50 cursor-pointer"
+                        >
+                          <span className="sr-only">Upload logo</span>
+                          <Camera className="w-5 h-5" />
+                        </button>
+
+                        {logoPreview && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setLogoPreview(null);
+                              setValue('businessProfile.logoAssetId', null);
+                            }}
+                            className="bg-white p-2 rounded-full shadow hover:bg-gray-50"
+                          >
+                            <span className="sr-only">Remove logo</span>
+                            <Trash className="w-4 h-4" />
+                          </button>
+                        )}
+                      </div>
+
+                      {/* Uploading logo overlay */}
+                      {uploadingLogo && (
+                        <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center rounded-full">
+                          <div className="text-white text-sm">{logoProgress}%</div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Hidden file inputs */}
+                <input
+                  ref={bannerInputRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    try {
+                      await uploadAndConfirm(file, 'banner');
+                    } catch { /* handled in helper */ }
+                    if (bannerInputRef.current) bannerInputRef.current.value = '';
+                  }}
+                />
+                <input
+                  ref={logoInputRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    try {
+                      await uploadAndConfirm(file, 'logo');
+                    } catch { /* handled in helper */ }
+                    if (logoInputRef.current) logoInputRef.current.value = '';
+                  }}
+                />
+
+                {/* Remaining form fields */}
+                <div className="mt-14 md:ml-36 grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2 col-span-1 md:col-span-2">
+                    <Label htmlFor="businessProfile.description">Description (Optional)</Label>
+                    <Input id="businessProfile.description" {...register('businessProfile.description')} />
+                  </div>
+
+                  <div className="space-y-2 col-span-1 md:col-span-2">
+                    <Label htmlFor="businessProfile.physicalAddress">Street Address (Optional)</Label>
+                    <Input id="businessProfile.physicalAddress" {...register('businessProfile.physicalAddress')} />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="businessProfile.city">City (Optional)</Label>
+                    <Input id="businessProfile.city" {...register('businessProfile.city')} />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="businessProfile.region">Region (Optional)</Label>
+                    <RegionDropdown
+                      country={country}
+                      value={watch('businessProfile.region') || ''}
+                      onChange={(val) => setValue('businessProfile.region', val)}
+                      className="w-full h-10 px-3 py-2 text-sm border rounded-md border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+
+                  {/* Owner Selection (SYSTEM_ADMIN only) */}
+                  {currentUserRoles.includes(Roles.SYSTEM_ADMIN) && (
+                    <div className="space-y-2 col-span-1 md:col-span-2">
+                      <Label htmlFor="ownerId">Tenant Owner (Optional)</Label>
+                      <Select
+                        onValueChange={(value) => setValue('ownerId', value === 'null' ? undefined : value)}
+                        value={watch('ownerId') || 'null'}
+                        disabled={ownersLoading}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select an owner (optional)" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="null">No Owner</SelectItem>
+                          {availableOwners.map((owner) => (
+                            <SelectItem key={owner.id} value={owner.id}>
+                              {owner.username} ({owner.firstName} {owner.lastName})
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      {errors.ownerId && <p className="text-red-500 text-xs">{errors.ownerId.message}</p>}
+                      <p className="text-gray-500 text-xs mt-1">
+                        Assign an existing GENERAL_USER or SYSTEM_ADMIN as the primary owner.
+                      </p>
+                    </div>
+                  )}
+                </div>
               </div>
             </CardContent>
           </>
         );
+
+
       case 2:
         const formData = watch(); // Get all form data for review
         return (
