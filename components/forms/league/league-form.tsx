@@ -30,10 +30,11 @@ interface LeagueFormProps {
 }
 
 export function LeagueCreationForm({ onSuccess, onCancel } : LeagueFormProps) {
+  
+  const { user: userAuth } = useAuthStore();
   const [currentStep, setCurrentStep] = useState(0);
   const [loading, setLoading] = useState(false);
-  const { user } = useAuthStore();
-  const isSystemAdmin = user?.roles.includes(Roles.SYSTEM_ADMIN);
+  const isSystemAdmin = userAuth?.roles.includes(Roles.SYSTEM_ADMIN);
 
   // Initialize react-hook-form with the full schema
   const methods = useForm<CreateLeagueDto>({
@@ -43,7 +44,7 @@ export function LeagueCreationForm({ onSuccess, onCancel } : LeagueFormProps) {
     division: 'D1',
     gender: Gender.MALE,
     visibility: LeagueVisibility.PUBLIC,
-    tenantId: isSystemAdmin ? '' : user?.tenantId || '',
+    tenantId: isSystemAdmin ? '' : userAuth?.tenantId || '',
     isActive: true,
     businessProfile: {
       description: '',
@@ -135,7 +136,7 @@ export function LeagueCreationForm({ onSuccess, onCancel } : LeagueFormProps) {
   const onSubmit = async (data: CreateLeagueDto) => {
     setLoading(true);
     try {
-      const payload = isSystemAdmin ? data : { ...data, tenantId: user?.tenantId };
+      const payload = isSystemAdmin ? data : { ...data, tenantId: userAuth?.tenantId };
       const response = await api.post('/leagues', payload);
       toast.success('League created successfully!');
       onSuccess(response.data.id);

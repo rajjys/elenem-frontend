@@ -10,7 +10,6 @@ import {
 } from "@/components/ui";
 import { ChevronLeft, ChevronRight, Loader2, X } from "lucide-react";
 import { toast } from "sonner";
-import axios from "axios";
 import { api } from "@/services/api";
 import { useAuthStore } from "@/store/auth.store";
 import {
@@ -27,6 +26,7 @@ import { Stepper, Step1Details, Step2BusinessProfile, Step3Review } from "./";
 
 // Define a type for the full form data
 export type TenantFormValues = z.infer<typeof CreateTenantSchema>;
+const steps = ["Tenant Details", "Business Profile", "Review & Submit"];
 
 interface TenantFormProps {
   onSuccess: (tenantId: string) => void;
@@ -44,13 +44,9 @@ export function TenantCreationForm({ onSuccess, onCancel }: TenantFormProps) {
   const logoInputRef = useRef<HTMLInputElement | null>(null);
   const bannerInputRef = useRef<HTMLInputElement | null>(null);
 
-  // previews + upload states
+  // previews
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [bannerPreview, setBannerPreview] = useState<string | null>(null);
-  const [uploadingLogo, setUploadingLogo] = useState(false);
-  const [uploadingBanner, setUploadingBanner] = useState(false);
-  const [logoProgress, setLogoProgress] = useState(0);
-  const [bannerProgress, setBannerProgress] = useState(0);
 
   const form = useForm<TenantFormValues>({
     resolver: zodResolver(CreateTenantSchema),
@@ -71,7 +67,7 @@ export function TenantCreationForm({ onSuccess, onCancel }: TenantFormProps) {
     },
   });
 
-  const { handleSubmit, trigger, setValue } = form;
+  const { handleSubmit, trigger } = form;
   const currentUserRoles = userAuth?.roles || [];
   const isSystemAdmin = currentUserRoles.includes(Roles.SYSTEM_ADMIN);
 
@@ -120,59 +116,6 @@ export function TenantCreationForm({ onSuccess, onCancel }: TenantFormProps) {
   };
   const prevStep = () => setCurrentStep((prev) => prev - 1);
 
-  // upload + confirm helper (kept in main so Step2 can call it)
-  async function uploadAndConfirm(file: File, field: "logo" | "banner") {
-    const setUploading = field === "logo" ? setUploadingLogo : setUploadingBanner;
-    const setProgress = field === "logo" ? setLogoProgress : setBannerProgress;
-    const setPreview = field === "logo" ? setLogoPreview : setBannerPreview;
-    const setAssetId = (id: string | null) => {
-      if (field === "logo") setValue("businessProfile.logoAssetId", id);
-      else setValue("businessProfile.bannerAssetId", id);
-      trigger(`businessProfile.${field}AssetId`);
-    };
-
-    setUploading(true);
-    setProgress(0);
-
-    try {
-      const presignResp = await api.post("/uploads/presign", {
-        fileName: file.name,
-        contentType: file.type || "application/octet-stream",
-        size: file.size,
-      });
-      const presign = presignResp.data;
-      const uploadUrl =
-        presign.presignedUrl ??
-        presign.url ??
-        presign.uploadUrl ??
-        presign.signedUrl;
-      const assetId = presign.assetId ?? presign.id;
-      if (!uploadUrl) throw new Error("No upload URL");
-
-      await axios.put(uploadUrl, file, {
-        headers: { "Content-Type": file.type || "application/octet-stream" },
-        onUploadProgress: (e) => {
-          if (e.total) setProgress(Math.round((e.loaded / e.total) * 100));
-        },
-      });
-
-      const confirmResp = await api.post("/uploads/confirm", { assetId });
-      const asset = confirmResp.data;
-      setAssetId(asset.id);
-      setPreview(asset.url ?? null);
-      toast.success("Upload successful");
-      return asset;
-    } catch (err) {
-      toast.error("Upload failed");
-      setAssetId(null);
-      setPreview(null);
-      setProgress(0);
-      throw err;
-    } finally {
-      setUploading(false);
-    }
-  }
-
   // submit handler
   const onSubmit: SubmitHandler<TenantFormValues> = async (data) => {
     setIsSubmitting(true);
@@ -192,8 +135,6 @@ export function TenantCreationForm({ onSuccess, onCancel }: TenantFormProps) {
     }
   };
 
-  const steps = ["Tenant Details", "Business Profile", "Review & Submit"];
-
   return (
     <div className="flex justify-center p-4 bg-gray-50">
       <Card className="w-full max-w-7xl shadow-lg rounded-xl">
@@ -210,18 +151,18 @@ export function TenantCreationForm({ onSuccess, onCancel }: TenantFormProps) {
                 setLogoPreview={setLogoPreview}
                 bannerPreview={bannerPreview}
                 setBannerPreview={setBannerPreview}
-                uploadingLogo={uploadingLogo}
-                uploadingBanner={uploadingBanner}
-                logoProgress={logoProgress}
-                bannerProgress={bannerProgress}
-                uploadAndConfirm={uploadAndConfirm}
                 availableOwners={availableOwners}
                 ownersLoading={ownersLoading}
                 currentUserRoles={currentUserRoles}
               />
             )}
             {currentStep === 2 && (
-              <Step3Review form={form} currentUserRoles={currentUserRoles} />
+              <Step3Review 
+                form={form} 
+                currentUserRoles={currentUserRoles}
+                logoPreview={logoPreview}
+                bannerPreview={bannerPreview}
+                />
             )}
           </div>
           <div className="flex items-center justify-between p-6 border-t">
