@@ -1,98 +1,226 @@
 "use client";
 
-import React, { useEffect } from 'react';
-import { Controller, useFormContext } from 'react-hook-form';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-import { CountryDropdown, RegionDropdown } from 'react-country-region-selector';
-import { api } from '@/services/api';
-import { CreateLeagueDto } from '@/schemas';
+import { RefObject, useState } from "react";
+import { UseFormReturn } from "react-hook-form";
+import Image from "next/image";
+import {
+  Label,
+  Input,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  CollapsibleTrigger,
+  Button,
+  Collapsible,
+  CollapsibleContent,
+} from "@/components/ui";
+import { Camera, ChevronDown, Trash } from "lucide-react";
+import { LeagueFormValues } from ".";
+import { UserResponseDto } from "@/schemas";
+import { useUploadAndConfirm } from "@/hooks/useUploadAndConfirm";
 
-export default function Step2_BusinessProfile() {
-  const { register, control, setValue, watch, formState: { errors } } = useFormContext();
-  const watchedTenantId = watch('tenantId');
-  const watchedCountry = watch('businessProfile.country');
-  //const [tenantCountry, setTenantCountry] = useState(null);
+interface Step2LeagueProfileProps {
+  form: UseFormReturn<LeagueFormValues>;
+  logoInputRef: RefObject<HTMLInputElement | null>;
+  bannerInputRef: RefObject<HTMLInputElement | null>;
+  logoPreview: string | null;
+  setLogoPreview: (url: string | null) => void;
+  bannerPreview: string | null;
+  setBannerPreview: (url: string | null) => void;
+  availableOwners: UserResponseDto[];
+  ownersLoading: boolean;
+  isSystemAdmin: boolean;
+}
 
-  // Fetch the tenant's country to pre-fill the business profile
-  useEffect(() => {
-    if (watchedTenantId) {
-      const fetchTenant = async () => {
-        try {
-          const res = await api.get(`/tenants/${watchedTenantId}`);
-          //setTenantCountry(res.data.country);
-          setValue('businessProfile.country', res.data.country);
-        } catch (error) {
-          console.error("Failed to fetch tenant", error);
-        }
-      };
-      fetchTenant();
+export function Step2LeagueBusinessProfile({
+  form,
+  logoInputRef,
+  bannerInputRef,
+  logoPreview,
+  setLogoPreview,
+  bannerPreview,
+  setBannerPreview,
+  availableOwners,
+  ownersLoading,
+  isSystemAdmin
+}: Step2LeagueProfileProps) {
+  const { register, setValue, watch, formState: { errors }, trigger } = form;
+  //const country = watch("country");
+  const [showMore, setShowMore] = useState(false);
+
+  // Hooks for logo & banner
+  const logoUpload = useUploadAndConfirm();
+  const bannerUpload = useUploadAndConfirm();
+
+  async function handleUpload(file: File, field: "logo" | "banner") {
+    const uploader = field === "logo" ? logoUpload : bannerUpload;
+    const setPreview = field === "logo" ? setLogoPreview : setBannerPreview;
+
+    const asset = await uploader.upload(file);
+    if (asset) {
+      if (field === "logo") {
+        setValue("businessProfile.logoAssetId", asset.id);
+      } else {
+        setValue("businessProfile.bannerAssetId", asset.id);
+      }
+      setPreview(asset.url ?? null);
+      trigger(`businessProfile.${field}AssetId`);
+    } else {
+      // reset on failure
+      if (field === "logo") {
+        setValue("businessProfile.logoAssetId", null);
+        setLogoPreview(null);
+      } else {
+        setValue("businessProfile.bannerAssetId", null);
+        setBannerPreview(null);
+      }
     }
-  }, [watchedTenantId, setValue]);
+  }
 
   return (
-    <div className="space-y-4">
-      <div className="grid w-full items-center gap-1.5">
-        <Label htmlFor="businessName">Business Name</Label>
-        <Input id="businessName" {...register("businessProfile.name")} />
-        {//errors.businessProfile?.name && <p className="text-red-500 text-sm">{errors.businessProfile.name.message}</p>
-        }
-      </div>
-
-      <div className="grid w-full items-center gap-1.5">
-        <Label htmlFor="description">Description (Optional)</Label>
-        <Input id="description" {...register("businessProfile.description")} />
-      </div>
-      
-      <div className="grid w-full items-center gap-1.5 hidden">
-        <Label htmlFor="country">Country</Label>
-        <Controller
-          control={control}
-          name="businessProfile.country"
-          render={({ field }) => (
-            <CountryDropdown
-              value={field.value || ''}
-              onChange={(val) => field.onChange(val)}
-              className="block w-full rounded-md border border-gray-300 py-2 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
-            />
+    <div>
+      {/* Banner */}
+      <div className="relative mb-12">
+        <div className="relative w-full h-48 bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center">
+          {bannerPreview ? (
+            <Image src={bannerPreview} alt="Banner preview" width={736} height={480} className="w-full h-full object-cover" />
+          ) : (
+            <div className="text-gray-400">No banner yet — upload one</div>
           )}
-        />
-      </div>
-
-      <div className="grid w-full items-center gap-1.5">
-        <Label htmlFor="region">Region</Label>
-        <Controller
-          control={control}
-          name="businessProfile.region"
-          render={({ field }) => (
-            <RegionDropdown
-              country={watchedCountry || ''}
-              value={field.value || ''}
-              onChange={(val) => field.onChange(val)}
-              className="block w-full rounded-md border border-gray-300 py-2 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
-            />
+          <div className="absolute top-3 right-3 flex items-center space-x-2">
+            <button type="button" onClick={() => bannerInputRef.current?.click()} className="bg-white p-2 rounded-full shadow hover:bg-gray-50 cursor-pointer">
+              <Camera className="w-5 h-5" />
+            </button>
+            {bannerPreview && (
+              <button
+                type="button"
+                onClick={() => {
+                  setValue("businessProfile.bannerAssetId", null);
+                  setBannerPreview(null);
+                }}
+                className="bg-white p-2 rounded-full shadow hover:bg-gray-50"
+              >
+                <Trash className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+          {bannerUpload.uploading && (
+            <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+              <div className="text-white">Uploading... {bannerUpload.progress}%</div>
+            </div>
           )}
-        />
+        </div>
+
+        {/* Logo */}
+        <div className="absolute left-2 -bottom-10">
+          <div className="relative w-28 h-28 rounded-full border-4 border-white shadow-md overflow-hidden bg-gray-100">
+            {logoPreview ? (
+              <Image src={logoPreview} alt="Logo preview" width={80} height={80} className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-gray-400">Logo</div>
+            )}
+            <div className="absolute bottom-1 right-1 flex space-x-2 z-50">
+              <button type="button" onClick={() => logoInputRef.current?.click()} className="bg-white p-2 rounded-full shadow hover:bg-gray-50 cursor-pointer">
+                <Camera className="w-5 h-5" />
+              </button>
+              {logoPreview && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setValue("businessProfile.logoAssetId", null);
+                    setLogoPreview(null);
+                  }}
+                  className="bg-white p-2 rounded-full shadow hover:bg-gray-50"
+                >
+                  <Trash className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+            {logoUpload.uploading && (
+              <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center rounded-full">
+                <div className="text-white text-sm">{logoUpload.progress}%</div>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
 
-      {/* Add more fields here as needed */}
+      {/* Hidden inputs */}
+      <input
+        ref={bannerInputRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={async (e) => {
+          const file = e.target.files?.[0];
+          if (file) await handleUpload(file, "banner");
+          if (bannerInputRef.current) bannerInputRef.current.value = "";
+        }}
+      />
+      <input
+        ref={logoInputRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={async (e) => {
+          const file = e.target.files?.[0];
+          if (file) await handleUpload(file, "logo");
+          if (logoInputRef.current) logoInputRef.current.value = "";
+        }}
+      />
 
-      {/* Display form-wide errors */}
-       {Object.keys(errors).length > 0 && (
-         <div className="mt-6 p-4 rounded-md bg-red-50 border border-red-200 text-red-700">
-           <p className="font-semibold">Please correct the following errors:</p>
-           <ul className="list-disc list-inside mt-2">
-             {Object.keys(errors).map(key => {
-               const error = errors[key as keyof CreateLeagueDto];
-               return (
-                 <li key={key}>
-                   {key}: {error?.message as string || 'Invalid value'}
-                 </li>
-               );
-             })}
-           </ul>
-         </div>
-      )}
+      {/* Other fields */}
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2 relative col-span-2 md:col-span-1">
+          <Label>City (Optional)</Label>
+          <Input {...register("businessProfile.city")} />
+        </div>
+
+        {isSystemAdmin && (
+          <div className="space-y-2 col-span-2">
+            <Label>League Owner (Optional)</Label>
+            <Select
+              onValueChange={(value) => setValue("ownerId", value === "null" ? undefined : value)}
+              value={watch("ownerId") || "null"}
+              disabled={ownersLoading}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select a league owner (optional)" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="null">No Owner</SelectItem>
+                {availableOwners.map((owner) => (
+                  <SelectItem key={owner.id} value={owner.id}>
+                    {owner.username} ({owner.firstName} {owner.lastName})
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {errors.ownerId && <p className="text-red-500 text-xs">{errors.ownerId.message}</p>}
+          </div>
+        )}
+      </div>
+
+      <Collapsible open={showMore} onOpenChange={setShowMore}>
+        <CollapsibleTrigger asChild>
+          <Button type="button" variant="ghost" className="w-full flex items-center justify-between">
+            Plus de détails
+            <ChevronDown className={`ml-2 h-4 w-4 transition-transform ${showMore ? "rotate-180" : ""}`} />
+          </Button>
+        </CollapsibleTrigger>
+        <CollapsibleContent>
+          <div className="space-y-2 md:col-span-2">
+            <Label>Description (Optional)</Label>
+            <Input {...register("businessProfile.description")} />
+          </div>
+          <div className="space-y-2 md:col-span-2">
+            <Label>Street Address (Optional)</Label>
+            <Input {...register("businessProfile.physicalAddress")} />
+          </div>
+        </CollapsibleContent>
+      </Collapsible>
     </div>
   );
 }

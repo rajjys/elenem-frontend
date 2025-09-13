@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useMemo } from 'react';
-import { useFormContext, useFieldArray, useWatch } from 'react-hook-form';
+import { useFieldArray, useWatch, UseFormReturn } from 'react-hook-form';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -12,16 +12,20 @@ import { CreateLeagueDto, PointSystemConfig, TieBreakerConfig } from '@/schemas/
 import { toast } from 'sonner';
 import { SportType, TenantDetails } from '@/schemas';
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
+import { LeagueFormValues } from '.';
 
 // Define the API response type for sport rules to ensure type safety
 interface SportRulesApiResponse {
   sportType: SportType;
   pointSystem: PointSystemConfig;
-  tieBreakers: TieBreakerConfig
+  tieBreakers: TieBreakerConfig;
+}
+interface Step3Props {
+   form: UseFormReturn<LeagueFormValues>;
 }
 
-export default function Step3_Rules() {
-  const { control, register, setValue, getValues, formState: { errors } } = useFormContext<CreateLeagueDto>();
+export default function Step3Rules({ form } : Step3Props ) {
+  const { control, register, setValue, getValues, formState: { errors } } = form;
   const watchedTenantId = useWatch({ control, name: 'tenantId' });
   const [sportRulesTemplate, setSportRulesTemplate] = useState<SportRulesApiResponse | null>(null);
   const [nextPointRule, setNextPointRule] = useState<string>('');

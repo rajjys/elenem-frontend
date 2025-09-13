@@ -1,6 +1,7 @@
 // src/prisma/tenant-schemas.ts
 import * as z from 'zod';
 import { SportType, Roles, SportTypeSchema, TenantTypes, TenantTypeSchema, GameStatus, PublicBusinessProfileResponseDto } from './index'; // Assuming SportType and Role are defined in src/prisma/index.ts
+import { CreateBusinessProfileSchema } from './common-schemas';
 
 export interface TenantBasic {
   id: string;
@@ -135,22 +136,10 @@ export const CreateTenantSchema = z.object({
   sportType: SportTypeSchema,
   country: z.string().min(1, 'Country is required.'),
   // The nested businessProfile object
-  businessProfile: z.object({
-    //id: z.string().cuid(),
-    //name: z.string(),
-    description: z.string().optional().nullable(),
-    country: z.string().optional().nullable(),
-    region: z.string().optional().nullable(),
-    city: z.string().optional().nullable(),
-    logoUrl: z.string().optional().nullable(),
-    bannerImageUrl: z.string().optional().nullable(),
-    logoAssetId: z.string().optional().nullable(),
-    bannerAssetId: z.string().nullable().optional(),
-    physicalAddress: z.string().optional().nullable(),
-  }),
+  businessProfile: CreateBusinessProfileSchema,
   // Optional ownerId for SYSTEM_ADMIN
   //isActive: z.boolean().optional().default(true),
-  ownerId: z.string().cuid().optional(),
+  ownerId: z.string().cuid().optional().nullable(),
 });
 
 export type CreateTenantDto = z.infer<typeof CreateTenantSchema>;

@@ -5,9 +5,9 @@ import React from 'react'
 import { useRouter } from 'next/navigation'
 import { AccessGate } from '@/app/(auth)/AccessGate'
 import { Roles, TeamDetails } from '@/schemas'
-import { TeamCreationForm } from '@/components/forms'
 import { useAuthStore } from '@/store/auth.store'
 import { toast } from 'sonner'
+import TeamForm from '@/components/forms/team/team-form'
 
 export default function CreateTeamPage() {
   const router = useRouter()
@@ -52,11 +52,11 @@ export default function CreateTeamPage() {
   }
 
   return (
-    <div className="container mx-auto p-6 max-w-2xl">
-      <h1 className="text-3xl font-bold text-gray-900 mb-6 text-center">Create New Team</h1>
+    <div className="container mx-auto max-w-2xl">
+      <h1 className="text-3xl font-bold text-gray-900 text-center">Creer une Equipe</h1>
 
       <AccessGate allowedRoles={[Roles.SYSTEM_ADMIN, Roles.TENANT_ADMIN, Roles.LEAGUE_ADMIN]}>
-        <TeamCreationForm onSuccess={handleSuccess} onCancel={handleCancel} />
+        <TeamForm onSuccess={handleSuccess} onCancel={handleCancel} />
       </AccessGate>
     </div>
   )

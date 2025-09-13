@@ -1,167 +1,248 @@
+// LeagueCreationForm.tsx
 "use client";
 
-import React, { useState } from 'react';
-import { useForm, FormProvider } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Button } from '@/components/ui/button';
-import { toast } from 'sonner';
-import { Loader2, ChevronRight, ChevronLeft, ListTodo, User, ClipboardList, Eye, X } from 'lucide-react';
-import { api } from '@/services/api';
-import { CreateLeagueSchema, CreateLeagueDto } from '@/schemas/league-schemas';
-import { useAuthStore } from '@/store/auth.store';
-import Step1_BasicInfo from './step1-basic-info';
-import Step2_BusinessProfile from './step2-business-profile';
-import Step3_Rules from './step3-rules';
-import Step4_Review from './step4-review';
-import { Gender, LeagueVisibility, Roles } from '@/schemas';
-import axios from 'axios';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from "react";
+import { SubmitHandler, useForm, UseFormReturn } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  Button,
+  Card,
+} from "@/components/ui";
+import {
+  CheckCircle,
+  ChevronLeft,
+  ChevronRight,
+  ImageIcon,
+  ListTodo,
+  Loader2,
+  Notebook,
+  X,
+} from "lucide-react";
+import { toast } from "sonner";
+import { api } from "@/services/api";
+import { useAuthStore } from "@/store/auth.store";
 
-// Define the steps and their corresponding components
-const steps = [
-  { name: "Basic Info", icon: ListTodo, component: Step1_BasicInfo },
-  { name: "Business Profile", icon: User, component: Step2_BusinessProfile },
-  { name: "Point System & Rules", icon: ClipboardList, component: Step3_Rules },
-  { name: "Review & Submit", icon: Eye, component: Step4_Review },
-];
+import { CreateLeagueSchema } from "@/schemas/league-schemas";
+import { UserResponseDto, PaginatedResponseDto, Roles, Gender, LeagueVisibility, TenantDetailsSchema } from "@/schemas";
+
+import { Stepper } from "../shared/stepper";
+import Step1BasicInfo from "./step1-basic-info";
+import Step3Rules from "./step3-rules";
+import Step4Review from "./step4-review";
+import { BusinessProfileForm, TFormValues } from "../shared";
+import z from "zod";
+import axios from "axios";
 
 interface LeagueFormProps {
-  onSuccess: (tenantId: string) => void;
+  onSuccess: (leagueId: string) => void;
   onCancel: () => void;
 }
 
-export function LeagueCreationForm({ onSuccess, onCancel } : LeagueFormProps) {
-  
+/**
+ * Re-usable TS type for the form object used by step components.
+ * Use CreateLeagueDto from your schemas to avoid mismatch.
+ */
+export type LeagueFormValues = z.infer<typeof CreateLeagueSchema>;
+
+export function LeagueForm({ onSuccess, onCancel }: LeagueFormProps) {
   const { user: userAuth } = useAuthStore();
+  const currentUserRoles = userAuth?.roles || [];
+  const isSystemAdmin = currentUserRoles.includes(Roles.SYSTEM_ADMIN);
+
+  // stepper state
   const [currentStep, setCurrentStep] = useState(0);
+  const steps = useMemo(() => ([
+      { name: "Details de Base", icon: ListTodo },
+      { name: "Personalisation", icon: ImageIcon },
+      { name: "Points et Regles", icon: Notebook },
+      { name: "Revue et Soumission", icon: CheckCircle },
+    ]), []);
+  // submission/loading
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [loading, setLoading] = useState(false);
-  const isSystemAdmin = userAuth?.roles.includes(Roles.SYSTEM_ADMIN);
 
-  // Initialize react-hook-form with the full schema
-  const methods = useForm<CreateLeagueDto>({
-  resolver: zodResolver(CreateLeagueSchema),
-  defaultValues: {
-    name: '',
-    division: 'D1',
-    gender: Gender.MALE,
-    visibility: LeagueVisibility.PUBLIC,
-    tenantId: isSystemAdmin ? '' : userAuth?.tenantId || '',
-    isActive: true,
-    businessProfile: {
-      description: '',
-      logoUrl: '',
-      bannerImageUrl: '',
-      physicalAddress: '',
-      city: '',
-      region: '',
-    },
-    pointSystemConfig: {
-      rules: [],
-    },
-    tieBreakerConfig: [],
-  },
-});;
+  // owners (always available to everyone per your instruction)
+  const [availableOwners, setAvailableOwners] = useState<UserResponseDto[]>([]);
+  const [ownersLoading, setOwnersLoading] = useState(false);
+  const [country, setCountry] = useState<string>();
 
-  const { handleSubmit, trigger, formState: { isSubmitting } } = methods;
+  // file upload refs & previews (passed down to Step2)
+  const logoInputRef = useRef<HTMLInputElement | null>(null);
+  const bannerInputRef = useRef<HTMLInputElement | null>(null);
+  const [logoPreview, setLogoPreview] = useState<string | null>(null);
+  const [bannerPreview, setBannerPreview] = useState<string | null>(null);
 
-  // Function to render the step-by-step guidance
-  const renderStepper = () => (
-    <div className="flex justify-between items-center mb-6">
-      {steps.map((step, index) => (
-        <React.Fragment key={index}>
-          <div className="space-x-2">
-            <div className="flex items-center justify-center">
-              <div
-                className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300
-                  ${index === currentStep ? "bg-blue-600 text-white shadow-lg" : "bg-gray-200 text-gray-500"}
-                  ${index < currentStep ? "bg-green-500 text-white" : ""}
-                `}
-              >
-                <step.icon size={20} />
-              </div>
-            </div>
-            <span
-              className={`text-sm hidden sm:inline-block transition-all duration-300 ${
-                index === currentStep
-                  ? "text-blue-600 font-semibold"
-                  : "text-gray-500"
-              }`}
-            >
-              {step.name}
-            </span>
-          </div>
-          {index < steps.length - 1 && (
-            <div className="flex-1 h-1 bg-gray-200 mx-2 rounded-full">
-              <div
-                className={`h-full transition-all duration-300 rounded-full ${
-                  index < currentStep ? "bg-blue-600" : ""
-                }`}
-                style={{ width: index < currentStep ? "100%" : "0" }}
-              />
-            </div>
-          )}
-        </React.Fragment>
-      ))}
-    </div>
-  );
+  // react-hook-form
+  const form = useForm<LeagueFormValues>({
+    resolver: zodResolver(CreateLeagueSchema),
+    defaultValues: {
+      name: "",
+      division: "D1",
+      gender: Gender.MALE,
+      visibility: LeagueVisibility.PUBLIC,
+      tenantId: isSystemAdmin ? "" : userAuth?.tenantId || "",
+      isActive: true,
+      businessProfile: {
+        description: "",
+        logoAssetId: null,
+        bannerAssetId: null,
+        physicalAddress: "",
+        city: "",
+        region: "",
+        country: "",
+        name: "",
+      },
+      pointSystemConfig: {
+        rules: [],
+      },
+      tieBreakerConfig: [],
+      ownerId: undefined,
+    } as LeagueFormValues,
+  });
 
+  const { handleSubmit, trigger, watch } = form;
 
-  const handleNext = async () => {
-    // Determine which fields to validate based on the current step
+  // watch tenantId so we can fetch owners for the selected tenant
+  const watchedTenantId = watch("tenantId");
+
+  // Fetch owners (open to everyone — optionally filtered by tenantId when provided)
+  useEffect(() => {
+    const fetchOwners = async () => {
+      setOwnersLoading(true);
+      try {
+        const params = new URLSearchParams();
+        // request only standard users (same approach you used elsewhere)
+        params.append("roles", Roles.GENERAL_USER);
+        if (watchedTenantId) params.append("tenantId", watchedTenantId);
+        else if (!isSystemAdmin && userAuth?.tenantId) params.append("tenantId", userAuth.tenantId);
+
+        const resp = await api.get<PaginatedResponseDto<UserResponseDto>>("/users", { params });
+        setAvailableOwners(resp.data.data || []);
+      } catch (err) {
+        console.error("Failed to fetch owners", err);
+        toast.error("Failed to load owners");
+      } finally {
+        setOwnersLoading(false);
+      }
+    };
+
+    fetchOwners();
+    // re-fetch when tenant selection changes or auth changes
+  }, [watchedTenantId, userAuth?.tenantId, isSystemAdmin]);
+
+  //Fetch Country
+  const fetchTenantDetails = useCallback(async () => {
+          setLoading(true);
+          try {
+            const response = await api.get(`/tenants/${watchedTenantId}`);
+            const validatedTenant = TenantDetailsSchema.parse(response.data);
+            setCountry(validatedTenant.country);
+          } catch (error) {
+              let errorMessage = "Failed to fetch tenant details.";
+              if (axios.isAxiosError(error)) {
+                  errorMessage = error.response?.data?.message || errorMessage;
+              }
+              toast.error(errorMessage);
+          } finally {
+            setLoading(false);
+          }
+        }, [watchedTenantId]);
+
+        useEffect(() => {
+                // Fetch tenant-specific data if needed, e.g., tenant name, logo, etc.
+                if (watchedTenantId) {
+                    fetchTenantDetails();
+                }
+            }, [watchedTenantId, fetchTenantDetails]);
+
+            
+  // step navigation (same approach as Tenant form)
+  const nextStep = async () => {
     let isValid = false;
-    switch (currentStep) {
-      case 0:
-        isValid = await trigger(['name', 'tenantId', 'parentLeagueId', 'division', 'gender', 'visibility', 'ownerId']);
-        break;
-      case 1:
-        isValid = await trigger(['businessProfile.description', 'businessProfile.region', 'businessProfile.city']);
-        break;
-      case 2:
-        isValid = await trigger(['pointSystemConfig', 'tieBreakerConfig']);
-        break;
-      default:
-        isValid = true;
-    }
-
-    if (isValid) {
-      setCurrentStep(prev => prev + 1);
+    if (currentStep === 0) {
+      // Basic info only (owner moved to step 2)
+      isValid = await trigger([
+        "name",
+        "tenantId",
+        "parentLeagueId",
+        "division",
+        "gender",
+        "visibility",
+      ]);
+    } else if (currentStep === 1) {
+      // BusinessProfile + owner
+      isValid = await trigger([
+        "businessProfile.city",
+        "businessProfile.region",
+        "ownerId",
+      ]);
+    } else if (currentStep === 2) {
+      isValid = await trigger(["pointSystemConfig", "tieBreakerConfig"]);
     } else {
-      toast.error('Please fill out all required fields.');
+      isValid = true;
     }
+
+    if (isValid) setCurrentStep((prev) => prev + 1);
+    else toast.error("Please fill out all required fields for this step.");
   };
 
-  const handleBack = () => {
-    setCurrentStep(prev => prev - 1);
-  };
+  const prevStep = () => setCurrentStep((prev) => Math.max(0, prev - 1));
 
-  const onSubmit = async (data: CreateLeagueDto) => {
+  // final submit
+  const onSubmit: SubmitHandler<LeagueFormValues> = async (data) => {
+    setIsSubmitting(true);
     setLoading(true);
     try {
+      // Non-admins must be restricted to their tenant
       const payload = isSystemAdmin ? data : { ...data, tenantId: userAuth?.tenantId };
-      const response = await api.post('/leagues', payload);
-      toast.success('League created successfully!');
+      const response = await api.post("/leagues", payload);
+      toast.success("League created successfully!");
       onSuccess(response.data.id);
     } catch (error) {
-      let errorMessage = "League creation failed. Please try again.";
-      if (axios.isAxiosError(error)) {
-        errorMessage = error.response?.data?.message || errorMessage;
-      }
-      toast.error(errorMessage);
+      console.error("League creation failed", error);
+      const msg = "League creation failed";
+      toast.error(msg);
     } finally {
+      setIsSubmitting(false);
       setLoading(false);
     }
   };
 
-  const CurrentStepComponent = steps[currentStep].component;
-
   return (
-    <FormProvider {...methods}>
-      <div className="p-4 bg-white rounded-lg shadow-md max-w-2xl mx-auto">
-        {renderStepper()}
+    <div className="flex justify-center p-4 bg-gray-50">
+      <Card className="w-full max-w-7xl shadow-lg rounded-xl">
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <div className="p-6">
+            <Stepper steps={steps} currentStep={currentStep} />
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          <CurrentStepComponent />
+            {currentStep === 0 && <Step1BasicInfo form={form} />}
 
-          <div className="flex justify-between space-x-4 pt-4 m-2">
+            {currentStep === 1 && (
+              <BusinessProfileForm
+                form={form as unknown as UseFormReturn<TFormValues>}
+                logoInputRef={logoInputRef}
+                bannerInputRef={bannerInputRef}
+                logoPreview={logoPreview}
+                setLogoPreview={setLogoPreview}
+                bannerPreview={bannerPreview}
+                setBannerPreview={setBannerPreview}
+                availableOwners={availableOwners}
+                ownersLoading={ownersLoading}
+                country={country}
+                />
+            )}
+            {currentStep === 2 && <Step3Rules form={form} />}
+
+            {currentStep === 3 && (
+              <Step4Review
+                form={form}
+                logoPreview={logoPreview}
+                bannerPreview={bannerPreview}
+              />
+            )}
+          </div>
+
+          <div className="flex items-center justify-between p-6 border-t">
             <Button
               type="button"
               variant="danger"
@@ -172,34 +253,33 @@ export function LeagueCreationForm({ onSuccess, onCancel } : LeagueFormProps) {
               <X size={16} />
               <span>Cancel</span>
             </Button>
-            <div className="flex space-x-4">
+
+            <div className="flex items-center space-x-4">
               {currentStep > 0 && (
-                <Button 
-                  type="button" 
-                  variant="ghost" 
-                  onClick={handleBack} 
-                  disabled={isSubmitting || loading} className="flex items-center space-x-2">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={prevStep}
+                  disabled={isSubmitting || loading}
+                >
                   <ChevronLeft size={16} />
                   <span>Back</span>
                 </Button>
               )}
 
               {currentStep < steps.length - 1 && (
-                <Button 
-                  type="button" 
-                  onClick={handleNext} 
-                  disabled={isSubmitting || loading} 
-                  className="flex items-center space-x-2">
+                <Button
+                  type="button"
+                  onClick={nextStep}
+                  disabled={isSubmitting || loading}
+                >
                   <span>Next</span>
                   <ChevronRight size={16} />
                 </Button>
               )}
 
               {currentStep === steps.length - 1 && (
-                <Button 
-                  type="submit" 
-                  disabled={isSubmitting || loading} 
-                  className="flex items-center space-x-2">
+                <Button type="submit" disabled={isSubmitting || loading}>
                   {isSubmitting || loading ? (
                     <>
                       <Loader2 className="animate-spin" size={16} />
@@ -213,7 +293,7 @@ export function LeagueCreationForm({ onSuccess, onCancel } : LeagueFormProps) {
             </div>
           </div>
         </form>
-      </div>
-    </FormProvider>
+      </Card>
+    </div>
   );
 }

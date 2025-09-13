@@ -1,20 +1,21 @@
 "use client";
 
 import React from "react";
-import { ListTodo, User, CheckCircle } from "lucide-react";
+import { LucideIcon } from "lucide-react";
 
 interface StepperProps {
-  steps: string[];
+  steps: {
+    name: string;
+    icon: LucideIcon;
+  }[];
   currentStep: number;
 }
-
-const icons = [ListTodo, User, CheckCircle];
 
 export function Stepper({ steps, currentStep }: StepperProps) {
   return (
     <div className="flex justify-between items-center mb-6">
       {steps.map((step, index) => {
-        const Icon = icons[index];
+        const Icon = step.icon;
         return (
           <React.Fragment key={index}>
             <div className="space-x-2">
@@ -32,7 +33,7 @@ export function Stepper({ steps, currentStep }: StepperProps) {
                   index === currentStep ? "text-blue-600 font-semibold" : "text-gray-500"
                 }`}
               >
-                {step}
+                {step.name}
               </span>
             </div>
             {index < steps.length - 1 && (

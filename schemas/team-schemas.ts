@@ -1,24 +1,12 @@
 // schemas/team.schemas.ts (new file, or add to your existing prisma/index.ts for shared schemas)
 import * as z from 'zod';
 import { GenderSchema, SportTypeSchema, TeamVisibility, TeamVisibilitySchema } from './enums';
-
-// 1) Business profile that now carries the media + description
-export const TeamBusinessProfileInput = z.object({
-  description: z.string().optional().or(z.literal("")),
-  logoUrl: z.string().url("Invalid logo URL.").optional().or(z.literal("")),
-  bannerImageUrl: z.string().url("Invalid banner image URL.").optional().or(z.literal("")),
-});
+import { CreateBusinessProfileSchema } from './common-schemas';
 
 // 2) Base team: drop description/logo/banner from here
 export const BaseTeamSchema = z.object({
   name: z.string().min(2, "Team name must be at least 2 characters long."),
   shortCode: z.string().min(2, "Short code must be at least 2 characters long.").optional().or(z.literal("")),
-  country: z.string().optional().or(z.literal("")),
-  city: z.string().optional().or(z.literal("")),
-  state: z.string().optional().or(z.literal("")),
-  establishedYear: z.number().int().min(1900, "Year must be 1900 or later.")
-    .max(new Date().getFullYear(), "Year cannot be in the future.").optional(),
-  teamProfile: z.record(z.any()).optional(),
 });
 
 // 3) Create schema: businessProfile moved in; owner/homeVenue live here (step 2)
@@ -27,9 +15,9 @@ export const CreateTeamFormSchema = BaseTeamSchema.extend({
   leagueId: z.string().min(1, "League is required."),
   // Only for SYS ADMIN UI filtering; not required by backend create (derived from league)
   tenantId: z.string().optional().or(z.literal("")),
-  businessProfile: TeamBusinessProfileInput,
-  ownerId: z.string().optional().or(z.literal("")),
-  homeVenueId: z.string().optional().or(z.literal("")),
+  businessProfile: CreateBusinessProfileSchema,
+  ownerId: z.string().optional().nullable().or(z.literal("")),
+  homeVenueId: z.string().nullable().optional().or(z.literal("")),
   visibility: TeamVisibilitySchema,
   isActive: z.boolean().optional(),
 });
@@ -62,7 +50,7 @@ export const TeamDetailsSchema = BaseTeamSchema.extend({
   isActive: z.boolean().optional(),
   leagueId: z.string().cuid(),
   tenantId: z.string().cuid(),
-  businessProfile: TeamBusinessProfileInput, // <— now here
+  businessProfile: CreateBusinessProfileSchema,
   league: z.object({
     id: z.string().cuid(),
     name: z.string(),

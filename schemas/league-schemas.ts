@@ -174,21 +174,12 @@ export const CreateLeagueSchema = z.object({
   ownerId: z.string().cuid().optional().nullable(),
   isActive: z.boolean(),
   // The business profile is now a required sub-object
-  businessProfile: z.object({
-    //id: z.string().cuid(),
-    //name: z.string().optional().null,
-    //country: z.string().optional().nullable(),
-    logoUrl: z.string().optional().nullable(),
-    bannerImageUrl: z.string().optional().nullable(),
-    physicalAddress: z.string().optional().nullable(),
-    description: z.string().optional().nullable(),
-    region: z.string().optional().nullable(),
-    city: z.string().optional().nullable(),
-  }),
+  businessProfile: CreateBusinessProfileSchema,
   // Point system and tiebreakers are optional here as they are configured in a separate step
   pointSystemConfig: PointSystemConfigSchema.optional(),
   tieBreakerConfig: TieBreakerConfigSchema.optional(),
 });
+
 export type CreateLeagueDto = z.infer<typeof CreateLeagueSchema>;
 
 // Update League Schema

@@ -25,8 +25,7 @@ export const AccessGate: React.FC<AccessGateProps> = ({ allowedRoles, children }
   const hasAccess = allowedRoles.some(role => currentUserRoles.includes(role))
 
   if (!hasAccess) {
-    console.log("Access Denied Here");
-    router.replace('/unauthorized') // Or use modal / inline fallback
+    router.replace('/access-denied') // Or use modal / inline fallback
     return null
   }
   return <>{children}</>

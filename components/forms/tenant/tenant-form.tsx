@@ -1,14 +1,14 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
-import { SubmitHandler, useForm } from "react-hook-form";
+import React, { useState, useRef, useEffect, useMemo } from "react";
+import { SubmitHandler, useForm, UseFormReturn } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import {
   Button,
   Card,
 } from "@/components/ui";
-import { ChevronLeft, ChevronRight, Loader2, X } from "lucide-react";
+import { CheckCircle, ChevronLeft, ChevronRight, ImageIcon, ListTodo, Loader2, X } from "lucide-react";
 import { toast } from "sonner";
 import { api } from "@/services/api";
 import { useAuthStore } from "@/store/auth.store";
@@ -22,11 +22,11 @@ import {
 } from "@/schemas";
 
 // Step components
-import { Stepper, Step1Details, Step2BusinessProfile, Step3Review } from "./";
+import { Step1TenantDetails, Step3Review } from "./";
+import { BusinessProfileForm, Stepper, TFormValues } from "../shared";
 
 // Define a type for the full form data
 export type TenantFormValues = z.infer<typeof CreateTenantSchema>;
-const steps = ["Tenant Details", "Business Profile", "Review & Submit"];
 
 interface TenantFormProps {
   onSuccess: (tenantId: string) => void;
@@ -43,10 +43,19 @@ export function TenantCreationForm({ onSuccess, onCancel }: TenantFormProps) {
   // refs for file upload
   const logoInputRef = useRef<HTMLInputElement | null>(null);
   const bannerInputRef = useRef<HTMLInputElement | null>(null);
-
   // previews
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [bannerPreview, setBannerPreview] = useState<string | null>(null);
+
+  const steps = useMemo(() => ([
+      { name: "Details de Base", icon: ListTodo },
+      { name: "Personalisation", icon: ImageIcon },
+      { name: "Revue et Soumission", icon: CheckCircle },
+    ]), []);
+
+  const currentUserRoles = userAuth?.roles || [];
+  const isSystemAdmin = currentUserRoles.includes(Roles.SYSTEM_ADMIN);
+  const canSelectOwner = !(currentUserRoles.includes(Roles.GENERAL_USER) && !isSystemAdmin );
 
   const form = useForm<TenantFormValues>({
     resolver: zodResolver(CreateTenantSchema),
@@ -66,10 +75,7 @@ export function TenantCreationForm({ onSuccess, onCancel }: TenantFormProps) {
       },
     },
   });
-
-  const { handleSubmit, trigger } = form;
-  const currentUserRoles = userAuth?.roles || [];
-  const isSystemAdmin = currentUserRoles.includes(Roles.SYSTEM_ADMIN);
+  const { handleSubmit, trigger, watch } = form;
 
   // fetch owners if admin
   useEffect(() => {
@@ -128,10 +134,10 @@ export function TenantCreationForm({ onSuccess, onCancel }: TenantFormProps) {
       toast.success(`Tenant ${data.tenantCode} created successfully!`);
       onSuccess(response.data.id);
     } catch (error) {
-      toast.error("Tenant creation failed");
-      console.error(error);
+        toast.error("Tenant creation failed");
+        console.error(error);
     } finally {
-      setIsSubmitting(false);
+        setIsSubmitting(false);
     }
   };
 
@@ -141,10 +147,10 @@ export function TenantCreationForm({ onSuccess, onCancel }: TenantFormProps) {
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="p-6">
             <Stepper steps={steps} currentStep={currentStep} />
-            {currentStep === 0 && <Step1Details form={form} />}
+            {currentStep === 0 && <Step1TenantDetails form={form} />}
             {currentStep === 1 && (
-              <Step2BusinessProfile
-                form={form}
+              <BusinessProfileForm
+                form={form as unknown as UseFormReturn<TFormValues>}
                 logoInputRef={logoInputRef}
                 bannerInputRef={bannerInputRef}
                 logoPreview={logoPreview}
@@ -153,7 +159,8 @@ export function TenantCreationForm({ onSuccess, onCancel }: TenantFormProps) {
                 setBannerPreview={setBannerPreview}
                 availableOwners={availableOwners}
                 ownersLoading={ownersLoading}
-                currentUserRoles={currentUserRoles}
+                canSelectOwner={canSelectOwner}
+                country={watch("country")}
               />
             )}
             {currentStep === 2 && (
