@@ -11,3 +11,4 @@ export * from './blog-post-schema';
 export * from './register-schema';
 export * from './interfaces';
 export * from './standings-schemas';
+export * from './posts-schemas'

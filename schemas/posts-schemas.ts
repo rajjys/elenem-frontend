@@ -1,0 +1,18 @@
+// src/schemas/post.ts
+import { z } from "zod";
+import { PostStatusSchema, PostTypeSchema, TargetTypeSchema } from "./enums";
+
+export const CreatePostSchema = z.object({
+  title: z.string().min(3, "Title must be at least 3 characters"),
+  slug: z.string().optional(),
+  excerpt: z.string().max(300).optional(),
+  type: PostTypeSchema,
+  status: PostStatusSchema,
+  scheduledAt: z.string().optional(),
+  content: z.string().min(10, "Content is required"),
+  heroImageId: z.string().optional(),
+  targetType: TargetTypeSchema, // you might later move this to an enum too
+  targetId: z.string().optional(),
+});
+
+export type CreatePostFormValues = z.infer<typeof CreatePostSchema>;

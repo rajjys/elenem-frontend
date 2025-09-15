@@ -29,7 +29,7 @@ export default function CreateTeamPage() {
     }
     else if(isLeagueAdmin){
       //router.push(`/team/dashboard?ctxTeamId=${team.id}`)
-      router.push('/leagues/teams')
+      router.push('/league/teams')
     }
     else {
       router.push(`/teams`)///Fallback. Won't be necessary

@@ -175,6 +175,7 @@ export async function middleware(request: NextRequest) {
     '/coach',
     '/referee',
     '/game',
+    '/post'
     // Add other paths specific to logged-in general users, players, referees etc.
   ];
   if (generalUserAuthenticatedPaths.some(path => pathname === path || pathname.startsWith(path + '/'))) {

@@ -51,7 +51,7 @@ export default function TenantLeaguesPage() {
         params.append('tenantId', currentTenantId); // Use currentTenantId directly
         params.append('page', "1");
         params.append('sortBy', 'name');
-        params.append('SortOrder', 'asc');
+        params.append('sortOrder', 'asc');
         }
 
       const response = await api.get(`/leagues?${params.toString()}`);

@@ -75,6 +75,25 @@ export enum SeasonStatus {
   ARCHIVED = 'ARCHIVED',
 }
 
+// src/enums/posts.ts
+export enum PostType {
+  BLOG = "BLOG",
+  STATUS = "STATUS",
+  ANNOUNCEMENT = "ANNOUNCEMENT",
+  MATCH_REPORT = "MATCH_REPORT",
+}
+
+export enum PostStatus {
+  DRAFT = "DRAFT",
+  PUBLISHED = "PUBLISHED",
+  SCHEDULED = "SCHEDULED",
+}
+export enum TargetType {
+  TEAM = "TEAM",
+  LEAGUE = "LEAGUE",
+  TENANT = "TENANT"
+}
+
 export const RoleSchema = z.nativeEnum(Roles);
 export const SportTypeSchema = z.nativeEnum(SportType);
 export const LeagueVisibilitySchema = z.nativeEnum(LeagueVisibility);
@@ -82,3 +101,6 @@ export const TeamVisibilitySchema = z.nativeEnum(TeamVisibility); ///
 export const TenantTypeSchema = z.nativeEnum(TenantTypes);
 export const GenderSchema = z.nativeEnum(Gender);
 export const SupportedLanguageSchema = z.nativeEnum(SupportedLanguages);
+export const PostTypeSchema = z.nativeEnum(PostType);
+export const PostStatusSchema = z.nativeEnum(PostStatus);
+export const TargetTypeSchema = z.nativeEnum(TargetType);
