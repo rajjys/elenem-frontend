@@ -7,7 +7,8 @@ import { FiAward } from 'react-icons/fi';
 // Import reusable components and the new hook
 import AppLayout from '@/components/layouts/AppLayout';
 import { LoadingSpinner } from '@/components/ui';
-import { Building2, Calendar, Home, ListChecks, PieChart, Settings,  Trophy, Users, Volleyball } from 'lucide-react';
+import { Building2, Calendar, Home, Image, ListChecks, PieChart, Settings,  Trophy, Users, Volleyball } from 'lucide-react';
+import { ArticleIcon } from '@phosphor-icons/react';
 
 // --- Main Layout ---
 const tenantNavItems = [
@@ -30,6 +31,13 @@ const tenantNavItems = [
       { label: "Standings", basePath: "/tenant/standings", icon: ListChecks },
       { label: "Statistics", basePath: "/tenant/statistics", icon: PieChart },
     ],
+  },
+  {
+    label: "Media",
+    icon: Image,
+    subItems: [
+      { label: "Posts", basePath: "/tenant/posts", icon: ArticleIcon}
+    ]
   },
   /*{
     label: "Shared Resources",

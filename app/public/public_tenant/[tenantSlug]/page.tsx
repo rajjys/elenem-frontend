@@ -11,7 +11,6 @@ import { api } from '@/services/api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui';
 import StandingsTable from '@/components/public/standings-table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { mockBlogPosts } from '@/data/mockBlogPosts';
 import VerticalBlogPostCard from '@/components/ui/vertical-blogpost-card';
 import axios from 'axios';
 import { toast } from 'sonner';
@@ -113,8 +112,8 @@ const TenantLandingPage = ({ params }: { params: Promise<{ tenantSlug: string }>
           : [];
 
       setGames(sortedGames);
-      const recentPosts = getRecentPosts(tenantSlug, mockBlogPosts);
-      setBlogPosts(recentPosts);
+      //const recentPosts = getRecentPosts(tenantSlug, mockBlogPosts);
+      //setBlogPosts(recentPosts);
       
     } catch (error) {
       setError('Failed to fetch data');
@@ -154,12 +153,29 @@ const TenantLandingPage = ({ params }: { params: Promise<{ tenantSlug: string }>
         fetchStandings();
     }, [selectedLeagueSlug]);
 
-
+/*
     // This function filters and sorts posts for a given tenant.
     const getRecentPosts = (tenantSlug: string, posts: BlogPost[]) => {
     const filteredPosts = posts.filter(post => post.tenantSlug === tenantSlug);
     return filteredPosts.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 10);
     };
+*/
+    useEffect(() => {
+    async function fetchPosts() {
+      try {
+        const res = await api.get("/public-posts", {
+          params: {
+            tenantSlug,
+            pageSize: 10,
+          },
+        });
+        setBlogPosts(res.data.data);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchPosts();
+  }, [tenantSlug]);
 
     if (loading) {
         return (

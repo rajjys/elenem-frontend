@@ -72,6 +72,9 @@ export function UsersTable({ users, onSort, sortBy, sortOrder, onDelete, onManag
               Roles
             </TableHead>
             <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Organisation
+            </TableHead>
+            <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Status
             </TableHead>
             <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -111,6 +114,9 @@ export function UsersTable({ users, onSort, sortBy, sortOrder, onDelete, onManag
               </TableCell>
               <TableCell className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                 {user.roles.map(role => role.replace(/_/g, ' ')).join(', ')}
+              </TableCell>
+              <TableCell className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                {user?.tenant?.tenantCode}
               </TableCell>
               <TableCell className="px-6 py-4 whitespace-nowrap">
                 <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${

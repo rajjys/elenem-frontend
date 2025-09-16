@@ -21,6 +21,11 @@ export const UserBasicSchema = z.object({
   profileImageUrl: z.string().url().optional().or(z.literal('')).nullable(), // Allowing empty string for optional URL
   createdAt: z.preprocess((arg) => (typeof arg === 'string' ? new Date(arg) : arg), z.date()),
   updatedAt: z.preprocess((arg) => (typeof arg === 'string' ? new Date(arg) : arg), z.date()),
+  tenant: z.object({
+    id: z.string(),
+    name: z.string(),
+    tenantCode: z.string(),
+  }).optional().nullable(),
 });
 
 export type UserBasic = z.infer<typeof UserBasicSchema>;
@@ -62,7 +67,7 @@ export const UserDetailSchema = UserBasicSchema.extend({
   tenant: z.object({
     id: z.string(),
     name: z.string(),
-    leagueCode: z.string(),
+    tenantCode: z.string(),
   }).optional().nullable(),
   managingLeagueId: z.string().cuid().optional().nullable(), // Unique for LEAGUE_ADMIN
   managingTeamId: z.string().cuid().optional().nullable(),

@@ -7,4 +7,7 @@ export type BlogPost = {
   date: string;
   imageUrl: string;
   slug: string;
+  heroImage?: {
+    url: string;
+  }
 };

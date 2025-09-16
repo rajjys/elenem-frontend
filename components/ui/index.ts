@@ -26,3 +26,4 @@ export * from './vertical-blogpost-card';
 export * from './form';
 export * from './collapsible';
 export * from './generalSearchDialog';
+export * from './PostCard';

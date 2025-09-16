@@ -1,7 +1,7 @@
 'use client';
 import { BlogPost } from '@/schemas';
 import Link from 'next/link';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 
 interface TenantHeroSectionProps {
   blogPosts: BlogPost[];
@@ -24,7 +24,7 @@ const TenantHeroSection: React.FC<TenantHeroSectionProps> = ({ primaryColor, sec
   const duration = 6000;
 
   // The core animation function
-  const animate = (timestamp: number) => {
+  const animate = useCallback((timestamp: number) => {
     if (!startTimeRef.current) {
       startTimeRef.current = timestamp;
     }
@@ -35,7 +35,7 @@ const TenantHeroSection: React.FC<TenantHeroSectionProps> = ({ primaryColor, sec
     if (newProgress < 100) {
       animationFrameRef.current = requestAnimationFrame(animate);
     }
-  };
+  }, []);
 
   // Effect to manage the carousel timer and progress bar animation
   useEffect(() => {
@@ -60,7 +60,7 @@ const TenantHeroSection: React.FC<TenantHeroSectionProps> = ({ primaryColor, sec
         setCurrentPostIndex(prevIndex => (prevIndex + 1) % blogPosts.length);
       }, duration);
     }
-  }, [blogPosts.length, currentPostIndex]);
+  }, [animate, blogPosts.length, currentPostIndex]);
 
   // Handler for manual clicks on progress bars
   const handlePostChange = (index: number) => {
@@ -92,7 +92,7 @@ const TenantHeroSection: React.FC<TenantHeroSectionProps> = ({ primaryColor, sec
       <div
         className="absolute inset-0 z-0 h-full w-full transition-all duration-1000 ease-in-out"
         style={{
-          backgroundImage: `url(${currentPost?.imageUrl})`,
+          backgroundImage: `url(${currentPost?.heroImage?.url})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
@@ -152,7 +152,7 @@ const TenantHeroSection: React.FC<TenantHeroSectionProps> = ({ primaryColor, sec
         <div
             className="relative h-4/5 w-full transition-all duration-1000 ease-in-out"
             style={{
-              backgroundImage: `url(${currentPost?.imageUrl})`,
+              backgroundImage: `url(${currentPost?.heroImage?.url})`,
               backgroundSize: 'cover',
               backgroundPosition: 'center',
             }}
