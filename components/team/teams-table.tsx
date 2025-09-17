@@ -214,10 +214,10 @@ export function TeamsTable({ teams, onSort, sortBy, sortOrder, onDelete, current
                 <div className="text-sm text-gray-900">{team.league?.division || 'N/A'}</div>
               </TableCell>
               <TableCell className="px-6 py-4 whitespace-nowrap">
-                <div className="text-sm text-gray-900">{team.country || 'N/A'}</div>
+                <div className="text-sm text-gray-900">{team.businessProfile.city || 'N/A'}</div>
               </TableCell>
               <TableCell className="px-6 py-4 whitespace-nowrap">
-                <div className="text-sm text-gray-900">{team.establishedYear || 'N/A'}</div>
+                <div className="text-sm text-gray-900">{team.businessProfile.establishedYear || 'N/A'}</div>
               </TableCell>
               <TableCell className="px-6 py-4 whitespace-nowrap">
                 <div className="text-sm text-gray-900">
