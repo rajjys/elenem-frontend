@@ -11,6 +11,7 @@ import { Pagination } from '@/components/ui/'; // Your Pagination component
 import { LoadingSpinner } from '@/components/ui/'; // Your LoadingSpinner component
 import { Button } from '@/components/ui/button'; // Your Button component
 import { toast } from 'sonner'; // Your toast notification library (e.g., Sonner)
+import axios from 'axios';
 
 export default function AdminTenantsPage() {
   const [tenants, setTenants] = useState<TenantBasic[]>([]);
@@ -100,17 +101,21 @@ export default function AdminTenantsPage() {
 
     try {
       await api.delete(`/tenants/${tenantId}`); // Your actual DELETE API call
-      toast.success('Tenant deleted successfully.');
+      toast.success('Organisation supprimee avec success.');
       fetchTenants(); // Re-fetch tenants to update the list
     } catch (error) {
-      const errorMessage = 'Failed to delete tenant.';
-      toast.error('Error deleting tenant', { description: errorMessage });
-      console.error('Delete tenant error:', error);
+      let errorMessage = "Erreur lors de la suppression de l'organisation.";
+      if (axios.isAxiosError(error)) {
+          errorMessage = error.response?.data?.message || errorMessage;
+      }
+      setError(errorMessage);
+      toast.error(errorMessage);
     }
   };
 
   return (
     <div className="container mx-auto p-6">
+      {error && <p className='text-red-400 pb-2'>Erreur: {error}</p>}
       <div className="flex justify-between items-center mb-4">
         <TenantFilters
           filters={filters}
@@ -127,8 +132,6 @@ export default function AdminTenantsPage() {
 
       {loading ? (
         <LoadingSpinner />
-      ) : error ? (
-        <p className="text-red-500 text-center mt-8">Error: {error}</p>
       ) : (
         <>
           <span hidden>{totalItems} Tenants</span>
