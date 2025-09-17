@@ -1,7 +1,7 @@
 // src/prisma/tenant-schemas.ts
 import * as z from 'zod';
-import { SportType, Roles, SportTypeSchema, TenantTypes, TenantTypeSchema, GameStatus, PublicBusinessProfileResponseDto } from './index'; // Assuming SportType and Role are defined in src/prisma/index.ts
-import { CreateBusinessProfileSchema } from './common-schemas';
+import { SportType, Roles, SportTypeSchema, TenantTypes, TenantTypeSchema, GameStatus } from './index'; // Assuming SportType and Role are defined in src/prisma/index.ts
+import { CreateBusinessProfileDto, CreateBusinessProfileSchema } from './common-schemas';
 
 export interface TenantBasic {
   id: string;
@@ -210,6 +210,16 @@ export const PaginatedTenantsResponseSchema = z.object({
   pageSize: z.number().int().min(1),
 });
 
+// Extend CreateBusinessProfileDto with an id field
+export interface BusinessProfileWithId extends CreateBusinessProfileDto {
+  id: string;
+  logoAsset: {
+    url: string
+  },
+  bannerAsset: {
+    url: string
+  }
+}
 // The frontend representation of the PublicTenantResponseDto
 export interface PublicTenantBasic {
   id: string;
@@ -219,7 +229,7 @@ export interface PublicTenantBasic {
   country: string;
   tenantCode: string;
   sportType: SportType;
-  businessProfile: PublicBusinessProfileResponseDto;
+  businessProfile: BusinessProfileWithId;
   _count: {
     leagues: number;
     teams: number;

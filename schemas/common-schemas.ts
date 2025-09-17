@@ -46,3 +46,5 @@ export const CreateBusinessProfileSchema = z.object({
   logoAssetId: z.string().optional().nullable(),
   bannerAssetId: z.string().optional().nullable(),
 });
+
+export type CreateBusinessProfileDto = z.infer<typeof CreateBusinessProfileSchema>

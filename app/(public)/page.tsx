@@ -15,6 +15,7 @@ import { Skeleton } from "@/components/ui";
 import GeneralSearchDialog from "@/components/ui/generalSearchDialog";
 import axios from "axios";
 import Link from "next/link";
+import Image from "next/image";
 
 const features = [
   { icon: <CalendarDays className="w-5 h-5 text-blue-500"/>, title: "Planification Intelligente", desc: "Vérifications automatiques des conflits, dates d'interdiction et lieux." },
@@ -260,12 +261,22 @@ export default function PublicLandingPage() {
                         process.env.NEXT_PUBLIC_HOME_URL_LOCAL : process.env.NEXT_PUBLIC_HOME_URL;
             const protocol = process.env.NODE_ENV === 'development' ? 'http://' : 'https://';
             const tenantUrl = t.businessProfile.website || `${protocol}${t.slug}.${ROOT_DOMAIN}`;
-            console.log(t.country);
             return <Link key={t.id} href={tenantUrl} className="block" >
               <Card className="rounded-2xl bg-white dark:bg-slate-900 shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all">
                 <CardContent className="p-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-400 to-amber-500" />
+                    {t.businessProfile.logoAsset?.url ? (
+                      <div className="relative w-10 h-10 rounded-xl overflow-hidden">
+                        <Image
+                          src={t.businessProfile.logoAsset.url}
+                          alt={`${t.name} logo`}
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
+                    ) : (
+                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-400 to-amber-500" />
+                    )}
                     <div>
                       <div className="font-medium leading-tight">{t.name}</div>
                       <div className="text-xs text-slate-500">
