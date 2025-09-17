@@ -160,13 +160,17 @@ export default function PublicGamesPage() {
             ))}
           </div>
         ) : (
-            <div className="text-center py-16 bg-white rounded-lg border">
-                <h3 className="text-xl font-semibold">Pas des Matchs Disponible</h3>
-                {availableDates.length > 0 && 
-                  <p className="text-muted-foreground mt-2">Pas de matchs Disponible a la date selectionnee.</p>
-                }
+            <div className="text-center py-16 bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-700">
+              <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-100">
+                Pas des Matchs Disponible
+              </h3>
+              {availableDates.length > 0 && (
+                <p className="mt-2 text-slate-500 dark:text-slate-400">
+                  Pas de matchs Disponible à la date sélectionnée.
+                </p>
+              )}
             </div>
-        )}
+          )}
       </div>
     </div>
   );
