@@ -8,6 +8,7 @@ import * as z from "zod";
 import {
   Button,
   Card,
+  LoadingSpinner,
 } from "@/components/ui";
 import { toast } from "sonner";
 import { api } from "@/services/api";
@@ -229,6 +230,10 @@ export function TeamForm({ onSuccess, onCancel }: TeamFormProps) {
     }
   };
 
+  if (!userAuth) return 
+                  <div className="flex items-center justify-center min-h-screen">
+                    <LoadingSpinner message="Chargement de l'utilisatuer"/>
+                  </div>
   return (
     <div className="flex justify-center p-4 bg-gray-50">
       <Card className="w-full max-w-7xl shadow-lg rounded-xl">
