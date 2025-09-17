@@ -161,7 +161,7 @@ export const PublicTenantHeader: React.FC<TenantHeaderProps> = ({ tenant }) => {
             <div className="flex items-center gap-2">
               {/* Desktop */}
               <Link
-                href="/login"
+                href="/"
                 className="hidden md:inline text-sm font-medium px-3 py-1.5 rounded-md border border-gray-200 hover:bg-gray-50"
                 style={{ color: primaryColor, borderColor: primaryColor }}
               >
@@ -169,7 +169,7 @@ export const PublicTenantHeader: React.FC<TenantHeaderProps> = ({ tenant }) => {
               </Link>
               {/* Mobile */}
               <Link
-                href="/login"
+                href="/"
                 className="md:hidden inline-flex items-center justify-center p-2 rounded-full border border-gray-200 hover:bg-gray-50"
               >
                 <FiUser className="w-5 h-5" />
