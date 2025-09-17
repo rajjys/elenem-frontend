@@ -58,8 +58,8 @@ function PublicTenantCard({ tenant }: { tenant: PublicTenantBasic }) {
                         {tenant.tenantCode} • {tenant.sportType} • {countryNameToCode[tenant.country]}
                     </p>
                     {/* Website */}
-                    <div className="mt-1 inline-flex items-center text-xs md:text-sm text-blue-600 dark:text-blue-400">
-                        {(tenant.businessProfile?.website || tenantUrl).replace(/^https?:\/\//, "")}
+                    <div className="mt-1 inline-flex items-center text-xs md:text-sm text-gray-600 dark:text-gray-400">
+                        { tenant.businessProfile?.website || tenantUrl }
                         <ExternalLink className="ml-1 w-3.5 h-3.5" />
                     </div>
                     {/* Footer info */}
