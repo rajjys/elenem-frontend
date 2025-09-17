@@ -17,7 +17,6 @@ import {
 import { api } from "@/services/api";
 import { TenantDetails } from "@/schemas";
 import Image from "next/image";
-import { toast } from "sonner";
 import axios from "axios";
 import Link from "next/link";
 
@@ -39,7 +38,8 @@ export default function GeneralSearchDialog() {
       if (axios.isAxiosError(error)) {
         errorMessage = error.response?.data?.message || errorMessage;
       }
-      toast.error(errorMessage);
+      //toast.error(errorMessage);
+      console.log(errorMessage);
     } finally {
       setIsLoading(false);
     }

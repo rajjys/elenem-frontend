@@ -19,7 +19,6 @@ export default function PublicTenantsPage() {
     const fetchTenants = useCallback((currentPage: number, currentFilters: {search?: string, sportType?: string, country?: string}) => {
         setLoading(true);
         const params = { ...currentFilters, page: currentPage, pageSize: 10 };
-        console.log(params);
         api.get('/public-tenants', { params })
             .then(response => {
                 const { data, totalPages: newTotalPages } = response.data;

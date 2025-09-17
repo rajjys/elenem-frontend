@@ -42,6 +42,7 @@ export default function PublicLandingPage() {
   const router = useRouter();
   const [games, setGames] = useState<GameDetails[]>([]);
   const [tenants, setTenants] = useState<PublicTenantBasic[]>([]);
+  const [loadingPopularGames, setLoadingPopularGames] = useState(false);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [Motion, setMotion] = React.useState<any>(null);
 
@@ -53,11 +54,11 @@ export default function PublicLandingPage() {
 
   const heroCopy = isFan
     ? {
-        eyebrow: "Trouvez votre ligue",
+        eyebrow: "Trouvez votre Organisation",
         title: "Scores, calendriers et classements — tout en un seul endroit",
         desc: "Recherchez par Ligue, équipe ou ville pour accéder directement à l'action. Chaque ligue dispose d'un site dédié avec des données en direct.",
         primary: "Parcourir les matchs",
-        secondary: "Trouver ma ligue",
+        secondary: "Trouver mon Organisation",
         primaryLink: "/games",
         secondaryLink: "/tenants"
       }
@@ -73,22 +74,20 @@ export default function PublicLandingPage() {
 
       useEffect(() => {
         const fetchGames = async () => {
-            //setLoading(true);
+            setLoadingPopularGames(true);
             try {
               // Fetch and process games
               const gamesResponse = await api.get<GameDetails[]>(`/public-games/search`, {
                 params: { take: 3 },
               });
-              const fetchedGames = gamesResponse.data;
-        
+              const fetchedGames = gamesResponse.data;       
               setGames(fetchedGames);
-              
             } catch (error) {
               //setError('Failed to fetch data');
               console.error("Failed to fetch games:", error);
               setGames([]);
             } finally {
-              //setLoading(false);
+              setLoadingPopularGames(false);
             }
           };
           fetchGames();
@@ -121,13 +120,13 @@ export default function PublicLandingPage() {
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-200">
       {/* Héros */}
       <section className="relative">
-        <div className="mx-auto max-w-7xl px-4 pt-10 pb-8 md:pt-14 md:pb-12">
+        <div className="mx-auto max-w-7xl px-4 pt-10 pb-4 md:pt-14 md:pb-6">
           <div className="grid md:grid-cols-2 gap-8 items-center">
             {/* Texte */}
             <Motion.motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
               <div className="flex items-center gap-2 mb-3">
                 <Pill>{heroCopy.eyebrow}</Pill>
-                <Badge variant="secondary" className="rounded-full bg-amber-100 text-amber-900 dark:bg-amber-900/70 dark:text-amber-200 border-none">Multi-locataire</Badge>
+                <Badge variant="secondary" className="rounded-full bg-amber-100 text-amber-900 dark:bg-amber-900/70 dark:text-amber-200 border-none py-1">Multi-locataire</Badge>
               </div>
               <h1 className="text-3xl md:text-5xl font-semibold tracking-tight leading-tight text-black dark:text-white">
                 {heroCopy.title}
@@ -138,12 +137,20 @@ export default function PublicLandingPage() {
 
               {/* CTAs selon l'audience */}
               <div className="mt-6 flex flex-wrap gap-3">
-                <Button size="lg" variant="primary" className="" onClick={() => router.push(heroCopy.primaryLink)}>
-                  {heroCopy.primary} <ArrowRight className="ml-2 w-4 h-4" />
+                <Button
+                  size="lg"
+                  variant="primary"
+                  className="w-full sm:flex-1"
+                  onClick={() => router.push(heroCopy.primaryLink)}
+                >
+                    {heroCopy.primary} <ArrowRight className="ml-2 w-4 h-4" />
                 </Button>
-                <Button size="lg" variant="outline" onClick={() => router.push(heroCopy.secondaryLink)}
-                className="rounded-2xl border-slate-300 dark:border-slate-700 hover:bg-slate-200/50 dark:hover:bg-slate-800">
-                  {heroCopy.secondary}
+                <Button
+                  size="lg"
+                  variant="outline"
+                  onClick={() => router.push(heroCopy.secondaryLink)}
+                  className="w-full sm:flex-1 rounded-2xl border-slate-300 dark:border-slate-700 hover:bg-slate-200/50 dark:hover:bg-slate-800">
+                    {heroCopy.secondary}
                 </Button>
               </div>
               {/* Recherche */}
@@ -158,16 +165,21 @@ export default function PublicLandingPage() {
 
               {/* Signaux de confiance */}
               <div className="mt-6 flex flex-wrap items-center gap-4 text-sm text-slate-500">
-                <Trophy className="w-4 h-4 text-blue-500" /> Approuvé par les associations régionales
-                <Star className="w-4 h-4 text-blue-500" /> SLA de disponibilité de 99,9 %
-                <Rocket className="w-4 h-4 text-orange-500" /> Lancez un site en quelques minutes
+                <span className="flex items-center gap-2">
+                  <Trophy className="w-4 h-4 text-blue-500" />
+                  <span>Approuvé par les associations régionales</span>
+                </span>
+                <span className="flex items-center gap-2">
+                  <Star className="w-4 h-4 text-blue-500" /> 
+                  <span>SLA de disponibilité de 99,9 %</span>
+                </span>
               </div>
             </Motion.motion.div>
 
             {/* Carte de mise en avant (selon l'audience) */}
             <Motion.motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.05 }}>
               <Card className="rounded-2xl overflow-hidden shadow-2xl shadow-blue-900/10 border border-slate-200/80 dark:border-slate-800/80">
-                <CardHeader className="border-b border-slate-200/70 dark:border-slate-800 text-gray-700">
+                <CardHeader className="border-b border-slate-200/70 text-slate-700">
                   <CardTitle className="flex items-center gap-2 text-base">
                     {isFan ? <Gamepad2 className="w-5 h-5 text-blue-500"/> : <Building2 className="w-5 h-5 text-blue-500"/>}
                     {isFan ? "Matchs populaires" : "Gérez votre ligue"}
@@ -175,18 +187,22 @@ export default function PublicLandingPage() {
                 </CardHeader>
                 <CardContent className="p-0 text-gray-800">
                     {isFan ? (
-                      <div className="divide-y divide-slate-200/70 dark:divide-slate-800">
+                      <div className="divide-y divide-slate-200/70">
                         {games.length === 0 ? (
-                          // Skeleton loader for 3 games
-                          Array.from({ length: 3 }).map((_, i) => (
-                            <div key={`skeleton-${i}`} className="p-4 flex items-center justify-between">
-                              <div className="flex flex-col gap-2">
-                                <Skeleton className="h-4 w-40" />
-                                <Pill><Skeleton className="h-3 w-32" /></Pill>
-                              </div>
-                              <Skeleton className="h-3 w-20" />
-                            </div>
-                          ))
+                          loadingPopularGames ?
+                              // Skeleton loader for 3 games
+                              Array.from({ length: 3 }).map((_, i) => (
+                                <div key={`skeleton-${i}`} className="p-4 flex items-center justify-between">
+                                  <div className="flex flex-col gap-2">
+                                    <Skeleton className="h-4 w-40" />
+                                    <Pill><Skeleton className="h-3 w-32" /></Pill>
+                                  </div>
+                                  <Skeleton className="h-3 w-20" />
+                                </div>
+                              )) : 
+                              <p className="h-40 flex items-center justify-center font-bold text-lg ">
+                                <span>Aucun match disponible</span>
+                              </p>
                         ) : (
                           games.map((g) => (
                             <Link href={`${g.tenant.businessProfile?.website || `https://${g.tenant.tenantCode}.elenem.site`}/games/${g.league.slug}/${g.slug}`} key={g.id} className="block">
@@ -238,21 +254,24 @@ export default function PublicLandingPage() {
         </div>
 
         {/* Ruban "Propulsé par" */}
-        <div className="absolute left-0 -bottom-3 md:-bottom-4 w-full">
+        <div className="w-full">
           <div className="mx-auto max-w-7xl px-4">
             <div className="rounded-2xl md:rounded-3xl border border-dashed border-blue-200 dark:border-blue-800/50 bg-blue-50/30 dark:bg-blue-950/20 p-3 md:p-4 text-xs flex items-center justify-between">
-              <span className="text-slate-600 dark:text-slate-400">Chaque site de ligue est « Propulsé par Elenem Leagues ».</span>
-              <a href="/features" className="inline-flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:underline">
+              <span className="text-slate-600 dark:text-slate-400 flex items-center gap-2">
+                <Rocket className="w-4 h-4 text-orange-500" />
+                <span>Lancez votre site en quelques minutes.</span>
+              </span>
+              <Link href="/features" className="inline-flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:underline">
                 En savoir plus sur le logiciel <ExternalLink className="w-3.5 h-3.5"/>
-              </a>
+              </Link>
             </div>
           </div>
         </div>
       </section>
-      {/* Teaser de l'annuaire des ligues */}
+      {/* Teaser de l'annuaire des Organisations */}
       <section id="tenants" className="mx-auto max-w-7xl px-4 pt-12 md:pt-16">
         <div className="flex items-end justify-between mb-4">
-          <h2 className="text-xl md:text-2xl font-semibold tracking-tight">Ligues sur Elenem</h2>
+          <h2 className="text-xl md:text-2xl font-semibold tracking-tight">Organisations sur Elenem</h2>
           <a className="text-sm text-blue-600 dark:text-blue-400 hover:underline" href="/tenants">Parcourir l&apos;annuaire</a>
         </div>
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
