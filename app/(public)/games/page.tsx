@@ -92,40 +92,49 @@ export default function PublicGamesPage() {
         }
     }, [availableDates, todayISO]);
 
-  if (loadingDates) {
-      return (
-          <div className="container max-w-2xl mx-auto p-4 sm:p-6">
-              <GamesPageSkeleton />
-          </div>
-      );
-  }
-
   return (
     <div className="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-200">
       <div className="container mx-auto min-h-screen max-w-2xl p-4 sm:p-6 space-y-8">
         <header>
           <h1 className="text-2xl md:text-3xl font-bold tracking-tight ">Matchs et Résultats: Toutes les Organisations</h1>
-          <p className="mt-2 text-sm md:text-md">Parcourez les Matchs publics dans toutes les ligues.</p>
+          <p className="my-2 text-sm md:text-md">Parcourez les Matchs publics dans toutes les ligues.</p>
         </header>
-        <Card className="overflow-hidden shadow-sm">
-          <CardHeader>
-            {availableDates.length > 0 && <CardTitle className='text-base px-2 text-slate-800'>Selectionner une date</CardTitle>}
-          </CardHeader>
-          <CardContent className="grid gap-4 md:gap-4 grid-cols-1">
-            <DateCarousel dates={availableDates} selectedDate={selectedDate} onDateSelect={setSelectedDate} />
-          </CardContent>
-        </Card>
-        {loadingGames ? (
+        { !loadingDates &&
+          <Card className="overflow-hidden shadow-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
+            <CardHeader>
+              {availableDates.length > 0 && (
+                <CardTitle className="text-base px-2 text-slate-800 dark:text-slate-100">
+                  Sélectionner une date
+                </CardTitle>
+              )}
+            </CardHeader>
+            <CardContent className="grid gap-4 md:gap-4 grid-cols-1">
+              <DateCarousel
+                dates={availableDates}
+                selectedDate={selectedDate}
+                onDateSelect={setSelectedDate}
+              />
+            </CardContent>
+          </Card>
+          }
+        {loadingDates ? 
+          <div className="container max-w-2xl mx-auto">
+              <GamesPageSkeleton />
+          </div>
+            :
+        loadingGames ? (
             <div className="space-y-8">
                  {Array.from({ length: 2 }).map((_, i) => (
-                     <Card key={i} className="overflow-hidden">
-                        <CardHeader><Skeleton className="h-7 w-1/3" /></CardHeader>
+                     <Card key={i} className="overflow-hidden bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
+                        <CardHeader>
+                          <Skeleton className="h-7 w-1/3 bg-slate-200 dark:bg-slate-700" />
+                        </CardHeader>
                         <CardContent className="grid gap-4 md:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-                            <Skeleton className="h-48 w-full rounded-lg" />
-                            <Skeleton className="h-48 w-full rounded-lg" />
-                            <Skeleton className="h-48 w-full rounded-lg" />
+                          <Skeleton className="h-48 w-full rounded-lg bg-slate-200 dark:bg-slate-700" />
+                          <Skeleton className="h-48 w-full rounded-lg bg-slate-200 dark:bg-slate-700" />
+                          <Skeleton className="h-48 w-full rounded-lg bg-slate-200 dark:bg-slate-700" />
                         </CardContent>
-                    </Card>
+                      </Card>
                  ))}
             </div>
         ) : gamesByTenant.length > 0 ? (

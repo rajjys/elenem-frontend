@@ -69,13 +69,13 @@ export const PublicHeader = ({
 
   const navLinks = [
   { label: 'Matchs', href: '/games'},
-  { label: 'Ligues', href: '/tenants'},
-  { label: 'Actualités', href: '/news'},
+  { label: 'Organisations', href: '/tenants'},
+  //{ label: 'Actualités', href: '/news'},
   { separator: true },
-  { label: 'Fonctionnalités', href: '/features'},
+  { label: 'Logiciel', href: '/features'},
   { label: 'Tarifs', href: '/pricing' },
   { label: 'API', href: '/api' },
-  { label: 'Documentation', href: '/docs' },
+  { label: 'Docs', href: '/docs' },
 ];
 
   useEffect(() => {
