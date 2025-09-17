@@ -62,19 +62,10 @@ export const TenantDetailsSchema = z.object({
   tenantType: TenantTypeSchema,
   sportType: SportTypeSchema,
   country: z.string().min(2, "Country is required"),//.max(2, "Country must be a 2-letter ISO code"), // ISO 2-letter code
-  businessProfile: z.object({
-    name: z.string().min(1, 'Business name is required.'),
-    description: z.string().optional(),
-    logoUrl: z.string().optional().nullable(), // Use a simple string as requested
-    bannerImageUrl: z.string().optional().nullable(), // Use a simple string as requested
-    website: z.string().optional().nullable(),
-    //socialMediaLinks: z.record(z.string()).optional(),
-    //establishedYear: z.number().int().min(1000).max(new Date().getFullYear()).optional(),
-    physicalAddress: z.string().optional(),
-    city: z.string().optional(),
-    //state: z.string().optional(),
-    region: z.string().optional(),
-    //postalCode: z.string().optional(),
+  businessProfile: CreateBusinessProfileSchema.extend({
+    id: z.string(),
+    logoAsset: z.object({ url: z.string().nullable().optional() }).optional().nullable(),
+    bannerAsset: z.object({ url: z.string().nullable().optional() }).optional().nullable(),
   }),
   isActive: z.boolean(),
   createdAt: z.preprocess((arg) => new Date(arg as string), z.date()),

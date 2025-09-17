@@ -105,7 +105,7 @@ export default function PublicGamesPage() {
       <div className="container mx-auto min-h-screen max-w-2xl p-4 sm:p-6 space-y-8">
         <header>
           <h1 className="text-2xl md:text-3xl font-bold tracking-tight ">Matchs et Résultats: Toutes les Organisations</h1>
-          <p className="mt-2 text-sm md:text-md ">Parcourez les Matchs publics dans toutes les ligues.</p>
+          <p className="mt-2 text-sm md:text-md">Parcourez les Matchs publics dans toutes les ligues.</p>
         </header>
         <Card className="overflow-hidden shadow-sm">
           <CardHeader>

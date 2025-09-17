@@ -261,38 +261,40 @@ export default function PublicLandingPage() {
                         process.env.NEXT_PUBLIC_HOME_URL_LOCAL : process.env.NEXT_PUBLIC_HOME_URL;
             const protocol = process.env.NODE_ENV === 'development' ? 'http://' : 'https://';
             const tenantUrl = t.businessProfile.website || `${protocol}${t.slug}.${ROOT_DOMAIN}`;
-            return <Link key={t.id} href={tenantUrl} className="block" >
-              <Card className="rounded-2xl bg-white dark:bg-slate-900 shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all">
-                <CardContent className="p-4">
-                  <div className="flex items-center gap-3">
-                    {t.businessProfile.logoAsset?.url ? (
-                      <div className="relative w-10 h-10 rounded-xl overflow-hidden">
-                        <Image
-                          src={t.businessProfile.logoAsset.url}
-                          alt={`${t.name} logo`}
-                          fill
-                          className="object-cover"
-                        />
-                      </div>
-                    ) : (
-                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-400 to-amber-500" />
-                    )}
+             
+            return (
+              <Link key={t.id} href={tenantUrl} className="block h-full">
+                <Card className="h-full rounded-2xl bg-white dark:bg-slate-900 shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all flex flex-col">
+                  <CardContent className="p-4 flex flex-col justify-between h-full">
                     <div>
-                      <div className="font-medium leading-tight">{t.name}</div>
-                      <div className="text-xs text-slate-500">
-                        {countryNameToCode[t.country]} • {capitalizeFirst(t.sportType)}
+                      <div className="flex items-center gap-3">
+                        {t.businessProfile.logoAsset?.url ? (
+                          <div className="relative w-10 h-10 rounded-xl overflow-hidden">
+                            <Image
+                              src={t.businessProfile.logoAsset.url}
+                              alt={`${t.name} logo`}
+                              fill
+                              className="object-cover"
+                            />
+                          </div>
+                        ) : (
+                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-400 to-amber-500" />
+                        )}
+                        <div>
+                          <div className="font-medium leading-tight">{t.name}</div>
+                          <div className="text-xs text-slate-500">
+                            {countryNameToCode[t.country]} • {capitalizeFirst(t.sportType)}
+                          </div>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  <div className="mt-3 text-xs text-slate-500 flex items-center">
-                    <span>
-                      {tenantUrl}
-                    </span>
-                    <ExternalLink className="ml-1 w-3.5 h-3.5" />
-                  </div>
-                </CardContent>
-              </Card>
-            </Link>
+                    <div className="mt-3 text-xs text-slate-500 flex items-center">
+                      <span>{tenantUrl}</span>
+                      <ExternalLink className="ml-1 w-3.5 h-3.5" />
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>)
             })}
         </div>
       </section>

@@ -102,9 +102,9 @@ export default function GeneralSearchDialog() {
                 <Card className="w-full max-w-full rounded-xl bg-white dark:bg-slate-900 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all mb-2">
                   <CardContent className="p-4 flex items-center gap-3 w-full overflow-hidden">
                     <div className="w-10 h-10 rounded-xl bg-slate-200 dark:bg-slate-700 flex items-center justify-center overflow-hidden shrink-0">
-                      {tenant.businessProfile?.logoUrl ? (
+                      {tenant.businessProfile.logoAsset?.url ? (
                         <Image
-                          src={tenant.businessProfile.logoUrl}
+                          src={tenant.businessProfile.logoAsset?.url}
                           alt={`${tenant.name} logo`}
                           width={30}
                           height={30}
