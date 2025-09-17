@@ -140,7 +140,7 @@ export function StandingsFilters({ onFiltersChange }: StandingsFiltersProps) {
       seasonId: selectedSeasonId,
     });
     console.log("Initial League ID: ", initialLeagueId);
-  }, [selectedTenantId, selectedLeagueId, selectedSeasonId, onFiltersChange]);
+  }, [selectedTenantId, selectedLeagueId, selectedSeasonId, onFiltersChange, initialLeagueId]);
   const renderTenantFilter = () => {
     if (ctxTenantId) {
       return (

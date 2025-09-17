@@ -1,5 +1,5 @@
 // components/StatusViewer.js
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import Image from 'next/image';
 
 // Corrected type definitions to match the usage in the component and mock data
@@ -29,13 +29,13 @@ const StatusViewer = ({ user, media, onClose }: StatusViewerProps) => {
   // Ensure currentMedia is always defined before accessing its properties
   const currentMedia = media[currentMediaIndex];
 
-  const goToNextMedia = () => {
+  const goToNextMedia = useCallback(() => {
     if (currentMediaIndex < media.length - 1) {
       setCurrentMediaIndex((prev) => prev + 1);
     } else {
       onClose(); // Close viewer if it's the last media
     }
-  };
+  }, [currentMediaIndex, media.length, onClose]);
 
   const goToPreviousMedia = () => {
     if (currentMediaIndex > 0) {

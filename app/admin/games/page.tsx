@@ -1,7 +1,7 @@
 // app/(admin)/games/page.tsx
 "use client";
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { api } from '@/services/api'; // Your actual API instance
@@ -16,8 +16,8 @@ import { useContextualLink } from '@/hooks'; // Your useContextualLink hook
 
 export default function AdminGamesPage() {
   const router = useRouter();
-  const { user } = useAuthStore(); // Get user from auth store
-  const currentUserRoles = user?.roles || [];
+  const { user: userAuth } = useAuthStore(); // Get user from auth store
+  const currentUserRoles = useMemo(() => userAuth?.roles || [], [userAuth?.roles]);;
   //const currentTenantId = user?.tenantId;
   //const currentLeagueId = user?.managingLeagueId;
   //const currentSeasonId = user?.managingSeasonId; // Assuming user might have a managingSeasonId
@@ -74,13 +74,13 @@ export default function AdminGamesPage() {
 
   useEffect(() => {
     // Authorization check for System Admin
-    if (!user || !currentUserRoles.includes(Roles.SYSTEM_ADMIN)) {
+    if (!userAuth || !currentUserRoles.includes(Roles.SYSTEM_ADMIN)) {
       toast.error("Unauthorized", { description: "You do not have permission to view this page." });
       // router.push('/dashboard'); // Uncomment to redirect
       return;
     }
     fetchGames();
-  }, [fetchGames, user, currentUserRoles, router]);
+  }, [fetchGames, userAuth, currentUserRoles, router]);
 
   const handleFilterChange = useCallback((newFilters: GameFilterParams) => {
     setFilters(prev => ({

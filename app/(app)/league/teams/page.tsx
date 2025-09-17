@@ -1,7 +1,7 @@
 // app/(league)/teams/page.tsx
 "use client";
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { api } from '@/services/api';
@@ -14,7 +14,7 @@ import { useAuthStore } from '@/store/auth.store';
 export default function LeagueTeamsPage() {
   const router = useRouter();
   const { user: userAuth } = useAuthStore();
-  const currentUserRoles = userAuth?.roles || [];
+  const currentUserRoles = useMemo(() => userAuth?.roles || [], [userAuth?.roles]);
   const ctxTenantId = useSearchParams().get('ctxTenantId'); // Use search params if needed
   const ctxLeagueId = useSearchParams().get('ctxLeagueId'); // Use search params if needed
       
@@ -96,7 +96,7 @@ export default function LeagueTeamsPage() {
     } finally {
       setLoading(false);
     }
-  }, [filters, currentLeagueId, currentTenantId]);
+  }, [filters, currentLeagueId]);
 
   useEffect(() => {
     // Authorization check for League Admin

@@ -5,6 +5,7 @@ import Image from "next/image";
 import { UseFormReturn } from "react-hook-form";
 import { CardContent } from "@/components/ui";
 import { TeamFormValues } from "./team-form";
+import { User } from "@/schemas";
 
 interface UserLite { id: string; username: string; }
 interface LeagueLite { id: string; name: string; }
@@ -17,7 +18,7 @@ interface Props {
   owners: UserLite[];
   leagues: LeagueLite[];
   venues: VenueLite[];
-  userAuth?: any;
+  userAuth?: User;
 }
 
 export default function Step3_TeamReview({ form, logoPreview, bannerPreview, owners, leagues, venues, userAuth }: Props) {

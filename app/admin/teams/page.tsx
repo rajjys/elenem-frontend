@@ -1,7 +1,7 @@
 // app/(admin)/teams/page.tsx
 "use client";
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { api } from '@/services/api'; // Your actual API instance
@@ -14,10 +14,10 @@ import { useAuthStore } from '@/store/auth.store'; // Auth store to get user rol
 
 export default function AdminTeamsPage() {
   const router = useRouter();
-  const { user } = useAuthStore(); // Get user from auth store
-  const currentUserRoles = user?.roles || [];
-  const currentTenantId = user?.tenantId;
-  const currentLeagueId = user?.managingLeagueId;
+  const { user: userAuth } = useAuthStore(); // Get user from auth store
+  const currentUserRoles = useMemo(() => userAuth?.roles || [], [userAuth?.roles]);;
+  const currentTenantId = userAuth?.tenantId;
+  const currentLeagueId = userAuth?.managingLeagueId;
 
   const [teams, setTeams] = useState<TeamDetails[]>([]);
   const [loading, setLoading] = useState(true);
@@ -70,13 +70,13 @@ export default function AdminTeamsPage() {
 
   useEffect(() => {
     // Authorization check for System Admin
-    if (!user || !currentUserRoles.includes(Roles.SYSTEM_ADMIN)) {
+    if (!userAuth || !currentUserRoles.includes(Roles.SYSTEM_ADMIN)) {
       toast.error("Unauthorized", { description: "You do not have permission to view this page." });
       //router.push('/dashboard'); // Redirect to a suitable page
       return;
     }
     fetchTeams();
-  }, [fetchTeams, user, currentUserRoles, router]);
+  }, [fetchTeams, userAuth, currentUserRoles, router]);
 
   const handleFilterChange = useCallback((newFilters: TeamFilterParams) => {
     setFilters(prev => ({

@@ -1,7 +1,7 @@
 'use client';
 import Head from 'next/head';
 import { useRouter, useSearchParams } from 'next/navigation'; // Or useNavigation from next/navigation for App Router
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useAuthStore } from '@/store/auth.store';
 import { LeagueBasic, LeagueBasicSchema, Roles } from '@/schemas';
 import { api } from '@/services/api';
@@ -63,7 +63,7 @@ export default function TenantDashboard() {
       ? userAuth?.managingLeagueId
       : null;
     //Fetch tenant-specific data if needed, e.g., tenant name, logo, etc.
-    const fetchLeagueDetails = async () => {
+    const fetchLeagueDetails = useCallback(async () => {
         setLoading(true);
         setError(null);
         if (!currentTenantId || !currentLeagueId) {
@@ -83,7 +83,7 @@ export default function TenantDashboard() {
         } finally {
           setLoading(false);
         }
-      };
+      }, [currentLeagueId, currentTenantId]);
 
     useEffect(() => {
         // Fetch tenant-specific data if needed, e.g., tenant name, logo, etc.
@@ -91,7 +91,7 @@ export default function TenantDashboard() {
             fetchLeagueDetails();
             //fetchLeagues();
         }
-    }, [currentLeagueId]);
+    }, [currentLeagueId, fetchLeagueDetails]);
     
     // Dynamically generate stat cards based on tenant data
     const statCards = [
