@@ -143,8 +143,8 @@ const TenantLandingPage = ({ params }: { params: Promise<{ tenantSlug: string }>
                 if(axios.isAxiosError(error)){
                     errorMessage = error.response?.data?.message || errorMessage;
                 }
-                toast.error(errorMessage);
-                console.error("Failed to fetch standings:", error);
+                //toast.error(errorMessage);
+                console.error("Failed to fetch standings:", errorMessage);
                 setStandings([]); // Clear standings on error
             } finally {
                 setLoadingStandings(false);
