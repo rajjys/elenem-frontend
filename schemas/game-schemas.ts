@@ -13,6 +13,9 @@ const TeamBasicSchema = z.object({
   businessProfile: z.object({
     logoUrl: z.string().nullable().optional(),
     bannerImageUrl: z.string().nullable().optional(),
+    logoAsset: z.object({
+      url: z.string()
+    }).optional().nullable()
   })
 });
 

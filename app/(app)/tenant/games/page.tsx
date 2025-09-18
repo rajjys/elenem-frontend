@@ -79,7 +79,7 @@ export default function TenantGamesPage() {
       setTotalItems(validatedData.totalItems);
       setTotalPages(validatedData.totalPages);
     } catch (error) {
-        let errorMessage = "Tenant creation failed. Please try again.";
+        let errorMessage = "Error fetching games";
         if (axios.isAxiosError(error)) {
           errorMessage = error.response?.data?.message || errorMessage;
         }

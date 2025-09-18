@@ -96,13 +96,13 @@ const GamePublicCard: React.FC<GamePublicCardProps> = ({ game }) => {
 
       <CardContent className="space-y-2">
         {renderTeam(
-          game.homeTeam.businessProfile.logoUrl,
+          game.homeTeam.businessProfile.logoAsset?.url,
           game.homeTeam.shortCode,
           homeScore,
           homeWin
         )}
         {renderTeam(
-          game.awayTeam.businessProfile.logoUrl,
+          game.awayTeam.businessProfile.logoAsset?.url,
           game.awayTeam.shortCode,
           awayScore,
           awayWin
