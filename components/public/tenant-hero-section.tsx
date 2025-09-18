@@ -87,7 +87,7 @@ const TenantHeroSection: React.FC<TenantHeroSectionProps> = ({ primaryColor, sec
   const currentPost = blogPosts[currentPostIndex];
 
   return (
-    <div className="relative h-[50vh] md:h-[90vh] lg:h-[92vh] w-full overflow-hidden">
+    <div className="relative h-[50vh] sm:h-[75vh] md:h-[90vh] lg:h-[92vh] w-full overflow-hidden">
       {/* Background image with overlay and smooth transition */}
       <div
         className="absolute inset-0 z-0 h-full w-full transition-all duration-1000 ease-in-out"
@@ -165,7 +165,7 @@ const TenantHeroSection: React.FC<TenantHeroSectionProps> = ({ primaryColor, sec
         {/* Text content below the image */}
         <div className={`flex h-1/5 flex-col z-12 justify-end bg-${primaryColor}-900 p-4 transition-all duration-500 ease-in-out`}>
           <Link href={`/news/${currentPost?.slug}`}>
-            <h2 className="text-3xl font-bold text-white transition-all duration-500 ease-in-out hover:text-gray-300">
+            <h2 className="text-2xl font-bold text-white transition-all duration-500 ease-in-out hover:text-gray-300">
               {currentPost?.title}
             </h2>
           </Link>

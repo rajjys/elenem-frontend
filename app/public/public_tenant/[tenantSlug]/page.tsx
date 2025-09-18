@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, use } from 'react';
 import Link from 'next/link';
-import { BlogPost, GameDetails, GameStatus, Standing } from '@/schemas'; // Assuming GameStatus is a valid import
+import { BlogPost, GameDetails, GameStatus, Gender, LeagueBasic, Standing } from '@/schemas'; // Assuming GameStatus is a valid import
 import TenantHeroSection from "@/components/public/tenant-hero-section";
 import GamePublicCard from '@/components/game/game-public-card'; // Assuming this is the correct path
 import { Skeleton } from "@/components/ui/skeleton";
@@ -60,10 +60,11 @@ const TenantLandingPage = ({ params }: { params: Promise<{ tenantSlug: string }>
       setTenant(tenantResponse.data);
       // Identify main leagues
       const mainLeagues = tenantResponse.data.leagues
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .sort((a: any, b: any) => {
+        .sort((a: LeagueBasic, b: LeagueBasic) => {
             if (a.parentLeagueId === null && b.parentLeagueId !== null) return -1;
             if (a.parentLeagueId !== null && b.parentLeagueId === null) return 1;
+            if (a.gender === Gender.MALE && b.gender !== Gender.MALE) return -1;
+            if (a.gender !== Gender.MALE && b.gender === Gender.MALE) return -1;
             return 0;
         })
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -219,7 +220,7 @@ const TenantLandingPage = ({ params }: { params: Promise<{ tenantSlug: string }>
                     
                         <div>
                             <div className="flex items-center justify-between px-8 mb-4">
-                                <h2 className="text-2xl font-bold pl-56">Matchs</h2>
+                                <h2 className="text-2xl font-bold md:pl-42 lg:pl-56">Matchs</h2>
                                 {/* "Voir Touts les matchs" link for larger screens */}
                                 {games.length > 0 && (
                                     <Link 
