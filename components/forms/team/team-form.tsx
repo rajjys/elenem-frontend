@@ -92,7 +92,7 @@ export function TeamForm({ onSuccess, onCancel }: TeamFormProps) {
     },
   });
 
-  const { watch, handleSubmit, trigger } = form;
+  const { watch, handleSubmit, trigger, formState : { errors } } = form;
   const selectedTenantId = watch("tenantId");
   //const selectedLeagueId = watch("leagueId");
 
@@ -230,10 +230,13 @@ export function TeamForm({ onSuccess, onCancel }: TeamFormProps) {
     }
   };
 
-  if (!userAuth) return 
-                  <div className="flex items-center justify-center min-h-screen">
-                    <LoadingSpinner message="Chargement de l'utilisatuer"/>
-                  </div>
+  if (!userAuth) 
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <LoadingSpinner message="Chargement de l'utilisatuer"/>
+      </div>
+    )
+    console.log(errors);
   return (
     <div className="flex justify-center p-4 bg-gray-50">
       <Card className="w-full max-w-7xl shadow-lg rounded-xl">

@@ -19,7 +19,7 @@ export const CreateBusinessProfileSchema = z.object({
   phone: z.string().optional().nullable(),
   businessPhone: z.string().optional().nullable(),
   supportEmail: z.string().email().optional().nullable(),
-  website: z.string().url().optional().nullable(),
+  website: z.string().optional().nullable(),
   socialLinks: SocialLinksSchema.optional().nullable(),
 
   // Financial/Administrative

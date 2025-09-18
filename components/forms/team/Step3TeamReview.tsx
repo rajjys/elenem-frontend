@@ -78,13 +78,6 @@ export default function Step3_TeamReview({ form, logoPreview, bannerPreview, own
         <p><strong>Owner:</strong> {ownerName}</p>
         <p><strong>Home Venue:</strong> {venueName}</p>
       </div>
-
-      {/* Raw media info */}
-      <div className="bg-gray-100 p-4 rounded-lg">
-        <h3 className="text-lg font-semibold mb-2">Media</h3>
-        <p><strong>Logo URL:</strong> {formData.businessProfile?.logoUrl || "N/A"}</p>
-        <p><strong>Banner URL:</strong> {formData.businessProfile?.bannerImageUrl || "N/A"}</p>
-      </div>
     </CardContent>
   );
 }
