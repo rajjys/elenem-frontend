@@ -71,7 +71,6 @@ export default function TeamLandingPage({ params }: { params: Promise<{ leagueSl
       const res = await api.get<string[]>(`/public-games/dates`, {
         params: { tenantSlug: team.tenant.slug, leagueSlug, teamSlug },
       });
-      console.log(res);
       const dates = res.data;
       setAvailableDates(dates);
       if (dates.length > 0) {
@@ -178,7 +177,7 @@ const fetchStandings = useCallback(async () => {
             <div className="w-full h-48 bg-gray-200 rounded-lg" />
           )}
           <div className="absolute bottom-0 left-4 flex items-center gap-4">
-            {team.businessProfile?.logoAsset?.url && (
+            {team.businessProfile?.logoAsset?.url ? (
               <Image
                 src={team.businessProfile.logoAsset.url}
                 alt={team.name}
@@ -186,7 +185,11 @@ const fetchStandings = useCallback(async () => {
                 height={50}
                 className="w-20 h-20 rounded-full border-4 border-white shadow-md"
               />
-            )}
+            ) :
+            (
+              <div className="h-20 w-20 rounded-full bg-gray-300 border-4 border-white" />
+            )
+            }
             <div className="text-white drop-shadow-md">
               <h1 className="text-2xl font-bold">{team.name}</h1>
               <p className="text-sm">{team.shortCode}</p>

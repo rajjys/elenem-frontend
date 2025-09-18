@@ -47,6 +47,7 @@ export default function PublicTeamsPage({ params }: { params: Promise<{ tenantSl
           leagueSlug: selectedLeague || undefined,
         },
       });
+      console.log(res.data.data);
       setTeams(res.data.data);
     } catch (err) {
       console.error(err);
@@ -134,7 +135,7 @@ export default function PublicTeamsPage({ params }: { params: Promise<{ tenantSl
                           className="h-8 w-8 rounded-full object-cover"
                         />
                       ) : (
-                        <div className="h-8 w-8 rounded-full bg-gray-500" />
+                        <div className="h-8 w-8 rounded-full bg-gray-300" />
                       )}
                       <div>
                         <h3 className="font-semibold">{team.name}</h3>
