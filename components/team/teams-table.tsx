@@ -198,7 +198,7 @@ export function TeamsTable({ teams, onSort, sortBy, sortOrder, onDelete, current
                   <div className="text-sm text-gray-900">
                     {team.league ? (
                       <Link href={buildLink(`/admin/leagues/${team.league.id}`)} className="text-primary-600 hover:text-primary-800">
-                        {team.league.name} ({team.league.leagueCode})
+                        {team.league.name}({team.league.slug})
                       </Link>
                     ) : 'N/A'}
                   </div>

@@ -168,7 +168,7 @@ export function SeasonsTable({ seasons, onSort, sortBy, sortOrder, onDelete, cur
                   <div className="text-sm text-gray-900">
                     {season.league ? (
                       <Link href={buildLink(`/admin/leagues/${season.league.id}`)} className="text-primary-600 hover:text-primary-800">
-                        {season.league.name} ({season.league.leagueCode})
+                        {season.league.name} ({season.league.slug})
                       </Link>
                     ) : 'N/A'}
                   </div>
