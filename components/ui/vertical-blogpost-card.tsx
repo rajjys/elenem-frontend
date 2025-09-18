@@ -24,7 +24,7 @@ const BlogPostCard = ({ post, themeColor="orange" }: BlogPostCardProps) => {
 
       {/* Title Text */}
       <div className="absolute bottom-0 w-full p-4 text-white">
-        <h3 className="text-lg md:text-xl font-bold leading-snug line-clamp-3">
+        <h3 className="text-base md:text-lg font-bold leading-snug line-clamp-3">
           {post.title}
         </h3>
       </div>

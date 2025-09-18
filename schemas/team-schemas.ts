@@ -1,7 +1,7 @@
 // schemas/team.schemas.ts (new file, or add to your existing prisma/index.ts for shared schemas)
 import * as z from 'zod';
 import { GenderSchema, SportTypeSchema, TeamVisibility, TeamVisibilitySchema } from './enums';
-import { CreateBusinessProfileSchema } from './common-schemas';
+import { BusinessProfileSchema, CreateBusinessProfileSchema } from './common-schemas';
 
 // 2) Base team: drop description/logo/banner from here
 export const BaseTeamSchema = z.object({
@@ -50,11 +50,11 @@ export const TeamDetailsSchema = BaseTeamSchema.extend({
   isActive: z.boolean().optional(),
   leagueId: z.string().cuid(),
   tenantId: z.string().cuid(),
-  businessProfile: CreateBusinessProfileSchema,
+  businessProfile: BusinessProfileSchema,
   league: z.object({
     id: z.string().cuid(),
     name: z.string(),
-    leagueCode: z.string(),
+    slug: z.string(),
     gender: z.any(),
     division: z.string(),
   }),

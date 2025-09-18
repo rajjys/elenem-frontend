@@ -283,7 +283,7 @@ const TenantLandingPage = ({ params }: { params: Promise<{ tenantSlug: string }>
                             <CardTitle><div className="text-2xl font-bold text-gray-700  text-center pl-4 pt-4">Classements {tenant?.name}</div></CardTitle>
                             <CardContent className="p-6">
                                 <Tabs value={selectedLeagueSlug || ''} onValueChange={setSelectedLeagueSlug} className="w-full">
-                                    <TabsList className="flex justify-between items-center">
+                                    <TabsList className="flex justify-around items-center">
                                         {mainLeagues.map((league) => (
                                             <TabsTrigger key={league.id} value={league.slug} className="text-xs md:text-sm cursor-pointer hover:bg-gray-200 focus:bg-gray-300">
                                                 {league.name}

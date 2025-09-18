@@ -121,7 +121,7 @@ const TenantStandingsPage = ({ params }: { params: Promise<{ tenantSlug: string 
         <CardContent>
           {mainLeagues.length > 0 ? (
             <Tabs value={selectedLeagueSlug || ""} onValueChange={setSelectedLeagueSlug}>
-              <TabsList className="flex justify-between items-center flex-wrap gap-2">
+              <TabsList className="flex justify-around items-center flex-wrap gap-2">
                 {mainLeagues.map((league) => (
                   <TabsTrigger key={league.id} value={league.slug}>
                     {league.division} - {league.gender === Gender.MALE ? 'M' : league.gender === Gender.FEMALE ? 'F' : 'X'}

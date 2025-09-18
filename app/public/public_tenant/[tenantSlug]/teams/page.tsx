@@ -10,24 +10,12 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowRight } from "lucide-react";
 import Image from "next/image";
-import { LeagueBasic, PaginatedLeaguesResponseDto } from "@/schemas";
-
-interface Team {
-  name: string;
-  shortName: string;
-  slug: string;
-  businessProfile?: {
-    logoUrl?: string | null;
-  };
-  league: {
-    slug: string;
-  }
-}
+import { LeagueBasic, PaginatedLeaguesResponseDto, TeamDetails } from "@/schemas";
 
 export default function PublicTeamsPage({ params }: { params: Promise<{ tenantSlug: string }> }) {
   const { tenantSlug } = use(params);
 
-  const [teams, setTeams] = useState<Team[]>([]);
+  const [teams, setTeams] = useState<TeamDetails[]>([]);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
   const [selectedLeague, setSelectedLeague] = useState<string | undefined>();
@@ -59,7 +47,6 @@ export default function PublicTeamsPage({ params }: { params: Promise<{ tenantSl
           leagueSlug: selectedLeague || undefined,
         },
       });
-      console.log(res.data.data);
       setTeams(res.data.data);
     } catch (err) {
       console.error(err);
@@ -138,20 +125,20 @@ export default function PublicTeamsPage({ params }: { params: Promise<{ tenantSl
                 <Card key={team.slug} className="overflow-hidden hover:shadow-md transition bg-gray-200 hover:bg-gray-50">
                   <CardContent className="flex items-center justify-between p-3">
                     <div className="flex items-center gap-4">
-                      {team.businessProfile?.logoUrl ? (
+                      {team.businessProfile?.logoAsset?.url ? (
                         <Image
-                          src={team.businessProfile.logoUrl}
+                          src={team.businessProfile.logoAsset.url}
                           alt={team.name}
                           height={30}
                           width={30}
                           className="h-8 w-8 rounded-full object-cover"
                         />
                       ) : (
-                        <div className="h-8 w-8 rounded-full bg-gray-200" />
+                        <div className="h-8 w-8 rounded-full bg-gray-500" />
                       )}
                       <div>
                         <h3 className="font-semibold">{team.name}</h3>
-                        <p className="text-sm text-gray-500">{team.shortName}</p>
+                        <p className="text-sm text-gray-500">{team.shortCode}</p>
                       </div>
                     </div>
                     <div>
