@@ -47,7 +47,6 @@ export default function PublicTeamsPage({ params }: { params: Promise<{ tenantSl
           leagueSlug: selectedLeague || undefined,
         },
       });
-      console.log(res.data.data);
       setTeams(res.data.data);
     } catch (err) {
       console.error(err);
