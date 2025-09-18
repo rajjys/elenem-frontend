@@ -1,7 +1,7 @@
 // components/layout/AppLayoutNavbar.tsx
 'use client'
 
-import { User, LogOut, Settings, Menu, Shield } from 'lucide-react'
+import { User, LogOut, Settings, Menu, Shield, LayoutDashboard } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Skeleton
@@ -56,7 +56,7 @@ export function AppLayoutNavbar({ logoUrl = "/logos/elenem-sport.png", dashboard
           <Menu className="h-6 w-6" />
         </Button>
 
-        <Link href={dashboardLink} className="flex items-center gap-3">
+        <Link href='/' className="flex items-center gap-3">
                 <Image src={logoUrl} alt="Elenem" width={120} height={48} className="object-contain" />
         </Link>
       </div>
@@ -81,6 +81,9 @@ export function AppLayoutNavbar({ logoUrl = "/logos/elenem-sport.png", dashboard
             {dropdownOpen && (
               <div className="absolute right-0 mt-2 w-52 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-40">
                 <div className="py-1">
+                  <Link href={dashboardLink} onClick={() => setDropdownOpen(false)} className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                    <LayoutDashboard className="w-4 h-4" /> Tableau de Bord
+                  </Link>
                   <Link href="/account/dashboard" onClick={() => setDropdownOpen(false)} className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                     <User className="w-4 h-4" /> Mon Espace
                   </Link>
