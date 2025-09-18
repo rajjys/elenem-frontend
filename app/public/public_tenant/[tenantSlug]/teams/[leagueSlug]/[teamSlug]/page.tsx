@@ -9,27 +9,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
 import GamePublicCard from "@/components/game/game-public-card";
 import DateCarousel from "@/components/game/date-carousel";
-import { GameDetails } from "@/schemas";
+import { GameDetails, TeamDetails } from "@/schemas";
 import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 
-interface TeamPublicDto {
-  id: string;
-  slug: string;
-  name: string;
-  shortCode: string;
-  leagueId: string;
-  visibility: string;
-  businessProfile: {
-    logoUrl?: string | null;
-    bannerImageUrl?: string | null;
-    website?: string | null;
-    phone?: string | null;
-    address?: string | null;
-  };
-  league: { slug: string; name: string; id: string; division: string; gender: string };
-  tenant: { name: string; id: string; tenantCode: string, slug: string };
-}
 interface TenantWithGames {
   tenantId: string;
   logoUrl?: string | null;
@@ -58,7 +41,7 @@ interface Standing {
 export default function TeamLandingPage({ params }: { params: Promise<{ leagueSlug: string; teamSlug: string }> }) {
   const { leagueSlug, teamSlug } = use(params);
 
-  const [team, setTeam] = useState<TeamPublicDto | null>(null);
+  const [team, setTeam] = useState<TeamDetails | null>(null);
   const [availableDates, setAvailableDates] = useState<string[]>([]);
   const [selectedDate, setSelectedDate] = useState<string>("");
   const [games, setGames] = useState<GameDetails[]>([]);
@@ -71,7 +54,7 @@ export default function TeamLandingPage({ params }: { params: Promise<{ leagueSl
   const fetchTeam = useCallback(async () => {
     setLoadingTeam(true);
     try {
-      const res = await api.get<TeamPublicDto>(`/public-teams/${teamSlug}`);
+      const res = await api.get<TeamDetails>(`/public-teams/${teamSlug}`);
       setTeam(res.data);
     } catch (err) {
       console.error(err);
@@ -183,9 +166,9 @@ const fetchStandings = useCallback(async () => {
       <div className="container mx-auto space-y-10">
         {/* Header */}
         <div className="relative">
-          {team.businessProfile?.bannerImageUrl ? (
+          {team.businessProfile?.bannerAsset?.url ? (
             <Image
-              src={team.businessProfile.bannerImageUrl}
+              src={team.businessProfile.bannerAsset.url}
               alt="Team banner"
               width={736}
               height={480}
@@ -195,9 +178,9 @@ const fetchStandings = useCallback(async () => {
             <div className="w-full h-48 bg-gray-200 rounded-lg" />
           )}
           <div className="absolute bottom-0 left-4 flex items-center gap-4">
-            {team.businessProfile?.logoUrl && (
+            {team.businessProfile?.logoAsset?.url && (
               <Image
-                src={team.businessProfile.logoUrl}
+                src={team.businessProfile.logoAsset.url}
                 alt={team.name}
                 width={50}
                 height={50}

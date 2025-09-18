@@ -63,6 +63,7 @@ export const TeamDetailsSchema = BaseTeamSchema.extend({
     name: z.string(),
     tenantCode: z.string(),
     sportType: z.any(),
+    slug: z.string()
   }),
   managers: z.array(z.object({
     id: z.string().cuid(),
