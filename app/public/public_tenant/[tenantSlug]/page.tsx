@@ -64,7 +64,7 @@ const TenantLandingPage = ({ params }: { params: Promise<{ tenantSlug: string }>
             if (a.parentLeagueId === null && b.parentLeagueId !== null) return -1;
             if (a.parentLeagueId !== null && b.parentLeagueId === null) return 1;
             if (a.gender === Gender.MALE && b.gender !== Gender.MALE) return -1;
-            if (a.gender !== Gender.MALE && b.gender === Gender.MALE) return -1;
+            if (a.gender !== Gender.MALE && b.gender === Gender.MALE) return 1;
             return 0;
         })
         // eslint-disable-next-line @typescript-eslint/no-explicit-any

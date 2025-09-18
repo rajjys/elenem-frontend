@@ -1,6 +1,6 @@
+import { BlogPost } from '@/schemas';
 import Image from 'next/image';
 import Link from 'next/link';
-import { BlogPost } from '@/data/mockBlogPosts';
 
 type BlogPostCardProps = {
   post: BlogPost;
@@ -12,7 +12,7 @@ const BlogPostCard = ({ post, themeColor="orange" }: BlogPostCardProps) => {
     <Link href={`/news/${post.slug}`} className="block w-full aspect-[9/14] relative rounded-md overflow-hidden group">
       {/* Background Image */}
       <Image
-        src={post.imageUrl}
+        src={post.heroImage.url}
         alt={post.title}
         fill
         className="object-cover transition-transform duration-300 group-hover:scale-105"
