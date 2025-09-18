@@ -145,7 +145,6 @@ export function TenantCreationForm({ onSuccess, onCancel }: TenantFormProps) {
   return (
     <div className="flex justify-center p-4 bg-gray-50">
       <Card className="w-full max-w-7xl shadow-lg rounded-xl">
-        {errors && <p className="text-red-400 pb-2">Erreur: {errors.businessProfile?.message} </p>}
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="p-6">
             <Stepper steps={steps} currentStep={currentStep} />
