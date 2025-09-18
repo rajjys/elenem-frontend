@@ -142,14 +142,14 @@ export default function GamePage({
       <Card className="mt-6 shadow-md">
         <CardContent className="p-6">
           {/* Teams row */}
-          <div className="grid grid-cols-3 items-center">
+          <div className="grid grid-cols-3 gap-3 items-center">
             {/* Home Team */}
             <div className="text-center">
               {homeStanding && <span className="text-center text-base text-green-900 font-semibold py-1 flex items-center justify-center gap-1">
                 {homeStanding.rank}
                 <ListBulletsIcon/>
               </span>}
-              {game.homeTeam.businessProfile.logoAsset?.url && (
+              {game.homeTeam.businessProfile.logoAsset?.url ? (
                 <Image
                   src={game.homeTeam.businessProfile.logoAsset.url}
                   alt={game.homeTeam.name}
@@ -157,7 +157,8 @@ export default function GamePage({
                   width={60}
                   className="w-20 h-20 mx-auto rounded-full"
                 />
-              )}
+              ) :
+                <div className="h-20 w-20 rounded-full bg-gray-300 mx-auto border-4 border-white" />}
               <Link href={`/teams/${leagueSlug}/${game.homeTeam.slug}`}>
                 <h3 className="mt-2 font-bold hover:text-green-700 transition-colors duration-300 ease-in-out">
                   {game.homeTeam.name}
@@ -174,10 +175,10 @@ export default function GamePage({
             </div>
             {/* Score & status */}
             <div className="text-center">
-              <p className="text-lg font-semibold">{getStatusDisplay(game.status)}</p>
+              <p className="text-base md:text-lg font-semibold">{getStatusDisplay(game.status)}</p>
               {(game.status === GameStatus.IN_PROGRESS ||
                 game.status === GameStatus.COMPLETED) && (
-                <p className="text-3xl font-bold my-2">
+                <p className="text-2xl md:text-3xl font-bold my-2">
                   {game.homeScore ?? "-"} : {game.awayScore ?? "-"}
                 </p>
               )}
@@ -192,7 +193,7 @@ export default function GamePage({
             {/* Away Team */}
             <div className="text-center">
               {awayStanding && <span className="text-center text-base text-green-900 font-semibold py-1 flex items-center justify-center gap-1">{awayStanding.rank}<ListBulletsIcon/></span>}
-              {game.awayTeam.businessProfile.logoAsset?.url && (
+              {game.awayTeam.businessProfile.logoAsset?.url ? (
                 <Image
                   src={game.awayTeam.businessProfile.logoAsset.url}
                   alt={game.awayTeam.name}
@@ -200,7 +201,9 @@ export default function GamePage({
                   width={60}
                   className="w-20 h-20 mx-auto rounded-full"
                 />
-              )}
+              ) :
+                <div className="h-20 w-20 rounded-full bg-gray-300 mx-auto border-4 border-white" />
+              }
               <Link href={`/teams/${leagueSlug}/${game.awayTeam.slug}`}>
                 <h3 className="mt-2 font-bold hover:text-green-700 transition-colors duration-300 ease-in-out">
                   {game.awayTeam.name}
