@@ -73,7 +73,7 @@ const StandingsTable: React.FC<StandingsTableProps> = ({ standings, rowsToShow =
                                 <Link href={`/teams/${standing.league.slug}/${standing.team.slug}`} className="flex items-center justify-start space-x-2 group">
                                     <Image
                                       className='h-8 w-8 rounded-full object-cover border border-gray-400 mr-2'
-                                      src={standing.team.businessProfile.logoUrl || "https://placehold.co/40x40/cccccc/333333?text=${team.name.charAt(0)}"}
+                                      src={standing.team.businessProfile.logoAsset?.url || "https://placehold.co/40x40/cccccc/333333?text=${team.name.charAt(0)}"}
                                       height={60}
                                       width={60}
                                       placeholder="blur"

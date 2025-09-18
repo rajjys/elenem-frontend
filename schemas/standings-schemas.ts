@@ -7,6 +7,9 @@ export interface Standing {
         businessProfile: {
             logoUrl: string | null;
             bannerImageUrl: string | null;
+            logoAsset?: {
+                url: string;
+            } | null;
         }
     };
     rank: number;
