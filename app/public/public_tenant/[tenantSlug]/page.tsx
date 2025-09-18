@@ -13,7 +13,6 @@ import StandingsTable from '@/components/public/standings-table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import VerticalBlogPostCard from '@/components/ui/vertical-blogpost-card';
 import axios from 'axios';
-import { toast } from 'sonner';
 
 
 interface PublicTenantDetails {

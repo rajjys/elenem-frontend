@@ -87,7 +87,7 @@ const TenantHeroSection: React.FC<TenantHeroSectionProps> = ({ primaryColor, sec
   const currentPost = blogPosts[currentPostIndex];
 
   return (
-    <div className="relative h-[80vh] md:h-[90vh] lg:h-[92vh] w-full overflow-hidden">
+    <div className="relative h-[50vh] md:h-[90vh] lg:h-[92vh] w-full overflow-hidden">
       {/* Background image with overlay and smooth transition */}
       <div
         className="absolute inset-0 z-0 h-full w-full transition-all duration-1000 ease-in-out"
