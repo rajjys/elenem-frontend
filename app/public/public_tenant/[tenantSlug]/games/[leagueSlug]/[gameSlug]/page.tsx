@@ -149,9 +149,9 @@ export default function GamePage({
                 {homeStanding.rank}
                 <ListBulletsIcon/>
               </span>}
-              {game.homeTeam.businessProfile.logoUrl && (
+              {game.homeTeam.businessProfile.logoAsset?.url && (
                 <Image
-                  src={game.homeTeam.businessProfile.logoUrl}
+                  src={game.homeTeam.businessProfile.logoAsset.url}
                   alt={game.homeTeam.name}
                   height={60}
                   width={60}
@@ -192,9 +192,9 @@ export default function GamePage({
             {/* Away Team */}
             <div className="text-center">
               {awayStanding && <span className="text-center text-base text-green-900 font-semibold py-1 flex items-center justify-center gap-1">{awayStanding.rank}<ListBulletsIcon/></span>}
-              {game.awayTeam.businessProfile.logoUrl && (
+              {game.awayTeam.businessProfile.logoAsset?.url && (
                 <Image
-                  src={game.awayTeam.businessProfile.logoUrl}
+                  src={game.awayTeam.businessProfile.logoAsset.url}
                   alt={game.awayTeam.name}
                   height={60}
                   width={60}
