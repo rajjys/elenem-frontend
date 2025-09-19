@@ -9,7 +9,6 @@ import { FiUser, FiChevronDown } from "react-icons/fi";
 import { Users, LayoutDashboard, User, Shield, Settings, LogOut,
   Calendar,
   ShieldCheck,
-  CreditCard,
   Home
 } from "lucide-react";
 
@@ -196,7 +195,7 @@ export const PublicHeader = ({
                 </div>
               ) : (
                 // LOGIN always visible (mobile & desktop)
-                <Link href="/login" className="inline-flex items-center gap-2 px-3 py-2 rounded-full border border-gray-200 hover:bg-gray-50">
+                <Link href="/login" className="inline-flex items-center gap-2 px-3 py-2 rounded-full border border-gray-200 hover:bg-gray-50" aria-disabled>
                   <FiUser className="w-5 h-5 p-1 rounded-full border border-gray-200" />
                   <span className="hidden sm:inline text-sm font-semibold text-sky-700">Se connecter</span>
                 </Link>
@@ -212,9 +211,9 @@ export const PublicHeader = ({
           {[
               { label: "Accueil", href: "/", icon: Home},
               { label: "Matchs", href: "/games", icon: Calendar},
-              { label: "Ligues", href: "/tenants", icon: Users },
-              { label: "Fonctionnalités", href: "/features", icon: ShieldCheck },
-              { label: "Tarifs", href: "/pricing", icon: CreditCard},
+              { label: "Organisations", href: "/tenants", icon: Users },
+              { label: "Logiciel", href: "/features", icon: ShieldCheck },
+              //{ label: "Tarifs", href: "/pricing", icon: CreditCard},
             ].map((link) => {
             const Icon = link.icon;
             const isActive = pathname === link.href;

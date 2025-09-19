@@ -55,7 +55,6 @@ export default function TeamLandingPage({ params }: { params: Promise<{ leagueSl
     setLoadingTeam(true);
     try {
       const res = await api.get<TeamDetails>(`/public-teams/${teamSlug}`);
-      console.log(res.data);
       setTeam(res.data);
     } catch (err) {
       console.error(err);
