@@ -1,7 +1,7 @@
 // app/(app)/layout.tsx
 import "./globals.css";
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Analytics } from "@vercel/analytics/next" ///Vercel Analytics
+import { SpeedInsights } from "@vercel/speed-insights/next"
 // app/layout.tsx (if this is the root layout) or a specific public group layout
 import React, { ReactNode } from 'react';
 import { Inter } from 'next/font/google'; // Example font
@@ -34,6 +34,8 @@ export default function PublicLayout({ children }: { children: ReactNode }) {
             richColors // ✅ success = green, error = red, etc.
             closeButton // ✅ shows an X button on every toast
         />
+        <Analytics/>
+        <SpeedInsights/>
       </body>
     </html>
   );
