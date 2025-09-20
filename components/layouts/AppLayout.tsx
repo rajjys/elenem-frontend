@@ -8,7 +8,7 @@ import { useAuthStore } from '@/store/auth.store'; // Assuming this path is corr
 import { CollapsibleNavLink, FlyoutMenu, NavLink } from '.'; // Adjust this import path if needed
 import { useContextualLink, useSidebarEligibility } from '@/hooks';
 import { Roles } from '@/schemas'; // Assuming Role enum is here
-import { AppLayoutNavbar } from './AppLayourNavbar'; // Import the updated Navbar
+import { AppLayoutNavbar } from './AppLayoutHeader'; // Import the updated Navbar
 import { Settings, Shield, User } from 'lucide-react';
 
 // Type for a React Icon component

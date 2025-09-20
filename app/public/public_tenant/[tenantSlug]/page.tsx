@@ -133,7 +133,6 @@ const TenantLandingPage = ({ params }: { params: Promise<{ tenantSlug: string }>
                 setStandings([]);
                 return;
             }
-
             setLoadingStandings(true);
             try {
                 const standingsResponse = await api.get(`/public-games/standings/${selectedLeagueSlug}`);

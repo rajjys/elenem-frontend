@@ -5,12 +5,6 @@ import { Roles } from './schemas'; // Assuming Role enum is imported from Prisma
 import { resolveTenantSlugFromHostname, verifyJWT } from './utils'; // Your utility to verify JWT
 import { JwtPayload } from './types';
 
-// Define your root domain from environment variables.
-// Use a fallback for development if NEXT_PUBLIC_ROOT_DOMAIN is not set.
-// For Vercel deployments, this will typically be your production domain.
-// For local development, you might use 'localhost:3000' or similar.
-const ROOT_DOMAIN = process.env.NODE_ENV === 'development' ? 'lvh.me:3000' : process.env.NEXT_PUBLIC_ROOT_DOMAIN  || 'elenem.site';
-
 // Define public paths that are accessible to everyone, regardless of authentication status.
 // These are typically paths on the root domain (e.g., website.com/login, website.com/leagues)
 const publicPaths = [
@@ -53,10 +47,8 @@ export async function middleware(request: NextRequest) {
   }
 
   // --- 2. Determine the tenant slug from the hostname for public-facing subdomains ---
-  //console.log("Hostname: ", hostname);
-  //console.log("Root Domain: ", ROOT_DOMAIN);
-  const tenantSlug = resolveTenantSlugFromHostname(hostname, ROOT_DOMAIN);
-  //console.log("Slug: ",tenantSlug)
+  const tenantSlug = resolveTenantSlugFromHostname(hostname);
+  console.log("Slug from Mid: ",tenantSlug)
   if (tenantSlug && !['www', 'localhost'].includes(tenantSlug)) {
     const newPath = url.pathname === '/'
     ? `/public/public_tenant/${tenantSlug}/`

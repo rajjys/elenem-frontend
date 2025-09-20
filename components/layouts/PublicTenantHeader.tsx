@@ -3,32 +3,22 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { FiUser } from "react-icons/fi";
 import { Users, ListOrdered, MoreHorizontal, Volleyball, Goal, Trophy, Home } from "lucide-react";
 import { useClickAway } from "@/hooks/useClickAway";
-import { SportType } from "@/schemas";
+import { SportType, TenantDetails } from "@/schemas";
 import { useScrollDirection } from "@/hooks";
 import { BasketballIcon, SoccerBallIcon, TennisBallIcon } from "@phosphor-icons/react";
+import { api } from "@/services/api";
+import { resolveTenantSlugFromHostname } from "@/utils";
+import { Skeleton } from "../ui";
 
 interface NavLink {
   label: string;
   href: string;
   icon?: React.ElementType;
-}
-
-interface TenantHeaderProps {
-  tenant: {
-    businessProfile: {
-      logoUrl?: string | null;
-      theme?: {
-        primaryColor?: string | null;
-        secondaryColor?: string | null;
-      };
-    };
-    sportType?: SportType;
-  };
 }
 
 const getSportIcon = (sportType?: SportType) => {
@@ -42,16 +32,38 @@ const getSportIcon = (sportType?: SportType) => {
   }
 };
 
-export const PublicTenantHeader: React.FC<TenantHeaderProps> = ({ tenant }) => {
+export const PublicTenantHeader = () => {
   const pathname = usePathname();
   const [moreOpen, setMoreOpen] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [tenant, setTenant] = useState<TenantDetails | null>();
 
   const scrollDir = useScrollDirection();
   const moreRef = useRef<HTMLDivElement>(null);
   useClickAway(moreRef, () => setMoreOpen(false));
 
-  const GameIcon = getSportIcon(tenant.sportType);
+  ///Fetch tenant details
+  useEffect(() => {
+      const hostname = window.location.hostname;
+      console.log("Host: ", hostname);
+      const slug = resolveTenantSlugFromHostname(hostname);
+      console.log("Slug: ",slug);
+      if (!slug) return;
+
+      const fetchTenant = async () => {
+        try {
+          const tenantResponse = await api.get<TenantDetails>(`/public-tenants/${slug}`);
+          console.log("Tenant: ", tenantResponse.data);
+          setTenant(tenantResponse.data);
+        } catch (err) {
+          console.error('Failed to fetch tenant:', err);
+        }
+      };
+
+      fetchTenant();
+    }, []);
+
+  const GameIcon = getSportIcon(tenant?.sportType ?? SportType.FOOTBALL);
 
   const mainLinks: NavLink[] = [
     { label: "Accueil", href: "/", icon: Home },
@@ -74,38 +86,32 @@ export const PublicTenantHeader: React.FC<TenantHeaderProps> = ({ tenant }) => {
     { label: "Contact", href: "/contact" },
   ];
 
-  const primaryColor = tenant.businessProfile.theme?.primaryColor || "#0284c7"; // default sky-600
-  const secondaryColor = tenant.businessProfile.theme?.secondaryColor || "#0369a1";
+  const primaryColor = tenant?.businessProfile.brandingTheme?.primaryColor || "orange"; // default sky-600
+  const secondaryColor = tenant?.businessProfile.brandingTheme?.secondaryColor || "blue";
 
   return (
     <>
       <header
-        className={`w-full border-b border-${secondaryColor}-200 bg-white/95 backdrop-blur-md z-50 transition-transform duration-300
+        className={`w-full border-b border-${secondaryColor}-200 bg-gray-200/95 backdrop-blur-md z-50 transition-transform duration-300
         ${scrollDir === "down" ? "-translate-y-full" : "translate-y-0"}
         md:sticky md:top-0`}
       >
         <div className="mx-auto max-w-7xl px-3 lg:px-6 flex h-12 lg:h-16 items-center justify-between gap-4">
             {/* Brand */}
-            <Link href="/" className="flex items-center gap-2">
-              {tenant.businessProfile.logoUrl ? (
-                <Image
-                  src={tenant.businessProfile.logoUrl}
+            <Link href="/" className="flex items-center justify-start gap-2">
+              {tenant?.businessProfile.logoAsset?.url ? (
+              <Image
+                  src={tenant.businessProfile.logoAsset.url}
                   alt="Tenant Logo"
-                  width={100}
-                  height={40}
-                  className="object-contain h-10 lg:h-14"
+                  width={60}
+                  height={60}
+                  className="object-contain h-11 lg:h-15 rounded-md"
                 />
+                
               ) : (
-                <Image
-                  src="/logos/elenem-sport.png"
-                  alt="Elenem"
-                  width={100}
-                  height={40}
-                  className="object-contain h-10 lg:h-14"
-                />
+                <Skeleton className="h-11 lg:h-15 rounded-md" />
               )}
             </Link>
-
             {/* Desktop Nav */}
             <nav className="hidden md:flex items-center gap-6 text-base">
               {mainLinks.map((link) => {
