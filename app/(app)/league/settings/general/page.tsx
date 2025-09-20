@@ -9,11 +9,12 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { LeagueBasic, SeasonDetails } from "@/schemas";
 import axios from "axios";
+import { useContextualLink } from "@/hooks";
 
 export default function GeneralLeagueSettingsPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-
+  const { buildLink } = useContextualLink();
   //const ctxTenantId = searchParams.get("ctxTenantId");
   const ctxLeagueId = searchParams.get("ctxLeagueId");
 
@@ -73,7 +74,8 @@ export default function GeneralLeagueSettingsPage() {
         currentSeasonId: selectedSeason || null,
       });
       toast.success("League updated successfully");
-      router.refresh();
+      //router.refresh();
+      router.push(buildLink('/league/dashboard'))
     } catch (error) {
       let errorMessage = "Failed to update league. Try Again later";
       if (axios.isAxiosError(error)) {

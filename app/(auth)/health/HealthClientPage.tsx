@@ -18,7 +18,6 @@ export default function HealthClientPage() {
     setMessage('Connecting to backend...');
     try {
       const response = await api.get('/auth/health'); // Your API call
-      console.log("Health check response: ", response);
       if (response.data && response.data.status === 'OK') {
         setStatus('ok');
         setMessage('Backend is connected and healthy!');

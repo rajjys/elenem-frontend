@@ -7,7 +7,6 @@ import { FiHome, FiAward } from 'react-icons/fi';
 // Import reusable components and the new hook
 import AppLayout from '@/components/layouts/AppLayout';
 import { LoadingSpinner } from '@/components/ui';
-import { Building2 } from 'lucide-react';
 
 // --- Main Layout ---
 const userAccountNavItems = [
@@ -16,7 +15,6 @@ const userAccountNavItems = [
     icon: FiHome,
     subItems: [
         { label: "Tableau de Board", basePath: "/account/dashboard", icon: FiHome },
-        { label: "Organisation", basePath: "/account/tenant", icon: Building2 },
     ],
   },
 ];

@@ -35,7 +35,6 @@ interface AppLayoutProps {
   themeColor?: string; // e.g., 'indigo', 'blue', 'emerald' - used for dynamic styling
   headerTitle?: string; // e.g., "ELENEM Admin", "My App" (Note: Header title is now mainly in Navbar)
   logoIcon?: IconType; // Icon component for the app logo (Note: Logo is now mainly in Navbar)
-  showContextSwitcher?: boolean; // Conditionally show the switcher (Note: ContextSwitcher is now in Navbar)
 }
 
 export default function AppLayout({

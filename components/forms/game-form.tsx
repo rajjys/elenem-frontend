@@ -294,7 +294,6 @@ export function GameForm({ onSuccess, onCancel }: GameFormProps) {
             </CardContent>
           </>
         );
-
       case 1:
         return (
           <>
