@@ -67,6 +67,7 @@ export const PublicHeader = ({
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const navLinks = [
+  { label: 'Accueil', href: '/'},
   { label: 'Matchs', href: '/games'},
   { label: 'Organisations', href: '/tenants'},
   //{ label: 'Actualités', href: '/news'},

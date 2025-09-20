@@ -63,7 +63,7 @@ export const PublicTenantHeader = () => {
       fetchTenant();
     }, []);
 
-  const GameIcon = getSportIcon(tenant?.sportType ?? SportType.FOOTBALL);
+  const GameIcon = getSportIcon(tenant?.sportType);
 
   const mainLinks: NavLink[] = [
     { label: "Accueil", href: "/", icon: Home },
