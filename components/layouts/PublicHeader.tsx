@@ -5,6 +5,7 @@ import Link from "next/link";
 import React, { useState, useEffect, useRef } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
+import { useScrollDirection } from "@/hooks";
 import { FiUser, FiChevronDown } from "react-icons/fi";
 import { Users, LayoutDashboard, User, Shield, Settings, LogOut,
   Calendar,
@@ -65,6 +66,7 @@ export const PublicHeader = ({
   const [loadingUser, setLoadingUser] = useState(true);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const scrollDir = useScrollDirection();
 
   const navLinks = [
   { label: 'Accueil', href: '/'},
@@ -117,7 +119,9 @@ export const PublicHeader = ({
 
   return (
     <>
-      <header className="sticky top-0 z-50 w-full border-b border-gray-200 bg-white/95 backdrop-blur-md">
+      <header className={`sticky top-0 z-50 w-full border-b border-gray-200 bg-white/95 backdrop-blur-md
+                            transition-transform duration-300
+                          ${scrollDir === "down" ? "-translate-y-full" : "translate-y-0"}`}>
         <div className="mx-auto max-w-8xl px-2 md:px-6 py-1">
           <div className="flex h-14 items-center justify-between gap-4">
             {/* BRAND */}

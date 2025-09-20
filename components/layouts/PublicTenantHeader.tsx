@@ -93,9 +93,8 @@ export const PublicTenantHeader = () => {
     <>
       <header
         className={`w-full border-b border-${secondaryColor}-200 bg-gray-200/95 backdrop-blur-md z-50 transition-transform duration-300
-        ${scrollDir === "down" ? "-translate-y-full" : "translate-y-0"}
-        md:sticky md:top-0`}
-      >
+          ${scrollDir === "down" ? "-translate-y-full" : "translate-y-0"}
+          sticky top-0`}>
         <div className="mx-auto max-w-7xl px-3 lg:px-6 flex h-12 lg:h-16 items-center justify-between gap-4">
             {/* Brand */}
             <Link href="/" className="flex items-center justify-start gap-2">
@@ -107,7 +106,6 @@ export const PublicTenantHeader = () => {
                   height={60}
                   className="object-contain h-11 lg:h-15 rounded-md"
                 />
-                
               ) : (
                 <Skeleton className="h-11 lg:h-15 rounded-md" />
               )}
@@ -122,14 +120,11 @@ export const PublicTenantHeader = () => {
                     <div className="relative" key="plus" ref={moreRef}>
                       <button
                         onClick={() => setMoreOpen(!moreOpen)}
-                        className={`flex flex-col items-center text-xs md:text-sm text-gray-600 hover:text-gray-900 hover:text-${primaryColor}-700 cursor-pointer`}
-                      >
+                        className={`flex flex-col items-center text-xs md:text-sm text-gray-600 hover:text-gray-900 hover:text-${primaryColor}-700 cursor-pointer`}>
                         <MoreHorizontal className="w-6 h-6" />
                         <div className="flex items-center gap-2">
                             <span>{link.label}</span>
-                            
                         </div>
-                        
                       </button>
                       {moreOpen && (
                         <div className="absolute right-0 mt-2 py-4 text-xs md:text-sm rounded-md border-b bg-white shadow-lg z-40">
