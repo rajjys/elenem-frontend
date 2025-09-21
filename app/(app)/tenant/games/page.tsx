@@ -84,18 +84,13 @@ export default function TenantGamesPage() {
           errorMessage = error.response?.data?.message || errorMessage;
         }
         toast.error(errorMessage);
+        console.error(error);
     } finally {
       setLoading(false);
     }
   }, [filters, currentTenantId]);
 
   useEffect(() => {
-    // Authorization check for Tenant Admin
-    if (!userAuth) {
-      toast.error("Unauthorized", { description: "You do not have permission to view this page." });
-      //router.push('/dashboard');
-      return;
-    }
     if (currentTenantId) { // Only fetch if tenantId is available
       fetchGames();
     }

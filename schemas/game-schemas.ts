@@ -27,10 +27,7 @@ const LeagueBasicSchema = z.object({
 const TenantBasicSchema = z.object({
   id: z.string(),
   name: z.string(),
-  tenantCode: z.string(),
-  businessProfile: z.object({
-    website: z.string().optional().nullable(),
-  })
+  tenantCode: z.string()
 });
 
 const SeasonBasicSchema = z.object({
