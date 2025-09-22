@@ -34,7 +34,7 @@ interface TeamScoreProps {
 
 const TeamScore = ({ label, score, onIncrement, onDecrement, isLive, canEdit }: TeamScoreProps) => {
   return (
-    <div className="flex flex-col items-center bg-gray-100 rounded-2xl shadow-inner dark:bg-gray-800 w-20 sm:w-24">
+    <div className="flex flex-col items-center rounded-2xl shadow-inner w-20 sm:w-24">
       <h2 className="text-xs sm:text-sm font-semibold text-gray-700 uppercase tracking-wide mb-2 dark:text-gray-300 text-center">
         {label}
       </h2>
@@ -42,9 +42,8 @@ const TeamScore = ({ label, score, onIncrement, onDecrement, isLive, canEdit }: 
         <Button
           onClick={onIncrement}
           variant="outline"
-          className="w-8 h-8 rounded-full border-2 border-gray-300 hover:bg-gray-200 dark:border-gray-600 dark:hover:bg-gray-700 mb-2"
-        >
-          <ChevronUp className="w-4 h-4 text-green-500" />
+          className="rounded-full border-2 border-gray-300 hover:bg-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600 mb-2">
+            <ChevronUp className='w-4 h-4 text-green-600 dark:text-green-300 font-bold' />
         </Button>
       )}
       <span className="text-3xl sm:text-4xl font-extrabold dark:text-white">
@@ -54,9 +53,8 @@ const TeamScore = ({ label, score, onIncrement, onDecrement, isLive, canEdit }: 
         <Button
           onClick={onDecrement}
           variant="outline"
-          className="w-8 h-8 rounded-full border-2 border-gray-300 hover:bg-gray-200 dark:border-gray-600 dark:hover:bg-gray-700 mt-2"
-        >
-          <ChevronDown className="w-4 h-4 text-red-500" />
+          className="rounded-full border-2 border-gray-300 hover:bg-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600 mb-2">
+            <ChevronDown className="w-4 h-4 text-red-600 dark:text-red-400 font-bold" />
         </Button>
       )}
     </div>
@@ -155,11 +153,19 @@ export default function GameManagementDashboard() {
     }
   };
 
+  ///Keep track of last livescore sent so not to resend again
+  const lastSentScores = React.useRef<{ home: number; away: number }>({ home: 0, away: 0 });
   // Effect to update live score when debounced scores change
   useEffect(() => {
     // Only send updates if the user can edit, the game exists, is IN_PROGRESS, and scores have changed
     if (!isTeamAdmin && game && game.status === GameStatus.IN_PROGRESS) {
-      handleLiveScoreUpdate(debouncedHomeScore, debouncedAwayScore);
+      if (
+        debouncedHomeScore !== lastSentScores.current.home ||
+        debouncedAwayScore !== lastSentScores.current.away
+      ) {
+        handleLiveScoreUpdate(debouncedHomeScore, debouncedAwayScore);
+        lastSentScores.current = { home: debouncedHomeScore, away: debouncedAwayScore };
+      }
     }
   }, [debouncedHomeScore, debouncedAwayScore, game, isTeamAdmin, handleLiveScoreUpdate]);
 
@@ -175,7 +181,7 @@ export default function GameManagementDashboard() {
   const canEdit = !isTeamAdmin;
 
   return (
-    <div className="flex flex-col min-h-screen p-4 sm:p-6 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">
+    <div className="flex flex-col min-h-screen px-2 py-4 sm:p-6 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">
       
       {/* Header: Back + Status + CTA */}
       <div className="flex items-center justify-between mb-4">
@@ -231,7 +237,7 @@ export default function GameManagementDashboard() {
       </div>
 
       {/* Team logos + scores */}
-      <div className="flex sm:flex-row items-center justify-around bg-white dark:bg-gray-800 rounded-3xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+      <div className="flex sm:flex-row items-center justify-around bg-gray-100 dark:bg-gray-800 rounded-3xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
         
         {/* Home team logo */}
         <div className="flex flex-col items-center">
@@ -250,7 +256,7 @@ export default function GameManagementDashboard() {
         </div>
 
         {/* Scores */}
-        <div className="flex items-center space-x-6 sm:space-x-12 my-4 sm:my-0">
+        <div className="flex items-center space-x-8 sm:space-x-12 my-4 sm:my-0">
           <TeamScore
             label="Domicile"
             score={homeScore}

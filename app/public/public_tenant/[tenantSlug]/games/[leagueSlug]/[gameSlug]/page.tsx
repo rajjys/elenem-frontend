@@ -11,6 +11,7 @@ import Image from "next/image";
 import { formatDateFr } from "@/utils";
 import { ListBulletsIcon } from "@phosphor-icons/react";
 import Link from "next/link";
+import { getStatusBadge } from "@/components/ui";
 
 interface Standing {
   teamSlug: string;
@@ -104,27 +105,10 @@ export default function GamePage({
     );
   }
 
-  const getStatusDisplay = (status: GameStatus) => {
-    switch (status) {
-      case GameStatus.SCHEDULED:
-        return "Programmé";
-      case GameStatus.IN_PROGRESS:
-        return "En cours";
-      case GameStatus.COMPLETED:
-        return "Terminé";
-      case GameStatus.POSTPONED:
-        return "Reporté";
-      case GameStatus.CANCELLED:
-        return "Annulé";
-      default:
-        return status;
-    }
-  };
-
   return (
     <div className="min-h-screen max-w-5xl mx-auto">
       {/* Banner */}
-      <div className="relative">
+      <div className="relative" hidden>
         {game.bannerImageUrl ? (
           <Image
             src={game.bannerImageUrl}
@@ -175,7 +159,7 @@ export default function GamePage({
             </div>
             {/* Score & status */}
             <div className="text-center">
-              <p className="text-base md:text-lg font-semibold">{getStatusDisplay(game.status)}</p>
+              <p className="text-base md:text-lg font-semibold">{getStatusBadge(game.status)}</p>
               {(game.status === GameStatus.IN_PROGRESS ||
                 game.status === GameStatus.COMPLETED) && (
                 <p className="text-2xl md:text-3xl font-bold my-2">

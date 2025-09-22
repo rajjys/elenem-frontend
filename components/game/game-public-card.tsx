@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, CardContent, CardHeader } from '@/components/ui';
+import { Card, CardContent, CardHeader, getStatusBadge } from '@/components/ui';
 import { GameDetails, GameStatus } from '@/schemas';
 import { formatDateFr } from '@/utils';
 import Image from 'next/image';
@@ -10,20 +10,6 @@ interface GamePublicCardProps {
 
 const GamePublicCard: React.FC<GamePublicCardProps> = ({ game }) => {
   const gameDate = formatDateFr(game.dateTime);
-
-  // Status badge
-  const statusBadge =
-  game.status === GameStatus.COMPLETED ? (
-    <span className="px-2 py-1 text-xs rounded-full bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-100">
-      Terminé
-    </span>
-  ) : game.status === GameStatus.IN_PROGRESS ? (
-    <span className="px-2 py-1 text-xs rounded-full bg-red-500 text-white">En cours</span>
-  ) : (
-    <span className="px-2 py-1 text-xs rounded-full bg-blue-500 text-white">Programmé</span>
-  );
-
-
   // Team row
   const renderTeam = (
   logo: string | null | undefined,
@@ -33,12 +19,16 @@ const GamePublicCard: React.FC<GamePublicCardProps> = ({ game }) => {
 ) => (
   <div className="flex items-center justify-between w-full py-1">
     <div className="flex items-center gap-2">
-      <Image
-        src={logo || `https://placehold.co/40x40?text=${name.charAt(0)}`}
-        alt={`${name} Logo`}
-        width={28}
-        height={28}
-        className="rounded-full border border-slate-300 dark:border-slate-600"/>
+      {logo ? 
+        <Image
+          src={logo}
+          alt={`${name} Logo`}
+          width={28}
+          height={28}
+          className="rounded-full border border-slate-300 dark:border-slate-600"/>
+          :
+          <div className="h-10 w-10 rounded-full bg-gradient-to-tr from-gray-400 to-blue-700" />
+        }
       <span
         className={`text-sm font-medium ${
           highlight
@@ -81,7 +71,7 @@ const GamePublicCard: React.FC<GamePublicCardProps> = ({ game }) => {
           <span className="hidden md:inline text-sm text-slate-700 dark:text-slate-200 font-medium">
             {gameDate}
           </span>
-          {statusBadge}
+          {getStatusBadge(game.status)}
         </div>
         <div className="md:hidden text-sm text-slate-700 dark:text-slate-200 font-medium flex justify-start gap-4">
           <span>{gameDate}</span>
