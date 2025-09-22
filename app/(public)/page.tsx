@@ -205,7 +205,7 @@ export default function PublicLandingPage() {
                               </p>
                         ) : (
                           games.map((g) => (
-                            <Link href={`${g.tenant.businessProfile?.website || `https://${g.tenant.tenantCode}.elenem.site`}/games/${g.league.slug}/${g.slug}`} key={g.id} className="block">
+                            <Link href={`https://${g.tenant.tenantCode}.elenem.site/games/${g.league.slug}/${g.slug}`} key={g.id} className="block">
                               <div
                                 key={g.id}
                                 className="p-4 flex items-center justify-between hover:bg-slate-100/60 dark:hover:bg-slate-300/40 transition-colors duration-300 ease-in-out"

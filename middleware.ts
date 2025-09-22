@@ -48,7 +48,6 @@ export async function middleware(request: NextRequest) {
 
   // --- 2. Determine the tenant slug from the hostname for public-facing subdomains ---
   const tenantSlug = resolveTenantSlugFromHostname(hostname);
-  console.log("Slug from Mid: ",tenantSlug)
   if (tenantSlug && !['www', 'localhost'].includes(tenantSlug)) {
     const newPath = url.pathname === '/'
     ? `/public/public_tenant/${tenantSlug}/`

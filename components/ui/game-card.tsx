@@ -88,8 +88,8 @@ export const GameCard: React.FC<GameCardProps> = ({ game, buildLink, getStatusBa
 
           {/* Actions */}
           <div className="flex flex-col gap-2 min-w-[130px]">
-            <Link href={buildLink("/game/dashboard")}>
-              <Button className="w-full text-sm">View Details</Button>
+            <Link href={buildLink(`/game/${game.id}/dashboard`)}>
+              <Button className="w-full text-sm">Manage</Button>
             </Link>
             {game.status === GameStatus.SCHEDULED && (
               <Button variant="outline" className="w-full border-gray-300 text-gray-700 text-sm">
