@@ -34,36 +34,35 @@ interface TeamScoreProps {
 
 const TeamScore = ({ label, score, onIncrement, onDecrement, isLive, canEdit }: TeamScoreProps) => {
   return (
-    <div className="flex flex-col items-center p-4 bg-gray-100 rounded-2xl shadow-inner dark:bg-gray-800">
-      <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-2 dark:text-gray-300">
+    <div className="flex flex-col items-center bg-gray-100 rounded-2xl shadow-inner dark:bg-gray-800 w-20 sm:w-24">
+      <h2 className="text-xs sm:text-sm font-semibold text-gray-700 uppercase tracking-wide mb-2 dark:text-gray-300 text-center">
         {label}
       </h2>
-      <div className="flex items-center space-x-4">
-        {canEdit && (
-          <Button
-            onClick={onDecrement}
-            variant="outline"
-            className="w-10 h-10 rounded-full border-2 border-gray-300 hover:bg-gray-200 transition-colors duration-200 dark:border-gray-600 dark:hover:bg-gray-700"
-          >
-            <ChevronDown className="w-5 h-5 text-red-500" />
-          </Button>
-        )}
-        <span className={`text-4xl font-extrabold transition-colors duration-300 dark:text-white ${isLive ? 'text-primary-600' : 'text-gray-900'}`}>
-          {score}
-        </span>
-        {canEdit && (
-          <Button
-            onClick={onIncrement}
-            variant="outline"
-            className="w-10 h-10 rounded-full border-2 border-gray-300 hover:bg-gray-200 transition-colors duration-200 dark:border-gray-700 dark:hover:bg-gray-700"
-          >
-            <ChevronUp className="w-5 h-5 text-green-500" />
-          </Button>
-        )}
-      </div>
+      {canEdit && isLive && (
+        <Button
+          onClick={onIncrement}
+          variant="outline"
+          className="w-8 h-8 rounded-full border-2 border-gray-300 hover:bg-gray-200 dark:border-gray-600 dark:hover:bg-gray-700 mb-2"
+        >
+          <ChevronUp className="w-4 h-4 text-green-500" />
+        </Button>
+      )}
+      <span className="text-3xl sm:text-4xl font-extrabold dark:text-white">
+        {score}
+      </span>
+      {canEdit && isLive && (
+        <Button
+          onClick={onDecrement}
+          variant="outline"
+          className="w-8 h-8 rounded-full border-2 border-gray-300 hover:bg-gray-200 dark:border-gray-600 dark:hover:bg-gray-700 mt-2"
+        >
+          <ChevronDown className="w-4 h-4 text-red-500" />
+        </Button>
+      )}
     </div>
   );
 };
+
 
 export default function GameManagementDashboard() {
   const router = useRouter();
@@ -76,7 +75,14 @@ export default function GameManagementDashboard() {
   const [isUpdating, setIsUpdating] = useState(false);
   const { user: userAuth } = useAuthStore();
   const currentUserRoles = userAuth?.roles || [];
+  const isSystemAdmin = currentUserRoles.includes(Roles.SYSTEM_ADMIN);
+  const isTenantAdmin = currentUserRoles.includes(Roles.TENANT_ADMIN);
+  const isLeagueAdmin = currentUserRoles.includes(Roles.LEAGUE_ADMIN);
   const isTeamAdmin = currentUserRoles.includes(Roles.TEAM_ADMIN);
+  const redirectPath = isSystemAdmin ? "/admin/games":
+                         isTenantAdmin ? "/tenant/games" :
+                         isLeagueAdmin ? "/league/games" :
+                         "/team/games"; // Default fallback path  
 
   // Use debounced values for API calls to avoid spamming the backend
   const [debouncedHomeScore] = useDebounce(homeScore, 500);
@@ -160,153 +166,127 @@ export default function GameManagementDashboard() {
   if (loading || !game) {
     return (
       <div className="flex justify-center items-center h-screen bg-gray-50 dark:bg-gray-900">
-        <LoadingSpinner message='Chargement du match' />
+        <LoadingSpinner message="Chargement du match" />
       </div>
     );
   }
 
+  const isLive = game.status === GameStatus.IN_PROGRESS;
+  const canEdit = !isTeamAdmin;
+
   return (
     <div className="flex flex-col min-h-screen p-4 sm:p-6 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">
-      <h1 className="text-lg md:text-xl lg:text-2xl font-extrabold mb-2 text-center text-primary-600 dark:text-primary-500">
-        {game.homeTeam.name} - {game.awayTeam.name}
-      </h1>
-      <div className="text-center mb-2">
-        <p className="text-sm md:text-base text-gray-500 dark:text-gray-300 mb-2">
-            {formatDateFr(game.dateTime)}
-        </p>
-        {getStatusBadge(game.status)}
-      </div>
-
-      {/* Game Header Card */}
-      <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-lg p-6 mb-8 border border-gray-200 dark:border-gray-700">
-        <div className="flex justify-around items-center text-center space-x-4">
-          <div className="flex flex-col items-center">
-            <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden dark:bg-gray-700">
-              <Image
-                src={game.homeTeam?.businessProfile?.logoAsset?.url || 'https://placehold.co/80x80/E2E8F0/1A202C?text=Home'}
-                alt={game.homeTeam.name || 'Home Team'}
-                width={60}
-                height={60}
-                className="object-cover w-full h-full"
-              />
-            </div>
-            <span className="mt-2 font-semibold text-sm sm:text-base text-gray-900 dark:text-gray-100 text-ellipsis overflow-hidden whitespace-nowrap max-w-[100px] sm:max-w-full">
-              {game.homeTeam.shortCode || game.homeTeam.name}
-            </span>
-          </div>
-          <div className="flex items-center text-3xl font-bold dark:text-white">
-            <span className="text-primary-600 dark:text-primary-500">{game.homeScore}</span>
-            <span className="mx-4 text-gray-400">-</span>
-            <span className="text-primary-600 dark:text-primary-500">{game.awayScore}</span>
-          </div>
-          <div className="flex flex-col items-center">
-            <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden dark:bg-gray-700">
-              <Image
-                src={game.awayTeam?.businessProfile?.logoAsset?.url || 'https://placehold.co/80x80/E2E8F0/1A202C?text=Away'}
-                alt={game.awayTeam.name || 'Away Team'}
-                className="object-cover w-full h-full"
-                width={60}
-                height={60}
-              />
-            </div>
-            <span className="mt-2 font-semibold text-sm sm:text-base text-gray-900 dark:text-gray-100 text-ellipsis overflow-hidden whitespace-nowrap max-w-[100px] sm:max-w-full">
-              {game.awayTeam.shortCode || game.awayTeam.name}
-            </span>
-          </div>
+      
+      {/* Header: Back + Status + CTA */}
+      <div className="flex items-center justify-between mb-4">
+        <Button
+          variant="outline"
+          onClick={() => router.push(redirectPath)}
+          className="rounded-xl"
+        >
+          ← Retour
+        </Button>
+        <div className='flex flex-col justify-center items-center'>
+          {getStatusBadge(game.status)}
+          <span className='text-xs md:text-sm lg:text-base py-1 text-gray-500 dark:text-gray-300'>{formatDateFr(game.dateTime)}</span>
+        </div>
+        <div>
+          {game.status === GameStatus.SCHEDULED && canEdit && (
+            <Button
+              onClick={() => handleStatusUpdate(GameStatus.IN_PROGRESS)}
+              variant='primary'
+            >
+              <Play className="w-4 h-4 mr-2" /> Démarrer le match
+            </Button>
+          )}
+          {game.status === GameStatus.IN_PROGRESS && canEdit && (
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant='danger' className="bg-red-500 hover:bg-red-600 text-white rounded-xl">
+                  <Flag className="w-4 h-4 mr-2" /> Clôturer le match
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Êtes-vous sûr ?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Cette action mettra fin au match et enregistrera le score final. Cette opération est irréversible.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Annuler</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleFinalScoreReport}>
+                    Confirmer
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          )}
+          {game.status === GameStatus.COMPLETED && (
+            <Button variant="outline" disabled className="rounded-xl">
+              <CheckCircle2 className="w-4 h-4 mr-2" /> Match terminé
+            </Button>
+          )}
         </div>
       </div>
 
-      {/* Conditional rendering for Team Admin */}
-      {isTeamAdmin ? (
-        <div className="text-center p-6 bg-yellow-50 dark:bg-yellow-900/20 rounded-2xl border border-yellow-200 dark:border-yellow-900">
-          <p className="text-yellow-800 dark:text-yellow-200 font-semibold text-lg">
-            You have view-only access.
-          </p>
-          <p className="text-sm text-yellow-600 dark:text-yellow-300 mt-2">
-            You cannot make changes to the score or game status.
-          </p>
+      {/* Team logos + scores */}
+      <div className="flex sm:flex-row items-center justify-around bg-white dark:bg-gray-800 rounded-3xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+        
+        {/* Home team logo */}
+        <div className="flex flex-col items-center">
+          <div className="w-10 h-10 md:w-16 md:h-16 lg:w-20 lg:h-20 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700">
+            <Image
+              src={game.homeTeam?.businessProfile?.logoAsset?.url || 'https://placehold.co/80x80/E2E8F0/1A202C?text=Home'}
+              alt={game.homeTeam.name || "Équipe Domicile"}
+              width={60}
+              height={60}
+              className="object-cover w-full h-full"
+            />
+          </div>
+          <span className="mt-2 font-semibold text-sm sm:text-base truncate max-w-[80px] sm:max-w-[120px] text-center">
+            {game.homeTeam.shortCode || game.homeTeam.name}
+          </span>
         </div>
-      ) : (
-        <>
-          {/* Score Management */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
-            <TeamScore
-              label={game.homeTeam.shortCode || 'Home'}
-              score={homeScore}
-              onIncrement={() => setHomeScore(s => s + 1)}
-              onDecrement={() => setHomeScore(s => Math.max(0, s - 1))}
-              isLive={game.status === GameStatus.IN_PROGRESS}
-              canEdit={true}
-            />
-            <TeamScore
-              label={game.awayTeam.shortCode || 'Away'}
-              score={awayScore}
-              onIncrement={() => setAwayScore(s => s + 1)}
-              onDecrement={() => setAwayScore(s => Math.max(0, s - 1))}
-              isLive={game.status === GameStatus.IN_PROGRESS}
-              canEdit={true}
+
+        {/* Scores */}
+        <div className="flex items-center space-x-6 sm:space-x-12 my-4 sm:my-0">
+          <TeamScore
+            label="Domicile"
+            score={homeScore}
+            onIncrement={() => setHomeScore(s => s + 1)}
+            onDecrement={() => setHomeScore(s => Math.max(0, s - 1))}
+            isLive={isLive}
+            canEdit={canEdit}
+          />
+          
+          <TeamScore
+            label="Extérieur"
+            score={awayScore}
+            onIncrement={() => setAwayScore(s => s + 1)}
+            onDecrement={() => setAwayScore(s => Math.max(0, s - 1))}
+            isLive={isLive}
+            canEdit={canEdit}
+          />
+        </div>
+
+        {/* Away team logo */}
+        <div className="flex flex-col items-center">
+          <div className="w-10 h-10 md:w-16 md:h-16 lg:w-20 lg:h-20 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700">
+            <Image
+              src={game.awayTeam?.businessProfile?.logoAsset?.url || 'https://placehold.co/80x80/E2E8F0/1A202C?text=Away'}
+              alt={game.awayTeam.name || "Équipe Extérieure"}
+              width={60}
+              height={60}
+              className="object-cover w-full h-full"
             />
           </div>
-
-          {/* Game Status Management */}
-          <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-lg p-6 flex flex-col items-center space-y-4 border border-gray-200 dark:border-gray-700">
-            <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100">Game Status</h3>
-            <p className="text-sm text-gray-500 dark:text-gray-400 text-center">
-              Current Status: <span className="font-semibold">{game.status}</span>
-            </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full">
-              {game.status === GameStatus.SCHEDULED && (
-                <Button
-                  onClick={() => handleStatusUpdate(GameStatus.IN_PROGRESS)}
-                  variant="default"
-                  className="w-full bg-green-500 hover:bg-green-600 text-white rounded-xl shadow-md transition-all duration-300 transform hover:scale-105"
-                >
-                  <Play className="w-5 h-5 mr-2" /> Start Game
-                </Button>
-              )}
-
-              {game.status === GameStatus.IN_PROGRESS && (
-                <>
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button
-                        variant="default"
-                        className="w-full bg-red-500 hover:bg-red-600 text-white rounded-xl shadow-md transition-all duration-300 transform hover:scale-105"
-                      >
-                        <Flag className="w-5 h-5 mr-2" /> Report Final Score
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          This action will end the game and finalize the score. This cannot be undone.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={handleFinalScoreReport}>
-                          Confirm
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                </>
-              )}
-              
-              {game.status === GameStatus.COMPLETED && (
-                <Button
-                  variant="outline"
-                  disabled
-                  className="w-full border-gray-300 text-gray-400 bg-gray-100 rounded-xl"
-                >
-                  <CheckCircle2 className="w-5 h-5 mr-2" /> Game Completed
-                </Button>
-              )}
-            </div>
-          </div>
-        </>
-      )}
+          <span className="mt-2 font-semibold text-sm sm:text-base truncate max-w-[80px] sm:max-w-[120px] text-center">
+            {game.awayTeam.shortCode || game.awayTeam.name}
+          </span>
+        </div>
+      </div>
     </div>
   );
 }
+
