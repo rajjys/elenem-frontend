@@ -98,7 +98,7 @@ export function RegisterForm() {
     try {
       await register(values);   // 👈 authStore does everything (API call + set tokens + set user -> login)
       toast.success("Registration successful!");
-      router.push("/account/dashboard"); // Redirect to dashboard
+      router.push("/welcome"); // Redirect to dashboard
     } catch (error) {
       let errorMessage = "Registration failed. Please try again.";
       if (axios.isAxiosError(error)) {

@@ -8,9 +8,9 @@ import Image from "next/image";
 import { useScrollDirection } from "@/hooks";
 import { FiUser, FiChevronDown } from "react-icons/fi";
 import { Users, LayoutDashboard, User, Shield, Settings, LogOut,
-  Calendar,
   ShieldCheck,
-  Home
+  Home,
+  CalendarDays
 } from "lucide-react";
 
 import { Roles, SportType } from "@/schemas";
@@ -75,7 +75,7 @@ export const PublicHeader = ({
   //{ label: 'Actualités', href: '/news'},
   { separator: true },
   { label: 'Logiciel', href: '/features'},
-  { label: 'Tarifs', href: '/pricing' },
+  { label: 'Plans', href: '/plans' },
   { label: 'API', href: '/api' },
   { label: 'Docs', href: '/docs' },
 ];
@@ -215,10 +215,9 @@ export const PublicHeader = ({
         <div className="flex items-center justify-around h-16">
           {[
               { label: "Accueil", href: "/", icon: Home},
-              { label: "Matchs", href: "/games", icon: Calendar},
+              { label: "Matchs", href: "/games", icon: CalendarDays},
               { label: "Organisations", href: "/tenants", icon: Users },
               { label: "Logiciel", href: "/features", icon: ShieldCheck },
-              //{ label: "Tarifs", href: "/pricing", icon: CreditCard},
             ].map((link) => {
             const Icon = link.icon;
             const isActive = pathname === link.href;

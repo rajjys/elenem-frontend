@@ -1,7 +1,10 @@
 "use client";
 import React, { useCallback, useEffect, useState } from "react";
 import { Trophy, Users2, CalendarDays, ShieldCheck, Rocket, Star, ArrowRight,
-  Smartphone, Building2, Globe2, ExternalLink, Gamepad2, Network, BookOpen, Terminal
+  Smartphone, Building2, Globe2, ExternalLink, Gamepad2, Network, BookOpen, Terminal,
+  Phone,
+  Calculator,
+  NetworkIcon
 } from "lucide-react";
 import { api } from '@/services/api';
 import { Button } from "@/components/ui/button";
@@ -11,11 +14,12 @@ import { useAudienceStore } from "@/store/audience.store";
 import { useRouter } from "next/navigation";
 import { GameDetails, PublicTenantBasic } from "@/schemas";
 import { capitalizeFirst, countryNameToCode, formatDateFr } from "@/utils";
-import { Skeleton } from "@/components/ui";
+import { CodeBlock, Skeleton } from "@/components/ui";
 import GeneralSearchDialog from "@/components/ui/generalSearchDialog";
 import axios from "axios";
 import Link from "next/link";
 import Image from "next/image";
+import { useAuthStore } from "@/store/auth.store";
 
 const features = [
   { icon: <CalendarDays className="w-5 h-5 text-blue-500"/>, title: "Planification Intelligente", desc: "Vérifications automatiques des conflits, dates d'interdiction et lieux." },
@@ -40,6 +44,7 @@ function Pill({ children }: { children: React.ReactNode }) {
 export default function PublicLandingPage() {
 
   const router = useRouter();
+  const {user: userAuth } = useAuthStore();
   const [games, setGames] = useState<GameDetails[]>([]);
   const [tenants, setTenants] = useState<PublicTenantBasic[]>([]);
   const [loadingPopularGames, setLoadingPopularGames] = useState(false);
@@ -69,7 +74,7 @@ export default function PublicLandingPage() {
         primary: "Voir les fonctionnalités",
         secondary: "Commencer gratuitement",
         primaryLink: "/features",
-        secondaryLink: "/get-started"
+        secondaryLink: userAuth ? '/welcome' : '/register'
       };
 
       useEffect(() => {
@@ -243,7 +248,10 @@ export default function PublicLandingPage() {
                         </div>
                       ))}
                       <div className="col-span-full text-sm text-right">
-                        <a className="inline-flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:underline" href="#features">Explorer toutes les fonctionnalités <ArrowRight className="w-4 h-4"/></a>
+                        <Link className="inline-flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:underline" href="/features">
+                          Explorer toutes les fonctionnalités 
+                          <ArrowRight className="w-4 h-4"/>
+                        </Link>
                       </div>
                     </div>
                   )}
@@ -270,9 +278,12 @@ export default function PublicLandingPage() {
       </section>
       {/* Teaser de l'annuaire des Organisations */}
       <section id="tenants" className="mx-auto max-w-7xl px-4 pt-12 md:pt-16">
-        <div className="flex items-end justify-between mb-4">
+        <div className="flex items-end justify-between flex-wrap mb-4">
           <h2 className="text-xl md:text-2xl font-semibold tracking-tight">Organisations sur Elenem</h2>
-          <a className="text-sm text-blue-600 dark:text-blue-400 hover:underline" href="/tenants">Parcourir l&apos;annuaire</a>
+          <Link className="text-sm text-blue-600 dark:text-blue-400 hover:underline flex items-center justify-center" href="/tenants">
+            <span>Parcourir l&apos;annuaire</span>
+            <ArrowRight className="ml-2 w-3 h-3" />
+          </Link>
         </div>
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {tenants.map((t) => {
@@ -319,9 +330,12 @@ export default function PublicLandingPage() {
       </section>
       {/* Bandeau des fonctionnalités du produit */}
       <section id="features" className="mx-auto max-w-7xl px-4 pt-12 md:pt-16">
-        <div className="flex items-end justify-between mb-4">
-          <h2 className="text-xl md:text-2xl font-semibold tracking-tight">Pourquoi les ligues nous choisissent</h2>
-          <a className="text-sm text-blue-600 dark:text-blue-400 hover:underline" href="/features">Voir le produit</a>
+        <div className="flex items-end justify-between mb-4 flex-wrap">
+          <h2 className="text-xl md:text-2xl font-semibold tracking-tight">Pourquoi choisir Elenem</h2>
+          <Link className="text-sm text-blue-600 dark:text-blue-400 hover:underline flex items-center justify-center" href="/features">
+            <span>Voir les fonctionnalités</span>
+            <ArrowRight className="ml-2 w-3 h-3" />
+          </Link>
         </div>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {features.map((f, i) => (
@@ -339,7 +353,7 @@ export default function PublicLandingPage() {
       </section>
 
       {/* Teaser des tarifs */}
-      <section id="pricing" className="mx-auto max-w-7xl px-4 pt-12 md:pt-16">
+      <section id="plans" className="mx-auto max-w-7xl px-4 pt-12 md:pt-16">
         <div className="rounded-3xl border border-blue-200 dark:border-slate-800 p-6 md:p-8 bg-gradient-to-br from-blue-50/50 to-amber-50/50 dark:from-slate-950 dark:to-amber-950/20">
           <div className="grid md:grid-cols-3 gap-6 items-center">
             <div className="md:col-span-2">
@@ -348,9 +362,19 @@ export default function PublicLandingPage() {
                 Commencez gratuitement. Mettez à niveau lorsque vous avez besoin de domaines personnalisés, de flux de travail avancés ou de limites d&apos;API plus élevées. Réductions pour les fédérations et les programmes pour jeunes.
               </p>
             </div>
-            <div className="flex md:justify-end gap-3">
-              <Button className="rounded-2xl bg-blue-600 text-white hover:bg-blue-700" variant="primary">Comparer les plans</Button>
-              <Button variant="outline" className="rounded-2xl bg-white/50 dark:bg-slate-900/50 border-slate-300 dark:border-slate-700">Parler aux ventes</Button>
+            <div className="flex justify-center md:justify-end flex-wrap gap-3">
+              <Link
+                href="/plans"
+                className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-500 ease-in-out">
+                <Calculator className="mr-2 w-4 h-4" />
+                Comparer les plans
+              </Link>
+              <Link
+                href="/contact-us"
+                className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-md text-blue-700 border border-blue-600 bg-transparent hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-slate-900/50 border-slate-300 dark:border-slate-700 transition duration-500 ease-in-out">
+                <Phone className="mr-2 w-4 h-4" /> 
+                Parler aux ventes
+              </Link>
             </div>
           </div>
         </div>
@@ -368,38 +392,36 @@ export default function PublicLandingPage() {
               <p className="text-sm text-slate-600 dark:text-slate-400 max-w-prose mt-1">
                 Accédez aux rencontres, classements, joueurs et médias avec des API REST claires. Mises à jour en temps réel via webhooks. SDK pour TypeScript et Python.
               </p>
-              <div className="mt-4 flex gap-3">
-                <Button className="rounded-2xl bg-blue-600 text-white hover:bg-blue-700" variant="primary">Obtenir une clé API</Button>
-                <Button variant="outline" className="rounded-2xl border-slate-300 dark:border-slate-700">
-                  <Link href="#docs" className="flex items-center"><BookOpen className="mr-2 w-4 h-4"/> Lire la documentation</Link>
-                </Button>
+              <div className="mt-4 flex justify-center md:justify-start flex-wrap gap-3">
+                <Link href='/api' className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-500 ease-in-out">
+                  <NetworkIcon className="mr-2 w-4 h-4" />
+                  Obtenir une clé API
+                </Link>
+                <Link href='/docs' className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-md text-blue-700 border border-blue-600 bg-transparent hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-slate-900/50 border-slate-300 dark:border-slate-700 transition duration-500 ease-in-out">
+                  <BookOpen className="mr-2 w-4 h-4"/> 
+                  Lire la documentation
+                </Link>
               </div>
             </div>
-            <div className="rounded-2xl border border-slate-200 dark:border-slate-800 p-4 bg-slate-100/70 dark:bg-slate-900/70">
-              <pre className="text-xs overflow-auto leading-relaxed text-slate-700 dark:text-slate-300">
-                {`GET /v1/tenants/{tenantId}/games?date=today
-                200 OK
-                {
-                "games": [
-                    { "home": "Volcans", "away": "Cité du Lac", "startsAt": "2025-08-31T16:30:00Z" }
-                ]
-                }`}
-              </pre>
+            <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-100/70 dark:bg-slate-900/70 max-w-full">
+              <CodeBlock
+                method="GET"
+                url="/v1/tenants/{tenantSlug}/games?date=today"
+                responseCode={200}
+                responseJson={{
+                  games: [
+                    {
+                      homeTeam: {name: "Volcans"},
+                      away: { name: "Cité du Lac" },
+                      dateTime: "2025-08-31T16:30:00Z"
+                    }
+                  ]
+                }}
+              />
             </div>
           </CardContent>
         </Card>
       </section>
-      {/* Barre de navigation inférieure mobile */}
-      <div className="fixed md:hidden bottom-3 left-0 right-0">
-        <div className="mx-auto max-w-md px-4">
-          <div className="rounded-2xl shadow-lg bg-white/80 dark:bg-slate-900/80 backdrop-blur border border-slate-200 dark:border-slate-800 flex justify-around py-2 text-xs">
-            <Link href="/games" className="flex flex-col items-center gap-1 text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"><CalendarDays className="w-4 h-4"/>Matchs</Link>
-            <Link href="/tenants" className="flex flex-col items-center gap-1 text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"><Users2 className="w-4 h-4"/>Ligues</Link>
-            <Link href="/features" className="flex flex-col items-center gap-1 text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"><ShieldCheck className="w-4 h-4"/>Fonctionnalités</Link>
-            <Link href="/pricing" className="flex flex-col items-center gap-1 text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"><Trophy className="w-4 h-4"/>Tarifs</Link>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }

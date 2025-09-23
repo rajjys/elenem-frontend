@@ -80,7 +80,7 @@ export default function GameManagementDashboard() {
   const redirectPath = isSystemAdmin ? "/admin/games":
                          isTenantAdmin ? "/tenant/games" :
                          isLeagueAdmin ? "/league/games" :
-                         "/team/games"; // Default fallback path  
+                         "/team/games"; // Team admin 
 
   // Use debounced values for API calls to avoid spamming the backend
   const [debouncedHomeScore] = useDebounce(homeScore, 500);
@@ -182,14 +182,12 @@ export default function GameManagementDashboard() {
 
   return (
     <div className="flex flex-col min-h-screen px-2 py-4 sm:p-6 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">
-      
       {/* Header: Back + Status + CTA */}
       <div className="flex items-center justify-between mb-4">
         <Button
           variant="outline"
           onClick={() => router.push(redirectPath)}
-          className="rounded-xl"
-        >
+          className="rounded-xl">
           ← Retour
         </Button>
         <div className='flex flex-col justify-center items-center'>

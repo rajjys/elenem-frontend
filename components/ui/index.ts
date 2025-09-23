@@ -27,3 +27,4 @@ export * from './form';
 export * from './collapsible';
 export * from './generalSearchDialog';
 export * from './PostCard';
+export * from './code-block';

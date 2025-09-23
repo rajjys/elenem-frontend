@@ -32,7 +32,7 @@ export default function LoginClientPage() {
         } else if (userRoles.includes(Roles.TEAM_ADMIN)) {
           router.push("/team/dashboard");
         } else {
-          router.push("/account/dashboard");
+          router.push("/welcome");
         }
       }
     }
