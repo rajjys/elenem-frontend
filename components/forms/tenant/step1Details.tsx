@@ -18,15 +18,16 @@ export function Step1TenantDetails({ form }: Step1Props) {
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       {/* Tenant Name */}
       <div className="space-y-2">
-        <Label htmlFor="name">Nom de l&apos;Organisation</Label>
-        <Input id="name" {...register("name")} />
+        <Label htmlFor="name">Nom de l&apos;organisation</Label>
+        <Input id="name" {...register("name")} restrict="alphanumeric" alphaFirst={true} allowSpace={true} transform="capitalize" maxCharacters={50} placeholder="ex: Ligue de la Paix"/>
         {errors.name && <p className="text-red-500 text-xs">{errors.name.message}</p>}
       </div>
 
       {/* Tenant Code */}
       <div className="space-y-2">
         <Label htmlFor="tenantCode">Code d&apos;Orgnisation</Label>
-        <Input id="tenantCode" {...register("tenantCode")} placeholder="ex: LIGUE2" />
+        <Input id="tenantCode" {...register("tenantCode")} restrict="alphanumeric" alphaFirst={true}  transform="uppercase" maxCharacters={12} placeholder="ex: LIGUE2" />
+        <Label className="text-slate-400">https://<span className="text-green-700">{watch("tenantCode").toLowerCase()}</span>.elenem.site</Label>
         {errors.tenantCode && <p className="text-red-500 text-xs">{errors.tenantCode.message}</p>}
       </div>
 

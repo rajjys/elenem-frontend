@@ -1,54 +1,130 @@
-import { SearchIcon } from "lucide-react"; // Assuming you're keeping lucide-react for this icon
+import { SearchIcon } from "lucide-react";
 import React from "react";
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   error?: string;
   required?: boolean;
-  restrict?: 'alpha' | 'alphanumeric' | 'numeric' | 'uppercase' | 'year' | 'none';
+  restrict?: 'alpha' | 'alphanumeric' | 'numeric' | 'year' | 'none';
+  alphaFirst?: boolean;
+  transform?: 'none' | 'uppercase' | 'capitalize';
+  allowSpace?: boolean;
   maxCharacters?: number;
   hint?: string;
   autoTrim?: boolean;
 }
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ label, name, type = 'text', error, required, restrict = 'none', maxCharacters, hint, autoTrim = false, onChange, onBlur, ...props }, ref) => {
+  (
+    {
+      label,
+      name,
+      type = 'text',
+      error,
+      required,
+      restrict = 'none',
+      alphaFirst = false,
+      transform = 'none',
+      allowSpace = false,
+      maxCharacters,
+      hint,
+      autoTrim = false,
+      onChange,
+      onBlur,
+      ...props
+    },
+    ref
+  ) => {
     const allowedControlKeys = [
       'Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab', 'Home', 'End',
     ];
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-      if (allowedControlKeys.includes(e.key)) return;
-      if (restrict === 'numeric' && !/^\d$/.test(e.key)) e.preventDefault();
-      else if (restrict === 'alpha' && !/^[a-zA-Z\s]$/.test(e.key)) e.preventDefault();
-      else if (restrict === 'uppercase' && !/^[a-zA-Z]$/.test(e.key)) e.preventDefault();
-      else if (restrict === 'alphanumeric' && !/^[a-zA-Z0-9]$/.test(e.key)) e.preventDefault();
+      if (allowedControlKeys.includes(e.key)) {
+        props.onKeyDown?.(e);
+        return;
+      }
+
+      const isPrintable = e.key.length === 1;
+      if (!isPrintable) {
+        props.onKeyDown?.(e);
+        return;
+      }
+
+      // AlphaFirst check
+      if (alphaFirst && e.currentTarget.value.length === 0) {
+        if (!/^\p{L}$/u.test(e.key)) {
+          e.preventDefault();
+          props.onKeyDown?.(e);
+          return;
+        }
+      }
+
+      // Restriction checks
+      if (restrict === 'numeric') {
+        if (!/^\d$/.test(e.key) && !(allowSpace && e.key === ' ')) e.preventDefault();
+      } else if (restrict === 'alpha') {
+        if (!/^[\p{L}]$/u.test(e.key) && !(allowSpace && e.key === ' ')) e.preventDefault();
+      } else if (restrict === 'alphanumeric') {
+        if (!/^[\p{L}\d]$/u.test(e.key) && !(allowSpace && e.key === ' ')) e.preventDefault();
+      }
+
       props.onKeyDown?.(e);
     };
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let value = e.target.value;
-    // Don't programmatically set value for file inputs
-    if (e.target.type !== "file") {
-      if (restrict === 'uppercase') value = value.toUpperCase();
-      if (restrict === 'numeric') value = value.replace(/[^0-9]/g, '');
-      if ((type === 'number' || restrict === 'year') && maxCharacters !== undefined) {
-        if (value.length > maxCharacters) value = value.slice(0, maxCharacters);
+    const applyTransform = (value: string) => {
+      if (transform === 'uppercase') return value.toUpperCase();
+      if (transform === 'capitalize') {
+        if (value.length === 0) return value;
+        return value.charAt(0).toUpperCase() + value.slice(1);
       }
-      e.target.value = value;
-    }
-    onChange?.(e);
-  };
+      return value;
+    };
 
-  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-    let value = e.target.value;
-    // Don't programmatically set value for file inputs
-    if (e.target.type !== "file") {
-      if (restrict === 'uppercase') { value = value.toUpperCase(); e.target.value = value; }
-      if (autoTrim && value.trim() !== value) { value = value.trim(); e.target.value = value; }
-    }
-    onBlur?.(e);
-  };
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      let value = e.target.value;
+
+      if (e.target.type !== "file") {
+        if (alphaFirst) {
+          value = value.replace(/^[^\p{L}]+/u, '');
+        }
+
+        if (restrict === 'numeric') {
+          value = value.replace(allowSpace ? /[^\d\s]/g : /[^\d]/g, '');
+        } else if (restrict === 'alpha') {
+          value = value.replace(allowSpace ? /[^\p{L}\s]/gu : /[^\p{L}]/gu, '');
+        } else if (restrict === 'alphanumeric') {
+          value = value.replace(allowSpace ? /[^\p{L}\d\s]/gu : /[^\p{L}\d]/gu, '');
+        }
+
+        if ((type === 'number' || restrict === 'year') && maxCharacters !== undefined) {
+          if (value.length > maxCharacters) value = value.slice(0, maxCharacters);
+        }
+
+        value = applyTransform(value);
+
+        e.target.value = value;
+      }
+
+      onChange?.(e);
+    };
+
+    const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+      let value = e.target.value;
+
+      if (e.target.type !== "file") {
+        if (alphaFirst) {
+          value = value.replace(/^[^\p{L}]+/u, '');
+        }
+        value = applyTransform(value);
+        if (autoTrim && value.trim() !== value) {
+          value = value.trim();
+        }
+        e.target.value = value;
+      }
+
+      onBlur?.(e);
+    };
 
     const isSearchType = type === 'search';
 
@@ -63,7 +139,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
         <div className={`relative ${isSearchType ? 'flex items-center' : ''}`}>
           {isSearchType && (
             <div className="absolute left-3">
-              <SearchIcon className="h-5 w-5 text-gray-400" /> {/* Added default icon sizing/color */}
+              <SearchIcon className="h-5 w-5 text-gray-400" />
             </div>
           )}
           <input
