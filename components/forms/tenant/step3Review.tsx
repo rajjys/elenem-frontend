@@ -6,7 +6,11 @@ import {
   CardContent,
 } from "@/components/ui";
 import { TenantFormValues } from ".";
-import { Roles } from "@/schemas";
+import { Roles, SportType } from "@/schemas";
+import { BasketballIcon, SoccerBallIcon, TennisBallIcon } from "@phosphor-icons/react";
+import { Volleyball, Goal, Trophy } from "lucide-react";
+import CountryFlag from 'react-country-flag';
+import { capitalizeFirst, countryNameToCode } from "@/utils";
 
 interface Step3Props {
   form: UseFormReturn<TenantFormValues>;
@@ -14,6 +18,16 @@ interface Step3Props {
   logoPreview: string | null;
   bannerPreview: string | null;
 }
+const getSportIcon = (sportType?: SportType) => {
+  switch (sportType) {
+    case SportType.FOOTBALL: return SoccerBallIcon;
+    case SportType.BASKETBALL: return BasketballIcon;
+    case SportType.VOLLEYBALL: return Volleyball;
+    case SportType.TENNIS: return TennisBallIcon;
+    case SportType.RUGBY: return Goal;
+    default: return Trophy;
+  }
+};
 
 export function Step3Review({
   form,
@@ -23,6 +37,7 @@ export function Step3Review({
 }: Step3Props) {
   const formData = form.watch();
 
+  const Icon = getSportIcon(formData.sportType);
   return (
     <>
       <CardContent className="space-y-6">
@@ -62,21 +77,34 @@ export function Step3Review({
 
         {/* Tenant Details */}
         <div className="bg-gray-100 p-4 rounded-lg">
-          <h3 className="text-lg font-semibold mb-2">Tenant Details</h3>
-          <p>
-            <strong>Name:</strong> {formData.name}
+          <div className="flex items-center justify-center gap-3 mb-2 border-b border-slate-300">
+            <Icon className="w-6 h-6 text-green-800 font-bold" />
+            <h3 className="text-lg md:text-xl font-semibold my-2">{formData.name}</h3>
+            <span><CountryFlag countryCode={countryNameToCode[formData.country]} svg style={{ width: '2em', height: '1em' }} /></span>
+          </div>
+          <p className="py-0.5">
+            <span className="text-slate-800 pr-1">code:</span>
+            <span className="text-slate-800 font-semibold">{formData.tenantCode}</span> 
           </p>
           <p>
-            <strong>Code:</strong> {formData.tenantCode}
+            <span className="text-slate-800 pr-1">site:</span>
+            <span className="text-slate-800 font-semibold">https://<span className="font-bold">{formData.tenantCode.toLowerCase()}</span>.elenem.site</span> 
           </p>
-          <p>
-            <strong>Type:</strong> {formData.tenantType}
+          <p className="py-0.5">
+            <span className="text-slate-800 pr-1">sport:</span>
+            <span className="text-slate-800 font-semibold ">{capitalizeFirst(formData.sportType)}</span>
           </p>
-          <p>
-            <strong>Sport:</strong> {formData.sportType}
+          <p className="py-0.5">
+            <span className="text-slate-800 pr-1">type:</span>
+            <span className="text-slate-800 font-semibold ">{capitalizeFirst(formData.tenantType)}</span>
           </p>
-          <p>
-            <strong>Country:</strong> {formData.country}
+          <p className="py-0.5">
+            <span className="text-slate-800 pr-1">pays:</span>
+            <span className="text-slate-800 font-semibold ">{capitalizeFirst(formData.country)}</span>
+          </p>
+          <p className="py-0.5">
+            <span className="text-slate-800 pr-1">Visibilite:</span>
+            <span className="text-slate-800 font-semibold ">Publique</span>
           </p>
           {currentUserRoles.includes(Roles.SYSTEM_ADMIN) && (
             <p>
@@ -87,17 +115,19 @@ export function Step3Review({
 
         {/* Business Profile */}
         <div className="bg-gray-100 p-4 rounded-lg">
-          <h3 className="text-lg font-semibold mb-2">Business Profile</h3>
+          <div className="flex items-center justify-center gap-3 mb-2 border-b border-slate-300">
+            <h3 className="text-lg md:text-xl font-semibold my-2">Profil business</h3>
+          </div>
           <p>
             <strong>Description:</strong>{" "}
             {formData.businessProfile.description || "N/A"}
           </p>
           <p>
-            <strong>Street Address:</strong>{" "}
+            <strong>address:</strong>{" "}
             {formData.businessProfile.physicalAddress || "N/A"}
           </p>
           <p>
-            <strong>City:</strong> {formData.businessProfile.city || "N/A"}
+            <strong>Ville:</strong> {formData.businessProfile.city || "N/A"}
           </p>
           <p>
             <strong>Region:</strong> {formData.businessProfile.region || "N/A"}

@@ -24,6 +24,7 @@ import {
 // Step components
 import { Step1TenantDetails, Step3Review } from "./";
 import { BusinessProfileForm, Stepper, TFormValues } from "../shared";
+import { countryNameToCode } from "@/utils";
 
 // Define a type for the full form data
 export type TenantFormValues = z.infer<typeof CreateTenantSchema>;
@@ -75,7 +76,7 @@ export function TenantCreationForm({ onSuccess, onCancel }: TenantFormProps) {
       },
     },
   });
-  const { handleSubmit, trigger, watch, formState: { errors } } = form;
+  const { handleSubmit, trigger, watch } = form;
 
   // fetch owners if admin
   useEffect(() => {
@@ -129,6 +130,7 @@ export function TenantCreationForm({ onSuccess, onCancel }: TenantFormProps) {
       const payload = {
         ...data,
         businessProfile: { ...data.businessProfile, name: data.name },
+        country: countryNameToCode[data.country]
       };
       const response = await api.post("/tenants/create", payload);
       toast.success(`Tenant ${data.tenantCode} created successfully!`);
@@ -140,8 +142,6 @@ export function TenantCreationForm({ onSuccess, onCancel }: TenantFormProps) {
         setIsSubmitting(false);
     }
   };
-
-  console.log(errors);
   return (
     <div className="flex justify-center p-4 bg-gray-50">
       <Card className="w-full max-w-7xl shadow-lg rounded-xl">
