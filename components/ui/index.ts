@@ -28,3 +28,4 @@ export * from './collapsible';
 export * from './generalSearchDialog';
 export * from './PostCard';
 export * from './code-block';
+export * from './LeagueCard';

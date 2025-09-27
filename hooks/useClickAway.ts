@@ -1,4 +1,5 @@
 // hooks/useClickAway.ts
+'use client'
 import { useEffect, RefObject } from "react";
 
 type EventType = MouseEvent | TouchEvent;

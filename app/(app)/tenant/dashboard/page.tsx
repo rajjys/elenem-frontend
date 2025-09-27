@@ -1,6 +1,6 @@
 'use client';
 import Head from 'next/head';
-import { useRouter, useSearchParams } from 'next/navigation'; // Or useNavigation from next/navigation for App Router
+import { useSearchParams } from 'next/navigation'; // Or useNavigation from next/navigation for App Router
 import React, { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useAuthStore } from '@/store/auth.store';
@@ -9,10 +9,12 @@ import { api } from '@/services/api';
 import { toast } from 'sonner';
 import { useContextualLink } from '@/hooks';
 import { StatsCard } from '@/components/ui/stats-card';
-import { Building, Building2, Calendar, Crown, Eye, MoreVertical, Plus, Settings, Target, Ticket, TrendingUp, Trophy, UserPlus, Users } from 'lucide-react';
-import { Avatar, Badge, Button, Card, CardContent, CardHeader, CardTitle, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, LoadingSpinner } from '@/components/ui';
-import { capitalize } from '@/utils';
+import { Building, Calendar, CalendarPlus, Plus, Target, Ticket, TrendingUp, Trophy, UserPlus, Users } from 'lucide-react';
+import { Avatar, Button, Card, CardContent, CardHeader, CardTitle, LeagueCard, LoadingSpinner } from '@/components/ui';
+import { capitalizeFirst, countryNameToCode } from '@/utils';
 import axios from 'axios';
+import Image from 'next/image';
+import CountryFlag from 'react-country-flag';
 
 interface UpcomingGame {
     id: string;
@@ -36,7 +38,6 @@ interface UpcomingGame {
 
     
 export default function TenantDashboard() {
-    const router = useRouter(); // Use useRouter for client-side navigation
     const userAuth = useAuthStore((state) => state.user);
     const currentUserRoles = userAuth?.roles || [];
     const [tenant, setTenant] = useState<TenantDetails | null>(null);
@@ -127,16 +128,56 @@ export default function TenantDashboard() {
     return (
         <div className="min-h-screen">
             <Head>
-                <title>Tenant Dashboard - ELENEM Sports</title>
-            </Head>  
-            <section className='flex items-center justify-between'>
-                <h1 className="text-2xl font-bold text-gray-800 mb-4">{tenant?.name}</h1>
-                <div className='flex whitespace-nowrap text-sm gap-3'>
-                    <Link href='/league/create' className="w-full flex items-center justify-center bg-emerald-600 text-white py-2 px-2 rounded-md hover:bg-emerald-700 transition-colors">
-                        <Plus className="h-4 w-4 mr-2" /> Creer un Ligue
+                <title>{tenant?.tenantCode || "Tenant"} - Dashboard</title>
+            </Head>
+            {/* Header Section */}
+            <section className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 md:gap-0 px-4 py-3 mb-4 bg-white shadow-sm rounded-md">
+                <div className="flex items-center gap-3">
+                    {tenant?.businessProfile.logoAsset?.url ? (
+                    <Image
+                        src={tenant.businessProfile.logoAsset.url}
+                        alt={tenant.tenantCode}
+                        width={40}
+                        height={40}
+                        className="rounded-full"
+                    />
+                    ) : (
+                    <Avatar name={tenant?.name || 'Tenant'} size={40} className="rounded-full" />
+                    )}
+
+                    <div>
+                    <h1 className="text-lg md:text-xl lg:text-2xl font-bold text-gray-800 leading-tight">
+                        {tenant?.name}
+                    </h1>
+                    {tenant?.tenantCode && (
+                        <p className="text-sm text-gray-500 flex items-center gap-1">
+                            <span>{capitalizeFirst(tenant.tenantCode)}</span>
+                            -
+                            <CountryFlag countryCode={countryNameToCode[tenant.country]} svg style={{ width: '2em', height: '1em' }} />
+                        </p>
+                    )}
+                    </div>
+                </div>
+
+                <div className="flex flex-wrap gap-2 md:gap-3 text-sm">
+                    <Link
+                    href={buildLink("/game/create")}
+                    className="flex items-center gap-2 bg-emerald-600 text-white px-3 py-2 rounded-md hover:bg-emerald-700 transition-colors"
+                    >
+                        <CalendarPlus className="h-4 w-4" />
+                        <span className="">Nouveau Match</span>
+                    </Link>
+
+                    <Link
+                    href={buildLink("/league/create")}
+                    className="flex items-center gap-2 bg-emerald-600 text-white px-3 py-2 rounded-md hover:bg-emerald-700 transition-colors"
+                    >
+                        <Trophy className="h-4 w-4" />
+                        <span className="">Créer une Ligue</span>
                     </Link>
                 </div>
             </section>
+
                 {/* Key Metrics Section */}
             <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-4">
                 {loading ? <LoadingSpinner /> : error ? <p className='text-red-500'>{error}</p> :
@@ -148,74 +189,21 @@ export default function TenantDashboard() {
             <section className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-4">
                 <div className="lg:col-span-2">
                     <Card className="shadow-elevated">
-                        <CardHeader className="flex flex-row items-center justify-between">
-                            <CardTitle className="text-lg font-semibold">Vos ligues</CardTitle>
-                            <Button variant="default" size="sm" onClick={() => router.push(buildLink('/tenant/leagues'))}>
-                                <Eye className="h-4 w-4 mr-2" />
-                                    Voir Plus
-                            </Button>
+                        <CardHeader className="flex flex-row items-center justify-between gap-2 sm:gap-4 px-4 py-3">
+                            <CardTitle className="text-xl font-semibold text-gray-800">{tenant?.leagues?.length} Ligues</CardTitle>
+                            <Link href={buildLink('/tenant/leagues')} className="inline-flex items-center text-sm font-medium text-emerald-700 hover:text-emerald-800 transition-colors">
+                                <Trophy className="h-4 w-4 mr-1 text-emerald-600" />
+                                <span>Toutes les Ligues</span>
+                            </Link>
                         </CardHeader>
-                        <CardContent className="">
+                        <CardContent className="py-2">
                         {leagues?.map((league: LeagueBasic) => (
-                        <Link href={buildLink('/league/dashboard', { ctxLeagueId: league.id })} key={league.id}>
-                            <div className="p-2 border border-gray-200 rounded-lg hover:bg-gray-200/30 transition-colors">
-                                <div className="flex items-center justify-between mb-3">
-                                    <div className="flex items-center gap-3">
-                                        <Avatar src={league.logoUrl} name={league.name} size={50} className="mr-2" />
-                                        <div>
-                                        <h3 className="font-semibold text-foreground">{league.name}</h3>
-                                        <div className="flex items-center gap-2 text-xs text-gray-500">
-                                            <span>{capitalize(tenant?.sportType.toString())}</span>
-                                            <span>•</span>
-                                            <span>season 2025</span>
-                                        </div>
-                                        </div>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <Badge variant={league.isActive === true ? 'success' : 'secondary'}>
-                                        {league.isActive === true? "Active" : "Inactive"}
-                                        </Badge>
-                                        <DropdownMenu>
-                                            <DropdownMenuTrigger asChild>
-                                                <Button variant="secondary" size="sm">
-                                                    <MoreVertical className="h-4 w-4" />
-                                                </Button>
-                                            </DropdownMenuTrigger>
-                                            <DropdownMenuContent align="end">
-                                                <DropdownMenuItem>
-                                                  <Eye className="mr-2 h-4 w-4" />
-                                                  Details
-                                                </DropdownMenuItem>
-                                                <DropdownMenuItem>
-                                                  <UserPlus className="mr-2 h-4 w-4" />
-                                                  Assign Manager
-                                                </DropdownMenuItem>
-                                                <DropdownMenuItem>
-                                                  <Settings className="mr-2 h-4 w-4" />
-                                                  Configurer
-                                                </DropdownMenuItem>
-                                            </DropdownMenuContent>
-                                        </DropdownMenu>
-                                    </div>
-                                    </div>
-                                    
-                                    <div className="grid grid-cols-3 gap-4 text-sm">
-                                    <div className="flex items-center gap-1 text-muted-foreground">
-                                        <Building2 className="h-3 w-3" />
-                                        <span className='text-gray-500'>{league.teams?.length} Equipes</span>
-                                    </div>
-                                    <div className="flex items-center gap-1 text-muted-foreground">
-                                        <Crown className="h-3 w-3" />
-                                        <span className='text-gray-500'>{league.managingUsers?.length} Managers</span>
-                                    </div>
-                                    <div className="flex items-center gap-1 text-green-600 font-bold">
-                                        <TrendingUp className="h-3 w-3" />
-                                        <span>$0</span>
-                                    </div>
-                                    </div>
-                                </div>
-                        </Link>
+                            <LeagueCard key={league.id} league={league} tenant={tenant!} />
                         ))}
+                        <Link href={buildLink('/tenant/leagues')} className="py-3 flex items-center justify-center text-sm font-medium text-emerald-600 hover:text-emerald-800 transition-colors">
+                            <Trophy className="h-4 w-4 mr-1 text-emerald-600" />
+                            <span>Toutes les Ligues</span>
+                        </Link>
                     </CardContent>
                     </Card>
                 </div>
@@ -223,7 +211,7 @@ export default function TenantDashboard() {
                 <div>
                     <Card className="shadow-elevated">
                     <CardHeader>
-                        <CardTitle className="text-lg font-semibold">Recent Activity</CardTitle>
+                        <CardTitle className="text-lg font-semibold">Matchs</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
                         {recentActivities.map((activity) => (
@@ -241,6 +229,10 @@ export default function TenantDashboard() {
                             </div>
                         </div>
                         ))}
+                        <Link href={buildLink('/tenant/games')} className="py-3 flex items-center justify-center text-sm font-medium text-emerald-600 hover:text-emerald-800 transition-colors">
+                            <Trophy className="h-4 w-4 mr-1 text-emerald-600" />
+                            <span>Tout les Matchs</span>
+                        </Link>
                     </CardContent>
                     </Card>
                 </div>
@@ -272,7 +264,7 @@ export default function TenantDashboard() {
                     </Card>
             </section>    
             {/* Upcoming Games Table */}
-            <section className="bg-white p-6 rounded-lg shadow-md mb-8" hidden>
+            <section className="bg-white p-6 rounded-lg shadow-md mb-8">
                     <div className="flex justify-between items-center mb-4">
                         <h2 className="text-xl font-semibold text-gray-800">Upcoming Games</h2>
                         <Link href={buildLink("/games")} className="text-emerald-600 hover:text-emerald-700 text-sm font-medium">
