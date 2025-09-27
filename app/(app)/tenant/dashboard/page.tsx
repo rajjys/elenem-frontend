@@ -4,39 +4,20 @@ import { useSearchParams } from 'next/navigation'; // Or useNavigation from next
 import React, { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useAuthStore } from '@/store/auth.store';
-import { LeagueBasic, PaginatedLeaguesResponseSchema, Roles, TenantDetails, TenantDetailsSchema } from '@/schemas';
+import { GameDetails, LeagueBasic, PaginatedLeaguesResponseSchema, Roles, TenantDetails, TenantDetailsSchema } from '@/schemas';
 import { api } from '@/services/api';
 import { toast } from 'sonner';
 import { useContextualLink } from '@/hooks';
 import { StatsCard } from '@/components/ui/stats-card';
-import { Building, Calendar, CalendarPlus, Plus, Target, Ticket, TrendingUp, Trophy, UserPlus, Users } from 'lucide-react';
-import { Avatar, Button, Card, CardContent, CardHeader, CardTitle, LeagueCard, LoadingSpinner } from '@/components/ui';
+import { Building, Calendar, CalendarPlus, Plus, Ticket, TrendingUp, Trophy, UserPlus } from 'lucide-react';
+import { Avatar, Button, Card, CardContent, CardHeader, CardTitle, getStatusBadge, LeagueCard, LoadingSpinner } from '@/components/ui';
 import { capitalizeFirst, countryNameToCode } from '@/utils';
 import axios from 'axios';
 import Image from 'next/image';
 import CountryFlag from 'react-country-flag';
+import { format } from 'date-fns';
+import DateCarousel from '@/components/game/date-carousel';
 
-interface UpcomingGame {
-    id: string;
-    homeTeam: string;
-    awayTeam: string;
-    league: string;
-    date: string;
-    time: string;
-    venue: string;
-    status: string; // e.g., 'Scheduled', 'Postponed'
-}
-
-    const mockUpcomingGames: UpcomingGame[] = [
-        { id: '1', homeTeam: "Thunderbolts FC", awayTeam: "Rapid Strikers", league: "Premier League '25", date: "2025-07-07", time: "19:00", venue: "City Arena", status: "Scheduled" },
-        { id: '2', homeTeam: "Crimson Knights", awayTeam: "Emerald Dragons", league: "Division A Cup", date: "2025-07-08", time: "14:30", venue: "Park View Stadium", status: "Scheduled" },
-        { id: '3', homeTeam: "United Titans", awayTeam: "Galaxy Stars", league: "Youth League '25", date: "2025-07-08", time: "17:00", venue: "Community Pitch 3", status: "Scheduled" },
-        { id: '4', homeTeam: "Silver Arrows", awayTeam: "Golden Eagles", league: "Premier League '25", date: "2025-07-09", time: "20:00", venue: "National Stadium", status: "Scheduled" },
-        { id: '5', homeTeam: "Phoenix Rising", awayTeam: "Storm Breakers", league: "Division B League", date: "2025-07-10", time: "16:00", venue: "Training Grounds A", status: "Scheduled" },
-    ];
-    // Example navItems structure, directly correlating to backend endpoints
-
-    
 export default function TenantDashboard() {
     const userAuth = useAuthStore((state) => state.user);
     const currentUserRoles = userAuth?.roles || [];
@@ -44,6 +25,13 @@ export default function TenantDashboard() {
     const [leagues, setLeagues] = useState<LeagueBasic>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+
+    const [availableDates, setAvailableDates] = useState<string[]>([]);
+    const [selectedDate, setSelectedDate] = useState<string>('');
+    const [gamesByDate, setGamesByDate] = useState<GameDetails[]>([]);
+    const [loadingDates, setLoadingDates] = useState(true);
+    const [loadingGames, setLoadingGames] = useState(false);
+
     const { buildLink } = useContextualLink();
     const ctxTenantId = useSearchParams().get('ctxTenantId'); // Use search params if needed
     
@@ -110,6 +98,64 @@ export default function TenantDashboard() {
         }
     }, [currentTenantId, fetchLeagues, fetchTenantDetails]);
     
+    // Fetch available dates on initial load
+      async function fetchDates() {
+          setLoadingDates(true);
+          try {
+              const response = await api.get<string[]>('/games/dates');
+              const dates = response.data;
+              if (!dates || dates.length === 0) {
+                //toast.info("Aucune date de match disponible.");
+                //console.warn("No available dates found.");
+                return;
+              }
+              setAvailableDates(dates);
+              if (dates.length > 0) {
+              // Select today's date if available, otherwise the first available date
+              const today = format(new Date(), 'yyyy-MM-dd');
+              setSelectedDate(dates.includes(today) ? today : dates[0]);
+            }
+          }
+          catch(error){
+            //toast.error("Failed to load game dates.");
+            console.error(error);
+          }
+          finally{
+              setLoadingDates(false)
+          }
+        }
+        // Fetch games when a date is selected
+          const fetchGames = useCallback(async (date: string) => {
+            if (!date) return;
+            setLoadingGames(true);
+            try {
+              const response = await api.get<{data: GameDetails[]}>('/games', { params: { date } });
+              const gamesResponse = response.data;
+              setGamesByDate(gamesResponse.data);
+            } catch (error) {
+                //toast.error(`Failed to load games for ${date}.`);
+                console.error(error);
+            }
+            finally{
+                setLoadingGames(false)
+            }
+          }, []);
+          useEffect(() => {
+             fetchDates(); 
+          }, []);
+        
+          useEffect(() => {
+              fetchGames(selectedDate);
+          }, [selectedDate, fetchGames]);
+          
+          const todayISO = new Date().toISOString().split('T')[0];
+              useEffect(() => {
+                  if (availableDates.length) {
+                      const futureOrToday = availableDates.find(d => d >= todayISO) ?? availableDates[0];
+                      setSelectedDate(futureOrToday);
+                  }
+              }, [availableDates, todayISO]);
+
     // Dynamically generate stat cards based on tenant data
     const statCards = [
         { title: "Total Leagues", value: tenant?.leagues?.length || 0, description: "Active Leagues Under Management", trend: {isPositive: true, value: 3.6, timespan: "season"}, icon: Trophy, bgColorClass: "bg-blue-400", textColorClass: "text-white", href: buildLink("/tenant/leagues") },
@@ -117,13 +163,6 @@ export default function TenantDashboard() {
         { title: "Total Players", value: 0, description: "Active Players in all Leagues", trend: {isPositive: true, value: 0, timespan: "season"}, icon: Calendar, bgColorClass: "bg-orange-400", textColorClass: "text-white", href: buildLink("/tenant/players") },
         { title: "Tickets Sold (Today)", value: 0, description: "Active Leagues Under Management", trend: {isPositive: true, value: 0, timespan: "season"}, icon: Ticket, bgColorClass: "bg-red-400", textColorClass: "text-white", href: buildLink("/tenant/tickets") }, // Keeping mock for now as per request
     ]
-    const recentActivities = [
-  { id: 1, action: "New league created", details: "Professional Volleyball League", time: "5 min ago", type: "league" },
-  { id: 2, action: "Manager assigned", details: "John Smith assigned to Basketball League", time: "15 min ago", type: "manager" },
-  { id: 3, action: "Payment received", details: "$3,200 from Soccer League subscription", time: "1 hour ago", type: "payment" },
-  { id: 4, action: "League completed", details: "Junior Tennis League finished season", time: "2 hours ago", type: "league" },
-  { id: 5, action: "New team registered", details: "Thunder Bolts joined Basketball League", time: "3 hours ago", type: "team" }
-];
 
     return (
         <div className="min-h-screen">
@@ -185,7 +224,7 @@ export default function TenantDashboard() {
                     <StatsCard key={index} {...card} />
                 ))}    
             </section>
-            {/* Leagues Overview */}
+            {/* Leagues and Games Overview */}
             <section className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-4">
                 <div className="lg:col-span-2">
                     <Card className="shadow-elevated">
@@ -210,30 +249,94 @@ export default function TenantDashboard() {
                 {/* Recent Activity */}
                 <div>
                     <Card className="shadow-elevated">
-                    <CardHeader>
-                        <CardTitle className="text-lg font-semibold">Matchs</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                        {recentActivities.map((activity) => (
-                        <div key={activity.id} className="flex items-start gap-3 p-3 rounded-lg hover:bg-muted/30 transition-colors">
-                            <div className="flex-shrink-0 mt-1">
-                            {activity.type === 'league' && <Trophy className="h-4 w-4 text-primary" />}
-                            {activity.type === 'manager' && <Users className="h-4 w-4 text-warning" />}
-                            {activity.type === 'payment' && <TrendingUp className="h-4 w-4 text-success" />}
-                            {activity.type === 'team' && <Target className="h-4 w-4 text-accent" />}
+                        <CardHeader className="flex flex-row items-center justify-between gap-2 sm:gap-4 px-4 py-3">
+                            <CardTitle className="text-xl font-semibold text-gray-800">Matchs</CardTitle>
+                            <Link href={buildLink('/tenant/games')} className="inline-flex items-center text-sm font-medium text-emerald-700 hover:text-emerald-800 transition-colors">
+                                <Trophy className="h-4 w-4 mr-1 text-emerald-600" />
+                                <span>Tout les Matchs</span>
+                            </Link>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            {
+                            !loadingDates ?
+                                availableDates.length > 0 ? 
+                                    (<DateCarousel
+                                        dates={availableDates}
+                                        selectedDate={selectedDate}
+                                        onDateSelect={setSelectedDate}
+                                    />):
+                                <p>Aucune date disponible</p>
+                                :
+                                <LoadingSpinner message='Chargement des dates' />
+                            }
+                            <div>
+                                {
+                                    !loadingGames ?
+                                        gamesByDate.length > 0 ? (
+                                            gamesByDate.map( game => (
+                                                <Link key={game.id} href={buildLink(`/game/${game.id}/dashboard`)} >
+                                                    <div className="flex items-center justify-between gap-4 px-3 py-2 my-1 border border-slate-200 rounded-md bg-white hover:bg-slate-100 transition-colors shadow-sm">
+                                                        {/* Game Status Badge */}
+                                                        <div className="shrink-0 ">
+                                                            {getStatusBadge(game.status)}
+                                                        </div>
+                                                        {/* Teams & Scores */}
+                                                        
+                                                        <div className="flex items-center justify-between gap-2 flex-1 text-sm font-medium text-slate-700">
+                                                            {/* Home Team */}
+                                                            <div className='flex items-center justify-start gap-2'>
+                                                                {game.homeTeam.businessProfile.logoAsset?.url ? (
+                                                                <Image
+                                                                    src={game.homeTeam.businessProfile.logoAsset.url}
+                                                                    alt={`${game.homeTeam.shortCode} Logo`}
+                                                                    width={24}
+                                                                    height={24}
+                                                                    className="rounded-full border border-slate-300 "
+                                                                />
+                                                                ) : (
+                                                                <div className="h-6 w-6 rounded-full bg-gradient-to-tr from-gray-400 to-blue-700" />
+                                                                )}
+                                                                <span>{game.homeTeam.shortCode}</span>
+                                                            </div>
+                                                            
+                                                            {/* Score */}
+                                                            {game.homeScore !== null && game.awayScore !== null && (
+                                                            <span className="px-2 font-bold text-slate-900">
+                                                                {game.homeScore} - {game.awayScore}
+                                                            </span>
+                                                            )}
+
+                                                            {/* Away Team */}
+                                                            <div className='flex items-center justify-end gap-2'>
+                                                                <span>{game.awayTeam.shortCode}</span>
+                                                                {game.awayTeam.businessProfile.logoAsset?.url ? (
+                                                                <Image
+                                                                    src={game.awayTeam.businessProfile.logoAsset.url}
+                                                                    alt={`${game.awayTeam.shortCode} Logo`}
+                                                                    width={24}
+                                                                    height={24}
+                                                                    className="rounded-full border border-slate-300"
+                                                                />
+                                                                ) : (
+                                                                <div className="h-6 w-6 rounded-full bg-gradient-to-tr from-gray-400 to-blue-700" />
+                                                                )}
+                                                            </div>
+                                                            
+                                                        </div>
+                                                    </div>
+                                                </Link>
+                                            ))
+                                        )   
+                                        : <p>Aucun Match Trouve</p>
+                                            
+                                        : <LoadingSpinner message='Chargement des Matchs' />
+                                }
                             </div>
-                            <div className="flex-1 min-w-0">
-                            <p className="font-medium text-sm text-foreground">{activity.action}</p>
-                            <p className="text-xs text-muted-foreground truncate">{activity.details}</p>
-                            <p className="text-xs text-muted-foreground mt-1">{activity.time}</p>
-                            </div>
-                        </div>
-                        ))}
-                        <Link href={buildLink('/tenant/games')} className="py-3 flex items-center justify-center text-sm font-medium text-emerald-600 hover:text-emerald-800 transition-colors">
-                            <Trophy className="h-4 w-4 mr-1 text-emerald-600" />
-                            <span>Tout les Matchs</span>
-                        </Link>
-                    </CardContent>
+                            <Link href={buildLink('/tenant/games')} className="py-3 flex items-center justify-center text-sm font-medium text-emerald-600 hover:text-emerald-800 transition-colors">
+                                <Trophy className="h-4 w-4 mr-1 text-emerald-600" />
+                                <span>Resultats & Calendrier</span>
+                            </Link>
+                        </CardContent>
                     </Card>
                 </div>
             </section>
@@ -261,62 +364,7 @@ export default function TenantDashboard() {
                             <span className="text-sm">View Analytics</span>
                         </Button>
                     </CardContent>
-                    </Card>
-            </section>    
-            {/* Upcoming Games Table */}
-            <section className="bg-white p-6 rounded-lg shadow-md mb-8">
-                    <div className="flex justify-between items-center mb-4">
-                        <h2 className="text-xl font-semibold text-gray-800">Upcoming Games</h2>
-                        <Link href={buildLink("/games")} className="text-emerald-600 hover:text-emerald-700 text-sm font-medium">
-                            View All Games
-                        </Link>
-                    </div>
-                    <div className="overflow-x-auto">
-                        <table className="min-w-full divide-y divide-gray-200">
-                            <thead className="bg-gray-50">
-                                <tr>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Match
-                                    </th>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        League
-                                    </th>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Date & Time
-                                    </th>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Venue
-                                    </th>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Status
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody className="bg-white divide-y divide-gray-200">
-                                {mockUpcomingGames.map((game) => (
-                                    <tr key={game.id} className="hover:bg-gray-50">
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                            {game.homeTeam} vs {game.awayTeam}
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            {game.league}
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            {game.date} at {game.time}
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            {game.venue}
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm">
-                                            <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                                {game.status}
-                                            </span>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
+                </Card>
             </section>
             {/* Additional sections can be added here, e.g., "Recent Activity," "Revenue Trends" */}
         </div>

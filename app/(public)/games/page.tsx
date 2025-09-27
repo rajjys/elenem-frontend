@@ -36,7 +36,6 @@ export default function PublicGamesPage() {
   // Fetch available dates on initial load
   async function fetchDates() {
       try {
-          console.log("Fetching Game Dates...");
           const response = await api.get<string[]>('/public-games/dates');
           const dates = response.data;
           if (!dates || dates.length === 0) {
