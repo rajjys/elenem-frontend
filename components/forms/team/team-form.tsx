@@ -15,11 +15,11 @@ import { api } from "@/services/api";
 import { useAuthStore } from "@/store/auth.store";
 import {
   Roles,
-  TeamVisibility,
   CreateTeamFormSchema as CreateTeamSchema,
   TeamFilterParams,
   TeamDetails,
   TenantDetailsSchema,
+  VisibilityLevel,
 } from "@/schemas";
 import { CheckCircle, ChevronLeft, ChevronRight, ListTodo, Image as ImageIcon, Loader2, X } from "lucide-react";
 import axios from "axios";
@@ -75,7 +75,7 @@ export function TeamForm({ onSuccess, onCancel }: TeamFormProps) {
     defaultValues: {
       name: "",
       shortCode: "",
-      visibility: TeamVisibility.PUBLIC,
+      visibility: VisibilityLevel.PUBLIC,
       businessProfile: {
         description: "",
         logoAssetId: null,

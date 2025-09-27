@@ -23,7 +23,7 @@ import { api } from "@/services/api";
 import { useAuthStore } from "@/store/auth.store";
 
 import { CreateLeagueSchema } from "@/schemas/league-schemas";
-import { UserResponseDto, PaginatedResponseDto, Roles, Gender, LeagueVisibility, TenantDetailsSchema } from "@/schemas";
+import { UserResponseDto, PaginatedResponseDto, Roles, Gender, VisibilityLevel, TenantDetailsSchema } from "@/schemas";
 
 import { Stepper } from "../shared/stepper";
 import Step1BasicInfo from "./step1-basic-info";
@@ -79,7 +79,7 @@ export function LeagueForm({ onSuccess, onCancel }: LeagueFormProps) {
       name: "",
       division: "D1",
       gender: Gender.MALE,
-      visibility: LeagueVisibility.PUBLIC,
+      visibility: VisibilityLevel.PUBLIC,
       tenantId: isSystemAdmin ? "" : userAuth?.tenantId || "",
       isActive: true,
       businessProfile: {

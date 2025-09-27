@@ -21,7 +21,7 @@ import {
 } from '@/components/ui/dialog';
 
 // Your League-specific types and enums from prisma
-import { LeagueFilterParams, SportType, LeagueVisibility, Gender } from '@/schemas';
+import { LeagueFilterParams, SportType, VisibilityLevel, Gender } from '@/schemas';
 
 // Icons from Lucide React
 import { Filter as FilterIcon } from 'lucide-react';
@@ -37,7 +37,7 @@ export function LeagueFilters({ filters, onFilterChange, onPageSizeChange }: Lea
   const [search, setSearch] = useState(filters.search || '');
   const [selectedSportType, setSelectedSportType] = useState<SportType | undefined>(filters.sportType);
   const [selectedCountry, setSelectedCountry] = useState<string | undefined>(filters.country);
-  const [selectedVisibility, setSelectedVisibility] = useState<LeagueVisibility | undefined>(filters.visibility);
+  const [selectedVisibility, setSelectedVisibility] = useState<VisibilityLevel | undefined>(filters.visibility);
   const [isActive, setIsActive] = useState<boolean | undefined>(filters.isActive); // Corresponds to `isActive`
   const [selectedGender, setSelectedGender] = useState<Gender | undefined>(filters.gender);
   const [selectedParentLeagueId, setSelectedParentLeagueId] = useState<string | undefined>(filters.parentLeagueId);
@@ -57,7 +57,7 @@ export function LeagueFilters({ filters, onFilterChange, onPageSizeChange }: Lea
     label: type.replace(/_/g, ' ')
   })), []);
 
-  const visibilityOptions = useMemo(() => Object.values(LeagueVisibility).map(vis => ({
+  const visibilityOptions = useMemo(() => Object.values(VisibilityLevel).map(vis => ({
     value: vis,
     label: vis.charAt(0) + vis.slice(1).toLowerCase()
   })), []);
@@ -264,7 +264,7 @@ export function LeagueFilters({ filters, onFilterChange, onPageSizeChange }: Lea
               <Label htmlFor="visibility" className="block text-sm font-medium text-gray-700 mb-1">Visibility</Label>
               <Select
                 value={selectedVisibility || ''}
-                onValueChange={(value: LeagueVisibility) => setSelectedVisibility(!value ? undefined : value)}
+                onValueChange={(value: VisibilityLevel) => setSelectedVisibility(!value ? undefined : value)}
               >
                 <SelectTrigger className="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
                   <SelectValue placeholder="Select Visibility" />

@@ -1,6 +1,6 @@
 // src/schemas/league-schemas.ts (or a similar location for your Zod schemas)
 import * as z from 'zod';
-import { SportType, LeagueVisibility, Gender, SportTypeSchema, LeagueVisibilitySchema } from '@/schemas'; // Assuming these enums are available or you'll mock them
+import { SportType, VisibilityLevel, Gender, SportTypeSchema, VisibilityLevelSchema } from '@/schemas'; // Assuming these enums are available or you'll mock them
 import { CreateBusinessProfileSchema } from './common-schemas'
 // Helper schemas for nested objects (similar to your DTOs)
 export const TenantLiteResponseSchema = z.object({
@@ -44,7 +44,7 @@ export const LeagueBasicSchema: z.ZodSchema<any> = z.lazy(() => z.object({
   name: z.string(),
   slug: z.string().optional(),
   isActive: z.boolean(),
-  visibility: LeagueVisibilitySchema,
+  visibility: VisibilityLevelSchema,
 
   createdAt: z.preprocess((arg) => new Date(arg as string), z.date()),
   updatedAt: z.preprocess((arg) => new Date(arg as string), z.date()),
@@ -106,7 +106,7 @@ export const LeagueFilterParamsSchema = z.object({
     leagueIds: z.array(z.string().cuid()).optional(), // Assuming CUIDs
     sportType: SportTypeSchema.optional(),
     country: z.string().optional(),
-    visibility: z.nativeEnum(LeagueVisibility).optional(),
+    visibility: z.nativeEnum(VisibilityLevel).optional(),
     isActive: z.boolean().optional(),
     gender: z.nativeEnum(Gender).optional(),
     parentLeagueId: z.string().cuid().optional(),
@@ -122,7 +122,7 @@ export interface LeagueFilterParams {
   leagueIds?: string[]; // For SYSTEM_ADMIN to filter by specific leagues
   sportType?: SportType;
   country?: string;
-  visibility?: LeagueVisibility;
+  visibility?: VisibilityLevel;
   isActive?: boolean; // Corresponds to `isActive` for filters
   gender?: Gender;
   parentLeagueId?: string;
@@ -170,7 +170,7 @@ export const CreateLeagueSchema = z.object({
   parentLeagueId: z.string().cuid().optional().nullable(),
   division: z.string(),
   gender: z.nativeEnum(Gender),
-  visibility: z.nativeEnum(LeagueVisibility).optional(),
+  visibility: z.nativeEnum(VisibilityLevel).optional(),
   ownerId: z.string().cuid().optional().nullable(),
   isActive: z.boolean(),
   // The business profile is now a required sub-object

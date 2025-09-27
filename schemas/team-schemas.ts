@@ -1,6 +1,6 @@
 // schemas/team.schemas.ts (new file, or add to your existing prisma/index.ts for shared schemas)
 import * as z from 'zod';
-import { GenderSchema, SportTypeSchema, TeamVisibility, TeamVisibilitySchema } from './enums';
+import { GenderSchema, SportTypeSchema, VisibilityLevel, VisibilityLevelSchema } from './enums';
 import { BusinessProfileSchema, CreateBusinessProfileSchema } from './common-schemas';
 
 // 2) Base team: drop description/logo/banner from here
@@ -18,14 +18,14 @@ export const CreateTeamFormSchema = BaseTeamSchema.extend({
   businessProfile: CreateBusinessProfileSchema,
   ownerId: z.string().optional().nullable().or(z.literal("")),
   homeVenueId: z.string().nullable().optional().or(z.literal("")),
-  visibility: TeamVisibilitySchema,
+  visibility: VisibilityLevelSchema,
   isActive: z.boolean().optional(),
 });
 
 // 4) Update-by-LA schema (unchanged except it no longer carries desc/logo/banner)
 export const UpdateTeamByLaFormSchema = BaseTeamSchema.extend({
   homeVenueId: z.string().nullable().optional(),
-  visibility: z.nativeEnum(TeamVisibility).optional(),
+  visibility: VisibilityLevelSchema.optional(),
   isActive: z.boolean().optional(),
 });
 
@@ -46,7 +46,7 @@ export const TeamDetailsSchema = BaseTeamSchema.extend({
   externalId: z.string().uuid(),
   slug: z.string(),
   homeVenueId: z.string().nullable().optional(),
-  visibility: z.nativeEnum(TeamVisibility).optional(),
+  visibility: VisibilityLevelSchema.optional(),
   isActive: z.boolean().optional(),
   leagueId: z.string().cuid(),
   tenantId: z.string().cuid(),
@@ -89,7 +89,7 @@ export const TeamFilterParamsSchema = z.object({
   city: z.string().optional(),
   state: z.string().optional(),
   isActive: z.boolean().optional(),
-  visibility: z.nativeEnum(TeamVisibility).optional(),
+  visibility: z.nativeEnum(VisibilityLevel).optional(),
   gender: GenderSchema.optional(), // Inherited from league
   division: z.string().optional(), // Inherited from league
   establishedYear: z.number().int().optional(),

@@ -22,8 +22,8 @@ import {
 import { Filter as FilterIcon } from 'lucide-react';
 import { CountryDropdown } from 'react-country-region-selector';
 
-import { TeamFilterParams } from '@/schemas';
-import { TeamVisibility, Gender, Roles, SportType } from '@/schemas'; // Prisma enums
+import { TeamFilterParams, VisibilityLevel } from '@/schemas';
+import { Gender, Roles, SportType } from '@/schemas'; // Prisma enums
 import { useAuthStore } from '@/store/auth.store';
 import { api } from '@/services/api'; // Your API instance
 import { toast } from 'sonner';
@@ -53,7 +53,7 @@ export function TeamsFilters({ filters, onFilterChange, onPageSizeChange, fixedT
   const [selectedCity, setSelectedCity] = useState(filters.city || '');
   const [selectedState, setSelectedState] = useState(filters.state || '');
   const [isActive, setIsActive] = useState<boolean | undefined>(filters.isActive);
-  const [selectedVisibility, setSelectedVisibility] = useState<TeamVisibility | undefined>(filters.visibility);
+  const [selectedVisibility, setSelectedVisibility] = useState<VisibilityLevel | undefined>(filters.visibility);
   const [selectedGender, setSelectedGender] = useState<Gender | undefined>(filters.gender);
   const [selectedSportType, setSelectedSportType] = useState<SportType | undefined>(filters.sportType);
   const [selectedDivision, setSelectedDivision] = useState(filters.division || '');
@@ -70,7 +70,7 @@ export function TeamsFilters({ filters, onFilterChange, onPageSizeChange, fixedT
   const [availableLeagues, setAvailableLeagues] = useState<LeagueBasicDto[]>([]);
 
   // Memoize options
-  const visibilityOptions = useMemo(() => Object.values(TeamVisibility).map(vis => ({
+  const visibilityOptions = useMemo(() => Object.values(VisibilityLevel).map(vis => ({
     value: vis,
     label: vis.charAt(0) + vis.slice(1).toLowerCase()
   })), []);
@@ -311,7 +311,7 @@ export function TeamsFilters({ filters, onFilterChange, onPageSizeChange, fixedT
               <Label htmlFor="visibility" className="block text-sm font-medium text-gray-700 mb-1">Visibility</Label>
               <Select
                 value={selectedVisibility || ''}
-                onValueChange={(value: TeamVisibility) => setSelectedVisibility(!value ? undefined : value)}
+                onValueChange={(value: VisibilityLevel) => setSelectedVisibility(!value ? undefined : value)}
               >
                 <SelectTrigger className="w-full border-gray-300 rounded-md shadow-sm focus:border-primary-500 focus:ring-primary-500">
                   <SelectValue placeholder="Select Visibility" />

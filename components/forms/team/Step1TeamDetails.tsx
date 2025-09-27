@@ -4,8 +4,8 @@
 import React from "react";
 import { UseFormReturn } from "react-hook-form";
 import { Label, Input, Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui";
-import { TeamVisibility } from "@/schemas";
 import { TeamFormValues } from "./team-form";
+import { VisibilityLevel } from "@/schemas";
 
 interface TenantLite { id: string; name: string; }
 interface LeagueLite { id: string; name: string; tenantId: string; }
@@ -67,10 +67,10 @@ export default function Step1TeamDetails({ form, tenants, leagues, venues, isSys
 
         <div className="space-y-2">
           <Label>Visibilite</Label>
-          <Select value={String(watch("visibility"))} onValueChange={(v) => setValue("visibility", v as unknown as TeamVisibility)}>
+          <Select value={String(watch("visibility"))} onValueChange={(v) => setValue("visibility", v as unknown as VisibilityLevel)}>
             <SelectTrigger><SelectValue placeholder="Type de visibilite" /></SelectTrigger>
             <SelectContent>
-              {Object.values(TeamVisibility).map(v => <SelectItem key={v} value={v}>{v.replace(/_/g, " ")}</SelectItem>)}
+              {Object.values(VisibilityLevel).map(v => <SelectItem key={v} value={v}>{v.replace(/_/g, " ")}</SelectItem>)}
             </SelectContent>
           </Select>
         </div>
