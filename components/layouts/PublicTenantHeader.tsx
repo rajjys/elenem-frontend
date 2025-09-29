@@ -6,31 +6,19 @@ import Image from "next/image";
 import React, { useState, useRef, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { FiUser } from "react-icons/fi";
-import { Users, ListOrdered, MoreHorizontal, Volleyball, Goal, Trophy, Home } from "lucide-react";
+import { Users, ListOrdered, MoreHorizontal, Home } from "lucide-react";
 import { useClickAway } from "@/hooks/useClickAway";
-import { SportType, TenantDetails } from "@/schemas";
+import { TenantDetails } from "@/schemas";
 import { useScrollDirection } from "@/hooks";
-import { BasketballIcon, SoccerBallIcon, TennisBallIcon } from "@phosphor-icons/react";
 import { api } from "@/services/api";
 import { resolveTenantSlugFromHostname } from "@/utils";
-import { Skeleton } from "../ui";
+import { getSportIcon, Skeleton } from "../ui";
 
 interface NavLink {
   label: string;
   href: string;
   icon?: React.ElementType;
 }
-
-const getSportIcon = (sportType?: SportType) => {
-  switch (sportType) {
-    case SportType.FOOTBALL: return SoccerBallIcon;
-    case SportType.BASKETBALL: return BasketballIcon;
-    case SportType.VOLLEYBALL: return Volleyball;
-    case SportType.TENNIS: return TennisBallIcon;
-    case SportType.RUGBY: return Goal;
-    default: return Trophy;
-  }
-};
 
 export const PublicTenantHeader = () => {
   const pathname = usePathname();
@@ -53,7 +41,6 @@ export const PublicTenantHeader = () => {
       const fetchTenant = async () => {
         try {
           const tenantResponse = await api.get<TenantDetails>(`/public-tenants/${slug}`);
-          console.log("Tenant: ", tenantResponse.data);
           setTenant(tenantResponse.data);
         } catch (err) {
           console.error('Failed to fetch tenant:', err);

@@ -37,17 +37,6 @@ const hrefIconMap: Record<string, React.ElementType> = {
   "/teams": Users,
 };
 
-const getSportIcon = (sportType?: SportType) => {
-  switch (sportType) {
-    case SportType.FOOTBALL: return SoccerBallIcon;
-    case SportType.BASKETBALL: return BasketballIcon;
-    case SportType.VOLLEYBALL: return Volleyball;
-    case SportType.TENNIS: return TennisBallIcon;
-    case SportType.RUGBY: return Goal;
-    default: return Trophy;
-  }
-};
-
 const extendNavLinksWithIcons = (navLinks: NavLink[], sportType?: SportType) =>
   navLinks.map(({ label, href }) => {
     const icon = href === "/games" ? getSportIcon(sportType) : hrefIconMap[href] || undefined;
