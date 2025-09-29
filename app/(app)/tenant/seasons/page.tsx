@@ -87,12 +87,6 @@ export default function TenantSeasonsPage() {
   }, [filters, currentTenantId]);
 
   useEffect(() => {
-    // Authorization check for Tenant Admin
-    if (!userAuth || !currentUserRoles.includes(Roles.TENANT_ADMIN)) {
-      toast.error("Unauthorized", { description: "You do not have permission to view this page." });
-      router.push('/dashboard');
-      return;
-    }
     if (currentTenantId) { // Only fetch if tenantId is available
       fetchSeasons();
     }

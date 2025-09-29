@@ -74,7 +74,10 @@ export function SeasonsFilters({ filters, onFilterChange, onPageSizeChange, fixe
 
   // Fetch tenants (for System Admin)
   const fetchTenants = useCallback(async () => {
-    if (!isSystemAdmin) return;
+    if (!isSystemAdmin || fixedTenantId) {
+      setAvailableTenants([]);
+      return
+    };
     try {
       const response = await api.get('/tenants', { params: { take: 100 } });
       setAvailableTenants(response.data.items);
@@ -82,7 +85,7 @@ export function SeasonsFilters({ filters, onFilterChange, onPageSizeChange, fixe
       toast.error("Failed to fetch tenants.");
       console.error("Fetch tenants error:", err);
     }
-  }, [isSystemAdmin]);
+  }, [isSystemAdmin, fixedTenantId]);
 
   // Fetch leagues based on selectedTenantId or fixedLeagueId
   const fetchLeagues = useCallback(async (tenantId?: string) => {
@@ -218,7 +221,7 @@ export function SeasonsFilters({ filters, onFilterChange, onPageSizeChange, fixe
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 py-4">
 
             {/* Tenant Selection (System Admin only) */}
-            {isSystemAdmin && (
+            {isSystemAdmin && !fixedTenantId && (
               <div>
                 <Label htmlFor="tenantId" className="block text-sm font-medium text-gray-700 mb-1">Tenant</Label>
                 <Select
