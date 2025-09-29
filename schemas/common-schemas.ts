@@ -38,8 +38,6 @@ export const CreateBusinessProfileSchema = z.object({
   timezone: z.string().optional().nullable(),
 
   // Brand Identity
-  logoUrl: z.string().url().optional().nullable(),
-  bannerImageUrl: z.string().url().optional().nullable(),
   brandingTheme: z.any().optional().nullable(),
 
   // Relations to MediaAsset

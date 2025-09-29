@@ -1,4 +1,4 @@
-import { Badge, Button } from '@/components/ui';
+import { Badge } from '@/components/ui';
 import { Avatar } from '@/components/ui';
 import {
   MoreVertical,
@@ -65,10 +65,10 @@ export const LeagueCard: React.FC<LeagueCardProps> = ({ league, tenant }) => {
               {league.isActive ? 'Active' : 'Inactive'}
             </Badge>
             <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="h-8 w-8">
+              <DropdownMenuTrigger asChild disabled>
+                <span className='p-1.5 bg-slate-100 hover:bg-slate-200 transition-colors duration-200 rounded-full shadow-sm cursor-pointer'>
                   <MoreVertical className="h-4 w-4" />
-                </Button>
+                </span>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuItem>

@@ -1,6 +1,6 @@
 // src/prisma/tenant-schemas.ts
 import * as z from 'zod';
-import { SportType, Roles, SportTypeSchema, TenantTypes, TenantTypeSchema, GameStatus } from './index'; // Assuming SportType and Role are defined in src/prisma/index.ts
+import { SportType, Roles, SportTypeSchema, TenantTypes, TenantTypeSchema, GameStatus, VisibilityLevelSchema } from './index'; // Assuming SportType and Role are defined in src/prisma/index.ts
 import { CreateBusinessProfileDto, CreateBusinessProfileSchema } from './common-schemas';
 
 export interface TenantBasic {
@@ -68,6 +68,7 @@ export const TenantDetailsSchema = z.object({
     bannerAsset: z.object({ url: z.string().nullable().optional() }).optional().nullable(),
   }),
   isActive: z.boolean(),
+  visibility: VisibilityLevelSchema,
   createdAt: z.preprocess((arg) => new Date(arg as string), z.date()),
   updatedAt: z.preprocess((arg) => new Date(arg as string), z.date()),
   ownerId: z.string().nullable().optional(), // Tenant owner, refers to User.id
@@ -128,8 +129,9 @@ export const CreateTenantSchema = z.object({
   country: z.string().min(1, 'Country is required.'),
   // The nested businessProfile object
   businessProfile: CreateBusinessProfileSchema,
+  isActive: z.boolean().optional(),
+  visibility: VisibilityLevelSchema.optional(),
   // Optional ownerId for SYSTEM_ADMIN
-  //isActive: z.boolean().optional().default(true),
   ownerId: z.string().cuid().optional().nullable(),
 });
 
@@ -138,19 +140,13 @@ export type CreateTenantDto = z.infer<typeof CreateTenantSchema>;
 // DTO for updating an existing tenant
 // All fields are optional for update, as only changed fields are sent
 export const UpdateTenantSchema = z.object({
-  name: z.string().min(1, "Tenant name is required").max(100),
-  description: z.string().nullable().optional(),
+  name: z.string().min(1, "Tenant name is required").max(100).optional(),
   tenantCode: z.string().min(3, "Tenant code must be at least 3 characters").max(12, "Tenant code must be at most 12 characters").regex(/^[A-Z0-9]+$/, "Tenant code must be uppercase alphanumeric").optional(),
   tenantType: TenantTypeSchema.optional(),
   sportType: SportTypeSchema.optional(),
   country: z.string().min(2, "Country is required").max(2, "Country must be a 2-letter ISO code").optional(),
-  region: z.string().nullable().optional(),
-  city: z.string().nullable().optional(),
-  state: z.string().nullable().optional(),
-  establishedYear: z.number().int().min(1900).max(new Date().getFullYear() + 5).nullable().optional(),
-  logoUrl: z.string().url("Invalid URL format").nullable().optional(),
-  bannerImageUrl: z.string().url("Invalid URL format").nullable().optional(),
   isActive: z.boolean().optional(),
+  visibility: VisibilityLevelSchema.optional(),
   ownerId: z.string().nullable().optional(), // Allow updating owner
 });
 

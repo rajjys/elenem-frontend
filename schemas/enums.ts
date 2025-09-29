@@ -41,9 +41,9 @@ export enum TenantTypes {
 }
 
 export enum SportType {
-  SOCCER = 'SOCCER',
   BASKETBALL = 'BASKETBALL',
   FOOTBALL = 'FOOTBALL',
+  AMERICAN_FOOTBALL = 'AMERICAN_FOOTBALL',
   BASEBALL = 'BASEBALL',
   TENNIS = 'TENNIS',
   HOCKEY = 'HOCKEY',

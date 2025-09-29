@@ -74,8 +74,8 @@ const tenantNavItems = [
     label: "Platform",
     icon: Settings,
     subItems: [
-      { label: "Account Settings", basePath: "/account/settings", icon: Settings },
-      { label: "User Management", basePath: "/tenant/users", icon: Users },
+      { label: "Parametres", basePath: "/tenant/settings", icon: Settings },
+      { label: "Gestion d'utilisateurs", basePath: "/tenant/users", icon: Users },
       //{ label: "Roles & Permissions", basePath: "/tenant/roles", icon: ShieldCheck },
       //{ label: "Audit Logs", basePath: "/tenant/audit-logs", icon: FileClock },
       //{ label: "Integrations", basePath: "/tenant/integrations", icon: Network },
