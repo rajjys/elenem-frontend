@@ -4,11 +4,10 @@ import Image from "next/image";
 import { UseFormReturn } from "react-hook-form";
 import {
   CardContent,
+  getSportIcon,
 } from "@/components/ui";
 import { TenantFormValues } from ".";
-import { Roles, SportType } from "@/schemas";
-import { BasketballIcon, SoccerBallIcon, TennisBallIcon } from "@phosphor-icons/react";
-import { Volleyball, Goal, Trophy } from "lucide-react";
+import { Roles } from "@/schemas";
 import CountryFlag from 'react-country-flag';
 import { capitalizeFirst, countryNameToCode } from "@/utils";
 
@@ -18,16 +17,6 @@ interface Step3Props {
   logoPreview: string | null;
   bannerPreview: string | null;
 }
-const getSportIcon = (sportType?: SportType) => {
-  switch (sportType) {
-    case SportType.FOOTBALL: return SoccerBallIcon;
-    case SportType.BASKETBALL: return BasketballIcon;
-    case SportType.VOLLEYBALL: return Volleyball;
-    case SportType.TENNIS: return TennisBallIcon;
-    case SportType.RUGBY: return Goal;
-    default: return Trophy;
-  }
-};
 
 export function Step3Review({
   form,

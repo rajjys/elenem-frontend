@@ -19,6 +19,7 @@ import {
   UserResponseDto,
   PaginatedResponseDto,
   CreateTenantSchema,
+  VisibilityLevel,
 } from "@/schemas";
 
 // Step components
@@ -65,6 +66,8 @@ export function TenantCreationForm({ onSuccess, onCancel }: TenantFormProps) {
       tenantCode: "",
       tenantType: TenantTypes.COMMERCIAL,
       sportType: SportType.FOOTBALL,
+      isActive: true,
+      visibility: VisibilityLevel.PUBLIC,
       country: "",
       businessProfile: {
         description: "",
@@ -111,6 +114,8 @@ export function TenantCreationForm({ onSuccess, onCancel }: TenantFormProps) {
         "tenantType",
         "sportType",
         "country",
+        "isActive",     // 👈 ADDED for Step 1 validation
+        "visibility",   // 👈 ADDED for Step 1 validation
       ]);
     } else if (currentStep === 1) {
       isValid = await trigger([
