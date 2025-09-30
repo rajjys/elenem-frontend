@@ -235,7 +235,7 @@ Games can be created:
 This redirects to `/game/create`.  
 
 📸 *Create a game:*  
-![Create Game Screenshot](/public/stock/create-game.jpg)  
+![Create Game Screenshot](/public/stock/create-game.JPG)  
 
 ---
 
