@@ -1,25 +1,8 @@
 // src/prisma/tenant-schemas.ts
 import * as z from 'zod';
 import { SportType, Roles, SportTypeSchema, TenantTypes, TenantTypeSchema, GameStatus, VisibilityLevelSchema } from './index'; // Assuming SportType and Role are defined in src/prisma/index.ts
-import { CreateBusinessProfileDto, CreateBusinessProfileSchema } from './common-schemas';
+import { BusinessProfileDto, CreateBusinessProfileSchema } from './common-schemas';
 
-export interface TenantBasic {
-  id: string;
-  externalId: string;
-  name: string;
-  tenantCode: string;
-  tenantType: TenantTypes;
-  slug: string;
-  isActive: boolean;
-  sportType: SportType; // From the provided Tenant model
-  country?: string | null;
-  owner?: {
-    id: string;
-    username: string;
-    firstName?: string | null;
-    lastName?: string | null;
-  } | null;
-}
 export interface TenantFilterParams {
   search?: string;
   isActive?: boolean;
@@ -31,25 +14,6 @@ export interface TenantFilterParams {
   sortBy?: 'name' | 'tenantCode' | 'tenantType' | 'sportType' | 'country' | 'ownerUsername' | 'createdAt' | 'updatedAt';
   sortOrder?: 'asc' | 'desc';
 }
-
-export const TenantBasicSchema = z.object({
-  id: z.string().cuid(),
-  externalId: z.string().uuid(),
-  name: z.string(),
-  tenantCode: z.string(),
-  tenantType: TenantTypeSchema,
-  slug: z.string(),
-  isActive: z.boolean(),
-  sportType: SportTypeSchema,
-  country: z.string().optional(),
-  owner: z.object({
-    id: z.string(),
-    username: z.string(),
-    firstName: z.string().nullable().optional(),
-    lastName: z.string().nullable().optional(),
-  }).nullable().optional(), // Expanded owner details
-});
-export type TenantBasicDto = z.infer<typeof TenantBasicSchema>;
 
 // Full Tenant Schema (for display/detail)
 export const TenantDetailsSchema = z.object({
@@ -148,7 +112,21 @@ export const UpdateTenantSchema = z.object({
 });
 
 export type UpdateTenantDto = z.infer<typeof UpdateTenantSchema>;
-
+// The frontend representation of the PublicTenantResponseDto
+export interface PublicTenantBasic {
+  id: string;
+  externalId: string;
+  slug: string;
+  name: string;
+  country: string;
+  tenantCode: string;
+  sportType: SportType;
+  businessProfile: BusinessProfileDto;
+  _count: {
+    leagues: number;
+    teams: number;
+  };
+}
 // For fetching a list of users for owner selection
 export const UserResponseDtoSchema = z.object({
   id: z.string(),
@@ -158,6 +136,8 @@ export const UserResponseDtoSchema = z.object({
   lastName: z.string().nullable().optional(),
   role: z.nativeEnum(Roles), // Include role to filter for GENERAL_USER
 });
+
+export type PaginatedTenantsResponseDto = z.infer<typeof PaginatedTenantsResponseSchema>;
 
 export type UserResponseDto = z.infer<typeof UserResponseDtoSchema>;
 
@@ -187,37 +167,9 @@ export const GetUsersParamsSchema = z.object({
 export type GetUsersParamsDto = z.infer<typeof GetUsersParamsSchema>;
 // Paginated Response Schema for Leagues
 export const PaginatedTenantsResponseSchema = z.object({
-  data: z.array(TenantBasicSchema),
+  data: z.array(TenantDetailsSchema),
   totalItems: z.number().int().min(0),
   totalPages: z.number().int().min(0),
   currentPage: z.number().int().min(1),
   pageSize: z.number().int().min(1),
 });
-
-// Extend CreateBusinessProfileDto with an id field
-export interface BusinessProfileWithId extends CreateBusinessProfileDto {
-  id: string;
-  logoAsset: {
-    url: string
-  },
-  bannerAsset: {
-    url: string
-  }
-}
-// The frontend representation of the PublicTenantResponseDto
-export interface PublicTenantBasic {
-  id: string;
-  externalId: string;
-  slug: string;
-  name: string;
-  country: string;
-  tenantCode: string;
-  sportType: SportType;
-  businessProfile: BusinessProfileWithId;
-  _count: {
-    leagues: number;
-    teams: number;
-  };
-}
-
-export type PaginatedTenantsResponseDto = z.infer<typeof PaginatedTenantsResponseSchema>;

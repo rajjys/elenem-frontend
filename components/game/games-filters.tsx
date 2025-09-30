@@ -21,7 +21,7 @@ import {
 
 import { Filter as FilterIcon } from 'lucide-react';
 
-import { GameFilterParams } from '@/schemas'; // Your GameFilterParams schema
+import { GameFilterParams, TenantDetails } from '@/schemas'; // Your GameFilterParams schema
 import { GameStatus, Roles } from '@/schemas'; // Prisma enums
 import { useAuthStore } from '@/store/auth.store';
 import { api } from '@/services/api'; // Your API instance
@@ -37,7 +37,6 @@ interface GamesFiltersProps {
   fixedTeamId?: string | null; // Team ID if context is fixed (e.g., Team Dashboard)
 }
 
-interface TenantBasicDto { id: string; name: string; }
 interface LeagueBasicDto { id: string; name: string; tenantId: string; }
 interface SeasonBasicDto { id: string; name: string; leagueId: string; tenantId: string; }
 interface TeamBasicDto { id: string; name: string; leagueId: string; tenantId: string; }
@@ -65,7 +64,7 @@ export function GamesFilters({ filters, onFilterChange, onPageSizeChange, fixedT
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const [availableTenants, setAvailableTenants] = useState<TenantBasicDto[]>([]);
+  const [availableTenants, setAvailableTenants] = useState<TenantDetails[]>([]);
   const [availableLeagues, setAvailableLeagues] = useState<LeagueBasicDto[]>([]);
   const [availableSeasons, setAvailableSeasons] = useState<SeasonBasicDto[]>([]);
   const [availableTeams, setAvailableTeams] = useState<TeamBasicDto[]>([]);

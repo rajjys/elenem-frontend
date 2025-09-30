@@ -21,7 +21,7 @@ import {
 
 import { Filter as FilterIcon } from 'lucide-react';
 
-import { SeasonFilterParams, SeasonStatus, Roles, PaginatedLeaguesResponseDto } from '@/schemas'; // Your filter schema
+import { SeasonFilterParams, SeasonStatus, Roles, PaginatedLeaguesResponseDto, TenantDetails } from '@/schemas'; // Your filter schema
 import { useAuthStore } from '@/store/auth.store';
 import { api } from '@/services/api'; // Your API instance
 import { toast } from 'sonner';
@@ -34,7 +34,6 @@ interface SeasonsFiltersProps {
   fixedLeagueId?: string | null; // League ID if context is fixed
 }
 
-interface TenantBasicDto { id: string; name: string; }
 interface LeagueBasicDto { id: string; name: string; tenantId: string; }
 
 export function SeasonsFilters({ filters, onFilterChange, onPageSizeChange, fixedTenantId, fixedLeagueId }: SeasonsFiltersProps) {
@@ -63,7 +62,7 @@ export function SeasonsFilters({ filters, onFilterChange, onPageSizeChange, fixe
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const [availableTenants, setAvailableTenants] = useState<TenantBasicDto[]>([]);
+  const [availableTenants, setAvailableTenants] = useState<TenantDetails[]>([]);
   const [availableLeagues, setAvailableLeagues] = useState<LeagueBasicDto[]>([]);
 
   // Memoize options

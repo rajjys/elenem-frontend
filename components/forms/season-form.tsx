@@ -19,7 +19,7 @@ import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { api } from "@/services/api";
 import { useAuthStore } from "@/store/auth.store";
-import { LeagueBasic, Roles, SeasonDetails, TenantBasic } from "@/schemas";
+import { LeagueBasic, Roles, SeasonDetails, TenantDetails } from "@/schemas";
 import { CreateSeasonSchema, SeasonStatus, CreateSeasonDto } from "@/schemas/";
 import axios from "axios";
 import Link from "next/link";
@@ -41,7 +41,7 @@ export function SeasonForm({ onSuccess, onCancel, dashboardLink, seasonsPageLink
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [loadingData, setLoadingData] = useState(true);
-  const [tenants, setTenants] = useState<TenantBasic[]>([]);
+  const [tenants, setTenants] = useState<TenantDetails[]>([]);
   const [leagues, setLeagues] = useState<LeagueBasic[]>([]);
 
   const today = new Date().toISOString().split("T")[0]; // "2025-08-29";
