@@ -126,15 +126,177 @@ For certain pages (`/league/dashboard`, `/team/...`), additional context must be
 The same logic applies to teams (`ctxTeamId`).
 
 ---
+---
 
-## ✅ Next Steps
+## 📖 Usage
 
-The next section will cover **Usage**:
+The following steps describe how to use **Elenem** after installation.  
+Each step includes the main action, the required fields, and where to find the functionality.
 
-* Creating tenants, leagues, and teams
-* Navigating between subdomains (`ligue2.lvh.me:3000`)
-* Role-based resource management
+---
 
-### Stay tuned.
+### 1. Authentication
+
+- Go to `/login` or `/register`.  
+- **Registration mandatory fields:**  
+  - `username`  
+  - `email`  
+  - `password`  
+  - `firstName`  
+  - `lastName`  
+- Optional fields are available during registration.  
+- After registration, you are redirected to the `/welcome` page.  
+  - From here, you can either keep browsing or go directly to the **Tenant creation form**.  
+
+📸  
+![Registration Screenshot](/public/stock/auth.jpg)
+### Register
+![Registration Screenshot](/public/stock/register.jpg)  
+### Login
+![Login Screenshot](/public/stock/login.jpg)  
+
+---
+
+### 2. Create a Tenant
+
+If the user is not already affiliated with a tenant, they may create one.  
+A **Tenant** represents the organization the user wants to manage.  
+
+- **Multistep form** with mandatory fields:  
+  - `tenantName`  
+  - `tenantCode`  
+  - `sportType`  
+  - `country`  
+- After creation, the user is assigned the role of **TENANT_ADMIN** by the backend.  
+- Redirected to: `/dashboard` for the newly created organization.  
+
+📸 *Create Tenant Form:*  
+![Create Tenant Screenshot](/public/stock/create-tenant.jpg)  
+
+📸 *Create Tenant Preview:*  
+![Create Tenant Screenshot](/public/stock/create-tenant-preview.jpg)  
+
+---
+
+### 3. Create a League
+
+From the */dashboard* or */leagues* page, click **"Create League"**.  
+This opens a **multistep form**:  
+
+1. Step 1 → Mandatory fields: `name`, `division`, `gender`  
+2. Step 2 → Optional fields  
+3. Step 3 → Point system and rules  
+4. Step 4 → Review & submit  
+
+#
+📸 *Create a League - Points System config:*  
+![Create League Screenshot](/public/stock/create-league.jpg)  
+
+---
+
+### 4. Create a Season
+
+A **Season** can be created:  
+- From the **/dashboard**, or  
+- From `/seasons`  page 
+
+Mandatory fields:  
+- `name`  
+- `startDate`  
+- `endDate`  
+
+Optional fields are available as well.  
+
+#
+📸 *Create a season:*  
+![Create Season Screenshot](/public/stock/create-season.jpg)  
+
+---
+
+### 5. Create Teams
+
+Teams can be created before or after creating a season.  
+- **Multistep form** with mandatory fields:  
+  - `name`  
+  - `shortCode`  
+
+#
+📸 *Team Creation:*  
+![Create Team Screenshot](/public/stock/create-team.jpg)  
+
+---
+
+### 6. Create Games
+
+Games can be created:  
+- From the **dashboard**, or  
+- From `/games` page (via the **"Create Game"** button)  
+
+This redirects to `/game/create`.  
+
+📸 *Create a game:*  
+![Create Game Screenshot](/public/stock/create-game.jpg)  
+
+---
+
+### 7. Manage Games
+
+To manage an existing game:  
+- Go to the dashboard or `/games` page  
+- Select the desired game → redirects to the **Game Dashboard**  
+- From here, you can update:  
+  - Game status  
+  - Score  
+  - Time  
+
+All updates automatically reflect on the **public site**:  
+- `https://mainsite.com`  
+- `https://tenant.mainsite.com`  
+
+📸 *Manage a game:*  
+![Manage Game Screenshot](/public/stock/manage-game.jpg)  
+
+📸 *Manage a game real-time:*  
+![Manage Game Screenshot](/public/stock/manage-game-live.jpg)  
+
+---
+
+### 8. Blogposts
+
+From `/posts` page, tenant admins can manage blogposts for their tenant’s website.  
+
+📸 *Screenshot placeholder:*  
+![Posts Management Screenshot](/public/docs/usage/posts.png)  
+
+---
+
+### 9. Settings
+
+From `/tenant/settings`, you can update:  
+- Tenant information  
+- Configurations  
+
+📸 *Screenshot placeholder:*  
+![Tenant Settings Screenshot](/public/docs/usage/settings.png)  
+
+---
+
+### 10. Tenant Users
+
+From `/tenant/users`, tenant admins can manage the users of their organization.  
+
+📸 *Screenshot placeholder:*  
+![Users Management Screenshot](/public/docs/usage/users.png)  
+
+---
+
+## 🌍 Public Visibility
+
+All created data (leagues, teams, games, standings, posts, etc.) is visible on:  
+- The **main site:** `https://mainsite.com`  
+- The **tenant subdomain:** `https://tenant.mainsite.com`  
+
+This ensures that fans and visitors always see up-to-date information.  
+
 
 
