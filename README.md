@@ -125,10 +125,9 @@ For certain pages (`/league/dashboard`, `/team/...`), additional context must be
 
 The same logic applies to teams (`ctxTeamId`).
 
----
----
+#
 
-## 📖 Usage
+# 📖 Usage
 
 The following steps describe how to use **Elenem** after installation.  
 Each step includes the main action, the required fields, and where to find the functionality.
@@ -298,5 +297,174 @@ All created data (leagues, teams, games, standings, posts, etc.) is visible on:
 
 This ensures that fans and visitors always see up-to-date information.  
 
+---
 
+#
+# 🤝 Contributing
+
+We welcome contributions to **Elenem**!  
+Whether you are fixing a bug, improving documentation, or adding a new feature, please follow these guidelines to keep the codebase clean, secure, and maintainable.
+
+---
+
+### 1. Fork and Clone
+
+- Fork the repository on GitHub.  
+- Clone your fork locally:
+
+```bash
+git clone https://github.com/<your-username>/elenem-frontend.git
+cd elenem-frontend
+````
+
+* Add the upstream remote (to sync with main repo later):
+
+```bash
+git remote add upstream https://github.com/rajjys/elenem-frontend.git
+```
+
+---
+
+### 2. Branching Strategy
+
+* Always create a new branch from `main` for your work:
+
+```bash
+git checkout main
+git pull upstream main
+git checkout -b feature/my-new-feature
+```
+
+* Use clear branch names:
+
+  * `feature/...` → for new features
+  * `fix/...` → for bug fixes
+  * `chore/...` → for config, tooling, cleanup
+  * `docs/...` → for documentation changes
+
+---
+
+### 3. Coding Standards
+
+* Follow **TypeScript + Next.js** conventions.
+* Use **Zod** for validation and **Zustand** for state management (do not reinvent the wheel).
+* Reuse **UI components** from `/components/ui` instead of creating duplicates.
+* Use **hooks** from `/hooks` when possible; create new ones if logic repeats.
+* Ensure **forms use react-hook-form with zodResolver**.
+* Respect **role-based access** with `<AccessGate />`. Never bypass it.
+
+---
+
+### 4. Environment & Configuration
+
+* Never hardcode environment variables.
+* Always use values from `.env` (e.g., `NEXT_PUBLIC_API_URL`).
+* For local dev, test against `lvh.me:3000` to ensure subdomains work.
+
+---
+
+### 5. Testing Your Changes
+
+Before committing:
+
+* Run the dev server:
+
+  ```bash
+  npm run dev
+  ```
+* Ensure **pages render without errors**.
+* Check **role-based flows** (login as different roles if possible).
+* Run **linting**:
+
+  ```bash
+  npm run lint
+  ```
+* Run **type-checking**:
+
+  ```bash
+  npm run build
+  ```
+
+---
+
+### 6. Commit Messages
+
+* Use clear, conventional commit messages:
+
+  * `feat: add league creation step`
+  * `fix: correct tenant redirect after registration`
+  * `docs: update README usage section`
+  * `chore: update dependencies`
+
+---
+
+### 7. Pull Requests
+
+* Push your branch to your fork.
+* Open a Pull Request (PR) to `main` in the upstream repo.
+* A PR must:
+
+  * Describe **what** you changed.
+  * Explain **why** the change is needed.
+  * Include screenshots (for UI changes).
+  * Pass **code review** before merging.
+
+---
+
+### 🚫 NO-NOs in Production Code
+
+To keep Elenem stable and professional, **never do the following**:
+
+* ❌ Hardcode API URLs, secrets, or tokens.
+* ❌ Push `.env` files or credentials.
+* ❌ Use `any` or ignore TypeScript errors (`// @ts-ignore`) without strong justification.
+* ❌ Leave `console.log`, `debugger`, or commented-out code.
+* ❌ Commit without lint/type checks passing.
+* ❌ Mix French and English in code; code stays **English-only**.
+* ❌ Duplicate logic already implemented in `/hooks`, `/schemas`, `/services`, etc.
+* ❌ Skip role-based access checks.
+* ❌ Merge directly into `main` without a PR and review.
+
+---
+
+### 8. Syncing Your Fork
+
+To update your branch with the latest changes from upstream:
+
+```bash
+git fetch upstream
+git checkout main
+git merge upstream/main
+```
+
+Then rebase your feature branch:
+
+```bash
+git checkout feature/my-branch
+git rebase main
+```
+
+---
+
+### 9. Asking for Help
+
+If you get stuck:
+
+* Open a **draft PR** early and ask for feedback.
+* Comment in the code where you’re unsure.
+* Communicate clearly in the PR description.
+
+---
+
+### ✅ Summary for Juniors
+
+* Always work in a branch.
+* Always run lint + type-check before committing.
+* Always open a PR → no direct merges.
+* Always remove debug code.
+* Always think about roles and contexts when building features.
+* Ask questions when in doubt.
+* The team needs you.
+
+By following these practices, you’ll quickly become a valuable contributor while keeping Elenem safe, clean, and production-ready 🚀
 
