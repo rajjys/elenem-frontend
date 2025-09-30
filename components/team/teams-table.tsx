@@ -152,11 +152,11 @@ export function TeamsTable({ teams, onSort, sortBy, sortOrder, onDelete, current
               </TableCell>
               <TableCell className="px-6 py-4 whitespace-nowrap">
                 <div className="flex items-center">
-                  {team.businessProfile.logoUrl && (
+                  {team.businessProfile.logoAsset?.url && (
                     <div className="flex-shrink-0 h-10 w-10">
                       <Image
                         className='h-10 w-10 rounded-full object-cover border border-gray-400'
-                        src={team.businessProfile.logoUrl}
+                        src={team.businessProfile.logoAsset.url}
                         height={60}
                         width={60}
                         placeholder="blur"

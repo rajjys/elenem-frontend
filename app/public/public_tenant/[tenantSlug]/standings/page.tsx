@@ -12,7 +12,6 @@ interface PublicTenantDetails {
   id: string;
   slug: string;
   name: string;
-  logoUrl?: string | null;
   leagues: {
     id: string;
     name: string;

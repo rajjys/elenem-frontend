@@ -32,9 +32,9 @@ export default function Step3_TeamReview({ form, logoPreview, bannerPreview, own
     <CardContent className="space-y-6">
       {/* Banner + Logo */}
       <div className="relative w-full h-48 bg-gray-100 rounded-lg flex items-center justify-center mb-12">
-        {bannerPreview || formData.businessProfile?.bannerImageUrl ? (
+        {bannerPreview || formData.businessProfile?.bannerAsset?.url ? (
           <Image
-            src={bannerPreview ?? (formData.businessProfile?.bannerImageUrl as string)}
+            src={bannerPreview ?? (formData.businessProfile?.bannerAsset?.url as string)}
             alt="Banner preview"
             width={736}
             height={480}
@@ -47,9 +47,9 @@ export default function Step3_TeamReview({ form, logoPreview, bannerPreview, own
         {/* Logo */}
         <div className="absolute left-4 -bottom-10">
           <div className="relative w-28 h-28 rounded-full border-4 border-white shadow-md overflow-hidden bg-gray-100">
-            {logoPreview || formData.businessProfile?.logoUrl ? (
+            {logoPreview || formData.businessProfile?.logoAsset?.url ? (
               <Image
-                src={logoPreview ?? (formData.businessProfile?.logoUrl as string)}
+                src={logoPreview ?? (formData.businessProfile?.logoAsset?.url as string)}
                 alt="Logo preview"
                 width={112}
                 height={112}

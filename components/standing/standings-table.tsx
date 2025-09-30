@@ -12,8 +12,7 @@ interface TeamStanding {
     id: string;
     name: string;
     businessProfile: {
-      logoUrl: string | null;
-      bannerImageUrl: string | null;
+      logoAsset?: { url: string | null },
     }
   };
   rank: number;
@@ -61,8 +60,8 @@ export function StandingsTable({ standings, managingTeamId }: StandingsTableProp
                 <TableCell className="font-medium text-center">{item.rank}</TableCell>
                 <TableCell>
                   <div className="flex items-center gap-3">
-                    {item.team.businessProfile.logoUrl ? (
-                      <Avatar src={item.team.businessProfile.logoUrl} name={item.team.name} size={40} />
+                    {item.team.businessProfile.logoAsset?.url ? (
+                      <Avatar src={item.team.businessProfile.logoAsset.url} name={item.team.name} size={40} />
                     ) : (
                       <div className="h-6 w-6 rounded-full bg-muted flex items-center justify-center text-xs">
                         {item.team.name.charAt(0)}

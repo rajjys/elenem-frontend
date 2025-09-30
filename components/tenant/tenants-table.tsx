@@ -1,7 +1,7 @@
 //components/tenant/tenants-table.tsx
 "use client";
 
-import { TenantBasic } from '@/schemas';
+import { TenantDetails } from '@/schemas';
 import React from 'react';
 import { Button, Table, TableBody, TableCell, TableHead, TableHeader, TableRow, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/';
 import Link from 'next/link';
@@ -11,7 +11,7 @@ import TenantLogo from './tenant-logo';
 type SortableColumn = 'name' | 'tenantCode' | 'sportType' | 'country' | 'ownerUsername' | 'createdAt' | 'updatedAt';
 
 interface TenantsTableProps { 
-  tenants: TenantBasic[];
+  tenants: TenantDetails[];
   onSort: (sortBy: SortableColumn) => void;
   sortOrder: 'asc' | 'desc';
   sortBy: string;
@@ -88,10 +88,10 @@ export function TenantsTable({ tenants, onSort, sortBy, sortOrder, onDelete }: T
               </TableCell>
               <TableCell className="px-6 py-4 whitespace-nowrap">
                 <div className="flex items-center">
-                  {tenant.logoUrl && (
+                  {tenant.businessProfile.logoAsset?.url && (
                     <div className="flex-shrink-0 h-10 w-10">
                       <TenantLogo
-                        src={tenant.logoUrl}
+                        src={tenant.businessProfile.logoAsset.url}
                         alt={`${tenant.name} Logo`}
                         fallbackText={tenant.name.charAt(0)}
                       />

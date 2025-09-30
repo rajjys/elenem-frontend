@@ -61,20 +61,20 @@ export default function Step2_TeamBusinessProfile({
     // assume uploader.upload(file) returns asset { id?, url? }
     const asset = await uploader.upload(file);
     if (asset) {
-      // team schema expects URLs — keep the same structure as your original team form (logoUrl / bannerImageUrl)
+      // team schema expects URLs — keep the same structure as your original team form (logoAsset.url / bannerAsset.url)
       if (field === "logo") {
-        setValue("businessProfile.logoUrl", asset.url);
+        setValue("businessProfile.logoAsset.url", asset.url);
       } else {
-        setValue("businessProfile.bannerImageUrl", asset.url);
+        setValue("businessProfile.bannerAsset.url", asset.url);
       }
       setPreview(asset.url ?? null);
-      await trigger(`businessProfile.${field === "logo" ? "logoUrl" : "bannerImageUrl"}`);
+      await trigger(`businessProfile.${field === "logo" ? "logoAsset.url" : "bannerAsset.url"}`);
     } else {
       if (field === "logo") {
-        setValue("businessProfile.logoUrl", "");
+        setValue("businessProfile.logoAsset.url", "");
         setLogoPreview(null);
       } else {
-        setValue("businessProfile.bannerImageUrl", "");
+        setValue("businessProfile.bannerAsset.url", "");
         setBannerPreview(null);
       }
     }
@@ -85,9 +85,9 @@ export default function Step2_TeamBusinessProfile({
       {/* Banner area */}
       <div className="relative mb-12">
         <div className="relative w-full h-48 bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center">
-          {bannerPreview || watch("businessProfile.bannerImageUrl") ? (
+          {bannerPreview || watch("businessProfile.bannerAsset.url") ? (
             <Image
-              src={bannerPreview ?? (watch("businessProfile.bannerImageUrl") as string)}
+              src={bannerPreview ?? (watch("businessProfile.bannerAsset.url") as string)}
               alt="Banner preview"
               width={736}
               height={480}
@@ -102,11 +102,11 @@ export default function Step2_TeamBusinessProfile({
               <Camera className="w-5 h-5" />
             </button>
 
-            {(bannerPreview || watch("businessProfile.bannerImageUrl")) && (
+            {(bannerPreview || watch("businessProfile.bannerAsset.url")) && (
               <button
                 type="button"
                 onClick={() => {
-                  setValue("businessProfile.bannerImageUrl", "");
+                  setValue("businessProfile.bannerAsset.url", "");
                   setBannerPreview(null);
                 }}
                 className="bg-white p-2 rounded-full shadow hover:bg-gray-50"
@@ -126,8 +126,8 @@ export default function Step2_TeamBusinessProfile({
         {/* Logo */}
         <div className="absolute left-4 -bottom-10">
           <div className="relative w-28 h-28 rounded-full border-4 border-white shadow-md overflow-hidden bg-gray-100">
-            {logoPreview || watch("businessProfile.logoUrl") ? (
-              <Image src={logoPreview ?? (watch("businessProfile.logoUrl") as string)} alt="Logo preview" width={112} height={112} className="w-full h-full object-cover" />
+            {logoPreview || watch("businessProfile.logoAsset.url") ? (
+              <Image src={logoPreview ?? (watch("businessProfile.logoAsset.url") as string)} alt="Logo preview" width={112} height={112} className="w-full h-full object-cover" />
             ) : (
               <div className="w-full h-full flex items-center justify-center text-gray-400">Logo</div>
             )}
@@ -136,8 +136,8 @@ export default function Step2_TeamBusinessProfile({
               <button type="button" onClick={() => logoInputRef.current?.click()} className="bg-white p-2 rounded-full shadow hover:bg-gray-50 cursor-pointer">
                 <Camera className="w-5 h-5" />
               </button>
-              {(logoPreview || watch("businessProfile.logoUrl")) && (
-                <button type="button" onClick={() => { setValue("businessProfile.logoUrl", ""); setLogoPreview(null); }} className="bg-white p-2 rounded-full shadow hover:bg-gray-50">
+              {(logoPreview || watch("businessProfile.logoAsset.url")) && (
+                <button type="button" onClick={() => { setValue("businessProfile.logoAsset.url", ""); setLogoPreview(null); }} className="bg-white p-2 rounded-full shadow hover:bg-gray-50">
                   <Trash className="w-4 h-4" />
                 </button>
               )}

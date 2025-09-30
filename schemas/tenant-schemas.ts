@@ -10,7 +10,6 @@ export interface TenantBasic {
   tenantCode: string;
   tenantType: TenantTypes;
   slug: string;
-  logoUrl?: string | null;
   isActive: boolean;
   sportType: SportType; // From the provided Tenant model
   country?: string | null;
@@ -40,7 +39,6 @@ export const TenantBasicSchema = z.object({
   tenantCode: z.string(),
   tenantType: TenantTypeSchema,
   slug: z.string(),
-  logoUrl: z.string().url().nullable().optional(),
   isActive: z.boolean(),
   sportType: SportTypeSchema,
   country: z.string().optional(),
@@ -86,7 +84,6 @@ export const TenantDetailsSchema = z.object({
     isActive: z.boolean(),
     createdAt: z.preprocess((arg) => new Date(arg as string), z.date()),
     updatedAt: z.preprocess((arg) => new Date(arg as string), z.date()),
-    logoUrl: z.string().optional(),
   })).optional(), // Optional array of leagues associated with the tenant
   teams: z.array(z.object({
     id: z.string().cuid(),

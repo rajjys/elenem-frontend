@@ -95,7 +95,7 @@ const GeneralUserDashboard = () => {
               <Card className='my-6 text-gray-800 bg-gray-200 hover:bg-gray-300 transition-colors rounded-md w-auto max-w-xs text-center'>
                 <CardTitle className="flex items-center">
                   <Image
-                    src={tenant?.businessProfile.logoUrl || `https://placehold.co/40x40/4F46E5/FFFFFF?text=${tenant?.name || 'T'}`}
+                    src={tenant?.businessProfile.logoAsset?.url || `https://placehold.co/40x40/4F46E5/FFFFFF?text=${tenant?.name || 'T'}`}
                     alt="Tenant Logo"
                     width={24}
                     height={24}

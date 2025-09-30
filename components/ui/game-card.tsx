@@ -52,7 +52,7 @@ export const GameCard: React.FC<GameCardProps> = ({ game, buildLink, getStatusBa
             <div className="flex items-center justify-around gap-4 mb-4">
               {/* Home Team */}
               <div className="flex items-center lg:justify-center gap-3 w-full xs:w-auto">
-                <Avatar name={game.homeTeam.name} src={game.homeTeam.businessProfile.logoUrl || null} size={40} />
+                <Avatar name={game.homeTeam.name} src={game.homeTeam.businessProfile.logoAsset?.url || null} size={40} />
                 <div>
                   <h3 className="font-semibold text-gray-900 block md:hidden">{game.homeTeam.shortCode}</h3>
                   <h3 className="font-semibold text-gray-900 hidden md:block">{game.homeTeam.name}</h3>
@@ -81,7 +81,7 @@ export const GameCard: React.FC<GameCardProps> = ({ game, buildLink, getStatusBa
                     <p className="text-sm text-gray-500 hidden sm:block">0-0</p>
                   }
                 </div>
-                <Avatar name={game.awayTeam.name} src={game.awayTeam.businessProfile.logoUrl || null} size={40} />
+                <Avatar name={game.awayTeam.name} src={game.awayTeam.businessProfile?.logoAsset?.url || null} size={40} />
               </div>
             </div>
           </div>

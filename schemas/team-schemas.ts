@@ -1,7 +1,7 @@
 // schemas/team.schemas.ts (new file, or add to your existing prisma/index.ts for shared schemas)
 import * as z from 'zod';
 import { GenderSchema, SportTypeSchema, VisibilityLevel, VisibilityLevelSchema } from './enums';
-import { BusinessProfileSchema, CreateBusinessProfileSchema } from './common-schemas';
+import { BusinessProfileSchema } from './common-schemas';
 
 // 2) Base team: drop description/logo/banner from here
 export const BaseTeamSchema = z.object({
@@ -15,7 +15,7 @@ export const CreateTeamFormSchema = BaseTeamSchema.extend({
   leagueId: z.string().min(1, "League is required."),
   // Only for SYS ADMIN UI filtering; not required by backend create (derived from league)
   tenantId: z.string().optional().or(z.literal("")),
-  businessProfile: CreateBusinessProfileSchema,
+  businessProfile: BusinessProfileSchema,
   ownerId: z.string().optional().nullable().or(z.literal("")),
   homeVenueId: z.string().nullable().optional().or(z.literal("")),
   visibility: VisibilityLevelSchema,

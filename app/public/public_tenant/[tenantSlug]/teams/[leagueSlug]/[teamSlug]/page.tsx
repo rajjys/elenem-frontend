@@ -27,8 +27,7 @@ interface Standing {
     shortCode: string;
     slug: string;
     businessProfile: {
-      logoUrl: string | null;
-      bannerImageUrl: string | null;
+      logoAsset?: { url: string | null } | null;
     },
   };
   rank: number;

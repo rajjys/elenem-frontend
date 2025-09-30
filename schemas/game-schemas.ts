@@ -11,8 +11,6 @@ const TeamBasicSchema = z.object({
   rank: z.number().optional().nullable(),
   record: z.string().optional().nullable(),
   businessProfile: z.object({
-    logoUrl: z.string().nullable().optional(),
-    bannerImageUrl: z.string().nullable().optional(),
     logoAsset: z.object({
       url: z.string()
     }).optional().nullable()

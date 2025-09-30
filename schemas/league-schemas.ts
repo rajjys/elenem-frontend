@@ -1,7 +1,7 @@
 // src/schemas/league-schemas.ts (or a similar location for your Zod schemas)
 import * as z from 'zod';
 import { SportType, VisibilityLevel, Gender, SportTypeSchema, VisibilityLevelSchema } from '@/schemas'; // Assuming these enums are available or you'll mock them
-import { CreateBusinessProfileSchema } from './common-schemas'
+import { BusinessProfileSchema, CreateBusinessProfileSchema } from './common-schemas'
 // Helper schemas for nested objects (similar to your DTOs)
 export const TenantLiteResponseSchema = z.object({
   id: z.string().cuid(),
@@ -40,7 +40,7 @@ export const LeagueBasicSchema: z.ZodSchema<any> = z.lazy(() => z.object({
   division: z.string(),
   gender: z.nativeEnum(Gender).nullable().optional(),
   currentSeasonId: z.string().cuid().nullable().optional(),
-  busiessProfile: CreateBusinessProfileSchema.optional(),
+  busiessProfile: BusinessProfileSchema.optional(),
   name: z.string(),
   slug: z.string().optional(),
   isActive: z.boolean(),
@@ -56,9 +56,7 @@ export const LeagueBasicSchema: z.ZodSchema<any> = z.lazy(() => z.object({
   teams: z.array(z.object({
     id: z.string().cuid(),
     name: z.string(),
-    logoUrl: z.string().nullable().optional(),
     shortCode: z.string().nullable().optional(),
-    bannerImageUrl: z.string().nullable().optional(),
     isActive: z.boolean(),
     country: z.string().nullable().optional(),
     region: z.string().nullable().optional(),
@@ -72,13 +70,6 @@ export const LeagueBasicSchema: z.ZodSchema<any> = z.lazy(() => z.object({
     email: z.string().email(),
     profilePictureUrl: z.string().nullable().optional(),
   }))
-  // If you include createdBy, updatedBy, deletedBy in LeagueResponseDto, add them here:
-  // createdById: z.string().cuid().nullable().optional(),
-  // createdBy: UserLiteResponseSchema.nullable().optional(),
-  // updatedById: z.string().cuid().nullable().optional(),
-  // updatedBy: UserLiteResponseSchema.nullable().optional(),
-  // deletedById: z.string().cuid().nullable().optional(),
-  // deletedBy: UserLiteResponseSchema.nullable().optional(),
 }));
 
 export type LeagueBasic = z.infer<typeof LeagueBasicSchema>;

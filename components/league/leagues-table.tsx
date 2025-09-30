@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/'; // Your UI components
 
 // Your League-specific types from prisma
-import { LeagueBasic } from '@/schemas'; // Assuming LeagueBasic is here
+import { LeagueBasic } from '@/schemas';
 
 // Icons from Lucide React
 import { ArrowUpDown, Pencil, Trash, MoreVertical } from 'lucide-react';
@@ -107,10 +107,10 @@ export function LeaguesTable({ leagues, onSort, sortOrder, sortBy, onDelete } : 
               </TableCell>
               <TableCell className="px-6 py-4 whitespace-nowrap">
                 <div className="flex items-center">
-                  {league.logoUrl && (
+                  {league.logoAsset?.url && (
                     <div className="flex-shrink-0 h-10 w-10">
                       <LeagueLogo
-                        src={league.logoUrl}
+                        src={league.logoAsset?.url}
                         alt={`${league.name} Logo`}
                         fallbackText={league.name.charAt(0)}
                       />

@@ -18,7 +18,6 @@ interface LeagueCardProps {
   league: {
     id: string;
     name: string;
-    logoUrl?: string;
     businessProfile?: {
       logoAsset?: {
         url?: string;
