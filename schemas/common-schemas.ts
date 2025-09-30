@@ -55,4 +55,5 @@ export const BusinessProfileSchema = CreateBusinessProfileSchema.extend({
   }).optional().nullable(),
 })
 
-export type CreateBusinessProfileDto = z.infer<typeof CreateBusinessProfileSchema>
+export type CreateBusinessProfileDto = z.infer<typeof CreateBusinessProfileSchema>;
+export type BusinessProfileDto = z.infer<typeof BusinessProfileSchema>;

@@ -22,7 +22,7 @@ import {
 import { Filter as FilterIcon } from 'lucide-react';
 import { CountryDropdown } from 'react-country-region-selector';
 
-import { TeamFilterParams, VisibilityLevel } from '@/schemas';
+import { TeamFilterParams, TenantDetails, VisibilityLevel } from '@/schemas';
 import { Gender, Roles, SportType } from '@/schemas'; // Prisma enums
 import { useAuthStore } from '@/store/auth.store';
 import { api } from '@/services/api'; // Your API instance
@@ -36,7 +36,6 @@ interface TeamsFiltersProps {
   fixedLeagueId?: string | null; // League ID if context is fixed (e.g., League Admin page)
 }
 
-interface TenantBasicDto { id: string; name: string; }
 interface LeagueBasicDto { id: string; name: string; tenantId: string; sportType?: SportType; gender?: Gender; division?: string; }
 
 
@@ -66,7 +65,7 @@ export function TeamsFilters({ filters, onFilterChange, onPageSizeChange, fixedT
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const [availableTenants, setAvailableTenants] = useState<TenantBasicDto[]>([]);
+  const [availableTenants, setAvailableTenants] = useState<TenantDetails[]>([]);
   const [availableLeagues, setAvailableLeagues] = useState<LeagueBasicDto[]>([]);
 
   // Memoize options

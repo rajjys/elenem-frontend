@@ -16,7 +16,7 @@ import {
   TextArea
 } from "@/components/ui/";
 import { useState, useEffect, useCallback } from "react";
-import { Gender, SupportedLanguages, Roles, TenantBasicDto, UserDetail, PaginatedTenantsResponseDto } from "@/schemas"; // Import UserDetail
+import { Gender, SupportedLanguages, Roles, UserDetail, PaginatedTenantsResponseDto, TenantDetails } from "@/schemas"; // Import UserDetail
 import { api } from '@/services/api';
 import { toast } from 'sonner';
 import { useAuthStore } from '@/store/auth.store'; // Import useAuthStore
@@ -64,7 +64,7 @@ export function UserForm({
 
   const [loadingForm, setLoadingForm] = useState(true); // Overall loading for form data
   const [loadingTenants, setLoadingTenants] = useState(false);
-  const [availableTenants, setAvailableTenants] = useState<TenantBasicDto[]>([]);
+  const [availableTenants, setAvailableTenants] = useState<TenantDetails[]>([]);
   const [initialUserData, setInitialUserData] = useState<UserDetail | null>(null); // To store fetched user data for edit
 
   const form = useForm<UserFormValues>({

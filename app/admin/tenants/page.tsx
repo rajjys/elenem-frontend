@@ -4,7 +4,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { api } from '@/services/api'; // Your actual API instance
-import { TenantBasic, PaginatedTenantsResponseSchema, TenantFilterParams } from '@/schemas'// Your actual Prisma types and schemas
+import { PaginatedTenantsResponseSchema, TenantFilterParams, TenantDetails } from '@/schemas'// Your actual Prisma types and schemas
 import { TenantFilters } from '@/components/tenant/tenant-filters'; // Your new TenantFilters component
 import { TenantsTable } from '@/components/tenant/tenants-table'; // Your new TenantsTable component
 import { Pagination } from '@/components/ui/'; // Your Pagination component
@@ -14,7 +14,7 @@ import { toast } from 'sonner'; // Your toast notification library (e.g., Sonner
 import axios from 'axios';
 
 export default function AdminTenantsPage() {
-  const [tenants, setTenants] = useState<TenantBasic[]>([]);
+  const [tenants, setTenants] = useState<TenantDetails[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [totalItems, setTotalItems] = useState(0);
