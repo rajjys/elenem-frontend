@@ -1,3 +1,5 @@
+'use client';
+
 import { SportType } from "@/schemas";
 import {
   BaseballIcon,
