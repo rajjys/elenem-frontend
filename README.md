@@ -149,11 +149,11 @@ Each step includes the main action, the required fields, and where to find the f
   - From here, you can either keep browsing or go directly to the **Tenant creation form**.  
 
 📸  
-![Registration Screenshot](/public/stock/auth.jpg)
+![Registration Screenshot](/public/stock/auth.JPG)
 ### Register
-![Registration Screenshot](/public/stock/register.jpg)  
+![Registration Screenshot](/public/stock/register.JPG)  
 ### Login
-![Login Screenshot](/public/stock/login.jpg)  
+![Login Screenshot](/public/stock/login.JPG)  
 
 ---
 
@@ -171,10 +171,10 @@ A **Tenant** represents the organization the user wants to manage.
 - Redirected to: `/dashboard` for the newly created organization.  
 
 📸 *Create Tenant Form:*  
-![Create Tenant Screenshot](/public/stock/create-tenant.jpg)  
+![Create Tenant Screenshot](/public/stock/create-tenant.JPG)  
 
 📸 *Create Tenant Preview:*  
-![Create Tenant Screenshot](/public/stock/create-tenant-preview.jpg)  
+![Create Tenant Screenshot](/public/stock/create-tenant-preview.JPG)  
 
 ---
 
@@ -190,7 +190,7 @@ This opens a **multistep form**:
 
 #
 📸 *Create a League - Points System config:*  
-![Create League Screenshot](/public/stock/create-league.jpg)  
+![Create League Screenshot](/public/stock/create-league.JPG)  
 
 ---
 
@@ -209,7 +209,7 @@ Optional fields are available as well.
 
 #
 📸 *Create a season:*  
-![Create Season Screenshot](/public/stock/create-season.jpg)  
+![Create Season Screenshot](/public/stock/create-season.JPG)  
 
 ---
 
@@ -222,7 +222,7 @@ Teams can be created before or after creating a season.
 
 #
 📸 *Team Creation:*  
-![Create Team Screenshot](/public/stock/create-team.jpg)  
+![Create Team Screenshot](/public/stock/create-team.JPG)  
 
 ---
 
@@ -254,10 +254,10 @@ All updates automatically reflect on the **public site**:
 - `https://tenant.mainsite.com`  
 
 📸 *Manage a game:*  
-![Manage Game Screenshot](/public/stock/manage-game.jpg)  
+![Manage Game Screenshot](/public/stock/manage-game.JPG)  
 
 📸 *Manage a game real-time:*  
-![Manage Game Screenshot](/public/stock/manage-game-live.jpg)  
+![Manage Game Screenshot](/public/stock/manage-game-live.JPG)  
 
 ---
 
