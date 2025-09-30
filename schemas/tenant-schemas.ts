@@ -141,7 +141,7 @@ export const UpdateTenantSchema = z.object({
   tenantCode: z.string().min(3, "Tenant code must be at least 3 characters").max(12, "Tenant code must be at most 12 characters").regex(/^[A-Z0-9]+$/, "Tenant code must be uppercase alphanumeric").optional(),
   tenantType: TenantTypeSchema.optional(),
   sportType: SportTypeSchema.optional(),
-  country: z.string().min(2, "Country is required").max(2, "Country must be a 2-letter ISO code").optional(),
+  country: z.string().min(2, "Country is required").optional(),
   isActive: z.boolean().optional(),
   visibility: VisibilityLevelSchema.optional(),
   ownerId: z.string().nullable().optional(), // Allow updating owner

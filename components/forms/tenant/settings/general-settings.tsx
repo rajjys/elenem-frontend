@@ -22,6 +22,7 @@ import { api } from "@/services/api";
 import { UpdateTenantSchema, VisibilityLevel, TenantDetails, SportType, TenantTypes } from "@/schemas"; // Add SportType, TenantTypes to imports
 import axios from "axios";
 import { Loader2 } from "lucide-react"; // Add Loader2 import
+import { countryCodeToName } from "@/utils";
 
 type FormValues = z.infer<typeof UpdateTenantSchema>;
 
@@ -88,7 +89,9 @@ export default function TenantGeneralSettings({ tenant }: TenantGeneralSettingsP
   } = form;
 
   // Watch for country change for CountryDropdown
-  const country = watch("country");
+  const countryCodeOrName = watch("country")
+  const country = countryCodeOrName ? countryCodeToName[countryCodeOrName] || countryCodeOrName : countryCodeOrName;
+  const tenantCode = watch("tenantCode");
 
   // keep form in sync when tenant prop changes (route navigation / data refetch)
   useEffect(() => {
@@ -133,7 +136,7 @@ export default function TenantGeneralSettings({ tenant }: TenantGeneralSettingsP
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 p-6 shadow-md bg-white rounded-lg">
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
@@ -159,6 +162,7 @@ export default function TenantGeneralSettings({ tenant }: TenantGeneralSettingsP
         <div className="space-y-2">
           <Label htmlFor="tenantCode">Code d&apos;Orgnisation</Label>
           <Controller
+          disabled={true}
             name="tenantCode"
             control={control}
             render={({ field }) => (
@@ -176,6 +180,7 @@ export default function TenantGeneralSettings({ tenant }: TenantGeneralSettingsP
               />
             )}
           />
+          <Label className="text-slate-400">https://<span className="text-green-700">{tenantCode?.toLowerCase()}</span>.elenem.site</Label>
           {errors.tenantCode && <p className="text-red-500 text-xs">{errors.tenantCode.message}</p>}
         </div>
 

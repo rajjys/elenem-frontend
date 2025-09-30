@@ -1,6 +1,6 @@
 // src/app/tenant/settings/page.tsx
 'use client';
-import  TenantGeneralSettings  from './general/page';
+import TenantGeneralSettings from "@/components/forms/tenant/settings/general-settings";
 //import { TenantBusinessProfile } from './profile/page';
 //import { TenantOwnership } from './ownership/page';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
