@@ -4,20 +4,20 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { useAuthStore } from '@/store/auth.store';
 import { api } from '@/services/api';
 import { toast } from 'sonner';
 import { LeagueBasic, PaginatedLeaguesResponseSchema, Roles } from '@/schemas';
 import { useContextualLink } from '@/hooks';
-import { Plus, Settings } from 'lucide-react';
+import { Trophy } from 'lucide-react';
 import axios from 'axios';
+import { LeagueCard } from '@/components/ui';
 
 // Define the League schema based on common data structures
 // This should match your backend DTO for a single League
 
 export default function TenantLeaguesPage() {
-  const router = useRouter();
   const userAuth = useAuthStore((state) => state.user);
 
   const [leagues, setLeagues] = useState<LeagueBasic[]>([]);
@@ -92,79 +92,30 @@ export default function TenantLeaguesPage() {
   }
 
   return (
-    <div className="min-h-screen p-6 bg-gray-50">
+    <div className="min-h-screen bg-gray-50">
       <Head>
         <title>Leagues - ELENEM Sports</title>
       </Head>
 
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-gray-800">{totalItems} Leagues</h1>
+        <h1 className="text-lg md:text-xl lg:text-2xl font-bold text-gray-800">{totalItems} Ligues</h1>
         <div className='flex whitespace-nowrap text-sm gap-3'>
-                    <button onClick={() => router.push('/tenant/settings')}
-                        className="w-full flex items-center justify-center text-gray-800 px-2 py-2 mx-2 border border-gray-200 rounded-md transition-colors">
-                        <Settings className="h-4 w-4 mr-2" />Settings
-                    </button>
-                    <button onClick={() => router.push('/league/create')}
-                        className="w-full flex items-center justify-center bg-emerald-600 text-white py-2 px-2 rounded-md hover:bg-emerald-700 transition-colors">
-                        <Plus className="h-4 w-4 mr-2" />Create New League
-                    </button>
-          </div>
+          <Link
+          href={buildLink("/league/create")}
+          className="flex items-center gap-2 bg-emerald-600 text-white px-3 py-2 rounded-md hover:bg-emerald-700 transition-colors">
+              <Trophy className="h-4 w-4" />
+              <span className="">Créer une Ligue</span>
+          </Link>
+        </div>
       </div>
-
       {leagues.length === 0 && !loading && !error ? (
-        <div className="text-center text-gray-500 text-lg mt-10">No leagues found for this tenant.</div>
+        <div className="text-center text-gray-500 text-lg mt-10">Pas de ligues disponibles pour cette organisation.</div>
       ) : (
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <span hidden>{totalItems} leagues</span>
+        <div className="bg-white p-2 md:p-6 rounded-lg shadow-md">
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Name
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Sport Type
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Country
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Status
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Established Year
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {leagues.map((league) => (
-                  <tr key={league.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      <Link href={buildLink('/league/dashboard', { ctxLeagueId: league.id })} className="text-emerald-600 hover:underline">
-                        {league.name}
-                      </Link>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {league.sportType}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {league.country || 'N/A'}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm">
-                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        league.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                      }`}>
-                        {league.isActive ? 'Active' : 'Inactive'}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {league.establishedYear || 'N/A'}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            {leagues?.map((league: LeagueBasic) => (
+                  <LeagueCard key={league.id} league={league} tenant={league.tenant}/>
+              ))}
           </div>
         </div>
       )}

@@ -1,4 +1,4 @@
-import { Badge } from '@/components/ui';
+import { SeasonStatusBadge } from '@/components/ui';
 import { Avatar } from '@/components/ui';
 import {
   MoreVertical,
@@ -8,11 +8,13 @@ import {
   Building2,
   Crown,
   TrendingUp,
+  Trash,
 } from 'lucide-react';
 import Link from 'next/link';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { capitalize } from '@/utils';
 import { useContextualLink } from '@/hooks';
+import { SeasonStatus } from '@/schemas';
 
 interface LeagueCardProps {
   league: {
@@ -26,10 +28,15 @@ interface LeagueCardProps {
     isActive?: boolean;
     teams?: { id: string }[];
     managingUsers?: { id: string }[];
+    currentSeason?: {
+      name: string;
+      status: SeasonStatus
+    }
   };
   tenant?: {
     sportType?: string;
   };
+  
 }
 
 export const LeagueCard: React.FC<LeagueCardProps> = ({ league, tenant }) => {
@@ -38,7 +45,7 @@ export const LeagueCard: React.FC<LeagueCardProps> = ({ league, tenant }) => {
 
   return (
     <Link href={buildLink('/league/dashboard', { ctxLeagueId: league.id })} key={league.id}>
-      <div className="p-2 border border-gray-200 rounded-lg hover:bg-gray-200/30 transition-colors my-1">
+      <div className="p-2 border border-gray-200 rounded-lg hover:bg-gray-200/30 transition-colors my-2">
         <div className="flex sm:items-center flex-wrap justify-between gap-2 sm:gap-4 mb-2">
           {/* Identity */}
           <div className="flex items-center gap-3">
@@ -54,17 +61,16 @@ export const LeagueCard: React.FC<LeagueCardProps> = ({ league, tenant }) => {
               <div className="flex items-center gap-2 text-xs text-gray-500">
                 <span>{capitalize(tenant?.sportType || '')}</span>
                 <span>•</span>
-                <span>Saison 2025</span>
+                <span>{league.currentSeason ? league.currentSeason.name : "Non definie"}</span>
               </div>
             </div>
           </div>
           {/* Status & Actions */}
-          <div className="flex items-center gap-2">
-            <Badge variant={league.isActive ? 'success' : 'secondary'} className="text-xs">
-              {league.isActive ? 'Active' : 'Inactive'}
-            </Badge>
+          <div className="flex items-center justify-between gap-2">
+            <SeasonStatusBadge status={league.currentSeason?.status} />
+
             <DropdownMenu>
-              <DropdownMenuTrigger asChild disabled>
+              <DropdownMenuTrigger asChild>
                 <span className='p-1.5 bg-slate-100 hover:bg-slate-200 transition-colors duration-200 rounded-full shadow-sm cursor-pointer'>
                   <MoreVertical className="h-4 w-4" />
                 </span>
@@ -81,6 +87,10 @@ export const LeagueCard: React.FC<LeagueCardProps> = ({ league, tenant }) => {
                 <DropdownMenuItem>
                   <Settings className="mr-2 h-4 w-4" />
                   Configurer
+                </DropdownMenuItem>
+                <DropdownMenuItem className='bg-red-50 text-red-500'>
+                  <Trash className="mr-2 h-4 w-4" />
+                  Supprimer
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

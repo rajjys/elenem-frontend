@@ -1,6 +1,6 @@
 // src/schemas/league-schemas.ts (or a similar location for your Zod schemas)
 import * as z from 'zod';
-import { SportType, VisibilityLevel, Gender, SportTypeSchema, VisibilityLevelSchema } from '@/schemas'; // Assuming these enums are available or you'll mock them
+import { SportType, VisibilityLevel, Gender, SportTypeSchema, VisibilityLevelSchema, SeasonStatus } from '@/schemas'; // Assuming these enums are available or you'll mock them
 import { BusinessProfileSchema, CreateBusinessProfileSchema } from './common-schemas'
 // Helper schemas for nested objects (similar to your DTOs)
 export const TenantLiteResponseSchema = z.object({
@@ -63,6 +63,11 @@ export const LeagueBasicSchema: z.ZodSchema<any> = z.lazy(() => z.object({
     city: z.string().nullable().optional(),
     state: z.string().nullable().optional(),
   })).optional(),
+  currentSeason: z.object({
+    id: z.string().cuid(),
+    name: z.string(),
+    status: z.nativeEnum(SeasonStatus)
+  }).optional().nullable(),
   players: z.array(z.object({
     id: z.string().cuid(),
     firstName: z.string().nullable().optional(),

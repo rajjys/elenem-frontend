@@ -238,7 +238,7 @@ export default function TenantDashboard() {
                                 <span>Toutes les Ligues</span>
                             </Link>
                         </CardHeader>
-                        <CardContent className="py-2 flex-1">
+                        <CardContent className="flex-1">
                         {leagues?.map((league: LeagueBasic) => (
                             <LeagueCard key={league.id} league={league} tenant={tenant!} />
                         ))}

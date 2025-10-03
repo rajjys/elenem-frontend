@@ -1,10 +1,22 @@
 // components/ui/badge.tsx
 import React from 'react';
-
+export type BadgeVariant =
+  | 'default'
+  | 'secondary'
+  | 'success'
+  | 'destructive'
+  | 'outline'
+  | 'planning'
+  | 'scheduled'
+  | 'active'
+  | 'paused'
+  | 'completed'
+  | 'canceled'
+  | 'archived';
 // Define the possible variants for the badge
 interface BadgeProps {
   children: React.ReactNode;
-  variant?: 'default' | 'secondary' | 'success' | 'destructive' | 'outline';
+  variant?: BadgeVariant;
   className?: string;
 }
 
@@ -29,6 +41,28 @@ export function Badge({ children, variant = 'default', className }: BadgeProps) 
     case 'outline':
       baseClasses += ' text-green-600 border border-green-600 bg-emerald-50 hover:bg-accent'; // Outline style
       break;
+    case 'planning':
+      baseClasses += ' bg-yellow-100 text-yellow-800 border border-yellow-300';
+      break;
+    case 'scheduled':
+      baseClasses += ' bg-blue-100 text-blue-800 border border-blue-300';
+      break;
+    case 'active':
+      baseClasses += ' bg-green-600 text-white';
+      break;
+    case 'paused':
+      baseClasses += ' bg-orange-100 text-orange-800 border border-orange-300';
+      break;
+    case 'completed':
+      baseClasses += ' bg-gray-100 text-gray-800 border border-gray-300';
+      break;
+    case 'canceled':
+      baseClasses += ' bg-red-600 text-white';
+      break;
+    case 'archived':
+      baseClasses += ' bg-slate-200 text-slate-600';
+      break;
+
     default:
       baseClasses += ' bg-gray-500 text-white'; // Fallback
       break;

@@ -30,3 +30,4 @@ export * from './PostCard';
 export * from './code-block';
 export * from './LeagueCard';
 export * from './getSportIcon';
+export * from './season-status-badge';
