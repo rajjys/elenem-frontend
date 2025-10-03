@@ -113,7 +113,11 @@ export default function AppLayout({
   const themeClass = `${themeColor}-theme`; // e.g., "emerald-theme"
 
   return (
-    <div className={`flex flex-col h-screen bg-gray-100 ${themeClass}`}>
+    <div className={`flex flex-col h-screen bg-gray-100 ${themeClass}`}
+         style={{
+         ["--hover-bg" as string]: `var(--color-${themeColor}-50)`,
+         ["--hover-text" as string]: `var(--color-${themeColor}-600)`,
+       }}>
       {/* Navbar is always visible */}
       <AppLayoutNavbar dashboardLink={dashboardLink} onMobileMenuToggle={toggleMobileMenu} handleLogout={handleLogout}/>
       <div className='flex flex-1 overflow-hidden'> {/* This flex container holds sidebar and main content */}

@@ -1,4 +1,3 @@
-// components/layouts/NavLink.tsx
 import Link from "next/link";
 
 interface NavLinkProps {
@@ -7,41 +6,44 @@ interface NavLinkProps {
     isSidebarOpen: boolean;
     isFlyout?: boolean;
     onClick?: () => void;
-    themeColor: string; // Add themeColor prop
-    buildLink: (basePath: string) => string; // Function to build the final href
+    themeColor: string;
+    buildLink: (basePath: string) => string;
 }
 
-export const NavLink: React.FC<NavLinkProps> = ({ item, currentPath, isSidebarOpen, isFlyout, onClick, themeColor, buildLink }) => {
+export const NavLink: React.FC<NavLinkProps> = ({
+    item,
+    currentPath,
+    isSidebarOpen,
+    isFlyout,
+    onClick,
+    themeColor,
+    buildLink,
+}) => {
     const finalHref = buildLink(item.basePath);
-    // More precise active check: Check if the pathname part of the URL matches 
     const isActive = currentPath === item.basePath;
     const Icon = item.icon;
 
-    // Define color variables based on the themeColor prop
+    // Define variables
     const primary600 = `var(--color-${themeColor}-600)`;
-    const primary50 = `var(--color-${themeColor}-50)`; // Assuming you'll add this to tailwind config
-    //const primary700 = `var(--color-${themeColor}-700)`;
+    const primary50 = `var(--color-${themeColor}-50)`;
 
     return (
         <Link
             href={finalHref}
             onClick={onClick}
-            className={`flex items-center py-2.5 px-4 rounded-md transition-colors duration-150
+            className={`flex items-center py-2.5 px-4 rounded-md transition-all duration-200 ease-in-out border-l-4
                 ${isActive
-                    ? `bg-[${primary600}] text-white font-semibold` // Active state
-                    : `text-gray-600 hover:bg-[${primary50}] hover:text-[${primary600}]` // Inactive state
-                }
-                ${!isSidebarOpen && !isFlyout && "justify-center"}
-                ${isFlyout && "w-full"}`}
+                    ? "font-semibold bg-[var(--hover-bg)] text-[var(--hover-text)] border-[var(--hover-text)]"
+                    : "text-gray-600 border-transparent nav-hover"}
+                ${!isSidebarOpen && !isFlyout ? "justify-center" : ""}
+                ${isFlyout ? "w-full" : ""}`}
             title={isSidebarOpen || isFlyout ? "" : item.label}
             style={{
-              backgroundColor: isActive ? primary600 : undefined,
-              color: isActive ? 'white' : undefined,
-              '--hover-bg': primary50, // Custom CSS variable for hover background
-              '--hover-text': primary600 // Custom CSS variable for hover text color
-            } as React.CSSProperties} // Cast to allow custom CSS variables
+                backgroundColor: isActive ? primary50 : undefined,
+                color: isActive ? primary600 : undefined,
+            }}
         >
-            <Icon className={`w-5 h-5 ${(isSidebarOpen || isFlyout) ? "mr-3" : ""}`} />
+            <Icon className={`w-5 h-5 transition-transform duration-150 group-hover:scale-105 ${isSidebarOpen || isFlyout ? "mr-3" : ""}`} />
             {(isSidebarOpen || isFlyout) && <span className="text-sm">{item.label}</span>}
         </Link>
     );

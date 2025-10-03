@@ -60,6 +60,8 @@
   --color-primary-700: 67 56 202;
   --color-primary-800: 55 48 163;
   --color-primary-900: 49 46 129;
+  --hover-bg: var(--color-indigo-50);
+  --hover-text: var(--color-indigo-600);
 }
 /* Theme Definitions */
 .indigo-theme {
@@ -165,4 +167,35 @@ body {
 }
 [data-state="closed"].animate-collapsible-up {
   animation: collapsible-up 0.2s ease-out;
+}
+/* Hover/focus consistency for NavLink, CollapsibleNavLink and FlyoutMenu*/
+.nav-hover {
+  transition: all 150ms ease-in-out;
+}
+
+/* Hover: changes only on mouse over */
+.nav-hover:hover {
+  background-color: var(--hover-bg);
+  color: var(--hover-text);
+}
+
+/* Keyboard focus only (not mouse click) */
+.nav-hover:focus-visible {
+  outline: 2px solid var(--hover-text);
+  outline-offset: 2px;
+}
+
+/* Optional: pressed state */
+.nav-hover:active {
+  background-color: var(--hover-bg);
+  filter: brightness(0.95);
+}
+
+/* Fade-in animation for flyouts */
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+.animate-fadeIn {
+  animation: fadeIn 0.15s ease-out forwards;
 }

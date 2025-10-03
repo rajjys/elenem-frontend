@@ -1,8 +1,6 @@
-// components/layouts/CollapsibleNavLink.tsx
 'use client'
 import { useEffect, useRef, useState } from "react";
 import { FiChevronDown, FiChevronRight } from "react-icons/fi";
-// Ensure NavLink is imported from the correct path, likely the same directory
 import { NavLink } from "./NavLink";
 
 interface CollapsibleNavLinkProps {
@@ -12,28 +10,36 @@ interface CollapsibleNavLinkProps {
     onFlyoutToggle: (label: string, target: HTMLElement) => void;
     activeFlyoutLabel: string | null;
     onMobileLinkClick?: () => void;
-    themeColor: string; // Add themeColor prop
-    buildLink: (basePath: string) => string; // Pass the buildLink function
+    themeColor: string;
+    buildLink: (basePath: string) => string;
 }
 
-export const CollapsibleNavLink: React.FC<CollapsibleNavLinkProps> = ({ category, currentPath, isSidebarOpen, onFlyoutToggle, activeFlyoutLabel, onMobileLinkClick, themeColor, buildLink }) => {
+export const CollapsibleNavLink: React.FC<CollapsibleNavLinkProps> = ({
+    category,
+    currentPath,
+    isSidebarOpen,
+    onFlyoutToggle,
+    activeFlyoutLabel,
+    onMobileLinkClick,
+    themeColor,
+    buildLink,
+}) => {
     const [accordionOpen, setAccordionOpen] = useState(category.subItems.some(sub => currentPath.startsWith(sub.basePath)));
     const CategoryIcon = category.icon;
     const triggerRef = useRef<HTMLButtonElement>(null);
-    // isActive check should be based on `startsWith` for categories, not exact match
+
     const isCategoryActive = category.subItems.some(sub => currentPath.startsWith(sub.basePath));
     const isThisFlyoutActive = activeFlyoutLabel === category.label;
 
     useEffect(() => {
-        if (isSidebarOpen && category.subItems.some(sub => currentPath.startsWith(sub.basePath))) {
+        if (isSidebarOpen && isCategoryActive) {
             setAccordionOpen(true);
         } else if (!isSidebarOpen) {
             setAccordionOpen(false);
         }
-    }, [currentPath, category.subItems, isSidebarOpen]);
+    }, [currentPath, category.subItems, isSidebarOpen, isCategoryActive]);
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const handleCategoryClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    const handleCategoryClick = () => {
         if (isSidebarOpen) {
             setAccordionOpen(!accordionOpen);
         } else {
@@ -43,43 +49,44 @@ export const CollapsibleNavLink: React.FC<CollapsibleNavLinkProps> = ({ category
         }
     };
 
-    // Define color variables based on the themeColor prop
     const primary100 = `var(--color-${themeColor}-100)`;
-    const primary50 = `var(--color-${themeColor}-50)`; // Assuming you'll add this to tailwind config
     const primary600 = `var(--color-${themeColor}-600)`;
-    const primary700 = `var(--color-${themeColor}-700)`;
-
-    // Apply dynamic styles using CSS variables
-    const categoryButtonActiveStyle = (isSidebarOpen && isCategoryActive) || (!isSidebarOpen && isThisFlyoutActive)
-        ? `bg-[${primary100}] text-[${primary700}]`
-        : `text-gray-700 hover:bg-[${primary50}] hover:text-[${primary600}]`;
 
     return (
-        <div className="relative">
+        <div className="relative group">
             <button
                 ref={triggerRef}
                 onClick={handleCategoryClick}
-                className={`flex items-center justify-between w-full py-2.5 px-4 rounded-md transition-colors duration-150
-                            ${categoryButtonActiveStyle}
-                            ${!isSidebarOpen && "justify-center"}`}
+                className={`flex items-center justify-between w-full py-2.5 px-4 rounded-md border-l-4 transition-all duration-200 ease-in-out
+                            ${isSidebarOpen ? "" : "justify-center"}
+                            ${isCategoryActive ? "bg-[var(--hover-bg)] text-[var(--hover-text)] border-[var(--hover-text)]"
+                                : "text-gray-700 border-transparent nav-hover"}`}
                 title={isSidebarOpen ? "" : category.label}
                 style={{
-                  backgroundColor: (isSidebarOpen && isCategoryActive) || (!isSidebarOpen && isThisFlyoutActive) ? primary100 : undefined,
-                  color: (isSidebarOpen && isCategoryActive) || (!isSidebarOpen && isThisFlyoutActive) ? primary700 : undefined,
-                  '--hover-bg': primary50, // Custom CSS variable for hover background
-                  '--hover-text': primary600 // Custom CSS variable for hover text color
-                } as React.CSSProperties} // Cast to allow custom CSS variables
+                    backgroundColor: isCategoryActive ? primary100 : undefined,
+                    color: isCategoryActive ? primary600 : undefined,
+                }}
             >
                 <div className="flex items-center">
-                    <CategoryIcon className={`w-5 h-5 ${isSidebarOpen ? "mr-3" : ""}`} />
+                    <CategoryIcon className={`w-5 h-5 transition-transform duration-150 group-hover:scale-105 ${isSidebarOpen ? "mr-3" : ""}`} />
                     {isSidebarOpen && <span className="text-sm font-medium">{category.label}</span>}
                 </div>
-                {isSidebarOpen && (accordionOpen ? <FiChevronDown className="w-5 h-5" /> : <FiChevronRight className="w-5 h-5" />)}
+                {isSidebarOpen && (
+                    accordionOpen
+                        ? <FiChevronDown className="w-5 h-5 transition-transform duration-200" />
+                        : <FiChevronRight className="w-5 h-5 transition-transform duration-200" />
+                )}
             </button>
-            {isSidebarOpen && accordionOpen && (
+
+            {/* Accordion */}
+            {isSidebarOpen && (
                 <div
-                    className="pl-5 mt-1 space-y-0.5 border-l-2 ml-3"
-                    style={{ borderColor: primary100 }} // Apply theme color to border
+                    className={`pl-5 mt-1 space-y-0.5 border-l-2 ml-3 overflow-hidden transition-all duration-300 ease-in-out`}
+                    style={{
+                        borderColor: primary100,
+                        maxHeight: accordionOpen ? "500px" : "0px",
+                        opacity: accordionOpen ? 1 : 0,
+                    }}
                 >
                     {category.subItems.map(subItem => (
                         <NavLink
@@ -88,8 +95,8 @@ export const CollapsibleNavLink: React.FC<CollapsibleNavLinkProps> = ({ category
                             currentPath={currentPath}
                             isSidebarOpen={isSidebarOpen}
                             onClick={onMobileLinkClick}
-                            themeColor={themeColor} // Pass themeColor
-                            buildLink={buildLink} // Pass down the function
+                            themeColor={themeColor}
+                            buildLink={buildLink}
                         />
                     ))}
                 </div>
