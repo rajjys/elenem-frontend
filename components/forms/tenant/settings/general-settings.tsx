@@ -28,6 +28,7 @@ type FormValues = z.infer<typeof UpdateTenantSchema>;
 
 interface TenantGeneralSettingsProps {
   tenant: TenantDetails;
+  onSuccess?: () => void;
 }
 
 // Helper: build a shape matching UpdateTenantSchema from the full TenantDetails
@@ -68,7 +69,7 @@ function computeDelta(oldObj: Partial<FormValues>, newObj: Partial<FormValues>) 
   return delta;
 }
 
-export default function TenantGeneralSettings({ tenant }: TenantGeneralSettingsProps) {
+export default function TenantGeneralSettings({ tenant, onSuccess  }: TenantGeneralSettingsProps) {
   // initial values stored in a ref so we can update it after successful saves
   const initialRef = useRef<FormValues>(buildDefaultValues(tenant));
 
@@ -109,18 +110,16 @@ export default function TenantGeneralSettings({ tenant }: TenantGeneralSettingsP
       toast.info("No changes detected to save.");
       return;
     }
-
     try {
       // call backend with partial payload. The backend should accept partial updates (PATCH/PUT semantics)
       await api.put(`/tenants/${tenant.id}`, deltaPayload);
-
       toast.success("General settings updated successfully!");
       // update the "saved" baseline and reset the form's dirty state
       initialRef.current = getValues();
       // Only reset with the new initial values, which are now current values
       reset(initialRef.current);
+      if (onSuccess) onSuccess();
     } catch (error) {
-
       let errorMessage = "Failed to update tenant settings";
       if (axios.isAxiosError(error)) {
           errorMessage = error.response?.data?.message || errorMessage;
