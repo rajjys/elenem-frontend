@@ -190,8 +190,6 @@ const onSubmit = async (data: ProfileFormValues) => {
       initialValues={initialRef.current}
     />
 
-    <hr className="my-6" />
-
     {/* --- 2. Contact Information --- */}
     <h3 className="text-xl font-semibold">Coordonnées</h3>
     <InlineEditField
@@ -238,8 +236,6 @@ const onSubmit = async (data: ProfileFormValues) => {
       initialValues={initialRef.current}
     />
 
-    <hr className="my-6" />
-
     {/* --- 3. Financial/Administrative --- */}
     <h3 className="text-xl font-semibold">Informations Financières/Administratives</h3>
     <InlineEditField
@@ -266,9 +262,6 @@ const onSubmit = async (data: ProfileFormValues) => {
       setActiveEditField={setActiveEditField}
       initialValues={initialRef.current}
     />
-
-    <hr className="my-6" />
-
     {/* --- 4. Location Details --- */}
     <h3 className="text-xl font-semibold">Détails de l&apos;Emplacement</h3>
     <InlineEditField
