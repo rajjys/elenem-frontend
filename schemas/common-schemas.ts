@@ -9,7 +9,15 @@ export const CreateBusinessProfileSchema = z.object({
   //name: z.string().min(1, 'Business name is required.'),
   legalName: z.string().optional().nullable(),
   type: z.enum(['TENANT', 'LEAGUE', 'TEAM']).optional(), // Assuming you have a BusinessProfileType enum
-  establishedYear: z.number().int().min(1000).max(new Date().getFullYear()).optional().nullable(),
+  establishedYear: z.coerce.number() 
+    .int("L'année doit être un nombre entier.") 
+    // Handle empty string/null input gracefully by allowing 0, then checking bounds
+    .transform((v) => (v === 0 ? null : v)) 
+    .nullable()
+    .optional()
+    // The checks remain the same, but they run AFTER coercion
+    .refine((val) => val === null || val && (val >= 1000), "L'année doit être après 999.")
+    .refine((val) => val === null || val && (val <= new Date().getFullYear()), "L'année ne peut pas être dans le futur."),
   description: z.string().optional().nullable(),
   nationalIdNumber: z.string().optional().nullable(),
   leagueRegistrationId: z.string().optional().nullable(),

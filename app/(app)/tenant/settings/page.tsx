@@ -12,6 +12,7 @@ import { Roles, TenantDetails, TenantDetailsSchema } from '@/schemas';
 import { useAuthStore } from '@/store/auth.store';
 import axios from 'axios';
 import { toast } from 'sonner';
+import { TenantBusinessProfile } from "@/components/forms/tenant/settings/profile";
 
 export default function TenantSettingsPage() {
   const [tenant, setTenant] = useState<TenantDetails | null>(null);
@@ -57,28 +58,30 @@ export default function TenantSettingsPage() {
             fetchTenantDetails();
         }
     }, [currentTenantId, fetchTenantDetails]);
-  // The Tenant object now contains the full data for all three sections
+
+    // Refetch function
+    const onSuccess = async () => {
+      await fetchTenantDetails();
+    };
 
   if(!tenant) return loading ? <LoadingSpinner message="Loading tenant settings..." /> : <div className="text-red-600 font-semibold">Error: {error || "Tenant not found or access denied."}</div>;
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
-      <h1 className="text-3xl font-bold">Tenant Settings: {tenant?.name}</h1>
+      <h1 className="text-3xl font-bold">Parametres: {tenant?.name}</h1>
       <Tabs defaultValue="general">
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="general">General</TabsTrigger>
           <TabsTrigger value="profile">Profil</TabsTrigger>
-          <TabsTrigger value="ownership">Ownership</TabsTrigger>
+          {isSystemAdmin && <TabsTrigger value="ownership">Ownership</TabsTrigger>}
         </TabsList>
-
         <TabsContent value="general">
           {/* Pass the full initial data to the child component */}
-          <TenantGeneralSettings tenant={tenant} /> 
+          <TenantGeneralSettings tenant={tenant} onSuccess={onSuccess} /> 
         </TabsContent>
-        
-        {/**<TabsContent value="profile">
-          <TenantBusinessProfile tenant={tenant} />
+        <TabsContent value="profile">
+          <TenantBusinessProfile tenant={tenant} onSuccess={onSuccess} />
         </TabsContent>
-        
+        {/**
         <TabsContent value="ownership">
           <TenantOwnership tenant={tenant} />
         </TabsContent>*/}
