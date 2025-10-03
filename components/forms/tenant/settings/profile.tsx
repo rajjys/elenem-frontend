@@ -1,14 +1,15 @@
 // src/app/tenant/settings/profile/page.tsx
-
-import { Button, Input } from "@/components/ui";
+'use client';
+import { Button } from "@/components/ui";
+import { InlineEditField } from "@/components/ui/Inline-edit-field";
 import { TenantDetails } from "@/schemas";
 import { CreateBusinessProfileSchema } from "@/schemas/common-schemas";
 import { api } from "@/services/api";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import { Loader2 } from "lucide-react";
-import { useEffect, useRef } from "react";
-import { useForm } from "react-hook-form";
+import { useEffect, useRef, useState } from "react";
+import { Path, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import z from "zod";
 
@@ -53,6 +54,10 @@ function computeDelta(oldObj: Partial<ProfileFormValues>, newObj: Partial<Profil
 export function TenantBusinessProfile({ tenant, onSuccess }: TenantProfileSettingsProps) {
   // Use the existing businessProfile data for the initial state
   const initialRef = useRef<ProfileFormValues>(buildDefaultValues(tenant));
+
+  // State to track which field is currently open for editing
+    const [activeEditField, setActiveEditField] = useState<Path<ProfileFormValues> | null>(null);
+
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(CreateBusinessProfileSchema),
     // Map initial data (e.g., initialProfile.name, initialProfile.contactEmail)
@@ -65,7 +70,6 @@ export function TenantBusinessProfile({ tenant, onSuccess }: TenantProfileSettin
     handleSubmit,
     formState: { isSubmitting, isDirty, errors },
     reset,
-    getValues,
     //setValue,
     //watch, // Use watch to read current values
   } = form;
@@ -77,121 +81,285 @@ export function TenantBusinessProfile({ tenant, onSuccess }: TenantProfileSettin
       reset(defaults);
     }, [tenant, reset]);
 
-const onSubmit = async () => {
-    const currentValues = getValues();
-    const deltaPayload = computeDelta(initialRef.current, currentValues);
-    if (Object.keys(deltaPayload).length === 0) {
-          toast.info("No changes detected to save.");
-          return;
-    }
-    
-    try {
-        // Send the update: We wrap the delta in the 'businessProfile' field.
-        await api.put(`/tenants/${tenant.id}`, { businessProfile: deltaPayload });
-        toast.success("Tenant Profile updated successfully!");
-         // update the "saved" baseline and reset the form's dirty state
-        initialRef.current = getValues();
-        // Only reset with the new initial values, which are now current values
-        reset(initialRef.current);
-        if(onSuccess) onSuccess();
-    } catch (error) {
-        let errorMessage = "Failed to update tenant settings";
-        if (axios.isAxiosError(error)) {
-            errorMessage = error.response?.data?.message || errorMessage;
+const onSubmit = async (data: ProfileFormValues) => {
+        // Close any active edit field on submit attempt
+        setActiveEditField(null);
+        
+        // 1. Manually parse the raw form data using Zod to get the final, validated, and transformed payload
+        let finalPayload: ProfileFormValues;
+        try {
+            finalPayload = CreateBusinessProfileSchema.parse(data);
+        } catch (e) {
+            // This should rarely happen if zodResolver worked, but good practice
+            toast.error("Validation failed before submission.");
+            console.error(e);
+            return;
         }
-        toast.error(errorMessage)
-        console.error("error updating Tenant:", error);
-    } finally {
-        // Ensure form state is updated regardless of the initial try/catch success/failure
-        // This is important to clear submitting state and dirty state
-        // If an error occurred before setting initialRef.current, we still want to reset to initialRef.current
-        reset(initialRef.current);
-    }
-  };
-  return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 p-6 pb-0 shadow-md bg-white rounded-lg">
-        {/* Error Display */}
-        {errors && Object.keys(errors).length > 0 && 
-          (
-            <div className="p-2 mb-4 text-sm text-red-700 bg-red-100 rounded-lg" role="alert">
-                <p className="font-semibold border-b flex items-center justify-center pb-2 mb-2">Erreurs de validation:</p>
-                <ul className="list-disc list-inside mt-1">
-                    {Object.entries(errors).map(([field, error]) => {
-                        // Safely extract the message from the error object
-                        let message: string | undefined;
-                        if (error && typeof error === 'object' && 'message' in error) {
-                            message = error.message as string;
-                        } else if (typeof error === 'string') {
-                            message = error;
-                        }
-                        
-                        // Fallback for array errors or complex objects not caught above
-                        if (error && typeof error === 'object' && 'root' in error && Array.isArray(error.root)) {
-                            message = error.root.map(e => e.message).join(', ');
-                        }
 
-                        if (!message) return null;
+        // 2. Compute delta using the final, transformed values
+        const initialOutputValues = CreateBusinessProfileSchema.parse(initialRef.current);
+        const finalDelta = computeDelta(initialOutputValues, finalPayload);
 
-                        return <li key={field}><span className="font-semibold">{field}</span>: {message}</li>;
-                    })}
-                </ul>
-            </div>
-          )
+        if (Object.keys(finalDelta).length === 0) {
+            toast.info("Aucune modification détectée à enregistrer.");
+            return;
         }
+
+        try {
+            await api.put(`/tenants/${tenant.id}`, { businessProfile: finalDelta });
             
-      {/* Informations Commerciales de Base */}
-      <h3 className="text-xl font-semibold mt-4">Informations Commerciales de Base</h3>
-      <Input label="Nom Légal" {...form.register('legalName')} />
-      <Input label="Année d'Établissement" type="number" {...form.register('establishedYear')} />
-      <Input label="Numéro d'Identification National" {...form.register('nationalIdNumber')} />
-      <Input label="ID d'Enregistrement de la Ligue" {...form.register('leagueRegistrationId')} />
-      <Input label="Description" {...form.register('description')}/>
-      {/* Coordonnées (Contact Information) - Completed from previous request */}
-      <h3 className="text-xl font-semibold mt-4">Coordonnées</h3>
-      <Input label="E-mail de Contact" {...form.register('contactEmail')} />
-      <Input label="Téléphone" {...form.register('phone')} />
-      <Input label="Téléphone Commercial" {...form.register('businessPhone')} />
-      <Input label="E-mail de Support" {...form.register('supportEmail')} />
-      <Input label="Site Web" {...form.register('website')} />
-      
-      {/* Informations Financières/Administratives - Completed from previous request */}
-      <h3 className="text-xl font-semibold mt-4">Informations Financières/Administratives</h3>
-      <Input label="Numéro d'Identification Fiscale" {...form.register('taxNumber')} />
-      <Input label="Informations Bancaires (JSON)" {...form.register('bankInfo')} />
-      <Input label="Informations Mobile Money (JSON)" {...form.register('mobileMoneyInfo')}/>
-      {/* Détails de l'Emplacement (Location Details) - Completed from previous request */}
-      <h3 className="text-xl font-semibold mt-4">Détails de l&apos;Emplacement</h3>
-      <Input label="Région" {...form.register('region')} />
-      <Input label="État/Province" {...form.register('state')} />
-      <Input label="Ville" {...form.register('city')} />
-      <Input label="Adresse Physique" {...form.register('physicalAddress')} />
-      <Input label="Latitude" type="number" {...form.register('latitude')} />
-      <Input label="Longitude" type="number" {...form.register('longitude')} />
-      <Input label="Fuseau Horaire" {...form.register('timezone')} />
-      
-      {/* Buttons */}
-      <div className="sticky bottom-0 z-10 p-4 -mx-6 mt-6 bg-white border-t rounded-b-lg border-slate-200 shadow-lg flex justify-end">
-          <div className="flex items-center gap-3">
-              <Button
-                  type="button"
-                  variant="ghost"
-                  onClick={() => reset(initialRef.current)}
-                  disabled={isSubmitting || !isDirty}
-              >
-                  Réinitialiser
-              </Button>
-              <Button type="submit" disabled={!isDirty || isSubmitting}>
-                  {isSubmitting ? (
-                      <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          <span>Sauvegarde...</span>
-                      </>
-                  ) : (
-                      <span>Sauvegarder</span>
-                  )}
-              </Button>
-          </div>
+            toast.success("Profil de locataire mis à jour avec succès !");
+            
+            // 3. Update the baseline with the successfully saved (and transformed) data
+            // We convert the saved finalPayload (number type) back to the form's input type (string/number)
+            initialRef.current = buildDefaultValues({ businessProfile: finalPayload } as TenantDetails); 
+            reset(initialRef.current);
+            
+            if (onSuccess) onSuccess();
+
+        } catch (error) {
+            let errorMessage = "Échec de la mise à jour des paramètres du locataire";
+            if (axios.isAxiosError(error)) {
+                errorMessage = error.response?.data?.message || errorMessage;
+            }
+            toast.error(errorMessage);
+            console.error("Erreur lors de la mise à jour du locataire :", error);
+        }
+    };
+
+    return (
+  <form
+    onSubmit={handleSubmit(onSubmit)}
+    className="space-y-6 p-6 pb-0 shadow-md bg-white rounded-lg"
+  >
+    {/* --- Error Summary Display (Optional for large forms) --- */}
+    {errors && Object.keys(errors).length > 0 && isDirty && (
+      <div
+        className="p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg"
+        role="alert"
+      >
+        <p className="font-semibold">
+          Erreurs de validation: Veuillez corriger les champs en édition.
+        </p>
       </div>
-    </form>
-  );
+    )}
+
+    {/* --- 1. Core Business Metadata --- */}
+    <h3 className="text-xl font-semibold pt-4">
+      Informations Commerciales de Base
+    </h3>
+    <InlineEditField
+      form={form}
+      name="legalName"
+      label="Nom Légal"
+      activeEditField={activeEditField}
+      setActiveEditField={setActiveEditField}
+      initialValues={initialRef.current}
+    />
+    <InlineEditField
+      form={form}
+      name="establishedYear"
+      label="Année d'Établissement"
+      type="number"
+      activeEditField={activeEditField}
+      setActiveEditField={setActiveEditField}
+      initialValues={initialRef.current}
+    />
+    <InlineEditField
+      form={form}
+      name="description"
+      label="Description"
+      activeEditField={activeEditField}
+      setActiveEditField={setActiveEditField}
+      initialValues={initialRef.current}
+    />
+    <InlineEditField
+      form={form}
+      name="nationalIdNumber"
+      label="Numéro d'Identification National"
+      activeEditField={activeEditField}
+      setActiveEditField={setActiveEditField}
+      initialValues={initialRef.current}
+    />
+    <InlineEditField
+      form={form}
+      name="leagueRegistrationId"
+      label="ID d'Enregistrement de la Ligue"
+      activeEditField={activeEditField}
+      setActiveEditField={setActiveEditField}
+      initialValues={initialRef.current}
+    />
+
+    <hr className="my-6" />
+
+    {/* --- 2. Contact Information --- */}
+    <h3 className="text-xl font-semibold">Coordonnées</h3>
+    <InlineEditField
+      form={form}
+      name="contactEmail"
+      label="E-mail de Contact"
+      type="email"
+      activeEditField={activeEditField}
+      setActiveEditField={setActiveEditField}
+      initialValues={initialRef.current}
+    />
+    <InlineEditField
+      form={form}
+      name="phone"
+      label="Téléphone"
+      activeEditField={activeEditField}
+      setActiveEditField={setActiveEditField}
+      initialValues={initialRef.current}
+    />
+    <InlineEditField
+      form={form}
+      name="businessPhone"
+      label="Téléphone Commercial"
+      activeEditField={activeEditField}
+      setActiveEditField={setActiveEditField}
+      initialValues={initialRef.current}
+    />
+    <InlineEditField
+      form={form}
+      name="supportEmail"
+      label="E-mail de Support"
+      type="email"
+      activeEditField={activeEditField}
+      setActiveEditField={setActiveEditField}
+      initialValues={initialRef.current}
+    />
+    <InlineEditField
+      form={form}
+      name="website"
+      label="Site Web"
+      type="url"
+      activeEditField={activeEditField}
+      setActiveEditField={setActiveEditField}
+      initialValues={initialRef.current}
+    />
+
+    <hr className="my-6" />
+
+    {/* --- 3. Financial/Administrative --- */}
+    <h3 className="text-xl font-semibold">Informations Financières/Administratives</h3>
+    <InlineEditField
+      form={form}
+      name="taxNumber"
+      label="Numéro d'Identification Fiscale"
+      activeEditField={activeEditField}
+      setActiveEditField={setActiveEditField}
+      initialValues={initialRef.current}
+    />
+    <InlineEditField
+      form={form}
+      name="bankInfo"
+      label="Informations Bancaires (JSON)"
+      activeEditField={activeEditField}
+      setActiveEditField={setActiveEditField}
+      initialValues={initialRef.current}
+    />
+    <InlineEditField
+      form={form}
+      name="mobileMoneyInfo"
+      label="Informations Mobile Money (JSON)"
+      activeEditField={activeEditField}
+      setActiveEditField={setActiveEditField}
+      initialValues={initialRef.current}
+    />
+
+    <hr className="my-6" />
+
+    {/* --- 4. Location Details --- */}
+    <h3 className="text-xl font-semibold">Détails de l&apos;Emplacement</h3>
+    <InlineEditField
+      form={form}
+      name="region"
+      label="Région"
+      activeEditField={activeEditField}
+      setActiveEditField={setActiveEditField}
+      initialValues={initialRef.current}
+    />
+    <InlineEditField
+      form={form}
+      name="state"
+      label="État/Province"
+      activeEditField={activeEditField}
+      setActiveEditField={setActiveEditField}
+      initialValues={initialRef.current}
+    />
+    <InlineEditField
+      form={form}
+      name="city"
+      label="Ville"
+      activeEditField={activeEditField}
+      setActiveEditField={setActiveEditField}
+      initialValues={initialRef.current}
+    />
+    <InlineEditField
+      form={form}
+      name="physicalAddress"
+      label="Adresse Physique"
+      activeEditField={activeEditField}
+      setActiveEditField={setActiveEditField}
+      initialValues={initialRef.current}
+    />
+    <InlineEditField
+      form={form}
+      name="latitude"
+      label="Latitude"
+      type="number"
+      activeEditField={activeEditField}
+      setActiveEditField={setActiveEditField}
+      initialValues={initialRef.current}
+    />
+    <InlineEditField
+      form={form}
+      name="longitude"
+      label="Longitude"
+      type="number"
+      activeEditField={activeEditField}
+      setActiveEditField={setActiveEditField}
+      initialValues={initialRef.current}
+    />
+    <InlineEditField
+      form={form}
+      name="timezone"
+      label="Fuseau Horaire"
+      activeEditField={activeEditField}
+      setActiveEditField={setActiveEditField}
+      initialValues={initialRef.current}
+    />
+
+    {/* --- STICKY FOOTER FOR SUBMISSION --- */}
+    <div
+      className="sticky bottom-0 z-10 p-4 -mx-6 mt-6 bg-white border-t border-slate-200 shadow-lg rounded-b-lg flex justify-end"
+      style={{ width: "calc(100% + 48px)" }}
+    >
+      <div className="flex items-center gap-3">
+        <Button
+          type="button"
+          variant="ghost"
+          onClick={() => {
+            setActiveEditField(null);
+            reset(initialRef.current);
+          }}
+          disabled={isSubmitting || !isDirty}
+        >
+          Réinitialiser
+        </Button>
+        <Button type="submit" disabled={!isDirty || isSubmitting}>
+          {isSubmitting ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              <span>Sauvegarde...</span>
+            </>
+          ) : (
+            <span>Enregistrer les Modifications</span>
+          )}
+        </Button>
+      </div>
+    </div>
+  </form>
+);
+
 }
