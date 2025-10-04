@@ -22,7 +22,7 @@ export default function TenantDashboard() {
     const userAuth = useAuthStore((state) => state.user);
     const currentUserRoles = userAuth?.roles || [];
     const [tenant, setTenant] = useState<TenantDetails | null>(null);
-    const [leagues, setLeagues] = useState<LeagueBasic>([]);
+    const [leagues, setLeagues] = useState<LeagueBasic[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -172,7 +172,7 @@ export default function TenantDashboard() {
     return (
         <div className="min-h-screen">
             <Head>
-                <title>{tenant?.tenantCode || "Tenant"} - Dashboard</title>
+                <title>{tenant?.tenantCode || "Tenant"} - Tableau de Bord</title>
             </Head>
             {/* Header Section */}
             <section className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 md:gap-0 px-4 py-3 mb-4 bg-white shadow-md rounded-md">
@@ -202,24 +202,18 @@ export default function TenantDashboard() {
                     </div>
                 </div>
                 <div className="flex flex-wrap gap-2 md:gap-3 text-sm">
-                    <Link
-                    href={buildLink("/game/create")}
-                    className="flex items-center gap-2 bg-emerald-600 text-white px-3 py-2 rounded-md hover:bg-emerald-700 transition-colors"
-                    >
+                    <Link href={buildLink("/game/create")}
+                        className="flex items-center gap-2 px-3 py-2 rounded-md transition-all duration-150 soft-theme-gradient">
                         <CalendarPlus className="h-4 w-4" />
                         <span className="">Nouveau Match</span>
                     </Link>
-
-                    <Link
-                    href={buildLink("/league/create")}
-                    className="flex items-center gap-2 bg-emerald-600 text-white px-3 py-2 rounded-md hover:bg-emerald-700 transition-colors"
-                    >
+                    <Link href={buildLink("/league/create")}
+                        className="flex items-center gap-2 px-3 py-2 rounded-md transition-all duration-150 soft-theme-gradient">
                         <Trophy className="h-4 w-4" />
                         <span className="">Créer une Ligue</span>
                     </Link>
                 </div>
             </section>
-
                 {/* Key Metrics Section */}
             <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-4">
                 {loading ? <LoadingSpinner /> : error ? <p className='text-red-500'>{error}</p> :

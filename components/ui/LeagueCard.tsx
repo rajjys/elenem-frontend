@@ -14,25 +14,10 @@ import Link from 'next/link';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { capitalize } from '@/utils';
 import { useContextualLink } from '@/hooks';
-import { SeasonStatus } from '@/schemas';
+import { LeagueBasic } from '@/schemas';
 
 interface LeagueCardProps {
-  league: {
-    id: string;
-    name: string;
-    businessProfile?: {
-      logoAsset?: {
-        url?: string;
-      };
-    };
-    isActive?: boolean;
-    teams?: { id: string }[];
-    managingUsers?: { id: string }[];
-    currentSeason?: {
-      name: string;
-      status: SeasonStatus
-    }
-  };
+  league: LeagueBasic;
   tenant?: {
     sportType?: string;
   };
@@ -77,16 +62,22 @@ export const LeagueCard: React.FC<LeagueCardProps> = ({ league, tenant }) => {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuItem>
-                  <Eye className="mr-2 h-4 w-4" />
-                  Détails
+                  <Link href={buildLink('/league/dashboard', { ctxLeagueId: league.id })} className='flex items-center w-full'>
+                    <Eye className="mr-2 h-4 w-4" />
+                    Détails
+                  </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <UserPlus className="mr-2 h-4 w-4" />
-                  Ajouter Manager
+                  <Link href={buildLink('/league/managers', { ctxLeagueId: league.id })} className='flex items-center w-full'>
+                    <UserPlus className="mr-2 h-4 w-4" />
+                    Ajouter Manager
+                  </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <Settings className="mr-2 h-4 w-4" />
-                  Configurer
+                  <Link href={buildLink('/league/settings', { ctxLeagueId: league.id })} className='flex items-center w-full'>
+                    <Settings className="mr-2 h-4 w-4" />
+                    Configurer
+                  </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem className='bg-red-50 text-red-500'>
                   <Trash className="mr-2 h-4 w-4" />

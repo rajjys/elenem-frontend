@@ -117,6 +117,12 @@ export default function AppLayout({
          style={{
          ["--hover-bg" as string]: `var(--color-${themeColor}-50)`,
          ["--hover-text" as string]: `var(--color-${themeColor}-600)`,
+         ["--color-theme" as string]: `var(--color-${themeColor}-600)`,
+         ["--color-theme-light-from" as string]: `color-mix(in srgb, var(--color-${themeColor}-100) 25%, white)`,
+         ["--color-theme-light-to" as string]: `color-mix(in srgb, var(--color-${themeColor}-50) 50%, white)`,
+         ["--color-theme-hover-from" as string]: `color-mix(in srgb, var(--color-${themeColor}-100) 40%, white)`,
+         ["--color-theme-hover-to" as string]: `color-mix(in srgb, var(--color-${themeColor}-200) 60%, white)`,
+         ["--color-theme-hover-text" as string]: `var(--color-${themeColor}-700)`,
        }}>
       {/* Navbar is always visible */}
       <AppLayoutNavbar dashboardLink={dashboardLink} onMobileMenuToggle={toggleMobileMenu} handleLogout={handleLogout}/>

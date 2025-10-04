@@ -190,6 +190,41 @@ body {
   background-color: var(--hover-bg);
   filter: brightness(0.95);
 }
+/* Light, soft gradient using theme color */
+.soft-theme-gradient {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(
+    to right,
+    var(--color-theme-light-from, hsl(0 0% 100% / 0.9)),
+    var(--color-theme-light-to, hsl(0 0% 98% / 1))
+  );
+  color: var(--color-theme, var(--color-indigo-600));
+  border: 1px solid hsl(0 0% 90% / 1);
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 2px hsl(0 0% 0% / 0.05);
+}
+
+/* Hover state: subtle tint */
+.soft-theme-gradient:hover,
+.soft-theme-gradient:focus {
+  background: linear-gradient(
+    to right,
+    var(--color-theme-hover-from, hsl(var(--theme-hue, 200) 100% 97%)),
+    var(--color-theme-hover-to, hsl(var(--theme-hue, 200) 100% 95%))
+  );
+  color: var(--color-theme-hover-text, var(--color-theme));
+  border-color: hsl(0 0% 85%);
+  transform: translateY(-1px);
+}
+
+/* Active (click) feedback */
+.soft-theme-gradient:active {
+  transform: scale(0.98);
+  filter: brightness(0.97);
+}
+
 
 /* Fade-in animation for flyouts */
 @keyframes fadeIn {

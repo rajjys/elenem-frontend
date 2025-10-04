@@ -3,13 +3,15 @@ import Head from 'next/head';
 import { useRouter, useSearchParams } from 'next/navigation'; // Or useNavigation from next/navigation for App Router
 import React, { useCallback, useEffect, useState } from 'react';
 import { useAuthStore } from '@/store/auth.store';
-import { LeagueBasic, LeagueBasicSchema, Roles } from '@/schemas';
+import { Gender, LeagueBasic, LeagueBasicSchema, Roles } from '@/schemas';
 import { api } from '@/services/api';
 import { toast } from 'sonner';
 import { useContextualLink } from '@/hooks';
 import { StatsCard } from '@/components/ui/stats-card';
-import { Award, Building, Calendar, Clock, Eye, MapPin, Plus, Settings, Target, Ticket, TrendingUp, Trophy,  Users } from 'lucide-react';
-import { Avatar, Button, Card, CardContent, CardHeader, CardTitle, LoadingSpinner } from '@/components/ui';
+import { Award, Building, Calendar, CalendarPlus, Clock, Eye, MapPin, Settings, Target, Ticket, TrendingUp, Trophy,  Users } from 'lucide-react';
+import { Avatar, Button, Card, CardContent, CardHeader, CardTitle, LoadingSpinner, SeasonStatusBadge } from '@/components/ui';
+import Image from 'next/image';
+import Link from 'next/link';
 
 interface UpcomingGame {
     id: string;
@@ -32,11 +34,10 @@ interface UpcomingGame {
 
 
     
-export default function TenantDashboard() {
-    const router = useRouter(); // Use useRouter for client-side navigation
+export default function LeagueDashboard() {
+    const router = useRouter();
     const userAuth = useAuthStore((state) => state.user);
     const currentUserRoles = userAuth?.roles || [];
-    //const [tenant, setTenant] = useState<TenantDetails | null>(null);
     const [league, setLeague] = useState<LeagueBasic>();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -95,10 +96,10 @@ export default function TenantDashboard() {
     
     // Dynamically generate stat cards based on tenant data
     const statCards = [
-        { title: "Total Teams", value: league?.teams?.length || 0, description: "Active Teams Under Management", trend: {isPositive: true, value: 3.6, timespan: "season"}, icon: Trophy, bgColorClass: "bg-blue-400", textColorClass: "text-white", href: buildLink("/league/teams") },
-        { title: "Total Players", value: league?.players?.length || 0, description: "Active Players in the League", trend: {isPositive: false, value: 2.6, timespan: "season"}, icon: Building, bgColorClass: "bg-green-400", textColorClass: "text-white", href: buildLink("/league/players") },
-        { title: "Games Played", value: mockUpcomingGames.length, description: "Games Played So far", trend: {isPositive: true, value: 4.8, timespan: "season"}, icon: Calendar, bgColorClass: "bg-orange-400", textColorClass: "text-white", href: buildLink("/league/games") },
-        { title: "Tickets Sold (Today)", value: 120, description: "Game Tickets sold today", trend: {isPositive: true, value: 3.6, timespan: "season"}, icon: Ticket, bgColorClass: "bg-red-400", textColorClass: "text-white", href: buildLink("/league/tickets") }, // Keeping mock for now as per request
+        { title: "Equipes", value: league?.teams?.length || 0, description: "Equipe actives", trend: {isPositive: true, value: 3.6, timespan: "season"}, icon: Trophy, bgColorClass: "bg-blue-400", textColorClass: "text-white", href: buildLink("/league/teams") },
+        { title: "Athletes", value: league?.players?.length || 0, description: "Athletes actifs", trend: {isPositive: false, value: 2.6, timespan: "season"}, icon: Building, bgColorClass: "bg-green-400", textColorClass: "text-white", href: buildLink("/league/players") },
+        { title: "Matchs Joues", value: 0, description: "Matchs deja jouees", trend: {isPositive: true, value: 66, timespan: "season"}, icon: Calendar, bgColorClass: "bg-orange-400", textColorClass: "text-white", href: buildLink("/league/games") },
+        { title: "Billets vendus (Aujourd'hui)", value: 0, description: "Game Tickets sold today", trend: {isPositive: true, value: 3.6, timespan: "season"}, icon: Ticket, bgColorClass: "bg-red-400", textColorClass: "text-white", href: buildLink("/league/tickets") }, // Keeping mock for now as per request
     ]
     const recentActivities = [
   { id: 1, action: "New league created", details: "Professional Volleyball League", time: "5 min ago", type: "league" },
@@ -112,20 +113,69 @@ export default function TenantDashboard() {
     return (
         <div className="min-h-screen">
             <Head>
-                <title>Tenant Dashboard - ELENEM Sports</title>
+                <title>{league?.tenant?.tenantCode || "Ligue"} - Tableau de Bord</title>
             </Head>  
-            <section className='flex items-center justify-between'>
-                <h1 className="text-2xl font-bold text-gray-800 mb-6">{league?.name}</h1>
-                <div className='flex whitespace-nowrap text-sm gap-3'>
-                    <button onClick={() => router.push(buildLink(`/league/edit/${currentLeagueId}`))}
-                        className="w-full flex items-center justify-center text-gray-800 px-2 py-2 mx-2 border border-gray-200 rounded-md transition-colors">
-                        <Settings className="h-4 w-4 mr-2"/> Settings
-                    </button>
-                    <button onClick={() => router.push(buildLink('/game/create'))}
-                        className="w-full flex items-center justify-center bg-emerald-600 text-white py-2 px-2 rounded-md hover:bg-emerald-700 transition-colors">
-                        <Plus className="h-4 w-4 mr-2" /> Schedule Game
-                    </button>
+            <section className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 md:gap-0 px-4 py-3 mb-4 bg-white shadow-md rounded-md">
+              <div className="flex items-center gap-3">
+                  {league?.businessProfile?.logoAsset?.url ? (
+                  <Image
+                      src={league.businessProfile.logoAsset.url}
+                      alt={league.division}
+                      width={40}
+                      height={40}
+                      className="rounded-full"
+                  />
+                  ) : (
+                  <Avatar name={league?.name || 'Ligue'} size={40} className="rounded-full" />
+                  )}
+                  {
+                    league &&
+                    <div>
+                      <h1 className="text-lg md:text-xl lg:text-2xl font-bold text-gray-800 leading-tight">
+                          {league.name}
+                      </h1>
+                      <p className="text-sm text-gray-500 flex items-center gap-2">
+                          <span>{league?.division}</span>
+                          -
+                          <span className='italic'>{
+                            league?.gender === Gender.MALE ? "Masculin" :
+                            league?.gender === Gender.FEMALE ? "Feminin" :
+                            league?.gender === Gender.MIXED ? "Mixte" : "-"
+                            }
+                          </span>
+                          -
+                          <SeasonStatusBadge status={league.currentSeason?.status} />
+                      </p>
+                    </div>}
+              </div>
+              {
+                league &&
+                <div className="flex flex-wrap gap-2 md:gap-3 text-sm">
+                  <Link href={buildLink("/game/create", { ctxLeagueId: league.id })}
+                    className="flex items-center gap-2 px-3 py-2 rounded-md transition-all duration-150 soft-theme-gradient">
+                    <CalendarPlus className="h-4 w-4" />
+                    <span>Nouveau Match</span>
+                  </Link>
+                  <Link href={buildLink("/team/create", { ctxLeagueId: league.id })}
+                    className="flex items-center gap-2 px-3 py-2 rounded-md transition-all duration-150 soft-theme-gradient">
+                      <Users className="h-4 w-4" />
+                      <span>Nouvelle Équipe</span>
+                  </Link>
+                  {
+                    league.currentSeasonId ?
+                    <Link href={buildLink(`/season/${league.currentSeasonId}/dashboard`)}
+                      className="flex items-center gap-2 px-3 py-2 rounded-md transition-all duration-150 soft-theme-gradient">
+                        <Settings className="h-4 w-4" />
+                        <span>Gérer la Saison</span>
+                    </Link> :
+                    <Link href={buildLink("/league/settings")}
+                      className="flex items-center gap-2 px-3 py-2 rounded-md transition-all duration-150 soft-theme-gradient">
+                        <Settings className="h-4 w-4" />
+                        <span>Activer la Saison</span>
+                    </Link>
+                  }
                 </div>
+              }
             </section>
                 {/* Key Metrics Section */}
             <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">

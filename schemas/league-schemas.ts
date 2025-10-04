@@ -27,8 +27,7 @@ export const UserLiteResponseSchema = z.object({
 });
 export type UserLiteResponseDto = z.infer<typeof UserLiteResponseSchema>;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const LeagueBasicSchema: z.ZodSchema<any> = z.lazy(() => z.object({
+export const LeagueBasicSchema = z.object({
   id: z.string().cuid(),
   externalId: z.string().uuid(),
   tenantId: z.string().cuid(),
@@ -40,7 +39,7 @@ export const LeagueBasicSchema: z.ZodSchema<any> = z.lazy(() => z.object({
   division: z.string(),
   gender: z.nativeEnum(Gender).nullable().optional(),
   currentSeasonId: z.string().cuid().nullable().optional(),
-  busiessProfile: BusinessProfileSchema.optional(),
+  businessProfile: BusinessProfileSchema.optional(),
   name: z.string(),
   slug: z.string().optional(),
   isActive: z.boolean(),
@@ -75,7 +74,7 @@ export const LeagueBasicSchema: z.ZodSchema<any> = z.lazy(() => z.object({
     email: z.string().email(),
     profilePictureUrl: z.string().nullable().optional(),
   }))
-}));
+});
 
 export type LeagueBasic = z.infer<typeof LeagueBasicSchema>;
 
