@@ -78,6 +78,40 @@ export const LeagueBasicSchema = z.object({
 
 export type LeagueBasic = z.infer<typeof LeagueBasicSchema>;
 
+export const LeagueMetricsSchema = z.object({
+  leagueId: z.string().cuid(),
+  seasonId: z.string().cuid(),
+
+  totalTeamCount: z.number(),
+  activeTeamCount: z.number(),
+  activeTeamCountDelta: z.number().optional(),
+
+  totalPlayerCount: z.number(),
+  activePlayerCount: z.number(),
+  activePlayerCountDelta: z.number().optional(),
+
+  gamesPlayed: z.number(),
+  gamesScheduled: z.number(),
+  gamesPlayedRatio: z.number(),
+
+  coachCount: z.number(),
+  refereeCount: z.number(),
+  fanCount: z.number(),
+
+  participatingTeamCount: z.number(),
+  participatingTeamDelta: z.number().optional(),
+
+  participatingPlayerCount: z.number(),
+  participatingPlayerDelta: z.number().optional(),
+
+  createdAt: z.string().transform((val) => new Date(val)),
+  updatedAt: z.string().transform((val) => new Date(val)),
+
+  lastSeasonId: z.string().cuid().optional(),
+  lastSeasonName: z.string().optional(),
+});
+
+export type LeagueMetrics =  z.infer<typeof LeagueMetricsSchema>
 
 // Paginated Response Schema for Leagues
 export const PaginatedLeaguesResponseSchema = z.object({

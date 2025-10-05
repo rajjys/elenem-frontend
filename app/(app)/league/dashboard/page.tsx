@@ -3,7 +3,7 @@ import Head from 'next/head';
 import { useRouter, useSearchParams } from 'next/navigation'; // Or useNavigation from next/navigation for App Router
 import React, { useCallback, useEffect, useState } from 'react';
 import { useAuthStore } from '@/store/auth.store';
-import { Gender, LeagueBasic, LeagueBasicSchema, Roles } from '@/schemas';
+import { Gender, LeagueBasic, LeagueBasicSchema, LeagueMetrics, LeagueMetricsSchema, Roles } from '@/schemas';
 import { api } from '@/services/api';
 import { toast } from 'sonner';
 import { useContextualLink } from '@/hooks';
@@ -39,12 +39,13 @@ export default function LeagueDashboard() {
     const userAuth = useAuthStore((state) => state.user);
     const currentUserRoles = userAuth?.roles || [];
     const [league, setLeague] = useState<LeagueBasic>();
-    const [loading, setLoading] = useState(true);
+    const [detailsLoading, setDetailsLoading] = useState(true);
+    const [metricsLoading, setMetricsLoading] = useState(false);
+    const [metrics, setMetrics] = useState<LeagueMetrics>()
     const [error, setError] = useState<string | null>(null);
 
     const { buildLink } = useContextualLink();
 
-    const ctxTenantId = useSearchParams().get('ctxTenantId'); // Use search params if needed
     const ctxLeagueId = useSearchParams().get('ctxLeagueId');
     
     // Determine current tenant ID based on user roles
@@ -52,23 +53,17 @@ export default function LeagueDashboard() {
     const isTenantAdmin = currentUserRoles.includes(Roles.TENANT_ADMIN);
     const isLeagueAdmin = currentUserRoles.includes(Roles.LEAGUE_ADMIN);
     
-    const currentTenantId = isSystemAdmin
-      ? ctxTenantId
-      : isTenantAdmin || isLeagueAdmin
-      ? userAuth?.tenantId
-      : null;
-
-  const currentLeagueId = isSystemAdmin || isTenantAdmin
-      ? ctxLeagueId
-      : isLeagueAdmin
-      ? userAuth?.managingLeagueId
-      : null;
+    const currentLeagueId = isSystemAdmin || isTenantAdmin
+        ? ctxLeagueId
+        : isLeagueAdmin
+        ? userAuth?.managingLeagueId
+        : null;
     //Fetch tenant-specific data if needed, e.g., tenant name, logo, etc.
     const fetchLeagueDetails = useCallback(async () => {
-        setLoading(true);
+        setDetailsLoading(true);
         setError(null);
-        if (!currentTenantId || !currentLeagueId) {
-          setLoading(false);
+        if (!currentLeagueId) {
+          setDetailsLoading(false);
           setError("League or Tenant ID not available. Please log in as a League Admin.");
           return;
         }
@@ -82,25 +77,38 @@ export default function LeagueDashboard() {
           toast.error("Error loading League", { description: errorMessage });
           console.error('Fetch League details error:', err);
         } finally {
-          setLoading(false);
+          setDetailsLoading(false);
         }
-      }, [currentLeagueId, currentTenantId]);
+      }, [currentLeagueId]);
+
+    
+    
+    const fetchLeagueMetrics = useCallback(async () => {
+      setMetricsLoading(true);
+      if (!currentLeagueId) {
+        setMetricsLoading(false);
+        return;
+      }
+      try {
+        const response = await api.get(`/leagues/${currentLeagueId}/metrics`);
+        const validatedMetrics = LeagueMetricsSchema.parse(response.data);
+        setMetrics(validatedMetrics);
+      } catch (err) {
+        console.error("Failed to fetch metrics:", err);
+        toast.error("Error loading metrics", { description: "Could not load league metrics." });
+      } finally {
+        setMetricsLoading(false)
+      }
+    }, [currentLeagueId]);
 
     useEffect(() => {
         // Fetch tenant-specific data if needed, e.g., tenant name, logo, etc.
         if (currentLeagueId) {
+          fetchLeagueMetrics();
             fetchLeagueDetails();
-            //fetchLeagues();
         }
-    }, [currentLeagueId, fetchLeagueDetails]);
+    }, [currentLeagueId, fetchLeagueDetails, fetchLeagueMetrics]);
     
-    // Dynamically generate stat cards based on tenant data
-    const statCards = [
-        { title: "Equipes", value: league?.teams?.length || 0, description: "Equipe actives", trend: {isPositive: true, value: 3.6, timespan: "season"}, icon: Trophy, bgColorClass: "bg-blue-400", textColorClass: "text-white", href: buildLink("/league/teams") },
-        { title: "Athletes", value: league?.players?.length || 0, description: "Athletes actifs", trend: {isPositive: false, value: 2.6, timespan: "season"}, icon: Building, bgColorClass: "bg-green-400", textColorClass: "text-white", href: buildLink("/league/players") },
-        { title: "Matchs Joues", value: 0, description: "Matchs deja jouees", trend: {isPositive: true, value: 66, timespan: "season"}, icon: Calendar, bgColorClass: "bg-orange-400", textColorClass: "text-white", href: buildLink("/league/games") },
-        { title: "Billets vendus (Aujourd'hui)", value: 0, description: "Game Tickets sold today", trend: {isPositive: true, value: 3.6, timespan: "season"}, icon: Ticket, bgColorClass: "bg-red-400", textColorClass: "text-white", href: buildLink("/league/tickets") }, // Keeping mock for now as per request
-    ]
     const recentActivities = [
   { id: 1, action: "New league created", details: "Professional Volleyball League", time: "5 min ago", type: "league" },
   { id: 2, action: "Manager assigned", details: "John Smith assigned to Basketball League", time: "15 min ago", type: "manager" },
@@ -108,7 +116,7 @@ export default function LeagueDashboard() {
   { id: 4, action: "League completed", details: "Junior Tennis League finished season", time: "2 hours ago", type: "league" },
   { id: 5, action: "New team registered", details: "Thunder Bolts joined Basketball League", time: "3 hours ago", type: "team" }
 ];
-    if(loading) return <LoadingSpinner />
+    if(detailsLoading) return <LoadingSpinner />
     if(error) return <div className='text-red-500 text-center mt-8'>Error: {error}</div>;
     return (
         <div className="min-h-screen">
@@ -179,10 +187,57 @@ export default function LeagueDashboard() {
             </section>
                 {/* Key Metrics Section */}
             <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
-                {statCards.map((card, index) => (
-                    <StatsCard key={index} {...card} />
-                ))}    
+              <StatsCard
+                title="Equipes"
+                value={metrics?.activeTeamCount ?? 0}
+                description={`Total: ${metrics?.totalTeamCount ?? 0}`}
+                trend={{
+                  value: Math.abs(metrics?.participatingTeamDelta ?? 0),
+                  timespan: "season",
+                }}
+                icon={Trophy}
+                variant="success"
+                href={buildLink("/league/teams")}
+              />
+
+              <StatsCard
+                title="Athletes"
+                value={metrics?.activePlayerCount ?? 0}
+                description={`Total: ${metrics?.totalPlayerCount ?? 0}`}
+                trend={{
+                  value: Math.abs(metrics?.participatingPlayerDelta ?? 0),
+                  timespan: "season",
+                }}
+                icon={Building}
+                variant="success"
+                href={buildLink("/league/players")}
+              />
+
+              <StatsCard
+                title="Matchs Joués"
+                value={metrics?.gamesPlayed ?? 0}
+                description={`Sur ${metrics?.gamesScheduled ?? 0} programmés`}
+                trend={{
+                  value: metrics?.gamesPlayedRatio ?? 0,
+                }}
+                icon={Calendar}
+                variant="danger"
+                href={buildLink("/league/games")}
+              />
+
+              <StatsCard
+                title="Billets vendus (Aujourd'hui)"
+                value={0} // Placeholder
+                description="Ventes de billets aujourd'hui"
+                trend={{
+                  value: 3.6,
+                  timespan: "season",
+                }}
+                icon={Ticket}
+                variant="neutral"
+              />
             </section>
+
             {/* Leagues Overview */}
             <section className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-4">
                 <div className="lg:col-span-2">
