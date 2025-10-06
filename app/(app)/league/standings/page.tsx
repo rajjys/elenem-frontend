@@ -1,4 +1,4 @@
-// app/(league)/standings/page.tsx
+// app/league/standings/page.tsx
 "use client";
 
 import React, { useState, useEffect, useCallback } from 'react';
@@ -13,29 +13,6 @@ import { useAuthStore } from '@/store/auth.store';
 
 export default function LeagueStandingsPage() {
   const { user: userAuth } = useAuthStore();
-  /* 
-  const currentUserRoles = userAuth?.roles || [];
-  
-  const ctxTenantId = useSearchParams().get('ctxTenantId'); // Use search params if needed
-  const ctxLeagueId = useSearchParams().get('ctxLeagueId'); // Use search params if needed
-  
-// Determine current tenant ID based on user roles
-  const isSystemAdmin = currentUserRoles.includes(Role.SYSTEM_ADMIN);
-  const isTenantAdmin = currentUserRoles.includes(Role.TENANT_ADMIN);
-  const isLeagueAdmin = currentUserRoles.includes(Role.LEAGUE_ADMIN);
-
-  const currentTenantId = isSystemAdmin
-      ? ctxTenantId
-      : isTenantAdmin || isLeagueAdmin
-      ? userAuth?.tenantId
-      : null;
-
-  const currentLeagueId = isSystemAdmin || isTenantAdmin
-      ? ctxLeagueId
-      : isLeagueAdmin
-      ? userAuth?.managingLeagueId
-      : null;
-*/
   const [filters, setFilters] = useState({});
   const [standings, setStandings] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -52,7 +29,6 @@ export default function LeagueStandingsPage() {
     setError(null);
     try {
       const response = await api.get('/games/standings', { params: finalFilters });
-      console.log(response);
       setStandings(response.data);
     } catch (error) {
       setError('Failed to load standings data.');

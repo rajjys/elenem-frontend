@@ -6,7 +6,7 @@ import { Card, CardContent, CardTitle } from "@/components/ui";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import StandingsTable from "@/components/public/standings-table";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Gender, Standing } from "@/schemas";
+import { Gender, Standings } from "@/schemas";
 
 interface PublicTenantDetails {
   id: string;
@@ -25,7 +25,7 @@ const TenantStandingsPage = ({ params }: { params: Promise<{ tenantSlug: string 
   const [tenant, setTenant] = useState<PublicTenantDetails | null>(null);
   const [mainLeagues, setMainLeagues] = useState<{ id: string; name: string; slug: string; division: string; gender: Gender}[]>([]);
   const [selectedLeagueSlug, setSelectedLeagueSlug] = useState<string | null>(null);
-  const [standings, setStandings] = useState<Standing[]>([]);
+  const [standings, setStandings] = useState<Standings[]>([]);
   const [loadingTenant, setLoadingTenant] = useState(true);
   const [loadingStandings, setLoadingStandings] = useState(false);
   const [error, setError] = useState<string | null>(null);

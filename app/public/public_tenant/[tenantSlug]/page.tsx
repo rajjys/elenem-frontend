@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, use } from 'react';
 import Link from 'next/link';
-import { BlogPost, GameDetails, GameStatus, Gender, LeagueBasic, Standing } from '@/schemas'; // Assuming GameStatus is a valid import
+import { BlogPost, GameDetails, GameStatus, Gender, LeagueBasic, Standings } from '@/schemas'; // Assuming GameStatus is a valid import
 import TenantHeroSection from "@/components/public/tenant-hero-section";
 import GamePublicCard from '@/components/game/game-public-card'; // Assuming this is the correct path
 import { Skeleton } from "@/components/ui/skeleton";
@@ -34,7 +34,7 @@ const TenantLandingPage = ({ params }: { params: Promise<{ tenantSlug: string }>
     const [tenant, setTenant] = useState<PublicTenantDetails | null>(null);
     const [mainLeagues, setMainLeagues] = useState<{ id: string; name: string; slug: string }[]>([]);
     const [selectedLeagueSlug, setSelectedLeagueSlug] = useState<string | null>(null);
-    const [standings, setStandings] = useState<Standing[]>([]);
+    const [standings, setStandings] = useState<Standings[]>([]);
     const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
     const [loadingStandings, setLoadingStandings] = useState(false);
     const [error, setError] = useState<string | null>(null);

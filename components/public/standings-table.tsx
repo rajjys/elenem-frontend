@@ -3,11 +3,11 @@
 import Image from "next/image";
 import { Skeleton } from "../ui";
 import Link from "next/link";
-import { Standing } from "@/schemas";
+import { Standings } from "@/schemas";
 
 // --- StandingsTable Component ---
 interface StandingsTableProps {
-    standings: Standing[];
+    standings: Standings[];
     rowsToShow?: number;
     isLoading: boolean;
 }

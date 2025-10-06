@@ -3,45 +3,28 @@ import Head from 'next/head';
 import { useRouter, useSearchParams } from 'next/navigation'; // Or useNavigation from next/navigation for App Router
 import React, { useCallback, useEffect, useState } from 'react';
 import { useAuthStore } from '@/store/auth.store';
-import { Gender, LeagueBasic, LeagueBasicSchema, LeagueMetrics, LeagueMetricsSchema, Roles } from '@/schemas';
+import { GameDetails, GameStatus, Gender, LeagueBasic, LeagueBasicSchema, LeagueMetrics, LeagueMetricsSchema, Roles, StandingsBasic } from '@/schemas';
 import { api } from '@/services/api';
 import { toast } from 'sonner';
 import { useContextualLink } from '@/hooks';
 import { StatsCard } from '@/components/ui/stats-card';
-import { Award, Building2, Calendar, CalendarPlus, Clock, Eye, MapPin, Settings, Target, Ticket, TrendingUp, Trophy,  User2,  Users } from 'lucide-react';
-import { Avatar, Button, Card, CardContent, CardHeader, CardTitle, LoadingSpinner, SeasonStatusBadge } from '@/components/ui';
+import { Award, Building2, Calendar, CalendarPlus, Clock, Clock1, Settings, Ticket, Trophy,  User2,  Users } from 'lucide-react';
+import { Avatar, Card, CardContent, CardFooter, CardHeader, CardTitle, LoadingSpinner, SeasonStatusBadge, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui';
 import Image from 'next/image';
 import Link from 'next/link';
+import { formatDateFr } from '@/utils';
+import qs from 'qs';
 
-interface UpcomingGame {
-    id: string;
-    homeTeam: string;
-    awayTeam: string;
-    league: string;
-    date: string;
-    time: string;
-    venue: string;
-    status: string; // e.g., 'Scheduled', 'Postponed'
-}
-
-    const mockUpcomingGames: UpcomingGame[] = [
-        { id: '1', homeTeam: "Goma West", awayTeam: "Virunga", league: "Premier League '25", date: "2025-07-07", time: "19:00", venue: "City Arena", status: "Scheduled" },
-        { id: '2', homeTeam: "Cyclone", awayTeam: "Barcelone", league: "Division A Cup", date: "2025-07-08", time: "14:30", venue: "Park View Stadium", status: "Scheduled" },
-        { id: '3', homeTeam: "Relax", awayTeam: "Byern", league: "Youth League '25", date: "2025-07-08", time: "17:00", venue: "Community Pitch 3", status: "Scheduled" },
-        { id: '4', homeTeam: "Silverback", awayTeam: "Shem", league: "Premier League '25", date: "2025-07-09", time: "20:00", venue: "National Stadium", status: "Scheduled" },
-        { id: '5', homeTeam: "Don Bosco", awayTeam: "Zebre", league: "Division B League", date: "2025-07-10", time: "16:00", venue: "Training Grounds A", status: "Scheduled" },
-    ];
-
-
-    
 export default function LeagueDashboard() {
-    const router = useRouter();
     const userAuth = useAuthStore((state) => state.user);
     const currentUserRoles = userAuth?.roles || [];
     const [league, setLeague] = useState<LeagueBasic>();
     const [detailsLoading, setDetailsLoading] = useState(true);
     const [metricsLoading, setMetricsLoading] = useState(false);
-    const [metrics, setMetrics] = useState<LeagueMetrics>()
+    const [metrics, setMetrics] = useState<LeagueMetrics>();
+    const [upcomingGames, setUpcomingGames] = useState<GameDetails[]>([]);
+    const [Standings, setStandings] = useState<StandingsBasic[]>([]);
+    const [recentGames, setRecentGames] = useState<GameDetails[]>([]);
     const [error, setError] = useState<string | null>(null);
 
     const { buildLink } = useContextualLink();
@@ -81,11 +64,9 @@ export default function LeagueDashboard() {
         }
       }, [currentLeagueId]);
 
-    
-    
     const fetchLeagueMetrics = useCallback(async () => {
       setMetricsLoading(true);
-      if (!currentLeagueId) {
+      if (!currentLeagueId || !league?.currentSeasonId) {
         setMetricsLoading(false);
         return;
       }
@@ -99,23 +80,68 @@ export default function LeagueDashboard() {
       } finally {
         setMetricsLoading(false)
       }
-    }, [currentLeagueId]);
+    }, [currentLeagueId, league?.currentSeasonId]);
+/// Fetch recent, upcoming games and standings
+    const fetchRecentGames = useCallback( async () => {
+      if (!currentLeagueId) return;
+      try {
+        const response = await api.get('/games/', { 
+          params: { leagueId: currentLeagueId, 
+          pageSize: 5,
+          sortBy: 'dateTime',
+          sortOrder: 'desc',
+          status: GameStatus.COMPLETED,
+        }});
+        setRecentGames(response.data.data);
+      } catch (error) {
+        console.error("Error fetching recent games:", error)
+      }
+    }, [currentLeagueId])
 
+    ///Fetch upcoming games
+    const fetchUpcomingGames = useCallback( async () => {
+      if (!currentLeagueId) return;
+      try {
+        const response = await api.get('/games', {
+          params: { leagueId: currentLeagueId,
+            pageSize: 5,
+            sortBy: 'dateTime',
+            sortOrder: 'asc',
+            status: [GameStatus.SCHEDULED, GameStatus.IN_PROGRESS],
+            fromDate: new Date("2025-09-09").toISOString(), // Only future games
+          },
+          paramsSerializer: (params) => qs.stringify(params, { arrayFormat: 'repeat' })
+        });
+        setUpcomingGames(response.data.data);
+      } catch (error){
+          console.error("Error fetching upcoming games:", error)
+      }
+    }, [currentLeagueId]);
+    /// Fetch league standings
+    const fetchLeagueStandings = useCallback( async () => {
+      if(!currentLeagueId || league?.currentSeasonId) return;
+      try {
+        const response = await api.get('/games/standings', 
+          { params: { 
+            leagueId: currentLeagueId,
+            seasonId: league?.currentSeasonId
+          }}
+        );
+        setStandings(response.data);
+      } catch(error) {
+        console.error("Error fetching standings:", error)
+      }
+    }, [currentLeagueId, league?.currentSeasonId])
     useEffect(() => {
         // Fetch tenant-specific data if needed, e.g., tenant name, logo, etc.
         if (currentLeagueId) {
           fetchLeagueMetrics();
-            fetchLeagueDetails();
+          fetchLeagueDetails();
+          fetchRecentGames();
+          fetchUpcomingGames()
+          fetchLeagueStandings();
         }
-    }, [currentLeagueId, fetchLeagueDetails, fetchLeagueMetrics]);
-    
-    const recentActivities = [
-  { id: 1, action: "New league created", details: "Professional Volleyball League", time: "5 min ago", type: "league" },
-  { id: 2, action: "Manager assigned", details: "John Smith assigned to Basketball League", time: "15 min ago", type: "manager" },
-  { id: 3, action: "Payment received", details: "$3,200 from Soccer League subscription", time: "1 hour ago", type: "payment" },
-  { id: 4, action: "League completed", details: "Junior Tennis League finished season", time: "2 hours ago", type: "league" },
-  { id: 5, action: "New team registered", details: "Thunder Bolts joined Basketball League", time: "3 hours ago", type: "team" }
-];
+    }, [currentLeagueId, fetchLeagueDetails, fetchLeagueMetrics, fetchRecentGames, fetchUpcomingGames, fetchLeagueStandings]);
     if(detailsLoading) return <LoadingSpinner />
     if(error) return <div className='text-red-500 text-center mt-8'>Error: {error}</div>;
     return (
@@ -123,7 +149,7 @@ export default function LeagueDashboard() {
             <Head>
                 <title>{league?.tenant?.tenantCode || "Ligue"} - Tableau de Bord</title>
             </Head>  
-            <section className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 md:gap-0 px-4 py-3 mb-4 bg-white shadow-md rounded-md">
+            <section className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 md:gap-0 px-4 py-3 mb-6 bg-white shadow-md rounded-md">
               <div className="flex items-center gap-3">
                   {league?.businessProfile?.logoAsset?.url ? (
                   <Image
@@ -186,7 +212,7 @@ export default function LeagueDashboard() {
               }
             </section>
                 {/* Key Metrics Section */}
-            <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
+            <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-6">
                   <StatsCard title="Equipes" value={metrics?.activeTeamCount ?? 0}
                     description={`Total: ${metrics?.totalTeamCount ?? 0}`}
                     trend={{
@@ -230,93 +256,92 @@ export default function LeagueDashboard() {
                     loading={metricsLoading}/>
             </section>
 
-            {/* Leagues Overview */}
-            <section className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-4">
-                <div className="lg:col-span-2">
-                    <Card className="shadow-elevated">
-                      <CardHeader className="flex flex-row items-center justify-between">
-                        <CardTitle className="text-lg font-semibold">Upcoming Games</CardTitle>
-                        <Button variant="default" size="sm" onClick={() => router.push(buildLink('/league/games'))}>
-                          <Eye className="h-4 w-4 mr-2" />
-                          View All
-                        </Button>
+            {/* Games & Standings Overview */}
+            <section className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+                {/* Recent Games */}
+                <div className="h-full lg:col-span-1">
+                    <Card className="h-full flex flex-col justify-between shadow-elevated bg-gray-50">
+                      <CardHeader className="flex flex-row items-center justify-between gap-2 sm:gap-4 px-4 border-b border-slate-200">
+                          <CardTitle className="text-lg font-semibold text-gray-500">Matchs Recents</CardTitle>
+                          <Link href={buildLink('/league/games#results')} className="inline-flex items-center text-sm font-medium text-slate-500 nav-hover">
+                              <Clock1 className="h-4 w-4 mr-1" />
+                              <span>Resultats</span>
+                          </Link>
                       </CardHeader>
-                      <CardContent className="space-y-4">
-                        {mockUpcomingGames.slice(0, 4).map((game) => (
-                          <div key={game.id} className="p-4 rounded-lg border border-gray-200 hover:bg-gray-200/30 transition-colors">
-                            <div className="flex items-center justify-between mb-3">
-                              <div className="flex items-center gap-6">
-                                <div className="flex items-center gap-3">
-                                  <Avatar  name={game.homeTeam} size={45}>
-                                  </Avatar>
-                                  <div className="text-center">
-                                    <div className="text-sm">{game.homeTeam}</div>
-                                    <div className="text-xs text-gray-500">Home</div>
-                                  </div>
-                                </div>
-                                <div className="text-xl font-bold text-gray-500">VS</div>
-                                <div className="flex items-center gap-3">
-                                  <div className="text-center">
-                                    <div className="text-sm">{game.awayTeam}</div>
-                                    <div className="text-xs text-gray-500">Away</div>
-                                  </div>
-                                  <Avatar  name={game.awayTeam} size={45}>
-                                  </Avatar>
-                                </div>
-                              </div>
-                              <Button variant="default" size="sm">
-                                View Details
-                              </Button>
-                            </div>
-                            
-                            <div className="grid grid-cols-3 gap-4 text-xs text-gray-500 pt-1">
-                              <div className="flex items-center gap-1">
-                                <Calendar className="h-3 w-3 mb-1 text-purple-700" />
-                                <span>{game.date}</span>
-                              </div>
-                              <div className="flex items-center gap-1">
-                                <Clock className="h-3 w-3 text-amber-700" />
-                                <span>{game.time}</span>
-                              </div>
-                              <div className="flex items-center gap-1">
-                                <MapPin className="h-3 w-3 text-red-700" />
-                                <span>{game.venue}</span>
-                              </div>
-                            </div>
-                          </div>
-                        ))}
+                      <CardContent className="flex-1">
+                        {
+                          recentGames.length > 0 ?
+                          recentGames.slice(0, 5).map((game) => (
+                            <MinimalGameCard key={game.id} game={game} />
+                          ))
+                          :
+                          <p className="text-center text-sm text-slate-500 py-8">Aucun match récent</p>
+                        }
                       </CardContent>
+                      <CardFooter className='flex items-center justify-center border-t border-slate-200'>
+                          <Link href={buildLink('/league/games#results')} className="py-1 flex items-center justify-center text-sm font-medium text-slate-500 nav-hover">
+                              <Clock className="h-4 w-4 mr-1" />
+                              <span>Tout les Resultats</span>
+                          </Link>
+                      </CardFooter>
                     </Card>
                 </div>
-
-                {/* Recent Activity */}
-                <div>
-                    <Card className="shadow-elevated">
-                    <CardHeader>
-                        <CardTitle className="text-lg font-semibold">Recent Activity</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                        {recentActivities.map((activity) => (
-                        <div key={activity.id} className="flex items-start gap-3 p-3 rounded-lg hover:bg-muted/30 transition-colors">
-                            <div className="flex-shrink-0 mt-1">
-                            {activity.type === 'league' && <Trophy className="h-4 w-4 text-primary" />}
-                            {activity.type === 'manager' && <Users className="h-4 w-4 text-warning" />}
-                            {activity.type === 'payment' && <TrendingUp className="h-4 w-4 text-success" />}
-                            {activity.type === 'team' && <Target className="h-4 w-4 text-accent" />}
-                            </div>
-                            <div className="flex-1 min-w-0">
-                            <p className="font-medium text-sm text-foreground">{activity.action}</p>
-                            <p className="text-xs text-muted-foreground truncate">{activity.details}</p>
-                            <p className="text-xs text-muted-foreground mt-1">{activity.time}</p>
-                            </div>
-                        </div>
-                        ))}
-                    </CardContent>
+                {/* Upcoming Games */}
+                <div className="h-full lg:col-span-1">
+                    <Card className="h-full flex flex-col justify-between shadow-elevated bg-gray-50">
+                      <CardHeader className="flex flex-row items-center justify-between gap-2 sm:gap-4 px-4 border-b border-slate-200">
+                          <CardTitle className="text-lg font-semibold text-gray-500">Prochains Matchs</CardTitle>
+                          <Link href={buildLink('/league/games#schedule')} className="inline-flex items-center text-sm font-medium text-slate-500 nav-hover">
+                              <Clock1 className="h-4 w-4 mr-1" />
+                              <span>Calendriers</span>
+                          </Link>
+                      </CardHeader>
+                      <CardContent className="flex-1">
+                        {
+                          upcomingGames.length > 0 ?
+                            upcomingGames.slice(0, 5).map((game) => (
+                              <MinimalGameCard key={game.id} game={game} />
+                            ))
+                          :
+                            <p className="text-center text-sm text-slate-500 py-8">Aucun match programmé</p>
+                        }
+                      </CardContent>
+                      <CardFooter className='flex items-center justify-center border-t border-slate-200'>
+                          <Link href={buildLink('/league/games#schedule')} className="py-1 flex items-center justify-center text-sm font-medium text-slate-500 nav-hover">
+                              <Clock className="h-4 w-4 mr-1" />
+                              <span>Calendriers Complets</span>
+                          </Link>
+                      </CardFooter>
+                    </Card>
+                </div>
+                <div className="h-full lg:col-span-1">
+                    <Card className="h-full flex flex-col justify-between shadow-elevated bg-gray-50">
+                      <CardHeader className="flex flex-row items-center justify-between gap-2 sm:gap-4 px-4 border-b border-slate-200">
+                          <CardTitle className="text-lg font-semibold text-gray-500">Classements</CardTitle>
+                          <Link href={buildLink('/league/standings')} className="inline-flex items-center text-sm font-medium text-slate-500 nav-hover">
+                              <Clock1 className="h-4 w-4 mr-1" />
+                              <span>Liste complete</span>
+                          </Link>
+                      </CardHeader>
+                      <CardContent className="flex-1">
+                        {
+                          Standings.length > 0 ?
+                          <StandingsTable standings={Standings.slice(0, 8)} />
+                          :
+                          <p className="text-center text-sm text-slate-500 py-8">Aucun classement disponible</p>
+                        }
+                      </CardContent>
+                      <CardFooter className='flex items-center justify-center border-t border-slate-200'>
+                          <Link href={buildLink('/league/standings')} className="py-1 flex items-center justify-center text-sm font-medium text-slate-500 nav-hover">
+                              <Clock className="h-4 w-4 mr-1" />
+                              <span>Classements Complets</span>
+                          </Link>
+                      </CardFooter>
                     </Card>
                 </div>
             </section>
             {/* Quick Actions */}
-            <section className='mb-4'>
+            <section className='mb-6 hidden'>
                 <Card className="shadow-elevated">
                     <CardHeader>
                         <CardTitle className="text-lg font-semibold">Quick Actions</CardTitle>
@@ -377,4 +402,92 @@ export default function LeagueDashboard() {
             {/* Additional sections can be added here, e.g., "Recent Activity," "Revenue Trends" */}
         </div>
     );
+}
+
+const MinimalGameCard = ({ game }: { game: GameDetails }) => {
+  return (
+    <Link href={`/game/${game.id}/dashboard`} key={game.id} className="block">
+      <div className="bg-white rounded-lg shadow-sm hover:shadow-md hover:bg-slate-100 transition p-2 my-2 space-y-3">
+        {/* Date & Status */}
+        <div className="flex items-center justify-between text-xs text-gray-600 font-semibold">
+          <span>{formatDateFr(game.dateTime)}</span>
+          {game.status === GameStatus.IN_PROGRESS && 
+            <span className='text-red-500 bg-red-50 border border-red-200 rounded-full px-3 py-0.5 font-semibold animate-pulse'>
+              Live
+            </span>
+          }
+        </div>
+        {/* Teams & Score */}
+        <div className="flex items-center justify-between gap-4">
+          {/* Home Team */}
+          <div className="flex items-center gap-2">
+            <Avatar
+              src={game.homeTeam.businessProfile.logoAsset?.url}
+              name="logo"
+              size={30}
+            />
+            <span className="font-semibold text-sm">{game.homeTeam.shortCode}</span>
+          </div>
+          {/* Score */}
+          <div className="flex items-center gap-2 text-lg font-bold text-gray-800">
+            <span>{game.homeScore}</span>
+            <span>-</span>
+            <span>{game.awayScore}</span>
+          </div>
+          {/* Away Team */}
+          <div className="flex items-center gap-2">
+            <span className="font-semibold text-sm">{game.awayTeam.shortCode}</span>
+            <Avatar
+              src={game.awayTeam.businessProfile.logoAsset?.url}
+              name="logo"
+              size={30}
+            />
+          </div>
+        </div>
+      </div>
+    </Link>
+  )
+}
+
+export function StandingsTable({ standings } : { standings: StandingsBasic []} ) {
+  const { buildLink } = useContextualLink();
+  const router = useRouter();
+  return (
+    <div className="overflow-x-auto">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead className="text-center px-1"></TableHead>
+            <TableHead className="min-w-[100px]"></TableHead>
+            <TableHead className="font-bold text-center">Pts</TableHead>
+            <TableHead className="text-center">J</TableHead>
+            <TableHead className="text-center">G</TableHead>
+            <TableHead className="text-center">P</TableHead>
+            <TableHead className="text-center">N</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {standings.map((item) => {
+            return (
+                  <TableRow key={item.team.id} className="cursor-pointer hover:bg-gray-100"
+                    onClick={() => router.push(buildLink(`/team/dashboard`, { ctxTeamId: item.team.id }))}>
+                    <TableCell className="font-medium text-center px-1">{item.rank}</TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-3">
+                          <Avatar src={item.team.businessProfile?.logoAsset?.url} name={item.team.name} size={25} />
+                        <span className="font-medium">{item.team.shortCode}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell className="font-bold text-center">{item.points}</TableCell>
+                    <TableCell className="text-center">{item.gamesPlayed}</TableCell>
+                    <TableCell className="text-center">{item.wins}</TableCell>
+                    <TableCell className="text-center">{item.losses}</TableCell>
+                    <TableCell className="text-center">{item.draws}</TableCell>
+                  </TableRow>
+            )})
+          }
+        </TableBody>
+      </Table>
+    </div>
+  );
 }
