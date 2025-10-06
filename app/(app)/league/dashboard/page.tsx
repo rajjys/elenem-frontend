@@ -8,7 +8,7 @@ import { api } from '@/services/api';
 import { toast } from 'sonner';
 import { useContextualLink } from '@/hooks';
 import { StatsCard } from '@/components/ui/stats-card';
-import { Award, Building, Calendar, CalendarPlus, Clock, Eye, MapPin, Settings, Target, Ticket, TrendingUp, Trophy,  Users } from 'lucide-react';
+import { Award, Building2, Calendar, CalendarPlus, Clock, Eye, MapPin, Settings, Target, Ticket, TrendingUp, Trophy,  User2,  Users } from 'lucide-react';
 import { Avatar, Button, Card, CardContent, CardHeader, CardTitle, LoadingSpinner, SeasonStatusBadge } from '@/components/ui';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -187,55 +187,47 @@ export default function LeagueDashboard() {
             </section>
                 {/* Key Metrics Section */}
             <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
-              <StatsCard
-                title="Equipes"
-                value={metrics?.activeTeamCount ?? 0}
-                description={`Total: ${metrics?.totalTeamCount ?? 0}`}
-                trend={{
-                  value: Math.abs(metrics?.participatingTeamDelta ?? 0),
-                  timespan: "season",
-                }}
-                icon={Trophy}
-                variant="success"
-                href={buildLink("/league/teams")}
-              />
-
-              <StatsCard
-                title="Athletes"
-                value={metrics?.activePlayerCount ?? 0}
-                description={`Total: ${metrics?.totalPlayerCount ?? 0}`}
-                trend={{
-                  value: Math.abs(metrics?.participatingPlayerDelta ?? 0),
-                  timespan: "season",
-                }}
-                icon={Building}
-                variant="success"
-                href={buildLink("/league/players")}
-              />
-
-              <StatsCard
-                title="Matchs Joués"
-                value={metrics?.gamesPlayed ?? 0}
-                description={`Sur ${metrics?.gamesScheduled ?? 0} programmés`}
-                trend={{
-                  value: metrics?.gamesPlayedRatio ?? 0,
-                }}
-                icon={Calendar}
-                variant="danger"
-                href={buildLink("/league/games")}
-              />
-
-              <StatsCard
-                title="Billets vendus (Aujourd'hui)"
-                value={0} // Placeholder
-                description="Ventes de billets aujourd'hui"
-                trend={{
-                  value: 3.6,
-                  timespan: "season",
-                }}
-                icon={Ticket}
-                variant="neutral"
-              />
+                  <StatsCard title="Equipes" value={metrics?.activeTeamCount ?? 0}
+                    description={`Total: ${metrics?.totalTeamCount ?? 0}`}
+                    trend={{
+                      value: Math.abs(metrics?.participatingTeamDelta ?? 0),
+                      timespan: "season",
+                    }} 
+                    icon={Building2} 
+                    variant="success" 
+                    href={buildLink("/league/teams")} 
+                    loading={metricsLoading}/>
+                  <StatsCard 
+                    title="Athletes" 
+                    value={metrics?.activePlayerCount ?? 0}
+                    description={`Total: ${metrics?.totalPlayerCount ?? 0}`}
+                    trend={{
+                      value: Math.abs(metrics?.participatingPlayerDelta ?? 0),
+                      timespan: "season",
+                    }} icon={User2} 
+                    variant="success" 
+                    href={buildLink("/league/players")}  
+                    loading={metricsLoading}/>
+                  <StatsCard 
+                    title="Matchs Joués" 
+                    value={metrics?.gamesPlayed ?? 0}
+                    description={`Sur ${metrics?.gamesScheduled ?? 0} programmés`}
+                    trend={{
+                      value: metrics?.gamesPlayedRatio ?? 0,
+                    }} 
+                    icon={Calendar} 
+                    variant="danger" 
+                    href={buildLink("/league/games")}  
+                    loading={metricsLoading}/>
+                  <StatsCard 
+                    title="Billets vendus (Aujourd'hui)" 
+                    value={0} // Placeholder
+                    description="Ventes de billets aujourd'hui"
+                    trend={{
+                      value: 3.6,
+                      timespan: "season",
+                    }} icon={Ticket} variant="neutral"  
+                    loading={metricsLoading}/>
             </section>
 
             {/* Leagues Overview */}

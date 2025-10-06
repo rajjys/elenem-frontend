@@ -14,7 +14,7 @@ const GeneralUserDashboard = () => {
   const [loadingUser, setLoadingUser] = useState(true);
 
   const [tenant, setTenant] = useState<TenantDetails | null>(null);
-  const [league, setLeague] = useState<LeagueBasic>(null);
+  const [league, setLeague] = useState<LeagueBasic>();
   const [team, setTeam] = useState<TeamDetails | null>(null);
 
   const isSystemAdmin = userAuth?.roles?.includes(Roles.SYSTEM_ADMIN);

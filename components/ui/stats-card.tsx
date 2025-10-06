@@ -1,6 +1,7 @@
 import { LucideIcon } from "lucide-react";
 import Link from "next/link";
 import clsx from "clsx";
+import { Skeleton } from "./skeleton";
 
 
 interface StatCardProps {
@@ -16,6 +17,7 @@ interface StatCardProps {
   href?: string;
   layout?: "vertical" | "horizontal";
   iconPosition?: "left" | "right";
+  loading?: boolean;
 }
 
 export const StatsCard: React.FC<StatCardProps> = ({
@@ -28,6 +30,7 @@ export const StatsCard: React.FC<StatCardProps> = ({
   href,
   layout = "horizontal",
   iconPosition = "right",
+  loading = false
 }) => {
 
   const trendDirection = !trend ? "neutral" :
@@ -84,5 +87,31 @@ export const StatsCard: React.FC<StatCardProps> = ({
     </div>
   );
 
+  const skeletonContent = (
+    <div
+      className={clsx(
+        "bg-white p-6 rounded-lg shadow-md transition-transform hover:scale-[1.02]",
+        layout === "horizontal" && "flex items-center justify-between gap-4"
+      )}
+    >
+      <div className="flex flex-col w-full">
+        <Skeleton className="h-4 w-24 mb-2" />
+        <Skeleton className="h-8 w-32 mb-2" />
+        <Skeleton className="h-3 w-20 mb-2" />
+        <Skeleton className="h-3 w-28" />
+      </div>
+      <div
+        className={clsx(
+          "p-2 rounded-md",
+          "bg-gray-100",
+          iconPosition === "left" && layout === "horizontal" && "order-first"
+        )}
+      >
+        <Skeleton className="w-5 h-5 rounded" />
+      </div>
+    </div>
+  );
+
+  if (loading) return skeletonContent;
   return href ? <Link href={href}>{cardContent}</Link> : cardContent;
 };
