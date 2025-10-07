@@ -1,6 +1,6 @@
 // prisma/season-schemas.ts
 import * as z from 'zod';
-import { LeagueBasicSchema } from './league-schemas';
+import { LeagueDetailsSchema } from './league-schemas';
 import { TenantDetailsSchema } from './tenant-schemas';
 import { SeasonStatus } from './enums';
 
@@ -89,7 +89,7 @@ export const SeasonDetailsSchema = z.object({
   status: z.nativeEnum(SeasonStatus),
   leagueId: z.string(),
   tenantId: z.string(),
-  league: LeagueBasicSchema.optional(),
+  league: LeagueDetailsSchema.optional(),
   tenant: TenantDetailsSchema.optional(),
 });
 export type SeasonDetails = z.infer<typeof SeasonDetailsSchema>;

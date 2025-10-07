@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowRight } from "lucide-react";
 import Image from "next/image";
-import { LeagueBasic, PaginatedLeaguesResponseDto, TeamDetails } from "@/schemas";
+import { LeagueDetails, PaginatedLeaguesResponseDto, TeamDetails } from "@/schemas";
 
 export default function PublicTeamsPage({ params }: { params: Promise<{ tenantSlug: string }> }) {
   const { tenantSlug } = use(params);
@@ -19,13 +19,13 @@ export default function PublicTeamsPage({ params }: { params: Promise<{ tenantSl
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
   const [selectedLeague, setSelectedLeague] = useState<string | undefined>();
-  const [leagues, setLeagues] = useState<LeagueBasic[]>([]);
+  const [leagues, setLeagues] = useState<LeagueDetails[]>([]);
 
   // fetch leagues for dropdown
   const fetchLeagues = useCallback(async () => {
     try {
       const res = await api.get<PaginatedLeaguesResponseDto>("/public-leagues", { params: { tenantSlug } });
-      const sortedLeagues = res.data.data.sort((a: LeagueBasic, b: LeagueBasic) => {
+      const sortedLeagues = res.data.data.sort((a: LeagueDetails, b: LeagueDetails) => {
             if (a.parentLeagueId === null && b.parentLeagueId !== null) return -1;
             if (a.parentLeagueId !== null && b.parentLeagueId === null) return 1;
             return 0;

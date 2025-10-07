@@ -4,9 +4,9 @@ import { useAuthStore } from '@/store/auth.store';
 import { Card, CardContent, CardTitle, Skeleton, Button } from '@/components/ui';
 import Image from 'next/image';
 import Link from 'next/link';
-import { LeagueBasic, Roles, TeamDetails, TeamDetailsSchema, TenantDetails } from '@/schemas';
+import { LeagueDetails, Roles, TeamDetails, TeamDetailsSchema, TenantDetails } from '@/schemas';
 import { api } from '@/services/api';
-import { TenantDetailsSchema, LeagueBasicSchema } from '@/schemas';
+import { TenantDetailsSchema, LeagueDetailsSchema } from '@/schemas';
 import { Plus } from 'lucide-react';
 
 const GeneralUserDashboard = () => {
@@ -14,7 +14,7 @@ const GeneralUserDashboard = () => {
   const [loadingUser, setLoadingUser] = useState(true);
 
   const [tenant, setTenant] = useState<TenantDetails | null>(null);
-  const [league, setLeague] = useState<LeagueBasic>();
+  const [league, setLeague] = useState<LeagueDetails>();
   const [team, setTeam] = useState<TeamDetails | null>(null);
 
   const isSystemAdmin = userAuth?.roles?.includes(Roles.SYSTEM_ADMIN);
@@ -46,7 +46,7 @@ const GeneralUserDashboard = () => {
         }
         if (isLeagueAdmin && userAuth?.managingLeagueId) {
           const response = await api.get(`/leagues/${userAuth.managingLeagueId}`);
-          setLeague(LeagueBasicSchema.parse(response.data));
+          setLeague(LeagueDetailsSchema.parse(response.data));
         }
         if (isTeamAdmin && userAuth?.managingTeamId) {
           const response = await api.get(`/teams/${userAuth.managingTeamId}`);

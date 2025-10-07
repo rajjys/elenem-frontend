@@ -3,7 +3,7 @@ import Head from 'next/head';
 import { useRouter, useSearchParams } from 'next/navigation'; // Or useNavigation from next/navigation for App Router
 import React, { useCallback, useEffect, useState } from 'react';
 import { useAuthStore } from '@/store/auth.store';
-import { GameDetails, GameStatus, Gender, LeagueBasic, LeagueBasicSchema, LeagueMetrics, LeagueMetricsSchema, Roles, StandingsBasic } from '@/schemas';
+import { GameDetails, GameStatus, Gender, LeagueDetails, LeagueDetailsSchema, LeagueMetrics, LeagueMetricsSchema, Roles, StandingsBasic } from '@/schemas';
 import { api } from '@/services/api';
 import { toast } from 'sonner';
 import { useContextualLink } from '@/hooks';
@@ -18,7 +18,7 @@ import qs from 'qs';
 export default function LeagueDashboard() {
     const userAuth = useAuthStore((state) => state.user);
     const currentUserRoles = userAuth?.roles || [];
-    const [league, setLeague] = useState<LeagueBasic>();
+    const [league, setLeague] = useState<LeagueDetails>();
     const [detailsLoading, setDetailsLoading] = useState(true);
     const [metricsLoading, setMetricsLoading] = useState(false);
     const [metrics, setMetrics] = useState<LeagueMetrics>();
@@ -52,7 +52,7 @@ export default function LeagueDashboard() {
         }
         try {
           const response = await api.get(`/leagues/${currentLeagueId}`);
-          const validatedLeague = LeagueBasicSchema.parse(response.data);
+          const validatedLeague = LeagueDetailsSchema.parse(response.data);
           setLeague(validatedLeague);
         } catch (err) {
           const errorMessage = "Failed to fetch League details.";

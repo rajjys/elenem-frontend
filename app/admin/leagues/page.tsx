@@ -4,7 +4,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { api } from '@/services/api'; // Your actual API instance
-import { LeagueBasic, PaginatedLeaguesResponseSchema, LeagueFilterParams } from '@/schemas/league-schemas'; // Your actual League types and schemas
+import { LeagueDetails, PaginatedLeaguesResponseSchema, LeagueFilterParams } from '@/schemas/league-schemas'; // Your actual League types and schemas
 import { LeagueFilters } from '@/components/league/league-filters'; // Your new LeagueFilters component
 import { LeaguesTable } from '@/components/league/leagues-table'; // Your new LeaguesTable component
 import { Pagination } from '@/components/ui/'; // Your Pagination component
@@ -13,7 +13,7 @@ import { Button } from '@/components/ui/button'; // Your Button component
 import { toast } from 'sonner'; // Your toast notification library (e.g., Sonner)
 
 export default function AdminLeaguesPage() {
-  const [leagues, setLeagues] = useState<LeagueBasic[]>([]);
+  const [leagues, setLeagues] = useState<LeagueDetails[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [totalItems, setTotalItems] = useState(0);

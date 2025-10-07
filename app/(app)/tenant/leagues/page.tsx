@@ -8,7 +8,7 @@ import { useSearchParams } from 'next/navigation';
 import { useAuthStore } from '@/store/auth.store';
 import { api } from '@/services/api';
 import { toast } from 'sonner';
-import { LeagueBasic, PaginatedLeaguesResponseSchema, Roles } from '@/schemas';
+import { LeagueDetails, PaginatedLeaguesResponseSchema, Roles } from '@/schemas';
 import { useContextualLink } from '@/hooks';
 import { Trophy } from 'lucide-react';
 import axios from 'axios';
@@ -20,7 +20,7 @@ import { LeagueCard } from '@/components/ui';
 export default function TenantLeaguesPage() {
   const userAuth = useAuthStore((state) => state.user);
 
-  const [leagues, setLeagues] = useState<LeagueBasic[]>([]);
+  const [leagues, setLeagues] = useState<LeagueDetails[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [totalItems, setTotalItems] = useState<number>(0);
@@ -113,7 +113,7 @@ export default function TenantLeaguesPage() {
       ) : (
         <div className="bg-white p-2 md:p-6 rounded-lg shadow-md">
           <div className="overflow-x-auto">
-            {leagues?.map((league: LeagueBasic) => (
+            {leagues?.map((league: LeagueDetails) => (
                   <LeagueCard key={league.id} league={league} tenant={league.tenant}/>
               ))}
           </div>

@@ -4,7 +4,7 @@ import { useSearchParams } from 'next/navigation'; // Or useNavigation from next
 import React, { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useAuthStore } from '@/store/auth.store';
-import { GameDetails, LeagueBasic, PaginatedLeaguesResponseSchema, Roles, TenantDetails, TenantDetailsSchema } from '@/schemas';
+import { GameDetails, LeagueDetails, PaginatedLeaguesResponseSchema, Roles, TenantDetails, TenantDetailsSchema } from '@/schemas';
 import { api } from '@/services/api';
 import { toast } from 'sonner';
 import { useContextualLink } from '@/hooks';
@@ -22,7 +22,7 @@ export default function TenantDashboard() {
     const userAuth = useAuthStore((state) => state.user);
     const currentUserRoles = userAuth?.roles || [];
     const [tenant, setTenant] = useState<TenantDetails | null>(null);
-    const [leagues, setLeagues] = useState<LeagueBasic[]>([]);
+    const [leagues, setLeagues] = useState<LeagueDetails[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -233,7 +233,7 @@ export default function TenantDashboard() {
                             </Link>
                         </CardHeader>
                         <CardContent className="flex-1">
-                        {leagues?.map((league: LeagueBasic) => (
+                        {leagues?.map((league: LeagueDetails) => (
                             <LeagueCard key={league.id} league={league} tenant={tenant!} />
                         ))}
                         

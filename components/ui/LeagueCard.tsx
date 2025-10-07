@@ -14,10 +14,10 @@ import Link from 'next/link';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { capitalize } from '@/utils';
 import { useContextualLink } from '@/hooks';
-import { LeagueBasic } from '@/schemas';
+import { LeagueDetails } from '@/schemas';
 
 interface LeagueCardProps {
-  league: LeagueBasic;
+  league: LeagueDetails;
   tenant?: {
     sportType?: string;
   };

@@ -7,7 +7,7 @@ import { toast } from "sonner"; // or your toast lib
 import { api } from "@/services/api"; // axios instance
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { LeagueBasic, SeasonDetails } from "@/schemas";
+import { LeagueDetails, SeasonDetails } from "@/schemas";
 import axios from "axios";
 import { useContextualLink } from "@/hooks";
 
@@ -18,7 +18,7 @@ export default function GeneralLeagueSettingsPage() {
   //const ctxTenantId = searchParams.get("ctxTenantId");
   const ctxLeagueId = searchParams.get("ctxLeagueId");
 
-  const [league, setLeague] = useState<LeagueBasic>();
+  const [league, setLeague] = useState<LeagueDetails>();
   const [seasons, setSeasons] = useState<SeasonDetails[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -30,7 +30,7 @@ export default function GeneralLeagueSettingsPage() {
     if (!ctxLeagueId) return;
     try {
       setLoading(true);
-      const res = await api.get<LeagueBasic>(`/leagues/${ctxLeagueId}`);
+      const res = await api.get<LeagueDetails>(`/leagues/${ctxLeagueId}`);
       setLeague(res.data);
       setSelectedSeason(res.data.currentSeasonId ?? null);
     } catch (error) {
@@ -103,7 +103,7 @@ export default function GeneralLeagueSettingsPage() {
 
   return (
     <div className="p-6 max-w-2xl mx-auto">
-      <h1 className="text-2xl font-semibold mb-6"><span>{league.name}</span> - General Settings</h1>
+      <h1 className="text-2xl font-semibold mb-6"><span>{league?.name}</span> - General Settings</h1>
 
       <div className="space-y-4">
         <div>

@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/'; // Your UI components
 
 // Your League-specific types from prisma
-import { LeagueBasic } from '@/schemas';
+import { LeagueDetails } from '@/schemas';
 
 // Icons from Lucide React
 import { ArrowUpDown, Pencil, Trash, MoreVertical } from 'lucide-react';
@@ -24,7 +24,7 @@ import LeagueLogo from './league-logo';
 type SortableColumn = 'name' | 'sportType' | 'country' | 'ownerUsername' | 'createdAt' | 'updatedAt' | 'division' | 'establishedYear';
 
 interface LeaguesTableProps {
-  leagues: LeagueBasic[];
+  leagues: LeagueDetails[];
   onSort: (sortBy: SortableColumn) => void;
   sortOrder: 'asc' | 'desc';
   sortBy: string;
@@ -107,10 +107,10 @@ export function LeaguesTable({ leagues, onSort, sortOrder, sortBy, onDelete } : 
               </TableCell>
               <TableCell className="px-6 py-4 whitespace-nowrap">
                 <div className="flex items-center">
-                  {league.logoAsset?.url && (
+                  {league?.businessProfile?.logoAsset?.url && (
                     <div className="flex-shrink-0 h-10 w-10">
                       <LeagueLogo
-                        src={league.logoAsset?.url}
+                        src={league.businessProfile.logoAsset?.url}
                         alt={`${league.name} Logo`}
                         fallbackText={league.name.charAt(0)}
                       />
@@ -142,13 +142,13 @@ export function LeaguesTable({ leagues, onSort, sortOrder, sortBy, onDelete } : 
                 <div className="text-sm text-gray-900">{league?.tenant?.sportType}</div>
               </TableCell>
               <TableCell className="px-6 py-4 whitespace-nowrap">
-                <div className="text-sm text-gray-900">{league.country || 'N/A'}</div>
+                <div className="text-sm text-gray-900">{league.tenant.country || 'N/A'}</div>
               </TableCell>
               <TableCell className="px-6 py-4 whitespace-nowrap">
                 <div className="text-sm text-gray-900">{league.division}</div>
               </TableCell>
               <TableCell className="px-6 py-4 whitespace-nowrap">
-                <div className="text-sm text-gray-900">{league.establishedYear || 'N/A'}</div>
+                <div className="text-sm text-gray-900">{league.businessProfile?.establishedYear || 'N/A'}</div>
               </TableCell>
               <TableCell className="px-6 py-4 whitespace-nowrap">
                 <div className="text-sm text-gray-900">

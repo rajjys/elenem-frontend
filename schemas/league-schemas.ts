@@ -8,6 +8,7 @@ export const TenantLiteResponseSchema = z.object({
   name: z.string(),
   tenantCode: z.string(),
   sportType: SportTypeSchema,
+  country: z.string().nullable().optional()
 });
 export type TenantLiteResponseDto = z.infer<typeof TenantLiteResponseSchema>;
 
@@ -27,11 +28,11 @@ export const UserLiteResponseSchema = z.object({
 });
 export type UserLiteResponseDto = z.infer<typeof UserLiteResponseSchema>;
 
-export const LeagueBasicSchema = z.object({
+export const LeagueDetailsSchema = z.object({
   id: z.string().cuid(),
   externalId: z.string().uuid(),
   tenantId: z.string().cuid(),
-  tenant: TenantLiteResponseSchema.nullable(), // Nullable as per DTO
+  tenant: TenantLiteResponseSchema, // Nullable as per DTO
   parentLeagueId: z.string().cuid().nullable().optional(),
   // For parentLeague, we avoid deep recursion in the Zod schema for simplicity and performance.
   // We only expect basic identifying fields if included.
@@ -41,7 +42,7 @@ export const LeagueBasicSchema = z.object({
   currentSeasonId: z.string().cuid().nullable().optional(),
   businessProfile: BusinessProfileSchema.optional(),
   name: z.string(),
-  slug: z.string().optional(),
+  slug: z.string(),
   isActive: z.boolean(),
   visibility: VisibilityLevelSchema,
 
@@ -76,7 +77,7 @@ export const LeagueBasicSchema = z.object({
   }))
 });
 
-export type LeagueBasic = z.infer<typeof LeagueBasicSchema>;
+export type LeagueDetails = z.infer<typeof LeagueDetailsSchema>;
 
 export const LeagueMetricsSchema = z.object({
   leagueId: z.string().cuid(),
@@ -115,7 +116,7 @@ export type LeagueMetrics =  z.infer<typeof LeagueMetricsSchema>
 
 // Paginated Response Schema for Leagues
 export const PaginatedLeaguesResponseSchema = z.object({
-  data: z.array(LeagueBasicSchema),
+  data: z.array(LeagueDetailsSchema),
   totalItems: z.number().int().min(0),
   totalPages: z.number().int().min(0),
   currentPage: z.number().int().min(1),
@@ -218,27 +219,6 @@ export const UpdateLeagueSchema = CreateLeagueSchema.partial().extend({
 });
 export type UpdateLeagueDto = z.infer<typeof UpdateLeagueSchema>;
 
-export const LeagueDetailsSchema = UpdateLeagueSchema.extend({
-  id: z.string().cuid(),
-  slug: z.string(),
-  createdAt: z.string().datetime(),
-  updatedAt: z.string().datetime(),
-  tenant: TenantLiteResponseSchema,
-  owner: UserLiteResponseSchema.optional().nullable(),
-  parentLeague: z.object({
-    id: z.string().cuid(),
-    name: z.string(),
-  }).optional().nullable(),
-  businessProfile: z.object({
-    id: z.string().cuid(),
-    name: z.string(),
-    country: z.string().optional().nullable(),
-    region: z.string().optional().nullable(),
-    city: z.string().optional().nullable(),
-  }),
-});
-
-export type LeagueDetails = z.infer<typeof LeagueDetailsSchema>;
 export type PointRule = z.infer<typeof PointRuleSchema>;
 export type BonusPointRule = z.infer<typeof BonusPointRuleSchema>;
 export type PointSystemConfig = z.infer<typeof PointSystemConfigSchema>;
