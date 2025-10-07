@@ -449,7 +449,7 @@ const MinimalGameCard = ({ game }: { game: GameDetails }) => {
   )
 }
 
-export function StandingsTable({ standings } : { standings: StandingsBasic []} ) {
+const StandingsTable = ({ standings } : { standings: StandingsBasic []}) => {
   const { buildLink } = useContextualLink();
   const router = useRouter();
   return (
