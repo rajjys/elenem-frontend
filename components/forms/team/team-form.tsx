@@ -27,6 +27,7 @@ import axios from "axios";
 import Step1TeamDetails from "./Step1TeamDetails";
 import Step3_TeamReview from "./Step3TeamReview";
 import { BusinessProfileForm, Stepper, TFormValues } from "../shared";
+import { flattenErrors } from "@/utils";
 
 type TeamFormValues = z.infer<typeof CreateTeamSchema>;
 export type { TeamFormValues };
@@ -77,6 +78,7 @@ export function TeamForm({ onSuccess, onCancel }: TeamFormProps) {
       shortCode: "",
       visibility: VisibilityLevel.PUBLIC,
       businessProfile: {
+        establishedYear: null,
         description: "",
         logoAssetId: null,
         bannerAssetId: null,
@@ -92,7 +94,7 @@ export function TeamForm({ onSuccess, onCancel }: TeamFormProps) {
     },
   });
 
-  const { watch, handleSubmit, trigger, formState : { errors } } = form;
+  const { watch, handleSubmit, trigger } = form;
   const selectedTenantId = watch("tenantId");
   //const selectedLeagueId = watch("leagueId");
 
@@ -236,11 +238,22 @@ export function TeamForm({ onSuccess, onCancel }: TeamFormProps) {
         <LoadingSpinner message="Chargement de l'utilisatuer"/>
       </div>
     )
-    console.log(errors);
   return (
     <div className="flex justify-center p-4 bg-gray-50">
       <Card className="w-full max-w-7xl shadow-lg rounded-xl">
         <form onSubmit={handleSubmit(onSubmit)}>
+          {/* Error Monitor */}
+          {Object.keys(form.formState.errors).length > 0 && (
+            <div className="my-4 p-4 bg-red-50 border border-red-200 rounded">
+              <h4 className="text-red-700 font-semibold mb-2">Veuillez corriger ces erreurs:</h4>
+              <ul className="list-disc pl-5 text-red-600 text-sm">
+                {
+                  flattenErrors(form.formState.errors).map((msg, i) => (
+                  <li key={i}>{msg}</li>
+                ))}
+              </ul>
+            </div>
+          )}
           <div className="p-6">
             <Stepper steps={steps} currentStep={currentStep} />
             {currentStep === 0 && (

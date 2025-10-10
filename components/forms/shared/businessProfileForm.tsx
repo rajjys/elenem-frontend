@@ -233,7 +233,7 @@ export function BusinessProfileForm({
           <Label>Année de création (facultatif)</Label>
           <Input
             type="number"
-            {...register("businessProfile.establishedYear", { valueAsNumber: true })}
+            {...register("businessProfile.establishedYear")}
             placeholder="e.g. 2019"
           />
         </div>
