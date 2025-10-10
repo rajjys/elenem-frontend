@@ -2,13 +2,12 @@
 "use client";
 
 import React, { useEffect, useState, useCallback, useRef } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { api } from "@/services/api";
 import { Button, Input, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Switch, LoadingSpinner } from "@/components/ui"; // Added all necessary UI components
 import { LeagueDetails, Roles, SeasonDetails, UpdateLeagueSchema, Gender, VisibilityLevel, GenderSchema, VisibilityLevelSchema } from "@/schemas"; // Added Gender, VisibilityLevel, and their Schemas (assuming they are exported)
 import axios from "axios";
-import { useContextualLink } from "@/hooks";
 import * as z from "zod";
 import { useAuthStore } from "@/store/auth.store";
 import { useForm, Controller } from "react-hook-form"; // Added react-hook-form imports
@@ -71,9 +70,7 @@ function computeDelta(oldObj: Partial<FormValues>, newObj: Partial<FormValues>) 
 }
 
 export default function GeneralLeagueSettingsPage() {
-  const router = useRouter();
   const searchParams = useSearchParams();
-  const { buildLink } = useContextualLink();
   const userAuth = useAuthStore((state) => state.user);
   const currentUserRoles = userAuth?.roles || [];
   const ctxLeagueId = searchParams.get('ctxLeagueId');
@@ -112,7 +109,7 @@ export default function GeneralLeagueSettingsPage() {
   } = form;
 
   // Watch for changes to currentSeasonId
-  const currentSeasonId = form.watch('currentSeasonId');
+  //const currentSeasonId = form.watch('currentSeasonId');
 
   // Fetch league details
   const fetchLeagueDetails = useCallback(async () => {
