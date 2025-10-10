@@ -122,13 +122,13 @@ export default function TenantGamesPage() {
   }
 
   return (
-    <div className="container mx-auto p-6">
+    <div className="container mx-auto md:p-6">
       <div className="flex flex-col space-y-4 mb-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-gray-900">Games</h1>
           <p className="text-muted-foreground text-gray-600">View and manage games within your tenant.</p>
         </div>
-        <div className="flex justify-between items-center">
+        <div className="md:flex justify-between items-center space-y-3 md:space-y-0">
           <GamesFilters
             filters={filters}
             onFilterChange={handleFilterChange}

@@ -247,7 +247,7 @@ export function GamesFilters({ filters, onFilterChange, onPageSizeChange, fixedT
       {/* Filter Button and Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogTrigger asChild>
-          <Button variant="outline" className="rounded-md shadow-sm bg-primary-600 hover:bg-primary-700 text-white font-semibold py-2 px-4 transition duration-300 ease-in-out transform hover:scale-105">
+          <Button variant="outline" className="whitespace-nowrap rounded-md shadow-sm hover:bg-primary-700 font-semibold py-2 px-4 transition duration-300 ease-in-out transform hover:scale-105">
             <FilterIcon className="mr-2 h-4 w-4" />
             More Filters
           </Button>
@@ -422,16 +422,16 @@ export function GamesFilters({ filters, onFilterChange, onPageSizeChange, fixedT
 
           <DialogFooter className="flex flex-col sm:flex-row sm:justify-end gap-2 mt-6">
             <Button
-              variant="outline"
+              variant="danger"
               onClick={handleClearAllFilters}
-              className="bg-red-500 hover:bg-red-600 text-white rounded-md shadow-sm transition duration-300 ease-in-out"
+              // className="bg-red-500 hover:bg-red-600 text-white rounded-md shadow-sm transition duration-300 ease-in-out"
             >
               Clear All Filters
             </Button>
             <Button
               type="button"
               onClick={() => setIsDialogOpen(false)}
-              className="bg-primary-600 hover:bg-primary-700 text-white rounded-md shadow-sm transition duration-300 ease-in-out"
+              // className="bg-primary-600 hover:bg-primary-700 text-white rounded-md shadow-sm transition duration-300 ease-in-out"
             >
               Close
             </Button>

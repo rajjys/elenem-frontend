@@ -139,7 +139,7 @@ export default function PublicGamesPage({ params }: { params: Promise<{ tenantSl
                 </CardHeader>
                 <CardContent className="grid gap-2 grid-cols-1">
                   {tenantData.games.map((game) => (
-                    <Link key={game.id} href={`/games/${game.league.slug}/${game.slug}`} target="_blank" rel="noopener noreferrer">
+                    <Link key={game.id} href={`/games/${game.league.slug}/${game.slug}`} rel="noopener noreferrer">
                         <GamePublicCard game={game}/>
                     </Link>
                   ))}

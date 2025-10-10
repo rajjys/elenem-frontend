@@ -17,7 +17,7 @@ export const GameCard: React.FC<GameCardProps> = ({ game, buildLink, getStatusBa
   });
   const formatTime = "12:00AM";
   return (
-    <Card key={game.id} className="hover:shadow-md transition-shadow border border-gray-200 rounded-lg m-2">
+    <Card key={game.id} className="hover:shadow-md transition-shadow border border-gray-200 rounded-lg md:m-8 my-3">
       <CardContent className="p-4 sm:p-6">
         <div className="flex flex-col md:flex-row sm:items-center justify-between gap-6">
           {/* Left Section */}
@@ -30,7 +30,7 @@ export const GameCard: React.FC<GameCardProps> = ({ game, buildLink, getStatusBa
                 {getStatusBadge(game.status)}
               </div>
               {/* Date & Time */}
-              <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500">
+              <div className="hidden md:flex flex flex-wrap items-center gap-4 text-xs text-gray-500">
                 <div className="flex items-center gap-1">
                   <Calendar className="h-4 w-4 text-gray-400 hidden sm:inline" />
                   {formatDate}
@@ -49,9 +49,9 @@ export const GameCard: React.FC<GameCardProps> = ({ game, buildLink, getStatusBa
             </div>
 
             {/* Teams Section */}
-            <div className="flex items-center justify-around gap-4 mb-4">
+            <div className="flex items-center justify-center gap-8 mb-3">
               {/* Home Team */}
-              <div className="flex items-center lg:justify-center gap-3 w-full xs:w-auto">
+              <div className="flex items-center lg:justify-center gap-3 xs:w-auto">
                 <Avatar name={game.homeTeam.name} src={game.homeTeam.businessProfile.logoAsset?.url || null} size={40} />
                 <div>
                   <h3 className="font-semibold text-gray-900 block md:hidden">{game.homeTeam.shortCode}</h3>
@@ -72,7 +72,7 @@ export const GameCard: React.FC<GameCardProps> = ({ game, buildLink, getStatusBa
               </div>
 
               {/* Away Team */}
-              <div className="flex items-center lg:justify-center gap-3 w-full xs:w-auto justify-end">
+              <div className="flex items-center lg:justify-center gap-3 xs:w-auto justify-end">
                 <div className="text-right">
                   <h3 className="font-semibold text-gray-900 block md:hidden">{game.awayTeam.shortCode}</h3>
                   <h3 className="font-semibold text-gray-900 hidden md:block">{game.awayTeam.name}</h3>
