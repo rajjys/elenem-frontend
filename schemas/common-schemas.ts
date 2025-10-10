@@ -8,16 +8,20 @@ export const CreateBusinessProfileSchema = z.object({
   // Core Business Metadata
   //name: z.string().min(1, 'Business name is required.'),
   legalName: z.string().optional().nullable(),
-  type: z.enum(['TENANT', 'LEAGUE', 'TEAM']).optional(), // Assuming you have a BusinessProfileType enum
-  establishedYear: z.coerce.number() 
-    .int("L'année doit être un nombre entier.") 
-    // Handle empty string/null input gracefully by allowing 0, then checking bounds
-    .transform((v) => (v === 0 ? null : v)) 
+  type: z.enum(['TENANT', 'LEAGUE', 'TEAM']).optional(),
+  establishedYear: z.preprocess(
+  (val) => {
+    if (val === "" || val === undefined || val === null) return undefined;
+    return Number(val);
+  },
+
+  z.number()
+    .int("L'année doit être un nombre entier.")
     .nullable()
-    .optional()
-    // The checks remain the same, but they run AFTER coercion
-    .refine((val) => val === null || val && (val >= 1000), "L'année doit être après 999.")
-    .refine((val) => val === null || val && (val <= new Date().getFullYear()), "L'année ne peut pas être dans le futur."),
+    .refine((val) => val === null || val >= 1000, "L'année doit être après 999.")
+    .refine((val) => val === null || val <= new Date().getFullYear(), "L'année ne peut pas être dans le futur.")
+).optional().nullable() as z.ZodType<number | null | undefined>,
+
   description: z.string().optional().nullable(),
   nationalIdNumber: z.string().optional().nullable(),
   leagueRegistrationId: z.string().optional().nullable(),

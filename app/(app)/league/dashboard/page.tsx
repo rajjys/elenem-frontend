@@ -108,7 +108,7 @@ export default function LeagueDashboard() {
             sortBy: 'dateTime',
             sortOrder: 'asc',
             status: [GameStatus.SCHEDULED, GameStatus.IN_PROGRESS],
-            fromDate: new Date("2025-09-09").toISOString(), // Only future games
+            fromDate: new Date().toISOString(), // Only future games
           },
           paramsSerializer: (params) => qs.stringify(params, { arrayFormat: 'repeat' })
         });

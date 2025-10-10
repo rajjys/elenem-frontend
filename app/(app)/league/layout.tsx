@@ -3,20 +3,15 @@
 
 import React, { ReactNode } from 'react';
 import {
-    FiBarChart2, FiSettings, FiUsers, FiAward, FiCalendar, FiDollarSign, FiImage,
-    FiGift, FiUser, FiFileText, FiList, FiCheckSquare,
-    FiTrendingUp,
+    FiBarChart2, FiSettings, FiUsers, FiAward, FiCalendar,
+     FiUser, FiFileText, FiList, FiCheckSquare,
     FiUserCheck,
     FiUserPlus,
-    FiClock,
-    FiFilePlus,
-    FiVolume2,
-    FiMessageCircle,
-    FiMessageSquare,
-    FiFileMinus
+    FiClock
 } from 'react-icons/fi'; // Example icons
 import AppLayout from '@/components/layouts/AppLayout';
 import { LoadingSpinner } from '@/components/ui';
+import { UserPlus } from 'lucide-react';
 
 interface LeagueAdminLayoutProps {
     children: ReactNode;
@@ -25,33 +20,34 @@ interface LeagueAdminLayoutProps {
 // Define navigation structure for League Admin
 const leagueNavItems = [
   {
-    label: "Dashboard",
+    label: "Tableau de Bord",
     icon: FiBarChart2,
     subItems: [
       { label: "Overview", basePath: "/league/dashboard", icon: FiBarChart2 },
-      { label: "Analytics", basePath: "/league/analytics", icon: FiTrendingUp },
+/*      { label: "Analytics", basePath: "/league/analytics", icon: FiTrendingUp }, */
     ],
   },
   {
-    label: "People & Teams",
+    label: "Personnes & Equipes",
     icon: FiUsers,
     subItems: [
-      { label: "Teams", basePath: "/league/teams", icon: FiUsers },
-      { label: "Players", basePath: "/league/players", icon: FiUser },
-      { label: "Officials", basePath: "/league/officials", icon: FiUserCheck },
-      { label: "Coaches", basePath: "/league/coaches", icon: FiUserPlus },
+      { label: "Equipes", basePath: "/league/teams", icon: FiUsers },
+      { label: "Athletes", basePath: "/league/players", icon: FiUser },
+      { label: "Officiels", basePath: "/league/officials", icon: FiUserCheck },
+      { label: "Coachs", basePath: "/league/coaches", icon: FiUserPlus },
     ],
   },
   {
-    label: "Competition",
+    label: "Competitions",
     icon: FiAward,
     subItems: [
-      { label: "Seasons", basePath: "/league/seasons", icon: FiCalendar },
-      { label: "Schedule", basePath: "/league/schedule", icon: FiClock },
-      { label: "Results", basePath: "/league/results", icon: FiCheckSquare },
-      { label: "Standings", basePath: "/league/standings", icon: FiList },
+      { label: "Saisons", basePath: "/league/seasons", icon: FiCalendar },
+      { label: "Programmes", basePath: "/league/schedule", icon: FiClock },
+      { label: "Resultats", basePath: "/league/results", icon: FiCheckSquare },
+      { label: "Classements", basePath: "/league/standings", icon: FiList },
     ],
   },
+  /* 
   {
     label: "Finances",
     icon: FiDollarSign,
@@ -62,7 +58,7 @@ const leagueNavItems = [
       { label: "Expenses", basePath: "/league/finances/expenses", icon: FiFileMinus },
       { label: "Invoices", basePath: "/league/finances/invoices", icon: FiFileText },
     ],
-  },
+  }, 
   {
     label: "Communication",
     icon: FiMessageSquare,
@@ -71,15 +67,16 @@ const leagueNavItems = [
       { label: "Messaging", basePath: "/league/communication/messaging", icon: FiMessageCircle },
       { label: "Contact Lists", basePath: "/league/communication/lists", icon: FiUsers },
     ],
-  },
+  }, */
   {
-    label: "Settings",
+    label: "Parametres",
     icon: FiSettings,
     subItems: [
       { label: "General", basePath: "/league/settings/general", icon: FiSettings },
-      { label: "Rules", basePath: "/league/settings/rules", icon: FiFileText },
-      { label: "Branding", basePath: "/league/settings/branding", icon: FiImage },
-      { label: "Staff", basePath: "/league/settings/staff", icon: FiUsers },
+      { label: "Reglements", basePath: "/league/settings/rules", icon: FiFileText },
+      { label: "Profil", basePath: "/league/settings/profile", icon: FiSettings },
+      /* { label: "Branding", basePath: "/league/settings/branding", icon: FiImage }, */
+      { label: "Admins", basePath: "/league/settings/staff", icon: UserPlus },
     ],
   },
 ];

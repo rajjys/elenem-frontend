@@ -24,7 +24,7 @@ import {
 
 // Step components
 import { Step1TenantDetails, Step3Review } from ".";
-import { countryNameToCode } from "@/utils";
+import { countryNameToCode, flattenErrors } from "@/utils";
 import { BusinessProfileForm, Stepper, TFormValues } from "../../shared";
 
 // Define a type for the full form data
@@ -151,6 +151,18 @@ export function TenantCreationForm({ onSuccess, onCancel }: TenantFormProps) {
     <div className="flex justify-center p-4 bg-gray-50">
       <Card className="w-full max-w-7xl shadow-lg rounded-xl">
         <form onSubmit={handleSubmit(onSubmit)}>
+          {/* Error Monitor */}
+          {Object.keys(form.formState.errors).length > 0 && (
+            <div className="my-4 p-4 bg-red-50 border border-red-200 rounded">
+              <h4 className="text-red-700 font-semibold mb-2">Veuillez corriger ces erreurs:</h4>
+              <ul className="list-disc pl-5 text-red-600 text-sm">
+                {
+                  flattenErrors(form.formState.errors).map((msg, i) => (
+                  <li key={i}>{msg}</li>
+                ))}
+              </ul>
+            </div>
+          )}
           <div className="p-6">
             <Stepper steps={steps} currentStep={currentStep} />
             {currentStep === 0 && <Step1TenantDetails form={form} />}

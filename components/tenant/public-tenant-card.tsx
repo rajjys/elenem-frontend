@@ -22,13 +22,13 @@ function PublicTenantCard({ tenant }: { tenant: PublicTenantBasic }) {
                     <div className="relative h-48 w-full md:h-full bg-slate-200 dark:bg-slate-700">
                         {/* Banner Image */}
                         <Image
-                        src={
-                            tenant.businessProfile?.bannerAsset?.url ||
-                            `https://placehold.co/600x400/aaa/666?text=${tenant.tenantCode}`
-                        }
-                        alt={`${tenant.name} banner`}
-                        fill
-                        className="object-cover"
+                            src={
+                                tenant.businessProfile?.bannerAsset?.url ||
+                                `https://placehold.co/600x400/aaa/666?text=${tenant.tenantCode}`
+                            }
+                            alt={`${tenant.name} banner`}
+                            fill
+                            className="object-cover"
                         />
 
                         {/* Dark overlay */}

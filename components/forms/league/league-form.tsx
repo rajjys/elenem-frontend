@@ -32,6 +32,7 @@ import Step4Review from "./step4-review";
 import { BusinessProfileForm, TFormValues } from "../shared";
 import z from "zod";
 import axios from "axios";
+import { flattenErrors } from "@/utils";
 
 interface LeagueFormProps {
   onSuccess: (leagueId: string) => void;
@@ -83,6 +84,7 @@ export function LeagueForm({ onSuccess, onCancel }: LeagueFormProps) {
       tenantId: isSystemAdmin ? "" : userAuth?.tenantId || "",
       isActive: true,
       businessProfile: {
+        establishedYear: null,
         description: "",
         logoAssetId: null,
         bannerAssetId: null,
@@ -207,11 +209,25 @@ export function LeagueForm({ onSuccess, onCancel }: LeagueFormProps) {
       setLoading(false);
     }
   };
-
+  if(form.formState.errors && (Object.keys(form.formState.errors).length > 0)){
+    console.error(form.formState.errors);
+  }
   return (
     <div className="flex justify-center p-4 bg-gray-50">
       <Card className="w-full max-w-7xl shadow-lg rounded-xl">
         <form onSubmit={handleSubmit(onSubmit)}>
+          {/* Error Monitor */}
+          {Object.keys(form.formState.errors).length > 0 && (
+            <div className="my-4 p-4 bg-red-50 border border-red-200 rounded">
+              <h4 className="text-red-700 font-semibold mb-2">Veuillez corriger ces erreurs:</h4>
+              <ul className="list-disc pl-5 text-red-600 text-sm">
+                {
+                  flattenErrors(form.formState.errors).map((msg, i) => (
+                  <li key={i}>{msg}</li>
+                ))}
+              </ul>
+            </div>
+          )}
           <div className="p-6">
             <Stepper steps={steps} currentStep={currentStep} />
 
