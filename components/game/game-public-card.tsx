@@ -84,7 +84,7 @@ const GamePublicCard: React.FC<GamePublicCardProps> = ({ game }) => {
         </div> */}
       </CardHeader>
 
-      <CardContent className="space-y-1 px-4 py-2">
+      <CardContent className="px-4 py-1">
         {renderTeam(
           game.homeTeam.businessProfile.logoAsset?.url,
           game.homeTeam.shortCode,
