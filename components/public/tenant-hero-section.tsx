@@ -121,7 +121,7 @@ const TenantHeroSection: React.FC<TenantHeroSectionProps> = ({ primaryColor, sec
         </div>
 
         {/* Progress bars for medium and larger screens */}
-        <div className="flex w-full max-w-4xl items-start justify-between space-x-4">
+        <div className="flex w-full max-w-4xl items-start justify-start space-x-4">
           {blogPosts.map((post, index) => (
             <div key={post.id} className="group space-x-2">
               <div className="h-1 flex-grow cursor-pointer rounded-full bg-gray-500/50">

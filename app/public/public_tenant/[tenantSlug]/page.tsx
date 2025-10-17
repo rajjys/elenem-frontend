@@ -6,7 +6,7 @@ import { BlogPost, GameDetails, GameStatus, Gender, LeagueDetails, Standings } f
 import TenantHeroSection from "@/components/public/tenant-hero-section";
 import GamePublicCard from '@/components/game/game-public-card'; // Assuming this is the correct path
 import { Skeleton } from "@/components/ui/skeleton";
-import { Plus } from 'lucide-react'; // For the "details" icon
+import { ChevronRight } from 'lucide-react'; // For the "details" icon
 import { api } from '@/services/api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui';
 import StandingsTable from '@/components/public/standings-table';
@@ -213,71 +213,64 @@ const TenantLandingPage = ({ params }: { params: Promise<{ tenantSlug: string }>
             />
 
             {/* Games Section */}
-            <div className={`py-4 bg-${primary}-900 text-white`}>
-                    
-                        <div>
-                            <div className="flex items-center justify-between px-8 mb-4">
-                                <h2 className="text-2xl font-bold md:pl-42 lg:pl-56">Matchs</h2>
-                                {/* "Voir Touts les matchs" link for larger screens */}
-                                {games.length > 0 && (
-                                    <Link 
-                                        href={`/games`} 
-                                        className="text-white text-sm font-semibold hover:underline hidden md:flex items-center space-x-1"
-                                    >
-                                        <span>Voir Touts les matchs</span>
-                                        <Plus className="h-4 w-4" />
-                                    </Link>
-                                )}
-                            </div>
-
-                            {games.length > 0 ? (
-                                <>
-                                    {/* Carousel for md and lg screens */}
-                                    <div className="hidden md:flex flex-row gap-4 overflow-x-auto snap-x snap-mandatory md:pl-42 lg:pl-56 no-scrollbar">
-                                        {games.map((game) => (
-                                            <div key={game.id} className="min-w-[calc(100%/2)] lg:min-w-[calc(100%/3)]">
-                                                <Link href={`/games/${game.league.slug}/${game.slug}`} className="block">
-                                                    <GamePublicCard game={game} />
-                                                </Link>
-                                            </div>
-                                        ))}
-                                    </div>
-                                    
-                                    {/* Stacked view for small screens */}
-                                    <div className="space-y-4 md:hidden">
-                                        {games.slice(0, 4).map((game) => (
-                                            <div key={game.id}>
-                                                <Link href={`/games/${game.league.slug}/${game.slug}`} className="block">
-                                                    <GamePublicCard game={game} />
-                                                </Link>
-                                            </div>
-                                        ))}
-                                    </div>
-                                    {/* "Voir Touts les matchs" link for small screens */}
-                                    {games.length > 4 && (
-                                        <Link 
-                                            href={`/games`} 
-                                            className="mt-4 md:hidden block w-full text-center bg-gray-800 hover:bg-gray-700 py-3 rounded-lg font-semibold transition-colors"
-                                        >
-                                            Voir Touts les matchs
-                                        </Link>
-                                    )}
-                                </>
-                            ) : (
-                                <div className="text-center py-16 rounded-lg">
-                                    <h3 className="text-xl font-semibold">Pas de Matchs Disponibles</h3>
-                                    <p className="mt-2">Aucun match n&apos;est planifié pour le moment.</p>
-                                </div>
-                            )}
-                        </div>
+            <div className={`py-4`}>   
+              <div>
+                {games.length > 0 && (
+                    <div className="hidden md:flex items-center justify-between px-8 mb-4 text-slate-700">
+                        <h2 className="text-xl font-bold md:pl-42 lg:pl-56">Matchs</h2>
+                        <Link href={`/games`} className="hidden md:flex md:items-center md:justify-center md:gap-2 font-semibold">
+                            <span>Voir Touts les matchs</span>
+                            <ChevronRight className="h-4 w-4" />
+                        </Link>
+                    </div> 
+             )}
+                {games.length > 0 ? (
+                    <>
+                      {/* Carousel for md and lg screens */}
+                      <div className="hidden md:flex flex-row gap-4 overflow-x-auto snap-x snap-mandatory md:pl-42 lg:pl-56 no-scrollbar">
+                          {games.map((game) => (
+                              <div key={game.id} className="min-w-[calc(100%/2)] lg:min-w-[calc(100%/3)]">
+                                  <Link href={`/games/${game.league.slug}/${game.slug}`} className="block">
+                                      <GamePublicCard game={game} />
+                                  </Link>
+                              </div>
+                          ))}
+                      </div>
+                      {/* Stacked view for small screens */}
+                      <div className="space-y-4 md:hidden mx-2">
+                          {games.slice(0, 4).map((game) => (
+                              <div key={game.id}>
+                                  <Link href={`/games/${game.league.slug}/${game.slug}`} className="block">
+                                      <GamePublicCard game={game} />
+                                  </Link>
+                              </div>
+                          ))}
+                      </div>
+                      {/* "Voir Touts les matchs" link for small screens */}
+                      {games.length > 0 && (
+                          <Link href={`/games`} className="flex items-center justify-center gap-2 mt-2 mx-4 md:hidden bg-slate-100 text-slate-700 py-2 border border-slate-200 rounded-full font-semibold">
+                              Touts les matchs
+                              <ChevronRight className='w-4 h-4 '/>
+                          </Link>
+                      )}
+                    </>
+                  ) : (
+                      <div className="text-center py-18 rounded-lg">
+                          <h3 className="text-xl font-semibold">Pas de Matchs Disponibles</h3>
+                          <p className="mt-2">Aucun match n&apos;est planifié pour le moment.</p>
+                      </div>
+                  )}
+              </div>
             </div>
             {/* Video Section */}
-
             {/* Standings Section */}
-            <div className={`space-y-4 py-6 bg-gradient-to-b from-${primary}-900 to-transparent`} >
+            <div className={`space-y-4 py-6`} >
                     {mainLeagues.length > 0 ? (
                         <Card className={`shadow-sm max-w-2xl mx-auto`}>
-                            <CardTitle><div className="text-2xl font-bold text-gray-700  text-center pl-4 pt-4">Classements {tenant?.name}</div></CardTitle>
+                            <CardTitle className='flex flex-col items-center justify-center'>
+                                <span className="text-2xl font-bold text-gray-700  text-center pl-4 pt-4">Classements</span>
+                                <span className='text-base text-slate-500'>{tenant?.name}</span>
+                            </CardTitle>
                             <CardContent className="p-6">
                                 <Tabs value={selectedLeagueSlug || ''} onValueChange={setSelectedLeagueSlug} className="w-full">
                                     <TabsList className="flex justify-around items-center">
@@ -304,17 +297,15 @@ const TenantLandingPage = ({ params }: { params: Promise<{ tenantSlug: string }>
                             </CardContent>
                         </Card>
                     ) : (
-                         <div className="text-center py-16 rounded-lg border">
+                         <div className="text-center py-16 rounded-lg">
                             <h3 className="text-xl font-semibold">Pas de Classements Disponibles</h3>
-                            <p className="mt-2 text-muted-foreground">Aucun classement n&apos;est disponible pour le moment.</p>
+                            <p className="mt-2 text-slate-700">Aucun classement n&apos;est disponible pour le moment.</p>
                         </div>
                     )}
             </div>
             {/* Recent News Section */}
             <div className="space-y-4 py-4 bg-gray-400">
-                
                 <div className='text-white'>
-                    <h2 className="text-2xl font-bold pl-2 md:pl-42 lg:pl-56 pb-4 lg:py-6">Dernières Actus</h2>
                     {
                         blogPosts.length > 0 ? (
                             <div className="flex space-x-4 overflow-x-auto pb-4 pl-2 md:pl-42 lg:pl-56 no-scrollbar">
@@ -324,8 +315,8 @@ const TenantLandingPage = ({ params }: { params: Promise<{ tenantSlug: string }>
                                 </span>))}
                             </div>
                         ) : (
-                            <div className="text-center py-16 rounded-lg border">
-                                <h3 className="text-xl font-semibold">Pas d&apos;informations disponibles</h3>
+                            <div className="text-center py-16 rounded-lg">
+                                <h3 className="text-xl font-semibold">Pas d&apos;actualitvs disponibles</h3>
                                 <p className="mt-2 text-muted-foreground">Aucune actualité n&apos;est disponible pour le moment.</p>
                             </div>
                         )
