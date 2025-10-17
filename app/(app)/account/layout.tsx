@@ -2,7 +2,7 @@
 "use client";
 
 import React, { ReactNode } from 'react';
-import { FiHome, FiAward } from 'react-icons/fi';
+import { FiHome } from 'react-icons/fi';
 
 // Import reusable components and the new hook
 import AppLayout from '@/components/layouts/AppLayout';
@@ -29,8 +29,6 @@ export default function TenantAdminLayout({ children }: TenantAdminLayoutProps) 
         <AppLayout
             navItems={userAccountNavItems}
             themeColor="blue" // Or 'blue', 'emerald', etc., as defined in tailwind.config.js
-            headerTitle="Account"
-            logoIcon={FiAward}
           >
           {children}
         </AppLayout>

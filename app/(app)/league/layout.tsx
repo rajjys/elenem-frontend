@@ -88,8 +88,7 @@ export default function LeagueAdminLayout({ children }: LeagueAdminLayoutProps) 
         <AppLayout
               navItems={leagueNavItems}
               themeColor="purple" // Or 'blue', 'emerald', etc., as defined in tailwind.config.js
-              headerTitle="League Admin"
-              logoIcon={FiAward}>
+              >
               {children}
             </AppLayout>
       </React.Suspense>

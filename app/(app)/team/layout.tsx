@@ -87,8 +87,7 @@ export default function TeamAdminLayout({ children }: TeamAdminLayoutProps) {
         <AppLayout
               navItems={teamNavItems}
               themeColor="emerald" // Or 'blue', 'emerald', etc., as defined in tailwind.config.js
-              headerTitle="Team Admin"
-              logoIcon={FiAward}>
+              >
               {children}
             </AppLayout>
         </React.Suspense>
