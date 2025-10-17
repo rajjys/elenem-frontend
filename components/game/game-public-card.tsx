@@ -27,7 +27,7 @@ const GamePublicCard: React.FC<GamePublicCardProps> = ({ game }) => {
           height={28}
           className="rounded-full border border-slate-300 dark:border-slate-600"/>
           :
-          <div className="h-10 w-10 rounded-full bg-gradient-to-tr from-gray-400 to-blue-700" />
+          <div className="h-6 w-6 rounded-full bg-gradient-to-tr from-gray-400 to-blue-700" />
         }
       <span
         className={`text-sm font-medium ${
