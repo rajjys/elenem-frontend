@@ -2,7 +2,7 @@
 "use client";
 
 import React, { ReactNode } from 'react';
-import { FiGrid, FiUsers, FiDollarSign, FiServer, FiShield, FiHelpCircle, FiBarChart2, FiDatabase, FiAward, FiEdit3, FiBox,
+import { FiGrid, FiUsers, FiDollarSign, FiServer, FiShield, FiHelpCircle, FiBarChart2, FiDatabase, FiEdit3, FiBox,
     FiVolume2,
     FiPackage,
     FiList,
