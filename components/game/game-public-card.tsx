@@ -15,36 +15,40 @@ const GamePublicCard: React.FC<GamePublicCardProps> = ({ game }) => {
     logo: string | null | undefined,
     name: string,
     score: number | null | undefined,
+    isHome: boolean,
     highlight: boolean
   ) => (
-    <div className="flex items-center justify-between w-full px-4">
+    <div className={`flex items-center justify-between w-full py-2 ${!isHome ? 'border-t border-slate-600' : ''}`}>
       <div className="flex items-center gap-2">
         {logo ?
           <Image
             src={logo}
             alt={`${name} Logo`}
-            width={28}
-            height={28}
+            width={32}
+            height={32}
             className="rounded-full border border-slate-300 dark:border-slate-600" />
           :
           <div className="h-10 w-10 rounded-full bg-gradient-to-tr from-gray-400 to-blue-700" />
         }
-        <span
-          className={`text-sm font-medium ${highlight
+        <div>
+          <span
+            className={`text-md font-medium ${highlight
               ? 'text-slate-900 dark:text-slate-100 font-semibold'
               : 'text-slate-600 dark:text-slate-400'
-            }`}>{name}</span>
+              }`}>{name}</span>
+          <span className="block text-xs text-slate-500">{isHome ? 'Home' : 'Away'}</span>
+        </div>
       </div>
-      {score !== null && (
-        <span
-          className={`text-sm font-bold ${highlight
+        {score !== null && (
+          <span
+            className={`text-xl font-bold ${highlight
               ? 'text-slate-900 dark:text-slate-100'
               : 'text-slate-500 dark:text-slate-400'
             }`}
         >
           {highlight && (
             <span
-              className="inline-block w-0 h-0 border-t-[5px] border-t-transparent border-b-[5px] border-b-transparent border-l-[5px] border-l-red-500 pr-0.5"
+              className="inline-block w-0 h-0 border-t-[7px] border-t-transparent border-b-[7px] border-b-transparent border-l-[7px] border-l-red-500 pr-0.5"
               title="Winner"
             />
           )}
@@ -63,15 +67,15 @@ const GamePublicCard: React.FC<GamePublicCardProps> = ({ game }) => {
 
   return (
     <Card className="rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md transition bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors duration-300 ease-in-out">
-      <CardHeader className="flex flex-col iteinlinems-start gap-1 px-4 py-1 border-b border-slate-200 dark:border-slate-700 space-y-1">
-        <div className="flex items-center justify-between w-full text-xs text-slate-500 dark:text-slate-400 px-2">
+      <CardHeader className="flex flex-row items-center justify-between px-4 pt-2 pb-0 space-y-0">
+        <div className="flex items-center justify-between w-full text-xs text-slate-500 dark:text-slate-400">
           <span>{game.round || game.league.name}</span>
           <span className="hidden md:inline text-xs text-slate-700 dark:text-slate-200 font-medium">
             {gameDate}
           </span>
           {getStatusBadge(game.status)}
         </div>
-        <div className="md:hidden text-xs px-2 text-slate-700 dark:text-slate-200 font-medium flex justify-start gap-4">
+        {/* <div className="md:hidden text-xs px-2 text-slate-700 dark:text-slate-200 font-medium flex justify-start gap-4">
           <span>{gameDate}</span>
           {game.homeVenue?.name && <span>•</span>}
           {game.homeVenue?.name && (
@@ -79,20 +83,22 @@ const GamePublicCard: React.FC<GamePublicCardProps> = ({ game }) => {
               {game.homeVenue.name}
             </div>
           )}
-        </div>
+        </div> */}
       </CardHeader>
 
-      <CardContent className="space-y-4 py-5">
+      <CardContent className="px-4 pb-2">
         {renderTeam(
           game.homeTeam.businessProfile.logoAsset?.url,
           game.homeTeam.shortCode,
           homeScore,
+          true,
           homeWin
         )}
         {renderTeam(
           game.awayTeam.businessProfile.logoAsset?.url,
           game.awayTeam.shortCode,
           awayScore,
+          false,
           awayWin
         )}
       </CardContent>
