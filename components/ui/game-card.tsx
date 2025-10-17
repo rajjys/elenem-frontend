@@ -1,15 +1,14 @@
 import { Calendar, Clock, MapPin, Users } from "lucide-react";
 import Link from "next/link";
-import { Avatar, Button, Badge, Card, CardContent } from ".";
+import { Avatar, Button, Badge, Card, CardContent, getStatusBadge } from ".";
 import { GameDetails, GameStatus } from "@/schemas";
 
 interface GameCardProps {
   game: GameDetails;
   buildLink: (path: string) => string;
-  getStatusBadge: (status: GameStatus, score?: { home: number; away: number }) => React.ReactNode;
 }
 
-export const GameCard: React.FC<GameCardProps> = ({ game, buildLink, getStatusBadge }) => {
+export const GameCard: React.FC<GameCardProps> = ({ game, buildLink }) => {
   const formatDate = new Date(game.dateTime).toLocaleDateString("en-US", {
     weekday: "short",
     month: "short",

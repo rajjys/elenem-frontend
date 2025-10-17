@@ -7,7 +7,7 @@ import { useSearchParams } from 'next/navigation';
 import { api } from '@/services/api';
 import { GameDetails, GameFilterParams, PaginatedGamesResponseSchema, GameFilterParamsSchema } from '@/schemas';
 import { GamesFilters } from '@/components/game/games-filters';
-import { Pagination, LoadingSpinner, Button, getStatusBadge } from '@/components/ui/';
+import { Pagination, LoadingSpinner, Button } from '@/components/ui/';
 import { GameCard } from '@/components/ui';
 import { toast } from 'sonner';
 import { Roles } from '@/schemas';
@@ -194,7 +194,6 @@ export default function LeagueGamesPage() {
                             key={game.id}
                             game={game}
                             buildLink={buildLink}
-                            getStatusBadge={getStatusBadge}
                         />
                     ))}
                 </div>

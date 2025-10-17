@@ -5,9 +5,9 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { api } from '@/services/api'; // Your actual API instance
-import { GameDetails, GameFilterParams, PaginatedGamesResponseSchema, GameStatus, GameFilterParamsSchema } from '@/schemas'; // Your Game DTOs and schemas
+import { GameDetails, GameFilterParams, PaginatedGamesResponseSchema, GameFilterParamsSchema } from '@/schemas'; // Your Game DTOs and schemas
 import { GamesFilters } from '@/components/game/games-filters'; // Your new GamesFilters component
-import { Pagination, LoadingSpinner, Button, Badge } from '@/components/ui/'; // Your Pagination components
+import { Pagination, LoadingSpinner, Button } from '@/components/ui/'; // Your Pagination components
 import { GameCard } from '@/components/ui'; // Your existing GameCard component
 import { toast } from 'sonner'; // Your toast notification library (e.g., Sonner)
 import { Roles } from '@/schemas'; // Assuming Role enum is here
@@ -98,45 +98,6 @@ export default function AdminGamesPage() {
     setFilters(prev => ({ ...prev, pageSize: newSize, page: 1 })); // Reset page to 1
   }, []);
 
-  /*
-  const handleDeleteGame = useCallback(async (gameId: string) => {
-      const confirmed = window.confirm('Are you sure you want to delete this game? This action cannot be undone.');
-      if (!confirmed) {
-        return;
-      }
-      try {
-        await api.delete(`/games/${gameId}`);
-        toast.success('Game deleted successfully.');
-        fetchGames(); // Re-fetch Games to update the list
-      } catch (error) {
-        const errorMessage = 'Failed to delete game.';
-        toast.error('Error deleting game', { description: errorMessage });
-        console.error('Delete game error:', error);
-      }
-    }, [fetchGames]);
-
-*/
-  // Function to get status badge (from your original page.tsx)
-  const getStatusBadge = (status: GameStatus) => {
-    switch (status) {
-      case GameStatus.IN_PROGRESS:
-        return <Badge variant="destructive" className="animate-pulse">Live</Badge>;
-      case GameStatus.COMPLETED:
-        return <Badge variant="success">Final</Badge>;
-      case GameStatus.SCHEDULED:
-        return <Badge variant="outline">Upcoming</Badge>;
-      case GameStatus.CANCELLED:
-        return <Badge variant="destructive">Cancelled</Badge>;
-      case GameStatus.POSTPONED:
-        return <Badge variant="secondary">Postponed</Badge>;
-      default:
-        return null;
-    }
-  };
-
-  // Note: No direct delete action in this UI, as per prompt.
-  // If you need it, you'd add a button/dropdown and a handleDeleteGame function.
-
   if (loading && !games.length) { // Show loading spinner only if no games are loaded yet
     return <LoadingSpinner />;
   }
@@ -176,7 +137,6 @@ export default function AdminGamesPage() {
               key={game.id}
               game={game}
               buildLink={buildLink}
-              getStatusBadge={getStatusBadge}
               //onDelete={handleDeleteGame}
               // Pass context IDs for dashboard link if GameCard needs to generate it
               //ctxTenantId={currentTenantId}
