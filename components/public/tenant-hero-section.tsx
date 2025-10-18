@@ -107,7 +107,7 @@ const TenantHeroSection: React.FC<TenantHeroSectionProps> = ({ primaryColor, sec
       <div className="relative z-10 hidden h-full w-full flex-col justify-end p-8 md:flex">
         <div className="mb-8 max-w-4xl transition-all duration-500 ease-in-out">
           <Link href={`/news/${currentPost?.slug}`}>
-            <h1 className="text-5xl font-bold text-white transition-all duration-500 ease-in-out hover:text-gray-300">
+            <h1 className="text-5xl font-bold text-gray-100 hover:text-white transition-all duration-300 ease-in-out ">
               {currentPost?.title}
             </h1>
           </Link>
@@ -121,7 +121,7 @@ const TenantHeroSection: React.FC<TenantHeroSectionProps> = ({ primaryColor, sec
         </div>
 
         {/* Progress bars for medium and larger screens */}
-        <div className="flex w-full max-w-4xl items-start justify-between space-x-4">
+        <div className="flex w-full max-w-4xl items-start justify-start space-x-4">
           {blogPosts.map((post, index) => (
             <div key={post.id} className="group space-x-2">
               <div className="h-1 flex-grow cursor-pointer rounded-full bg-gray-500/50">

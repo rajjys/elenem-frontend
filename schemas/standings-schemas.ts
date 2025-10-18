@@ -34,6 +34,11 @@ export const StandingsBasicSchema = z.object({
         logoAsset: z.object({
             url: z.string()
         }).nullable().optional()
+    }),
+    league: z.object({
+        id: z.string(),
+        name: z.string(),
+        slug: z.string()
     })
   }),
 
