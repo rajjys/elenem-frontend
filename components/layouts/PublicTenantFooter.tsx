@@ -19,13 +19,11 @@ import {
     Phone,
     ExternalLink,
     Shield,
-    TrendingUp,
     Eye,
     Globe
 } from "lucide-react";
-import { BusinessProfileForm } from "../forms/shared";
 
-export const TenantFooter = () => {
+export const PublicTenantFooter = () => {
     const [tenant, setTenant] = useState<TenantDetails | null>(null);
     const [currentYear] = useState(new Date().getFullYear());
 
@@ -67,7 +65,7 @@ export const TenantFooter = () => {
         { href: "/teams", label: "Équipes", icon: Users },
     ];
     return (
-        <footer className="bg-gradient-to-br from-gray-100 to-gray-200 text-gray-800 border-t border-gray-300">
+        <footer className="mb-14 md:mb-0 bg-gradient-to-br from-gray-100 to-gray-200 text-gray-800 border-t border-gray-300">
             <div className="max-w-7xl mx-auto px-4 py-8">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
                     <div className="lg:col-span-2">
@@ -200,7 +198,7 @@ export const TenantFooter = () => {
                             <div className="flex items-center text-gray-700">
                                 <Globe className="w-4 h-4 mr-3 text-gray-500 flex-shrink-0" />
                                 <span className="hover:text-orange-500 transition-colors truncate cursor-pointer">
-                                    {businessProfile.website ? `${businessProfile.website}` : `${tenant.slug}.elenem.site`}
+                                    {businessProfile.website ? `${businessProfile.website}` : `${tenant.slug}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`}
                                 </span>
                             </div>
                         </div>
@@ -275,7 +273,7 @@ export const TenantFooter = () => {
                             </span>
                             <span>•</span>
                             <span className="opacity-80 hover:opacity-100 transition-opacity">
-                                Powered by <strong>Elenem</strong>
+                                Powered by <strong><a href="https://www.elenem.site" target="blank">Elenem</a></strong>
                             </span>
                         </div>
                     </div>

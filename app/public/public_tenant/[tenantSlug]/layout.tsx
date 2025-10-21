@@ -2,7 +2,7 @@
 // app/layout.tsx (if this is the root layout) or a specific public group layout
 import React, { ReactNode } from 'react';
 import { PublicTenantHeader } from '@/components/layouts';
-import { TenantFooter } from '@/components/layouts/TenantFooter';
+import { PublicTenantFooter } from '@/components/layouts/PublicTenantFooter';
 
 export default function PublicLayout({ children }: { children: ReactNode }) {
 
@@ -11,7 +11,7 @@ export default function PublicLayout({ children }: { children: ReactNode }) {
             <PublicTenantHeader />
               <main className="flex-grow">{children}</main>
             { /*<PublicFooter />*/ }
-            <TenantFooter />
+            <PublicTenantFooter />
           </div>
   );
 }
