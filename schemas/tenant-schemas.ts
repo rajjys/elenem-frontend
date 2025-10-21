@@ -20,6 +20,7 @@ export const TenantDetailsSchema = z.object({
   id: z.string().cuid(),
   externalId: z.string().uuid(),
   name: z.string().min(1, "Tenant name is required").max(100),
+  slug: z.string(),
   tenantCode: z.string().min(3, "Tenant code must be at least 3 characters").max(12, "Tenant code must be at most 12 characters").regex(/^[A-Z0-9]+$/, "Tenant code must be uppercase alphanumeric"),
   tenantType: TenantTypeSchema,
   sportType: SportTypeSchema,
@@ -52,6 +53,7 @@ export const TenantDetailsSchema = z.object({
   teams: z.array(z.object({
     id: z.string().cuid(),
     name: z.string(),
+    shortCode: z.string(),
     isActive: z.boolean(),
     createdAt: z.preprocess((arg) => new Date(arg as string), z.date()),
     updatedAt: z.preprocess((arg) => new Date(arg as string), z.date()),
