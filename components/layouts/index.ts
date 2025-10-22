@@ -5,3 +5,4 @@ export * from './PublicFooter';
 export * from './PublicHeader';
 export * from './AppLayout';
 export * from './PublicTenantHeader';
+export * from './user-dropdown';

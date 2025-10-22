@@ -1,24 +1,23 @@
 'use client'
 
-import { User, LogOut, Settings, Menu, Shield, LayoutDashboard } from 'lucide-react'
+import { Menu } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useAuthStore } from '@/store/auth.store'
 import { useEffect, useState, useRef } from 'react'
-import { FiChevronDown, FiUser } from 'react-icons/fi'
+import { FiUser } from 'react-icons/fi'
+import UserDropdown from './user-dropdown'
 
 interface AppLayoutNavbarProps {
   logoUrl?: string;
-  dashboardLink: string;
   onMobileMenuToggle: () => void;
   handleLogout: () => void;
 }
 
-export function AppLayoutNavbar({
+export function AppLayoutHeader({
   logoUrl = "/logos/elenem-sport.png",
-  dashboardLink,
   onMobileMenuToggle,
   handleLogout,
 }: AppLayoutNavbarProps) {
@@ -79,69 +78,8 @@ export function AppLayoutNavbar({
         {loadingUser ? (
           <Skeleton className="h-10 w-10 rounded-full" />
         ) : userAuth ? (
-          <div className="relative" ref={dropdownRef}>
-            <button
-              onClick={() => setDropdownOpen(!dropdownOpen)}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-md border border-gray-200 nav-hover transition-all duration-150"
-            >
-              {userAuth.profileImageUrl ? (
-                <Image
-                  src={userAuth.profileImageUrl}
-                  alt={userAuth.username}
-                  width={28}
-                  height={28}
-                  className="rounded-full object-cover"
-                />
-              ) : (
-                <FiUser className="w-6 h-6 p-1 rounded-full border border-gray-200" />
-              )}
-              <span className="hidden sm:inline text-sm font-medium">
-                {userAuth.username || userAuth.email}
-              </span>
-              <FiChevronDown className="w-4 h-4" />
-            </button>
-
-            {dropdownOpen && (
-              <div className="absolute right-0 mt-2 w-52 rounded-md shadow-xl bg-white ring-1 ring-black/5 z-40 animate-fadeIn">
-                <div className="py-1">
-                  <Link
-                    href={dashboardLink}
-                    onClick={() => setDropdownOpen(false)}
-                    className="flex items-center gap-2 px-4 py-2 text-sm rounded-md nav-hover"
-                  >
-                    <LayoutDashboard className="w-4 h-4" /> Tableau de Bord
-                  </Link>
-                  <Link
-                    href="/account/dashboard"
-                    onClick={() => setDropdownOpen(false)}
-                    className="flex items-center gap-2 px-4 py-2 text-sm rounded-md nav-hover"
-                  >
-                    <User className="w-4 h-4" /> Mon Espace
-                  </Link>
-                  <Link
-                    href="/account/security"
-                    onClick={() => setDropdownOpen(false)}
-                    className="flex items-center gap-2 px-4 py-2 text-sm rounded-md nav-hover"
-                  >
-                    <Shield className="w-4 h-4" /> Sécurité
-                  </Link>
-                  <Link
-                    href="/account/settings"
-                    onClick={() => setDropdownOpen(false)}
-                    className="flex items-center gap-2 px-4 py-2 text-sm rounded-md nav-hover"
-                  >
-                    <Settings className="w-4 h-4" /> Paramètres
-                  </Link>
-                  <button
-                    onClick={handleLogout}
-                    className="flex items-center gap-2 w-full text-left px-4 py-2 text-sm rounded-md nav-hover"
-                  >
-                    <LogOut className="w-4 h-4" /> Déconnexion
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
+          // Use the new reusable UserDropdown
+          <UserDropdown handleLogout={handleLogout} />
         ) : (
           <Link
             href="/login"

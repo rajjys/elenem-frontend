@@ -6,17 +6,19 @@ import React, { useState, useEffect, useRef } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
 import { useScrollDirection } from "@/hooks";
-import { FiUser, FiChevronDown } from "react-icons/fi";
-import { Users, LayoutDashboard, User, Shield, Settings, LogOut,
+import { FiUser } from "react-icons/fi";
+import { 
+  Users,
   ShieldCheck,
   Home,
   CalendarDays
 } from "lucide-react";
 
-import { Roles, SportType } from "@/schemas";
+import { SportType } from "@/schemas";
 import { useAuthStore } from "@/store/auth.store";
 import { Skeleton } from "../ui";
 import { AudienceToggle } from "../landing/AudienceToggle";
+import UserDropdown from "./user-dropdown";
 
 interface NavLink { label: string; href: string; }
 interface PublicHeaderProps {
@@ -27,27 +29,8 @@ interface PublicHeaderProps {
   onSearch?: () => void;
 }
 
-/*
-const hrefIconMap: Record<string, React.ElementType> = {
-  "/": Home,
-  "/games": Trophy,
-  "/tenants": Users,
-  "/news": Newspaper,
-  "/standings": ListOrdered,
-  "/teams": Users,
-};
-
-const extendNavLinksWithIcons = (navLinks: NavLink[], sportType?: SportType) =>
-  navLinks.map(({ label, href }) => {
-    const icon = href === "/games" ? getSportIcon(sportType) : hrefIconMap[href] || undefined;
-    return { label, href, icon };
-  });
-*/
 export const PublicHeader = ({
   logoUrl = "/logos/elenem-sport.png",
-  //sportType = SportType.FOOTBALL,
-  ///primaryColor = "blue",
- // onSearch,
 }: PublicHeaderProps) => {
   const pathname = usePathname();
   const router = useRouter();
@@ -84,24 +67,6 @@ export const PublicHeader = ({
     if (dropdownOpen) document.addEventListener("mousedown", onDoc);
     return () => document.removeEventListener("mousedown", onDoc);
   }, [dropdownOpen]);
-
-  const isSystemAdmin = userAuth?.roles?.includes(Roles.SYSTEM_ADMIN);
-  const isTenantAdmin = userAuth?.roles?.includes(Roles.TENANT_ADMIN);
-  const isLeagueAdmin = userAuth?.roles?.includes(Roles.LEAGUE_ADMIN);
-  const isTeamAdmin = userAuth?.roles?.includes(Roles.TEAM_ADMIN);
-  const isPlayer = userAuth?.roles?.includes(Roles.PLAYER);
-  const isCoach = userAuth?.roles?.includes(Roles.COACH);
-  const isReferee = userAuth?.roles?.includes(Roles.REFEREE);
-  const isManagementUser = isSystemAdmin || isTenantAdmin || isLeagueAdmin || isTeamAdmin || isPlayer || isCoach || isReferee;
-
-  const dashboardLink = isSystemAdmin ? "/admin/dashboard"
-    : isTenantAdmin ? "/tenant/dashboard"
-    : isLeagueAdmin ? "/league/dashboard"
-    : isTeamAdmin ? "/team/dashboard"
-    : isPlayer ? "/player/dashboard"
-    : isCoach ? "/coach/dashboard"
-    : isReferee ? "/referee/dashboard"
-    : "/account/dashboard";
 
   //const updatedNavLinks = extendNavLinksWithIcons(navLinks, sportType);
   const handleLogout = () => { logout(); router.push("/"); };
@@ -152,41 +117,8 @@ export const PublicHeader = ({
                   <Skeleton className="h-10 w-10 rounded-full" />
                 </div>
               ) : userAuth ? (
-                <div className="relative" ref={dropdownRef}>
-                  <button onClick={() => setDropdownOpen(!dropdownOpen)} className="flex items-center gap-2 rounded-full px-3 py-1.5 border border-gray-100 hover:bg-gray-50">
-                    {userAuth.profileImageUrl ? (
-                      <Image src={userAuth.profileImageUrl} alt={userAuth.username} width={28} height={28} className="rounded-full object-cover" />
-                    ) : (
-                      <FiUser className="w-6 h-6 p-1 rounded-full border border-gray-200" />
-                    )}
-                    <span className="hidden sm:inline text-sm font-medium">{userAuth.username || userAuth.email}</span>
-                    <FiChevronDown className="w-4 h-4" />
-                  </button>
-
-                  {dropdownOpen && (
-                    <div className="absolute right-0 mt-2 w-52 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-40">
-                      <div className="py-1">
-                        {isManagementUser && (
-                          <Link href={dashboardLink} onClick={() => setDropdownOpen(false)} className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                            <LayoutDashboard className="w-4 h-4" /> Tableau de Bord
-                          </Link>
-                        )}
-                        <Link href="/account/dashboard" onClick={() => setDropdownOpen(false)} className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                          <User className="w-4 h-4" /> Mon Espace
-                        </Link>
-                        <Link href="/account/security" onClick={() => setDropdownOpen(false)} className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                          <Shield className="w-4 h-4" /> Sécurité
-                        </Link>
-                        <Link href="/account/settings" onClick={() => setDropdownOpen(false)} className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                          <Settings className="w-4 h-4" /> Paramètres
-                        </Link>
-                        <button onClick={handleLogout} className="flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                          <LogOut className="w-4 h-4" /> Déconnexion
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </div>
+                // Use the new reusable UserDropdown
+                <UserDropdown handleLogout={handleLogout} />
               ) : (
                 // LOGIN always visible (mobile & desktop)
                 <Link href="/login" className="inline-flex items-center gap-2 px-3 py-2 rounded-full border border-gray-200 hover:bg-gray-50" aria-disabled>

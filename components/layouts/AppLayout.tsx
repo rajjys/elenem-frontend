@@ -8,7 +8,7 @@ import { useAuthStore } from '@/store/auth.store'; // Assuming this path is corr
 import { CollapsibleNavLink, FlyoutMenu, NavLink } from '.'; // Adjust this import path if needed
 import { useContextualLink, useDashboardLinkEligibillity, useSidebarEligibility } from '@/hooks';
 import { Roles } from '@/schemas'; // Assuming Role enum is here
-import { AppLayoutNavbar } from './AppLayoutHeader'; // Import the updated Navbar
+import { AppLayoutHeader } from './AppLayoutHeader'; // Import the updated Navbar
 import { ArrowLeft,  ChevronLeft, ChevronRight, Settings, Shield, User } from 'lucide-react';
 
 // Type for a React Icon component
@@ -121,7 +121,7 @@ export default function AppLayout({
          ["--color-theme-hover-text" as string]: `var(--color-${themeColor}-700)`,
        }}>
       {/* Navbar is always visible */}
-      <AppLayoutNavbar dashboardLink={dashboard.link} onMobileMenuToggle={toggleMobileMenu} handleLogout={handleLogout}/>
+      <AppLayoutHeader onMobileMenuToggle={toggleMobileMenu} handleLogout={handleLogout}/>
       <div className='flex flex-1 overflow-hidden'> {/* This flex container holds sidebar and main content */}
         {/* Sidebar (desktop) */}
         {shouldShowSidebar 
