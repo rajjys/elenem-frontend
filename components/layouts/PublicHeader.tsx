@@ -73,7 +73,7 @@ export const PublicHeader = ({
 
   return (
     <>
-      <header className={`sticky top-0 z-50 w-full border-b border-gray-200 bg-white/95 backdrop-blur-md
+      <header className={`sticky top-0 z-50 w-full border-b border-gray-200 bg-slate-50 dark:bg-slate-950 dark:border-gray-700 backdrop-blur-md
                             transition-transform duration-300
                           ${scrollDir === "down" ? "-translate-y-full" : "translate-y-0"}`}>
         <div className="mx-auto max-w-8xl px-2 md:px-6 py-1">
@@ -101,7 +101,7 @@ export const PublicHeader = ({
                     className={`flex items-center gap-2 px-3 py-2 rounded-md transition-colors duration-200 ${
                       isActive
                         ? 'font-semibold text-sky-700 bg-sky-50'
-                        : 'text-slate-600 dark:text-slate-600 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-sky-50'
+                        : 'text-slate-600 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-sky-50'
                     }`}
                   >
                     <span>{link.label}</span>
@@ -122,8 +122,8 @@ export const PublicHeader = ({
               ) : (
                 // LOGIN always visible (mobile & desktop)
                 <Link href="/login" className="inline-flex items-center gap-2 px-3 py-2 rounded-full border border-gray-200 hover:bg-gray-50" aria-disabled>
-                  <FiUser className="w-5 h-5 p-1 rounded-full border border-gray-200" />
-                  <span className="hidden sm:inline text-sm font-semibold text-sky-700">Se connecter</span>
+                  <FiUser className="w-5 h-5 p-1 rounded-full border border-gray-200 dark:text-white" />
+                  <span className="hidden sm:inline text-sm font-semibold text-sky-500">Se connecter</span>
                 </Link>
               )}
             </div>
@@ -132,7 +132,7 @@ export const PublicHeader = ({
       </header>
 
       {/* Bottom nav only for small screens */}
-      <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-200 lg:hidden">
+      <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white dark:bg-slate-950 dark:border-gray-700 border-t border-gray-200 lg:hidden">
         <div className="flex items-center justify-around h-16">
           {[
               { label: "Accueil", href: "/", icon: Home},
@@ -143,7 +143,7 @@ export const PublicHeader = ({
             const Icon = link.icon;
             const isActive = pathname === link.href;
             return (
-              <Link key={link.href} href={link.href} className={`flex flex-col items-center gap-1 text-xs ${isActive ? "text-sky-600" : "text-gray-600"}`}>
+              <Link key={link.href} href={link.href} className={`flex flex-col items-center gap-1 text-xs ${isActive ? "text-sky-600" : "text-gray-600 dark:text-gray-200"}`}>
                 {Icon && <Icon className="w-5 h-5" />}
                 <span>{link.label}</span>
               </Link>
