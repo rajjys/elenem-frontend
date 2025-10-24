@@ -9,7 +9,7 @@ import { api } from '@/services/api';
 import { toast } from 'sonner';
 import { useContextualLink } from '@/hooks';
 import { StatsCard } from '@/components/ui/stats-card';
-import { Building, CalendarPlus, Clock, Clock1, Newspaper, Ticket, TrendingUp, Trophy, UserPlus, Users } from 'lucide-react';
+import { Building, CalendarPlus, Clock, Clock1, Newspaper, Plus, Ticket, TrendingUp, Trophy, UserPlus, Users } from 'lucide-react';
 import { Avatar, Card, CardContent, CardFooter, CardHeader, CardTitle, getStatusBadge, LeagueCard, LoadingSpinner } from '@/components/ui';
 import { capitalizeFirst, countryNameToCode } from '@/utils';
 import axios from 'axios';
@@ -224,22 +224,32 @@ export default function TenantDashboard() {
             {/* Leagues and Games Overview */}
             <section className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-4">
                 <div className="h-full lg:col-span-2">
-                    <Card className="h-full flex flex-col justify-between shadow-elevated">
-                        <CardHeader className="flex flex-row items-center justify-between gap-2 sm:gap-4 px-4 py-2 border-b border-slate-200">
-                            <CardTitle className="text-xl font-semibold text-gray-800">{tenant?.leagues?.length} Ligues</CardTitle>
-                            <Link href={buildLink('/tenant/leagues')} className="inline-flex items-center text-sm font-medium text-emerald-700 hover:text-emerald-800 transition-colors">
-                                <Trophy className="h-4 w-4 mr-1 text-emerald-600" />
+                    <Card className="h-full flex flex-col justify-between shadow-elevated bg-gray-50">
+                        <CardHeader className="flex flex-row items-center justify-between gap-2 sm:gap-4 px-4 border-b border-slate-200">
+                            <CardTitle className="text-lg font-semibold text-gray-500">{tenant?.leagues?.length} Ligues</CardTitle>
+                            <Link href={buildLink('/tenant/leagues')} className="inline-flex items-center text-sm font-medium text-slate-500 nav-hover">
+                                <Trophy className="h-4 w-4 mr-1" />
                                 <span>Toutes les Ligues</span>
                             </Link>
                         </CardHeader>
                         <CardContent className="flex-1">
-                        {leagues?.map((league: LeagueDetails) => (
-                            <LeagueCard key={league.id} league={league} tenant={tenant!} />
-                        ))}
-                        
+                            {
+                                leagues.length == 0 ?
+                                <p className='my-8 flex flex-col items-center justify-center gap-2'>
+                                    <span>Aucune Ligue Trouvee</span>
+                                    <Link href={buildLink("/league/create")} className='inline-flex items-center font-medium text-slate-500 nav-hover'>
+                                        <Plus className="h-4 w-4 mr-1" />
+                                        Creer une nouvelle Ligue
+                                    </Link>
+                                </p> 
+                                    :
+                                leagues.map((league: LeagueDetails) => (
+                                    <LeagueCard key={league.id} league={league} tenant={tenant!} />
+                                ))
+                            }
                         </CardContent>
                         <CardFooter className='flex items-center justify-center border-t border-slate-200'>
-                            <Link href={buildLink('/tenant/leagues')} className="py-1 flex items-center justify-center text-sm font-medium text-emerald-600 hover:text-emerald-800 transition-colors">
+                            <Link href={buildLink('/tenant/leagues')} className="inline-flex items-center text-sm font-medium text-slate-500 nav-hover">
                                 <Trophy className="h-4 w-4 mr-1 text-emerald-600" />
                                 <span>Toutes les Ligues</span>
                             </Link>

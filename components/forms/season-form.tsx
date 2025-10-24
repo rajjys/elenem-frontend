@@ -4,10 +4,6 @@
 import React, { useState, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { TextArea } from "../ui"; // Assuming you have a TextArea component
 import {
   Select,
   SelectContent,
@@ -15,23 +11,25 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { api } from "@/services/api";
 import { useAuthStore } from "@/store/auth.store";
 import { LeagueDetails, Roles, SeasonDetails, TenantDetails } from "@/schemas";
 import { CreateSeasonSchema, SeasonStatus, CreateSeasonDto } from "@/schemas/";
 import axios from "axios";
-import Link from "next/link";
+import { Button, Input, Label, TextArea } from "../ui";
+import { capitalizeFirst } from "@/utils";
 
 interface SeasonFormProps {
   onSuccess: (season: SeasonDetails) => void;
   onCancel: () => void;
-  dashboardLink: string;
-  seasonsPageLink: string;
+  currentTenantId?: string | null;
+  currentTenantName?: string | null;
+  currentLeagueId?: string | null;
+  currentLeagueName?: string | null;
 }
 
-export function SeasonForm({ onSuccess, onCancel, dashboardLink, seasonsPageLink}: SeasonFormProps) {
+export function SeasonForm({ onSuccess, onCancel, currentLeagueId, currentTenantId, currentTenantName, currentLeagueName }: SeasonFormProps) {
   const { user: userAuth } = useAuthStore();
   const currentUserRoles = userAuth?.roles || [];
 
@@ -46,6 +44,15 @@ export function SeasonForm({ onSuccess, onCancel, dashboardLink, seasonsPageLink
 
   const today = new Date().toISOString().split("T")[0]; // "2025-08-29";
   const tomorrow = new Date(Date.now() + 86400000).toISOString().split("T")[0];
+  
+  // A local state to track the selected tenant ID, independent of form state
+  // This is the source of truth for fetching leagues
+  const [selectedTenantId, setSelectedTenantId] = useState(
+    currentTenantId ||
+    ((isTenantAdmin || isLeagueAdmin) ? userAuth?.tenantId : "") ||
+    ""
+  );
+
   const form = useForm<CreateSeasonDto>({
     resolver: zodResolver(CreateSeasonSchema),
     defaultValues: {
@@ -55,11 +62,9 @@ export function SeasonForm({ onSuccess, onCancel, dashboardLink, seasonsPageLink
       description: "",
       isActive: true,
       status: SeasonStatus.ACTIVE,
-      tenantId:
-        (isTenantAdmin && userAuth?.tenantId) ||
-        (isLeagueAdmin && userAuth?.tenantId) ||
-        "",
-      leagueId: (isLeagueAdmin && userAuth?.managingLeagueId) || "",
+      // leagueId is the only ID field submitted
+      leagueId: currentLeagueId ? currentLeagueId : 
+        isLeagueAdmin && userAuth?.managingLeagueId ? userAuth.managingLeagueId : ""
     },
   });
 
@@ -72,220 +77,230 @@ export function SeasonForm({ onSuccess, onCancel, dashboardLink, seasonsPageLink
     watch,
   } = form;
 
-  const watchedTenantId = watch("tenantId");
+  const watchedLeagueId = watch("leagueId"); // Only watch leagueId as tenantId is gone from the form/payload
 
-  // Fetch tenants for SystemAdmin
+  // --- FIX 1: Tenant Fetching Logic (Only for SystemAdmin when no fixed context) ---
   useEffect(() => {
     const fetchTenants = async () => {
-      if (isSystemAdmin) {
+      // Only System Admins need to fetch the list of *all* tenants 
+      // AND only if we are not in a fixed tenant/league context.
+      if (isSystemAdmin && !currentTenantId && !currentLeagueId) {
         try {
           const res = await api.get("/tenants", { params: { take: 100 } });
           setTenants(res.data.data);
+          // If a SystemAdmin has a default (empty string) for selectedTenantId, 
+          // but there are tenants, ensure to set loading to false.
         } catch (error) {
-          let errorMessage = "Failed to fetch tenants.";
+          let errorMessage = "Failed to fetch organisations.";
           if (axios.isAxiosError(error)) {
               errorMessage = error.response?.data?.message || errorMessage;
           }
-          //setError(errorMessage);
           toast.error(errorMessage);
         }
       }
       setLoadingData(false);
     };
     fetchTenants();
-  }, [isSystemAdmin]);
+  }, [currentTenantId, currentLeagueId, isSystemAdmin]);
 
-  // Fetch leagues when tenant changes
+  // --- FIX 2: League Fetching Logic (Based on selectedTenantId) ---
   useEffect(() => {
     const fetchLeagues = async () => {
-      if (!watchedTenantId) {
+      // 1. Need a tenant ID to fetch leagues.
+      // 2. Do NOT fetch if a league is already fixed in context.
+      if (!selectedTenantId || currentLeagueId) {
         setLeagues([]);
         return;
       }
       try {
+        // Fetch leagues based on the currently selected tenant
         const res = await api.get("/leagues", {
-          params: { tenantIds: watchedTenantId, take: 100 },
+          params: { tenantId: selectedTenantId, take: 100 },
         });
         setLeagues(res.data.data);
+        // Clear leagueId if the previous one is no longer available
+        if (!res.data.data.find((l: LeagueDetails) => l.id === watchedLeagueId)) {
+           setValue("leagueId", "");
+        }
       } catch (error) {
         let errorMessage = "Failed to fetch leagues.";
         if (axios.isAxiosError(error)) {
             errorMessage = error.response?.data?.message || errorMessage;
         }
-        //setError(errorMessage);
         toast.error(errorMessage);
       }
     };
     fetchLeagues();
-  }, [watchedTenantId]);
+  }, [currentLeagueId, selectedTenantId, setValue, watchedLeagueId]);
 
-  // Auto-set tenant/league for tenant/league admins
+  // Auto-set LeagueId for LeagueAdmin and prioritize context props
   useEffect(() => {
-    if (isTenantAdmin && userAuth?.tenantId) {
-      setValue("tenantId", userAuth.tenantId);
+    // Context League ID takes highest priority
+    if (currentLeagueId) {
+        setValue("leagueId", currentLeagueId);
+        return;
     }
-    if (isLeagueAdmin && userAuth?.tenantId && userAuth?.managingLeagueId) {
-      setValue("tenantId", userAuth.tenantId);
+    // League Admin league ID is next
+    if (isLeagueAdmin && userAuth?.managingLeagueId) {
       setValue("leagueId", userAuth.managingLeagueId);
     }
-  }, [isTenantAdmin, isLeagueAdmin, userAuth, setValue]);
+    // No need to set tenantId on the form anymore, only in local state (selectedTenantId)
+  }, [isLeagueAdmin, userAuth, setValue, currentLeagueId]);
+
 
   const onSubmit = async (data: CreateSeasonDto) => {
     setIsSubmitting(true);
     try {
+      // Removed tenantId from the payload.
       const payload = {
-        ...data,
+        name: data.name,
         startDate: data.startDate,
         endDate: data.endDate,
+        description: data.description,
+        isActive: data.isActive,
+        status: data.status,
+        leagueId: data.leagueId, // Backend will derive tenantId from this
       };
+
       const res = await api.post<SeasonDetails>("/seasons", payload);
+      toast.success("Season created successfully!");
       onSuccess(res.data);
     } catch (error) {
-      let errorMessage = "Failed to fetch Seasons.";
+      let errorMessage = "Failed to create season.";
       if (axios.isAxiosError(error)) {
           errorMessage = error.response?.data?.message || errorMessage;
       }
-      //setError(errorMessage);
       toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  return (
-    <div className="p-6 bg-white rounded-lg shadow-md max-w-2xl mx-auto">
-      <h1 className="text-3xl font-bold text-gray-900 mb-6 text-center">Create New Season</h1>
-      {/* Back to Dashboard */}
-      <div className="pb-6 flex justify-between border-b border-blue-100">
-        <Link href={dashboardLink} 
-        className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-blue-700 
-                    bg-transparent border border-transparent rounded-md shadow-sm hover:bg-blue-50 
-                    focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition ease-in-out duration-300 cursor-pointer">
-           ← Back to Dashboard
-        </Link>
-        <Link href={seasonsPageLink} 
-        className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-blue-700 
-                   bg-transparent border border-transparent rounded-md shadow-sm hover:bg-blue-50 
-                   focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition ease-in-out duration-300 cursor-pointer">
-           Back to Seasons
-        </Link>
-      </div>
+  // Determine what name to display for the fixed tenant
+  const displayTenantName = currentTenantName || (
+    (isTenantAdmin || isLeagueAdmin) && (userAuth)?.tenant?.name
+  ) || null;
+  
+  // Determine what name to display for the fixed league
+  const displayLeagueName = currentLeagueName || (
+    isLeagueAdmin && userAuth?.managingLeague?.name
+  ) || null;
 
+
+  return (
+    <div className="p-4 bg-white max-w-2xl mx-auto">
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        {loadingData && (isSystemAdmin || isTenantAdmin) && (
+        {loadingData && (isSystemAdmin || isTenantAdmin) && !currentLeagueId && (
           <p className="text-center text-gray-500">
-            Loading available tenants and leagues...
+            Loading available organisations and leagues...
           </p>
         )}
-        {/* Active toggle */}
-        <div className="flex items-center space-x-2 pt-6 md:pt-10">
-          <Controller
-            name="isActive"
-            control={control}
-            render={({ field }) => (
-              <Switch
-                id="isActive"
-                checked={field.value}
-                onCheckedChange={field.onChange}
-                disabled={isSubmitting}
+        
+        {/* --- Tenant Context Display / Selection --- */}
+        <div>
+          {/* Display fixed Tenant Name if context is present and no selection is needed */}
+          {(displayTenantName && (currentTenantId || isTenantAdmin || isLeagueAdmin) && !isSystemAdmin) && (
+             <p className="font-semibold text-lg text-slate-600 py-1 border-b border-slate-300">
+                {displayTenantName}
+             </p>
+          )}
+
+          {/* Tenant Select for SystemAdmin ONLY when no fixed context is set */}
+          {isSystemAdmin && !currentTenantId && !currentLeagueId ? (
+            <div>
+              <Label htmlFor="tenantId">Organisation</Label>
+              <Controller
+                name="tenantId" // Field is still needed for Zod/validation, but won't be submitted
+                control={control}
+                render={() => (
+                  <Select
+                    onValueChange={(val) => {
+                      // Update local state and clear league
+                      setSelectedTenantId(val); 
+                      setValue("leagueId", "");
+                    }}
+                    value={selectedTenantId}
+                    disabled={isSubmitting || loadingData}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select an organisation" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {tenants.map((t) => (
+                        <SelectItem key={t.id} value={t.id}>
+                          {t.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
               />
-            )}
-          />
-          <Label htmlFor="isActive px-2" >Is Active</Label>
+              {/* Note: Errors.tenantId will still show up if validation fails, but it's not registered to an input */}
+              {errors.tenantId && (
+                <p className="text-red-500 text-sm">{errors.tenantId.message}</p>
+              )}
+            </div>
+          ) : null}
         </div>
-        {/* Tenant select for SystemAdmin */}
-        {isSystemAdmin && (
-          <div>
-            <Label htmlFor="tenantId">Tenant</Label>
-            <Controller
-              name="tenantId"
-              control={control}
-              render={({ field }) => (
-                <Select
-                  onValueChange={(val) => {
-                    field.onChange(val);
-                    setValue("leagueId", "");
-                  }}
-                  value={field.value}
-                  disabled={isSubmitting || loadingData}
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select tenant" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {tenants.map((t) => (
-                      <SelectItem key={t.id} value={t.id}>
-                        {t.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              )}
-            />
-            {errors.tenantId && (
-              <p className="text-red-500 text-sm">{errors.tenantId.message}</p>
-            )}
-          </div>
-        )}
+        
+        {/* --- League Context Display / Selection --- */}
+        <div>
+          {/* Display fixed League Name if context is present */}
+          {(displayLeagueName && currentLeagueId) && (
+              <p className="font-semibold text-base text-slate-600 py-1 border-b border-slate-300">
+                  League: {displayLeagueName}
+              </p>
+          )}
 
-        {/* League select */}
-        {(isSystemAdmin || isTenantAdmin) && (
-          <div>
-            <Label htmlFor="leagueId" hidden>League</Label>
-            <Controller
-              name="leagueId"
-              control={control}
-              render={({ field }) => (
-                <Select
-                  onValueChange={field.onChange}
-                  value={field.value}
-                  disabled={isSubmitting || loadingData || !watchedTenantId}
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select league" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {leagues.map((l) => (
-                      <SelectItem key={l.id} value={l.id}>
-                        {l.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+          {/* League Select for System/Tenant Admin when league context is NOT fixed */}
+          {(!currentLeagueId && (isSystemAdmin || isTenantAdmin)) ? (
+            <div>
+              <Label htmlFor="leagueId" hidden>Ligue</Label>
+              <Controller
+                name="leagueId"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    onValueChange={field.onChange}
+                    value={field.value}
+                    // Disable if submitting, loading, or no tenant is selected/fixed
+                    disabled={isSubmitting || loadingData || !selectedTenantId}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select a league" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {leagues.map((l) => (
+                        <SelectItem key={l.id} value={l.id}>
+                          {l.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+              {errors.leagueId && (
+                <p className="text-red-500 text-sm">{errors.leagueId.message}</p>
               )}
-            />
-            {errors.leagueId && (
-              <p className="text-red-500 text-sm">{errors.leagueId.message}</p>
-            )}
-          </div>
-        )}
+            </div>
+          ) : null}
+        </div>
 
-        {/* Auto League ID for LeagueAdmin */}
-        {isLeagueAdmin && userAuth?.managingLeagueId && (
-          <div>
-            <Label htmlFor="leagueId">League (Auto-assigned)</Label>
-            <Input
-              id="leagueId"
-              type="text"
-              value={userAuth.managingLeagueId}
-              disabled
-              className="bg-gray-100"
-            />
-          </div>
-        )}
+        {/* --- Season Details --- */}
 
         {/* Season Name */}
         <div>
-          <Label htmlFor="name" hidden>Season Name</Label>
-          <Input id="name" type="text" placeholder="Season Name" {...register("name")} disabled={isSubmitting} />
+          <Label htmlFor="name" hidden>Nom</Label>
+          <Input id="name" type="text" placeholder="Nom de la saison" {...register("name")} disabled={isSubmitting} />
           {errors.name && (
             <p className="text-red-500 text-sm">{errors.name.message}</p>
           )}
         </div>
-        <div  className="flex items-center justify-between">
+        
+        <div  className="flex items-center justify-between">
           {/* Start Date */}
           <div className="grow mr-2">
-            <Label htmlFor="startDate">Start Date</Label>
+            <Label htmlFor="startDate">Date de debut</Label>
             <Input id="startDate" type="date" {...register("startDate")} disabled={isSubmitting} />
             {errors.startDate && (
               <p className="text-red-500 text-sm">{errors.startDate.message}</p>
@@ -294,18 +309,20 @@ export function SeasonForm({ onSuccess, onCancel, dashboardLink, seasonsPageLink
 
           {/* End Date */}
           <div className="grow ml-2">
-            <Label htmlFor="endDate">End Date</Label>
+            <Label htmlFor="endDate">Date de fin</Label>
             <Input id="endDate" type="date" {...register("endDate")} disabled={isSubmitting} />
             {errors.endDate && (
               <p className="text-red-500 text-sm">{errors.endDate.message}</p>
             )}
           </div>
         </div>
+        
         {/* Description */}
         <div>
-          <Label htmlFor="description" hidden>Description (Optional)</Label>
+          <Label htmlFor="description" hidden>Description (Optionelle)</Label>
           <TextArea id="description" placeholder="Description" {...register("description")} rows={3} disabled={isSubmitting} />
         </div>
+        
         {/* Status */}
         <div>
           <Label htmlFor="status">Status</Label>
@@ -320,7 +337,7 @@ export function SeasonForm({ onSuccess, onCancel, dashboardLink, seasonsPageLink
                 <SelectContent>
                   {Object.values(SeasonStatus).map((status) => (
                     <SelectItem key={status} value={status}>
-                      {status.replace(/_/g, " ")}
+                      {capitalizeFirst(status.replace(/_/g, " "))}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -334,7 +351,7 @@ export function SeasonForm({ onSuccess, onCancel, dashboardLink, seasonsPageLink
           <Button type="button" variant="secondary" onClick={onCancel} disabled={isSubmitting}>
             Cancel
           </Button>
-          <Button type="submit" disabled={isSubmitting}>
+          <Button type="submit" disabled={isSubmitting || (isSystemAdmin && !selectedTenantId)}>
             {isSubmitting ? "Creating..." : "Create Season"}
           </Button>
         </div>
