@@ -6,6 +6,7 @@ export type BadgeVariant =
   | 'success'
   | 'destructive'
   | 'outline'
+  | 'unknown'
   | 'planning'
   | 'scheduled'
   | 'active'
@@ -40,6 +41,9 @@ export function Badge({ children, variant = 'default', className }: BadgeProps) 
       break;
     case 'outline':
       baseClasses += ' text-green-600 border border-green-600 bg-emerald-50 hover:bg-accent'; // Outline style
+      break;
+    case 'unknown':
+      baseClasses += ' text-gray-450 border border-gray-450 bg-gray-100'; // Outline style
       break;
     case 'planning':
       baseClasses += ' bg-yellow-100 text-yellow-800 border border-yellow-300';

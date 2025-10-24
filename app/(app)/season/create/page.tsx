@@ -17,10 +17,6 @@ export default function CreateSeasonPage() {
   const isSystemAdmin = currentUserRoles.includes(Roles.SYSTEM_ADMIN);
   const isTenantAdmin = currentUserRoles.includes(Roles.TENANT_ADMIN);
   const isLeagueAdmin = currentUserRoles.includes(Roles.LEAGUE_ADMIN);
-  const dashboardLink = isSystemAdmin ? "/admin/dashboard":
-                         isTenantAdmin ? "/tenant/dashboard" :
-                         isLeagueAdmin ? "/league/dashboard" :
-                         "/account/dashboard"; // Default fallback path 
   const seasonsPageLink = isSystemAdmin ? "/admin/seasons":
                           isTenantAdmin ? "/tenant/seasons" :
                           isLeagueAdmin ? "/league/seasons" :
@@ -38,7 +34,7 @@ export default function CreateSeasonPage() {
     <div className="container mx-auto p-6 max-w-2xl">
       {/* AccessGate to restrict who can access this creation form */}
       <AccessGate allowedRoles={[Roles.SYSTEM_ADMIN, Roles.TENANT_ADMIN, Roles.LEAGUE_ADMIN]}>
-        <SeasonForm onSuccess={handleSuccess} onCancel={handleCancel} dashboardLink={dashboardLink} seasonsPageLink={seasonsPageLink} />
+        <SeasonForm onSuccess={handleSuccess} onCancel={handleCancel} />
       </AccessGate>
     </div>
   );

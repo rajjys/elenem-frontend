@@ -4,17 +4,19 @@ import { SeasonStatus } from '@/schemas';
 
 // Mapping des statuts vers le texte en français
 const statusLabels: Record<SeasonStatus, string> = {
-  [SeasonStatus.PLANNING]: 'En planification',
-  [SeasonStatus.SCHEDULED]: 'Planifiée',
-  [SeasonStatus.ACTIVE]: 'En cours',
-  [SeasonStatus.PAUSED]: 'En pause',
-  [SeasonStatus.COMPLETED]: 'Terminée',
-  [SeasonStatus.CANCELED]: 'Annulée',
-  [SeasonStatus.ARCHIVED]: 'Archivée',
+  [SeasonStatus.UNKNOWN]: 'Saison Inconnue',
+  [SeasonStatus.PLANNING]: 'Saison en planification',
+  [SeasonStatus.SCHEDULED]: 'Saison Planifiée',
+  [SeasonStatus.ACTIVE]: 'Saison en cours',
+  [SeasonStatus.PAUSED]: 'Saison en pause',
+  [SeasonStatus.COMPLETED]: 'Saison terminée',
+  [SeasonStatus.CANCELED]: 'Saison annulée',
+  [SeasonStatus.ARCHIVED]: 'Saison archivée',
 };
 
 // Mapping des statuts vers les variantes visuelles
 const statusVariants: Record<SeasonStatus, BadgeVariant> = {
+  [SeasonStatus.UNKNOWN]: 'unknown',
   [SeasonStatus.PLANNING]: 'planning',
   [SeasonStatus.SCHEDULED]: 'scheduled',
   [SeasonStatus.ACTIVE]: 'active',
@@ -29,9 +31,9 @@ interface SeasonStatusBadgeProps {
   className?: string;
 }
 
-export function SeasonStatusBadge({ status = SeasonStatus.PLANNING, className }: SeasonStatusBadgeProps) {
-  const label = statusLabels[status] ?? 'Statut inconnu';
-  const variant = statusVariants[status] ?? 'default';
+export function SeasonStatusBadge({ status = SeasonStatus.UNKNOWN, className }: SeasonStatusBadgeProps) {
+  const label = statusLabels[status];
+  const variant = statusVariants[status];
 
   return (
     <Badge variant={variant} className={className}>

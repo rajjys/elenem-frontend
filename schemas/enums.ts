@@ -57,10 +57,11 @@ export enum SportType {
 export enum VisibilityLevel {
   PUBLIC = "PUBLIC",
   PRIVATE = "PRIVATE",// Requires invitation or approval to view
-  ARCHIVED = "ARCHIVED" // Old leagues, viewable but inactive for new operations
+  ARCHIVED = "ARCHIVED" // Old entities, viewable but inactive for new operations
 }
 // Enum for Season Status
 export enum SeasonStatus {
+  UNKNOWN = 'UNKNOWN',
   PLANNING = 'PLANNING',   
   SCHEDULED = 'SCHEDULED',
   ACTIVE = 'ACTIVE',

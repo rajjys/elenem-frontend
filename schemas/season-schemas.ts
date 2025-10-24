@@ -13,7 +13,7 @@ export const CreateSeasonSchema = z.object({
   description: z.string().optional(),
   status: z.nativeEnum(SeasonStatus),
   leagueId: z.string().min(1, 'League is required.'),
-  tenantId: z.string().min(1, 'Tenant is required.'), // This will be dynamic based on user role
+  tenantId: z.string().optional()
 }).refine((data) => data.endDate >= data.startDate, {
   message: "End date cannot be before start date.",
   path: ["endDate"],
