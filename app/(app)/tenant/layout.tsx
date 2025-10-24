@@ -6,7 +6,7 @@ import React, { ReactNode } from 'react';
 // Import reusable components and the new hook
 import AppLayout from '@/components/layouts/AppLayout';
 import { LoadingSpinner } from '@/components/ui';
-import { Building2, Calendar, Home, Image, ListChecks, PieChart, Settings,  Trophy, Users, Volleyball } from 'lucide-react';
+import { Building2, Home, Image, ListChecks, PieChart, Settings,  Trophy, Users, Volleyball } from 'lucide-react';
 import { ArticleIcon } from '@phosphor-icons/react';
 
 // --- Main Layout ---
@@ -25,7 +25,7 @@ const tenantNavItems = [
     subItems: [
       { label: "Leagues", basePath: "/tenant/leagues", icon: Trophy },
       { label: "Teams", basePath: "/tenant/teams", icon: Building2 },
-      { label: "Seasons", basePath: "/tenant/seasons", icon: Calendar },
+      //{ label: "Seasons", basePath: "/tenant/seasons", icon: Calendar },
       { label: "Games", basePath: "/tenant/games", icon: Volleyball },
       { label: "Standings", basePath: "/tenant/standings", icon: ListChecks },
       { label: "Statistics", basePath: "/tenant/statistics", icon: PieChart },
