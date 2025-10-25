@@ -29,7 +29,7 @@ export const AudienceToggle = () => {
             onClick={() => toggleIsFan()}
             className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition-colors ${
               active
-                ? "bg-white shadow-md text-blue-600 dark:bg-slate-900/100"
+                ? "bg-white shadow-md text-sky-700 bg-sky-50 dark:text-sky-200 dark:bg-blue-900/50"
                 : "text-slate-600 hover:bg-sky-50 hover:text-blue-600 dark:text-gray-200 dark:hover:text-blue-400 dark:hover:bg-slate-900/100"
             }`}
           >
