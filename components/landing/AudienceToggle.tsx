@@ -20,7 +20,7 @@ export const AudienceToggle = () => {
   ];
 
   return (
-    <div className="inline-flex p-1 rounded-xl bg-slate-300 dark:bg-slate-950 border border-slate-300 transition-all duration-200 ease-in-out">
+    <div className="inline-flex p-1 rounded-xl bg-slate-300 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 transition-all duration-200 ease-in-out">
       {options.map(({ label, value, icon }) => {
         const active = isFan === value;
         return (
