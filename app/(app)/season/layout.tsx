@@ -31,7 +31,7 @@ export default function TeamAdminLayout({ children }: TeamAdminLayoutProps) {
     return (
       <React.Suspense fallback={<LoadingSpinner />}>
         <AppLayout navItems={teamNavItems} themeColor="blue">
-              {children}
+          {children}
         </AppLayout>
       </React.Suspense>
     );

@@ -226,9 +226,9 @@ export function TeamsFilters({ filters, onFilterChange, onPageSizeChange, fixedT
       {/* Filter Button and Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogTrigger asChild>
-          <Button variant="outline" className="rounded-md shadow-sm bg-primary-600 hover:bg-primary-700 text-white font-semibold py-2 px-4 transition duration-300 ease-in-out transform hover:scale-105">
+          <Button variant="outline" className="transition duration-300 ease-in-out transform hover:scale-105">
             <FilterIcon className="mr-2 h-4 w-4" />
-            More Filters
+            Filtres
           </Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[700px] rounded-lg shadow-xl p-6 bg-white">
@@ -439,18 +439,10 @@ export function TeamsFilters({ filters, onFilterChange, onPageSizeChange, fixedT
           </div>
 
           <DialogFooter className="flex flex-col sm:flex-row sm:justify-end gap-2 mt-6">
-            <Button
-              variant="outline"
-              onClick={handleClearAllFilters}
-              className="bg-red-500 hover:bg-red-600 text-white rounded-md shadow-sm transition duration-300 ease-in-out"
-            >
+            <Button variant="danger" onClick={handleClearAllFilters} className="duration-300 ease-in-out">
               Clear All Filters
             </Button>
-            <Button
-              type="button"
-              onClick={() => setIsDialogOpen(false)}
-              className="bg-primary-600 hover:bg-primary-700 text-white rounded-md shadow-sm transition duration-300 ease-in-out"
-            >
+            <Button type="button" onClick={() => setIsDialogOpen(false)} className="transition duration-300 ease-in-out">
               Close
             </Button>
           </DialogFooter>
