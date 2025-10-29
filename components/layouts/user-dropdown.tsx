@@ -31,15 +31,15 @@ export const UserDropdown: FC<UserDropdownProps> = ({ handleLogout }) => {
   const isCoach = userAuth?.roles?.includes(Roles.COACH);
   const isReferee = userAuth?.roles?.includes(Roles.REFEREE);
   const isManagementUser = isSystemAdmin || isTenantAdmin || isLeagueAdmin || isTeamAdmin || isPlayer || isCoach || isReferee;
-  
+
   const dashboardLink = isSystemAdmin ? "/admin/dashboard"
     : isTenantAdmin ? "/tenant/dashboard"
-    : isLeagueAdmin ? "/league/dashboard"
-    : isTeamAdmin ? "/team/dashboard"
-    : isPlayer ? "/player/dashboard"
-    : isCoach ? "/coach/dashboard"
-    : isReferee ? "/referee/dashboard"
-    : "/account/dashboard";
+      : isLeagueAdmin ? "/league/dashboard"
+        : isTeamAdmin ? "/team/dashboard"
+          : isPlayer ? "/player/dashboard"
+            : isCoach ? "/coach/dashboard"
+              : isReferee ? "/referee/dashboard"
+                : "/account/dashboard";
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -64,7 +64,7 @@ export const UserDropdown: FC<UserDropdownProps> = ({ handleLogout }) => {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setDropdownOpen(!dropdownOpen)}
-        className="flex items-center gap-2 px-2 py-1 rounded-full border border-gray-200 nav-hover transition-all duration-150"
+        className="flex items-center gap-2 px-2 py-1 rounded-full border border-slate-200 bg-slate-50 nav-hover transition-all duration-150"
       >
         {userAuth.profileImageUrl ? (
           <Image
@@ -75,7 +75,7 @@ export const UserDropdown: FC<UserDropdownProps> = ({ handleLogout }) => {
             className="rounded-full object-cover"
           />
         ) : (
-          <FiUser className="w-6 h-6 p-1 rounded-full border border-gray-200" />
+          <FiUser className="w-6 h-6 p-1 rounded-full border border-slate-200 dark:border-slate-800" />
         )}
         <span className="hidden sm:inline text-sm font-medium">
           {userAuth.username || userAuth.email}
@@ -84,7 +84,7 @@ export const UserDropdown: FC<UserDropdownProps> = ({ handleLogout }) => {
       </button>
 
       {dropdownOpen && (
-        <div className="absolute right-0 mt-2 w-52 rounded-md shadow-xl bg-white ring-1 ring-black/5 z-40 animate-fadeIn">
+        <div className="absolute right-0 mt-2 w-52 rounded-md shadow-md bg-white dark:bg-slate-950 dark:text-gray-200 ring-1 ring-black/5 dark:ring-slate-700 z-40 animate-fadeIn">
           <div>
             {/* Common Dashboard Link */}
             {
@@ -119,7 +119,7 @@ export const UserDropdown: FC<UserDropdownProps> = ({ handleLogout }) => {
             <Button
               variant='danger'
               onClick={() => { handleLogout(); closeDropdown(); }}
-              className="w-full flex items-center justify-start gap-2">
+              className="w-full flex items-center justify-start gap-2 dark:bg-red-950/20">
               <LogOut className="w-4 h-4" /> Déconnexion
             </Button>
           </div>
