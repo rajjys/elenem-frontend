@@ -3,19 +3,19 @@
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
 import { api } from '@/services/api';
 import { TeamDetails, TeamFilterParams, TeamFilterParamsSchema, Roles, SortableColumn } from '@/schemas/';
 import { TeamsFilters, TeamsTable } from '@/components/team/';
-import { Pagination, LoadingSpinner, Button } from '@/components/ui/';
+import { Pagination, LoadingSpinner } from '@/components/ui/';
 import { toast } from 'sonner';
 import { useAuthStore } from '@/store/auth.store';
+import { useSearchParams } from 'next/navigation';
+import { Plus } from 'lucide-react';
+import { useContextualLink } from '@/hooks';
 
 export default function TenantTeamsPage() {
-  const router = useRouter();
   const { user: userAuth } = useAuthStore();
   const currentUserRoles = useMemo(() => userAuth?.roles || [], [userAuth?.roles]);
-
   const ctxTenantId = useSearchParams().get('ctxTenantId'); // Use search params if needed
       // Determine current tenant ID based on user roles
       const isSystemAdmin = currentUserRoles.includes(Roles.SYSTEM_ADMIN);
@@ -27,7 +27,7 @@ export default function TenantTeamsPage() {
       ? userAuth?.tenantId
       : null;
   const currentLeagueId = userAuth?.managingLeagueId; // Not directly used for filtering here, but passed to table
-
+  const { buildLink } = useContextualLink();
   const [teams, setTeams] = useState<TeamDetails[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -99,7 +99,7 @@ export default function TenantTeamsPage() {
     if (currentTenantId) { // Only fetch if tenantId is available
       fetchTeams();
     }
-  }, [fetchTeams, userAuth, currentUserRoles, router, currentTenantId]);
+  }, [fetchTeams, currentTenantId]);
 
   const handleFilterChange = useCallback((newFilters: TeamFilterParams) => {
     setFilters(prev => ({
@@ -153,7 +153,7 @@ export default function TenantTeamsPage() {
   }
 
   return (
-    <div className="container mx-auto p-6">
+    <div className="container mx-auto">
       <div className="flex justify-between items-center mb-4">
         <TeamsFilters
           filters={filters}
@@ -161,8 +161,9 @@ export default function TenantTeamsPage() {
           onPageSizeChange={handlePageSizeChange}
           fixedTenantId={currentTenantId} // Pass fixed tenant ID to filters
         />
-        <Link href="/team/create" passHref>
-          <Button variant="primary" className='whitespace-nowrap'>Create New Team</Button>
+        <Link href={buildLink("/league/create")} className="flex items-center text-sm gap-2 px-3 py-2 rounded-md transition-all duration-150 soft-theme-gradient">
+          <Plus className="h-4 w-4"/>
+          <span className="whitespace-nowrap">Nouvelle Equipe</span>
         </Link>
       </div>
       <span hidden>{totalItems} Teams</span>

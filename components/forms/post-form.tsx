@@ -18,7 +18,7 @@ import "@uiw/react-markdown-preview/markdown.css";
 
 // Lazy load because it uses window
 const MDEditor = dynamic(() => import("@uiw/react-md-editor"), { ssr: false });
-import { CreatePostFormValues, CreatePostSchema, PostStatus, PostType, TargetType } from "@/schemas";
+import { CreatePostFormValues, CreatePostSchema, PostStatus, PostType, PostTargetType } from "@/schemas";
 
 interface PostFormProps {
   onSuccess: () => void;
@@ -34,7 +34,7 @@ export function PostForm({ onSuccess, onCancel }: PostFormProps) {
     defaultValues: {
       status: PostStatus.DRAFT,
       type: PostType.BLOG,
-      targetType: TargetType.TENANT,
+      targetType: PostTargetType.TENANT,
     },
   });
 
@@ -151,7 +151,7 @@ export function PostForm({ onSuccess, onCancel }: PostFormProps) {
         <Label>Target Scope</Label>
         <Select
           value={form.watch("targetType")}
-          onValueChange={(val: TargetType) => form.setValue("targetType", val)}
+          onValueChange={(val: PostTargetType) => form.setValue("targetType", val)}
         >
           <SelectTrigger>
             <SelectValue placeholder="Select scope" />

@@ -84,7 +84,7 @@ export enum PostStatus {
   PUBLISHED = "PUBLISHED",
   SCHEDULED = "SCHEDULED",
 }
-export enum TargetType {
+export enum PostTargetType {
   TEAM = "TEAM",
   LEAGUE = "LEAGUE",
   TENANT = "TENANT"
@@ -98,4 +98,4 @@ export const GenderSchema = z.nativeEnum(Gender);
 export const SupportedLanguageSchema = z.nativeEnum(SupportedLanguages);
 export const PostTypeSchema = z.nativeEnum(PostType);
 export const PostStatusSchema = z.nativeEnum(PostStatus);
-export const TargetTypeSchema = z.nativeEnum(TargetType);
+export const PostTargetTypeSchema = z.nativeEnum(PostTargetType);
