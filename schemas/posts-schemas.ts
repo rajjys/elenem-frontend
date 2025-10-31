@@ -21,7 +21,7 @@ export const PostFilterParamsSchema = z.object({
   page: z.number().int().min(1).default(1).optional(),
   pageSize: z.number().int().min(1).max(100).default(10).optional(),
   search: z.string().optional(),
-  sortBy: z.enum(['title', 'createdAt', 'updatedAt']).default('createdAt').optional(),
+  sortBy: z.enum(['title' , 'type' , 'status' , 'tenantName' , 'leagueName' , 'teamName' , 'createdAt' , 'publishedAt']).default('createdAt').optional(),
   sortOrder: z.enum(['asc', 'desc']).default('desc').optional(),
   targetType: PostTargetTypeSchema.optional(),
   targetId: z.string().nullable().optional(),

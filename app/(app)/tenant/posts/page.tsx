@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { api } from "@/services/api";
-import { LoadingSpinner, Pagination, PostCard } from "@/components/ui";
+import { LoadingSpinner, Pagination } from "@/components/ui";
 import { PostFilterParams, PostFilterParamsSchema, PostResponseDto, Roles } from "@/schemas";
 import Link from "next/link";
 import { Plus } from "lucide-react";
@@ -10,7 +10,9 @@ import { useContextualLink } from "@/hooks";
 import { useAuthStore } from "@/store/auth.store";
 import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
-import { PostsFilters } from "@/components/post";
+import { PostsFilters, PostsTable } from "@/components/post";
+
+type SortableColumn = 'title' | 'type' | 'status' | 'tenantName' | 'leagueName' | 'teamName' | 'createdAt' | 'publishedAt';
 
 export default function TenantPostsPage() {
   const { user: userAuth } = useAuthStore();
@@ -73,7 +75,7 @@ export default function TenantPostsPage() {
       
       const response = await api.get(`/posts?${params.toString()}`);
       const validatedData = response.data;
-
+      
       setPosts(validatedData.data || []);
       setTotalItems(validatedData.totalItems || 0);
       setTotalPages(validatedData.totalPages || 1);
@@ -113,6 +115,15 @@ export default function TenantPostsPage() {
     (newSize: number) => setFilters(prev => ({ ...prev, pageSize: newSize, page: 1 })),
     []
   );
+
+  const handleSort = useCallback((column: SortableColumn) => {
+      setFilters(prev => ({
+        ...prev,
+        sortBy: column,
+        sortOrder: prev.sortBy === column && prev.sortOrder === 'asc' ? 'desc' : 'asc',
+        page: 1,
+      }));
+    }, []);
 
   const handleDeletePost = useCallback(
     async (postId: string) => {
@@ -167,14 +178,15 @@ export default function TenantPostsPage() {
           <p className="py-2 text-base md:text-lg font-semibold text-slate-500">
             {totalItems} Publications
           </p>
-          {posts.map(post => (
-            <PostCard
-              key={post.id}
-              post={post}
-              href={`/tenant/posts/${post.slug}`}
-              onDelete={() => handleDeletePost(post.id)}
-            />
-          ))}
+          <PostsTable
+            posts={posts}
+            onSort={handleSort}
+            sortBy={filters.sortBy || 'createdAt'}
+            sortOrder={filters.sortOrder || 'desc'}
+            onDelete={handleDeletePost}
+            currentUserRoles={currentUserRoles}
+            currentTenantId={currentTenantId}
+          />
         </div>
       )}
 
