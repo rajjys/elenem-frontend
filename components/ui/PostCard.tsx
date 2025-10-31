@@ -9,10 +9,9 @@ import Link from "next/link";
 interface PostCardProps {
   post: PostResponseDto;
   href: string;
-  onDelete?: () => void;
 }
 
-export function PostCard({ post, href, onDelete }: PostCardProps) {
+export function PostCard({ post, href }: PostCardProps) {
   return (
     <Link href={href}>
       <Card className="flex items-center space-x-4 hover:shadow-md transition my-2">
