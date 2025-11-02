@@ -36,13 +36,7 @@ import {
   AlertTriangle,
   Trophy,
   FileText,
-  Link,
-  Image as ImageIcon,
-  Film,
-  Flag,
-  Award,
   Clock,
-  Users,
 } from "lucide-react";
 import axios from "axios";
 import Image from 'next/image';
@@ -199,8 +193,6 @@ export function GameForm({ onSuccess, onCancel }: GameFormProps) {
           //api.get(`/venues`, { params: { leagueId: selectedLeagueId, pageSize: 100 } }),
         ]);
         setTeams(teamsRes.data.data);
-        console.log("temeansnndssshjr", teamsRes.data.data);
-
         setVenues(venuesRes);
       } catch {
         toast.error("Failed to load teams/venues");
@@ -209,9 +201,6 @@ export function GameForm({ onSuccess, onCancel }: GameFormProps) {
       }
     })();
   }, [selectedLeagueId]);
-
-  console.log("Teamsmsmsmmmsms", teams);
-
 
   // ---------------- Stepper ----------------
   const steps = useMemo(() => [
