@@ -3,7 +3,6 @@
 import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import dynamic from "next/dynamic";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,12 +12,13 @@ import { api } from "@/services/api";
 import { toast } from "sonner";
 import Image from "next/image";
 
-import "@uiw/react-md-editor/markdown-editor.css";
-import "@uiw/react-markdown-preview/markdown.css";
+// import "@uiw/react-md-editor/markdown-editor.css";
+// import "@uiw/react-markdown-preview/markdown.css";
 
 // Lazy load because it uses window
-const MDEditor = dynamic(() => import("@uiw/react-md-editor"), { ssr: false });
+// const MDEditor = dynamic(() => import("@uiw/react-md-editor"), { ssr: false });
 import { CreatePostFormValues, CreatePostSchema, PostStatus, PostType, PostTargetType } from "@/schemas";
+import { PostRichTextEditor } from "../ui";
 
 interface PostFormProps {
   onSuccess: () => void;
@@ -69,7 +69,18 @@ export function PostForm({ onSuccess, onCancel }: PostFormProps) {
         <Label htmlFor="excerpt">Excerpt</Label>
         <Input id="excerpt" {...form.register("excerpt")} />
       </div>
-
+      {/* Content */}
+      <div>
+        <Label>Content</Label>
+        {/* The content field must now store a JSON string.
+          Since you're using react-hook-form, you pass the value and the setter.
+        */}
+        <PostRichTextEditor
+          initialContent={form.watch("content") || undefined} // Pass the current value
+          onChange={(val) => form.setValue("content", val, { shouldValidate: true })} // Update the form value with the JSON string
+        />
+        {/* Optional: Add form error display here */}
+      </div>
       {/* Type */}
       <div>
         <Label>Type</Label>
@@ -118,14 +129,6 @@ export function PostForm({ onSuccess, onCancel }: PostFormProps) {
         </div>
       )}
 
-      {/* Content */}
-      <div>
-        <Label>Content</Label>
-        <MDEditor
-            value={form.watch("content") || ""}
-            onChange={(val) => form.setValue("content", val || "")}
-        />
-      </div>
       {/* Hero Image */}
       <div>
         <Label>Hero Image</Label>
