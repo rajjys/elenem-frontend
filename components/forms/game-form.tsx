@@ -34,6 +34,15 @@ import {
   X,
   Shield,
   AlertTriangle,
+  Trophy,
+  FileText,
+  Link,
+  Image as ImageIcon,
+  Film,
+  Flag,
+  Award,
+  Clock,
+  Users,
 } from "lucide-react";
 import axios from "axios";
 import Image from 'next/image';
@@ -259,6 +268,8 @@ export function GameForm({ onSuccess, onCancel }: GameFormProps) {
 
   // ---------------- Step Renderers ----------------
   const renderStep = () => {
+    const homeTeam = teams.find((t) => t.id === watch("homeTeamId"));
+    const awayTeam = teams.find((t) => t.id === watch("awayTeamId"));
     switch (currentStep) {
       case 0:
         return (
@@ -407,8 +418,6 @@ export function GameForm({ onSuccess, onCancel }: GameFormProps) {
         );
 
       case 2:
-        const homeTeam = teams.find((t) => t.id === watch("homeTeamId"));
-        const awayTeam = teams.find((t) => t.id === watch("awayTeamId"));
         if (gameStatus !== "COMPLETED") {
           return (
             <>
@@ -474,18 +483,109 @@ export function GameForm({ onSuccess, onCancel }: GameFormProps) {
               <CardTitle>Review & Submit</CardTitle>
               <CardDescription>Confirm before creating game.</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-3">
-              <div><strong>League:</strong> {selectedLeague?.name ?? userAuth?.managingLeague?.name}</div>
-              <div><strong>Home Team:</strong> {teams.find(t => t.id === watch("homeTeamId"))?.name || "—"}</div>
-              <div><strong>Away Team:</strong> {teams.find(t => t.id === watch("awayTeamId"))?.name || "—"}</div>
-              <div><strong>Date/Time:</strong> {watch("dateTime")}</div>
-              <div><strong>Status:</strong> {gameStatus}</div>
-              <div><strong>Notes:</strong> {watch("notes") || "—"}</div>
-              <div><strong>Banner:</strong> {watch("bannerImageUrl") || "—"}</div>
-              <div><strong>Highlights:</strong> {watch("highlightsUrl") || "—"}</div>
-              {gameStatus === "COMPLETED" && (
-                <div><strong>Score:</strong> {watch("homeScore") ?? "—"} - {watch("awayScore") ?? "—"}</div>
-              )}
+            <CardContent className="space-y-6">
+              <div className="bg-gray-50 rounded-2xl p-6 shadow-md space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4 text-sm">
+                  <div className="flex items-center justify-between">
+                    <span className="flex items-center gap-2 text-gray-500">
+                      <Trophy className="w-4 h-4" /> League:
+                    </span>
+                    <span className="font-medium text-center">
+                      {selectedLeague?.name ?? userAuth?.managingLeague?.name}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <span className="flex items-center gap-2 text-gray-500">
+                      <Calendar className="w-4 h-4" /> Date & Heure:
+                    </span>
+                    <span className="truncate font-medium text-center">
+                      {watch("dateTime")
+                        ? new Date(watch("dateTime")).toLocaleString("fr", {})
+                        : "—"}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <span className="flex items-center gap-2 text-gray-500">
+                      <Clock className="w-4 h-4" /> Statut:
+                    </span>
+                    <span
+                      className={`font-semibold px-2 py-0.5 rounded-md ${gameStatus === "COMPLETED"
+                        ? "bg-green-100 text-green-700"
+                        : "bg-yellow-100 text-yellow-700"
+                        }`}
+                    >
+                      {gameStatus}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <span className="flex items-center gap-2 text-gray-500">
+                      <FileText className="w-4 h-4" /> Notes:
+                    </span>
+                    <span className="font-medium text-right truncate max-w-[60%]">
+                      {watch("notes") || "—"}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-gray-50 rounded-2xl p-6 shadow-md">
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-8">
+                  <div className="flex flex-col items-center space-y-2">
+                    {homeTeam?.businessProfile?.logoAsset?.url ? (
+                      <div className="flex flex-col items-center space-y-2">
+                        <Image
+                          src={homeTeam.businessProfile?.logoAsset?.url}
+                          alt={`${homeTeam.name}`}
+                          width={20}
+                          height={20}
+                          className="w-16 h-16 rounded-full object-cover border shadow-sm"
+                        />
+                        <span className="font-semibold text-center text-gray-800">{homeTeam.name}</span>
+                      </div>) :
+                      (homeTeam?.name)
+                    }
+                  </div>
+                  {gameStatus === "COMPLETED" ? (
+                    <div className="flex items-center gap-3 bg-gray-100 px-6 py-3 rounded-xl">
+                      <span className="text-2xl font-bold text-gray-800">
+                        {watch("homeScore") ?? "—"}
+                      </span>
+                      <span className="text-gray-500 text-lg font-medium">:</span>
+                      <span className="text-2xl font-bold text-gray-800">
+                        {watch("awayScore") ?? "—"}
+                      </span>
+                    </div>
+                  ) : (
+                    <span className="text-sm text-gray-700">En attente de résultat</span>
+                  )}
+
+                  <div className="flex flex-col items-center space-y-2">
+                    {awayTeam?.businessProfile?.logoAsset?.url ? (
+                      <div className="flex flex-col items-center space-y-2">
+                        <Image
+                          src={awayTeam.businessProfile?.logoAsset?.url}
+                          alt={`${awayTeam.name}`}
+                          width={20}
+                          height={20}
+                          className="w-16 h-16 rounded-full object-cover border shadow-sm"
+                        />
+                        <span className="font-semibold text-center text-gray-800">{awayTeam.name}</span>
+                      </div>) :
+                      (awayTeam?.name)
+                    }
+                  </div>
+                </div>
+
+                {gameStatus === "COMPLETED" && (
+                  <div className="flex justify-center mt-4 text-green-600 gap-2 items-center text-sm">
+                    <CheckCircle className="w-4 h-4" />
+                    Match prêt à être enregistré.
+                  </div>
+                )}
+              </div>
             </CardContent>
           </>
         );
