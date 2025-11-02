@@ -9,7 +9,7 @@ export const CreatePostSchema = z.object({
   type: PostTypeSchema,
   status: PostStatusSchema,
   scheduledAt: z.string().optional(),
-  content: z.string().min(10, "Content is required"),
+  content: z.string().min(10, "Content is required").optional(),
   heroImageId: z.string().optional(),
   targetType: PostTargetTypeSchema, // you might later move this to an enum too
   targetId: z.string().optional(),

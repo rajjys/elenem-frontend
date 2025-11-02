@@ -36,6 +36,7 @@ import {
   AlertTriangle,
 } from "lucide-react";
 import axios from "axios";
+import Image from 'next/image';
 
 // ---------------- Schema ----------------
 const createGameSchema = z
@@ -62,8 +63,10 @@ const createGameSchema = z
 export type CreateGameFormValues = z.infer<typeof createGameSchema>;
 
 // ---------------- Types ----------------
+interface AssetDto { id: string; url: string }
+interface BusinessProfile { logoAsset?: AssetDto }
 interface BasicDto { id: string; name: string; currentSeasonId?: string | null }
-interface TeamDto extends BasicDto { shortCode?: string }
+interface TeamDto extends BasicDto { shortCode?: string, businessProfile?: BusinessProfile; }
 interface VenueDto extends BasicDto { id: string; name: string; address?: string }
 
 interface GameFormProps {
@@ -154,7 +157,7 @@ export function GameForm({ onSuccess, onCancel }: GameFormProps) {
         }
         if (isLeagueAdmin) return; // nothing else to load
 
-        const params = new URLSearchParams({ 'pageSize' : '100' });
+        const params = new URLSearchParams({ 'pageSize': '100' });
         if (isSystemAdmin && selectedTenantId) params.append('tenantId', selectedTenantId);
         if (isTenantAdmin) params.append('tenantId', userAuth?.tenantId || '');
         const res = await api.get("/leagues", { params });
@@ -185,6 +188,8 @@ export function GameForm({ onSuccess, onCancel }: GameFormProps) {
           //api.get(`/venues`, { params: { leagueId: selectedLeagueId, pageSize: 100 } }),
         ]);
         setTeams(teamsRes.data.data);
+        console.log("temeansnndssshjr", teamsRes.data.data);
+
         setVenues(venuesRes);
       } catch {
         toast.error("Failed to load teams/venues");
@@ -193,6 +198,9 @@ export function GameForm({ onSuccess, onCancel }: GameFormProps) {
       }
     })();
   }, [selectedLeagueId]);
+
+  console.log("Teamsmsmsmmmsms", teams);
+
 
   // ---------------- Stepper ----------------
   const steps = useMemo(() => [
@@ -238,7 +246,7 @@ export function GameForm({ onSuccess, onCancel }: GameFormProps) {
       };
       const res = await api.post<GameDetails>("/games", payload);
       onSuccess(res.data);
-    } catch(error) {
+    } catch (error) {
       let errorMessage = "Failed to create game.";
       if (axios.isAxiosError(error)) {
         errorMessage = error.response?.data?.message || errorMessage;
@@ -311,7 +319,19 @@ export function GameForm({ onSuccess, onCancel }: GameFormProps) {
                 <Label>Home Team</Label>
                 <Select value={watch("homeTeamId") ?? ""} onValueChange={(v) => setValue("homeTeamId", v)} disabled={!selectedLeagueId || loading.deps}>
                   <SelectTrigger><SelectValue placeholder="Select home team" /></SelectTrigger>
-                  <SelectContent>{teams.map(t => <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>)}</SelectContent>
+                  <SelectContent>{teams.map(t => <SelectItem key={t.id} value={t.id}>
+                    <div className="flex items-center space-x-2">
+                      <img
+                      src={t.businessProfile?.logoAsset?.url}
+                      alt={`${t.name}`}
+                      width={20}
+                      height={20}
+                      className="rounded-full"
+                    />
+                    <span>{t.name}</span>
+                    </div>
+                  </SelectItem>)}
+                  </SelectContent>
                 </Select>
                 {errors.homeTeamId && <p className="text-xs text-red-500">{errors.homeTeamId.message as string}</p>}
               </div>
@@ -320,7 +340,19 @@ export function GameForm({ onSuccess, onCancel }: GameFormProps) {
                 <Label>Away Team</Label>
                 <Select value={watch("awayTeamId") ?? ""} onValueChange={(v) => setValue("awayTeamId", v)} disabled={!selectedLeagueId || loading.deps}>
                   <SelectTrigger><SelectValue placeholder="Select away team" /></SelectTrigger>
-                  <SelectContent>{teams.map(t => <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>)}</SelectContent>
+                  <SelectContent>{teams.map(t => <SelectItem key={t.id} value={t.id}>
+                    <div className="flex items-center space-x-2">
+                      <img
+                      src={t.businessProfile?.logoAsset?.url}
+                      alt={`${t.name}`}
+                      width={20}
+                      height={20}
+                      className="rounded-full"
+                    />
+                    <span>{t.name}</span>
+                    </div>
+                    </SelectItem>)}
+                    </SelectContent>
                 </Select>
                 {errors.awayTeamId && <p className="text-xs text-red-500">{errors.awayTeamId.message as string}</p>}
               </div>

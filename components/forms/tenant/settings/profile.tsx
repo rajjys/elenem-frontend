@@ -230,6 +230,7 @@ const onSubmit = async (data: ProfileFormValues) => {
       form={form}
       name="website"
       label="Site Web"
+      // type="text"
       type="url"
       activeEditField={activeEditField}
       setActiveEditField={setActiveEditField}
