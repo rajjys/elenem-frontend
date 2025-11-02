@@ -322,13 +322,13 @@ export function GameForm({ onSuccess, onCancel }: GameFormProps) {
                   <SelectContent>{teams.map(t => <SelectItem key={t.id} value={t.id}>
                     <div className="flex items-center space-x-2">
                       <img
-                      src={t.businessProfile?.logoAsset?.url}
-                      alt={`${t.name}`}
-                      width={20}
-                      height={20}
-                      className="rounded-full"
-                    />
-                    <span>{t.name}</span>
+                        src={t.businessProfile?.logoAsset?.url}
+                        alt={`${t.name}`}
+                        width={20}
+                        height={20}
+                        className="rounded-full"
+                      />
+                      <span>{t.name}</span>
                     </div>
                   </SelectItem>)}
                   </SelectContent>
@@ -341,18 +341,21 @@ export function GameForm({ onSuccess, onCancel }: GameFormProps) {
                 <Select value={watch("awayTeamId") ?? ""} onValueChange={(v) => setValue("awayTeamId", v)} disabled={!selectedLeagueId || loading.deps}>
                   <SelectTrigger><SelectValue placeholder="Select away team" /></SelectTrigger>
                   <SelectContent>{teams.map(t => <SelectItem key={t.id} value={t.id}>
-                    <div className="flex items-center space-x-2">
-                      <img
-                      src={t.businessProfile?.logoAsset?.url}
-                      alt={`${t.name}`}
-                      width={20}
-                      height={20}
-                      className="rounded-full"
-                    />
-                    <span>{t.name}</span>
-                    </div>
-                    </SelectItem>)}
-                    </SelectContent>
+                    {t.businessProfile?.logoAsset?.url ? (
+                      <div className="flex items-center space-x-2">
+                        <Image
+                          src={t.businessProfile?.logoAsset?.url}
+                          alt={`${t.name}`}
+                          width={20}
+                          height={20}
+                          className="rounded-full"
+                        />
+                        <span>{t.name}</span>
+                      </div>) :
+                      (t.name)
+                    }
+                  </SelectItem>)}
+                  </SelectContent>
                 </Select>
                 {errors.awayTeamId && <p className="text-xs text-red-500">{errors.awayTeamId.message as string}</p>}
               </div>
@@ -404,6 +407,8 @@ export function GameForm({ onSuccess, onCancel }: GameFormProps) {
         );
 
       case 2:
+        const homeTeam = teams.find((t) => t.id === watch("homeTeamId"));
+        const awayTeam = teams.find((t) => t.id === watch("awayTeamId"));
         if (gameStatus !== "COMPLETED") {
           return (
             <>
@@ -426,10 +431,36 @@ export function GameForm({ onSuccess, onCancel }: GameFormProps) {
             <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <Label>Home Score</Label>
+                {homeTeam?.businessProfile?.logoAsset?.url ? (
+                  <div className="flex items-center space-x-2">
+                    <Image
+                      src={homeTeam.businessProfile?.logoAsset?.url}
+                      alt={`${homeTeam.name}`}
+                      width={20}
+                      height={20}
+                      className="rounded-full"
+                    />
+                    <span>{homeTeam.name}</span>
+                  </div>) :
+                  (homeTeam?.name)
+                }
                 <Input type="number" {...register("homeScore", { valueAsNumber: true })} />
               </div>
               <div className="space-y-2">
                 <Label>Away Score</Label>
+                {awayTeam?.businessProfile?.logoAsset?.url ? (
+                  <div className="flex items-center space-x-2">
+                    <Image
+                      src={awayTeam.businessProfile?.logoAsset?.url}
+                      alt={`${awayTeam.name}`}
+                      width={20}
+                      height={20}
+                      className="rounded-full"
+                    />
+                    <span>{awayTeam.name}</span>
+                  </div>) :
+                  (awayTeam?.name)
+                }
                 <Input type="number" {...register("awayScore", { valueAsNumber: true })} />
               </div>
             </CardContent>
