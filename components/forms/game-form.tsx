@@ -333,16 +333,19 @@ export function GameForm({ onSuccess, onCancel }: GameFormProps) {
                 <Select value={watch("homeTeamId") ?? ""} onValueChange={(v) => setValue("homeTeamId", v)} disabled={!selectedLeagueId || loading.deps}>
                   <SelectTrigger><SelectValue placeholder="Select home team" /></SelectTrigger>
                   <SelectContent>{teams.map(t => <SelectItem key={t.id} value={t.id}>
-                    <div className="flex items-center space-x-2">
-                      <img
-                        src={t.businessProfile?.logoAsset?.url}
-                        alt={`${t.name}`}
-                        width={20}
-                        height={20}
-                        className="rounded-full"
-                      />
-                      <span>{t.name}</span>
-                    </div>
+                    {t.businessProfile?.logoAsset?.url ? (
+                      <div className="flex items-center space-x-2">
+                        <Image
+                          src={t.businessProfile?.logoAsset?.url}
+                          alt={`${t.name}`}
+                          width={20}
+                          height={20}
+                          className="rounded-full"
+                        />
+                        <span>{t.name}</span>
+                      </div>) :
+                      (t.name)
+                    }
                   </SelectItem>)}
                   </SelectContent>
                 </Select>
