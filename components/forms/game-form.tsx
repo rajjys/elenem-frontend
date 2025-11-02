@@ -46,7 +46,6 @@ import {
 } from "lucide-react";
 import axios from "axios";
 import Image from 'next/image';
-import { useSearchParams } from "next/navigation";
 import { formatDateFr } from '@/utils';
 
 // ---------------- Schema ----------------
@@ -137,20 +136,6 @@ export function GameForm({ onSuccess, onCancel }: GameFormProps) {
 
   const selectedLeague = useMemo(() => leagues.find(l => l.id === selectedLeagueId), [leagues, selectedLeagueId]);
   const hasCurrentSeason = !!selectedLeague?.currentSeasonId;
-
-  const searchParams = useSearchParams();
-  const ctxLeagueId = searchParams.get("ctxLeagueId");
-
-  useEffect(() => {
-    console.log("context", ctxLeagueId);
-    
-    if (!ctxLeagueId) return;
-    const leagueExists = leagues.some(l => l.id === ctxLeagueId);
-    if (leagueExists) {
-      setValue("leagueId", ctxLeagueId);
-      setCurrentStep(1);
-    }
-  }, [ctxLeagueId, setValue]);
 
   // ---------------- Load Data ----------------
   useEffect(() => {
