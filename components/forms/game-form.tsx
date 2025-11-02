@@ -46,6 +46,8 @@ import {
 } from "lucide-react";
 import axios from "axios";
 import Image from 'next/image';
+import { useSearchParams } from "next/navigation";
+import { formatDateFr } from '@/utils';
 
 // ---------------- Schema ----------------
 const createGameSchema = z
@@ -135,6 +137,21 @@ export function GameForm({ onSuccess, onCancel }: GameFormProps) {
 
   const selectedLeague = useMemo(() => leagues.find(l => l.id === selectedLeagueId), [leagues, selectedLeagueId]);
   const hasCurrentSeason = !!selectedLeague?.currentSeasonId;
+
+  const searchParams = useSearchParams();
+  const ctxLeagueId = searchParams.get("ctxLeagueId");
+
+  useEffect(() => {
+    console.log("context", ctxLeagueId);
+    
+    if (!ctxLeagueId) return;
+    const leagueExists = leagues.some(l => l.id === ctxLeagueId);
+    if (leagueExists) {
+      setValue("leagueId", ctxLeagueId);
+      setCurrentStep(1);
+    }
+  }, [ctxLeagueId, setValue]);
+
   // ---------------- Load Data ----------------
   useEffect(() => {
     if (isSystemAdmin) {
@@ -477,13 +494,14 @@ export function GameForm({ onSuccess, onCancel }: GameFormProps) {
         );
 
       default:
+        const gameDate = formatDateFr(watch("dateTime"))     
         return (
           <>
             <CardHeader className="text-center">
               <CardTitle>Review & Submit</CardTitle>
               <CardDescription>Confirm before creating game.</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-6">
+            <CardContent className="space-y-6 px-0">
               <div className="bg-gray-50 rounded-2xl p-6 shadow-md space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4 text-sm">
                   <div className="flex items-center justify-between">
@@ -500,9 +518,7 @@ export function GameForm({ onSuccess, onCancel }: GameFormProps) {
                       <Calendar className="w-4 h-4" /> Date & Heure:
                     </span>
                     <span className="truncate font-medium text-center">
-                      {watch("dateTime")
-                        ? new Date(watch("dateTime")).toLocaleString("fr", {})
-                        : "—"}
+                      {gameDate}
                     </span>
                   </div>
 
