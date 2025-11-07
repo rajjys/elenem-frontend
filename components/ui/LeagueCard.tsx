@@ -21,18 +21,18 @@ interface LeagueCardProps {
   tenant?: {
     sportType?: string;
   };
-  
+  onDeleteLeague: (LeagueId: string) => void;
 }
 
-export const LeagueCard: React.FC<LeagueCardProps> = ({ league, tenant }) => {
+export const LeagueCard: React.FC<LeagueCardProps> = ({ league, tenant, onDeleteLeague }) => {
     const { buildLink } = useContextualLink();
     const logoUrl = league.businessProfile?.logoAsset?.url;
 
   return (
-    <Link href={buildLink('/league/dashboard', { ctxLeagueId: league.id })} key={league.id}>
-      <div className="p-2 border border-gray-200 rounded-lg hover:bg-gray-200/30 transition-colors my-2">
-        <div className="flex sm:items-center flex-wrap justify-between gap-2 sm:gap-4 mb-2">
-          {/* Identity */}
+    <div className="p-2 border border-gray-200 rounded-lg hover:bg-gray-200/30 transition-colors my-2">
+      <div className="flex sm:items-center flex-wrap justify-between gap-2 sm:gap-4 mb-2">
+        {/* Identity */}
+        <Link href={buildLink('/league/dashboard', { ctxLeagueId: league.id })} key={league.id}>
           <div className="flex items-center gap-3">
             {logoUrl ? (
               <Avatar src={logoUrl} name={league.name} size={40} className="shrink-0" />
@@ -46,13 +46,14 @@ export const LeagueCard: React.FC<LeagueCardProps> = ({ league, tenant }) => {
               <div className="flex items-center gap-2 text-xs text-gray-500">
                 <span>{capitalize(tenant?.sportType || '')}</span>
                 <span>•</span>
-                <span>{league.currentSeason ? league.currentSeason.name : "Non definie"}</span>
+                <span>{league.currentSeason && league.currentSeason.status !== "UNKNOWN" ? league.currentSeason.name : "Non definie"}</span>
               </div>
             </div>
           </div>
-          {/* Status & Actions */}
-          <div className="flex items-center justify-between gap-2">
-            <SeasonStatusBadge status={league.currentSeason?.status} />
+        </Link>
+        {/* Status & Actions */}
+        <div className="flex items-center justify-between gap-2">
+          <SeasonStatusBadge status={league.currentSeason?.status} />
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -81,7 +82,7 @@ export const LeagueCard: React.FC<LeagueCardProps> = ({ league, tenant }) => {
                 </DropdownMenuItem>
                 <DropdownMenuItem className='bg-red-50 text-red-500'>
                   <Trash className="mr-2 h-4 w-4" />
-                  Supprimer
+                  <button onClick={() => onDeleteLeague(league.id)}>Supprimer</button>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -89,6 +90,7 @@ export const LeagueCard: React.FC<LeagueCardProps> = ({ league, tenant }) => {
         </div>
 
         {/* Stats – Hidden on XS */}
+      <Link href={buildLink('/league/dashboard', { ctxLeagueId: league.id })} key={league.id}>
         <div className="hidden sm:grid grid-cols-3 gap-4 text-xs text-muted-foreground">
           <div className="flex items-center gap-1">
             <Building2 className="h-3 w-3" />
@@ -103,7 +105,7 @@ export const LeagueCard: React.FC<LeagueCardProps> = ({ league, tenant }) => {
             <span>$0</span>
           </div>
         </div>
-      </div>
-    </Link>
+      </Link>
+    </div>
   );
 };

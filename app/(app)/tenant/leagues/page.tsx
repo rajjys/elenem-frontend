@@ -71,6 +71,27 @@ export default function TenantLeaguesPage() {
     }
   }, [currentTenantId, isSystemAdmin]); // Dependency on  and currentTenantId
 
+  const handleDeleteLeague = useCallback(async (leagueId: string) => {
+      const confirmed = window.confirm('Are you sure you want to delete this League? This action cannot be undone.');
+      if (!confirmed) {
+        return;
+      }
+  
+      try {
+        await api.delete(`/leagues/${leagueId}`);
+        toast.success('League deleted successfully.');
+        fetchLeagues();
+      } catch (err) {
+        // const errorMessage = 'Failed to delete League.';
+        let errorMessage = 'Failed to delete League.';
+        if (axios.isAxiosError(err) && err.response?.data?.message) {
+          errorMessage = err.response.data.message;
+        }
+        toast.error('Error deleting League', { description: errorMessage });
+        console.error('Delete League error:', err);
+      }
+    }, [fetchLeagues]);
+
   useEffect(() => {
     fetchLeagues();
   }, [fetchLeagues]);
@@ -114,7 +135,7 @@ export default function TenantLeaguesPage() {
         <div className="bg-white p-2 md:p-6 rounded-lg shadow-md">
           <div className="overflow-x-auto">
             {leagues?.map((league: LeagueDetails) => (
-                  <LeagueCard key={league.id} league={league} tenant={league.tenant}/>
+                  <LeagueCard key={league.id} league={league} tenant={league.tenant} onDeleteLeague={handleDeleteLeague}/>
               ))}
           </div>
         </div>
