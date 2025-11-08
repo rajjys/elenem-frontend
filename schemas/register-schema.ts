@@ -1,5 +1,5 @@
 import z from "zod";
-import { Gender, PostStatus, PostType, SupportedLanguages } from "./";
+import { Gender, SupportedLanguages } from "./";
 
 export const RegisterFormSchema = z.object({
   username: z.string().min(1, { message: "Username is required" }),
@@ -51,27 +51,4 @@ export interface BasicAssetDto {
   mimeType?: string;
   width?: number;
   height?: number;
-}
-
-export interface PostResponseDto {
-  id: string;
-  slug: string;
-  title: string;
-  excerpt?: string | null;
-  content: string;
-
-  type: PostType;
-  status: PostStatus;
-
-  heroImage?: BasicAssetDto | null;
-
-  tenant: BasicTenantDto;
-  league?: BasicLeagueDto | null;
-  team?: BasicTeamDto | null;
-
-  createdAt: string;
-  updatedAt: string;
-  publishedAt?: string | null;
-
-  createdBy?: BasicUserDto | null;
 }
