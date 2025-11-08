@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, use } from "react";
 import { useRouter } from "next/navigation";
 import { api } from "@/services/api";
 import { PostResponseDto } from "@/schemas";
@@ -68,10 +68,10 @@ const fetchPublicPost = async (
 export default function PublicPostPage({
   params,
 }: {
-  params: { tenantSlug: string; postSlug: string };
+  params: Promise<{ tenantSlug: string; postSlug: string }>
 }) {
   const router = useRouter();
-  const { tenantSlug, postSlug } = params;
+  const { tenantSlug, postSlug } = use(params);
 
   const [postData, setPostData] = useState<PostResponseDto | null>(null);
   const [loading, setLoading] = useState(true);
