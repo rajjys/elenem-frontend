@@ -161,6 +161,27 @@ export default function TenantDashboard() {
                   }
               }, [availableDates, todayISO]);
 
+    const handleDeleteLeague = useCallback(async (leagueId: string) => {
+      const confirmed = window.confirm('Are you sure you want to delete this League? This action cannot be undone.');
+      if (!confirmed) {
+        return;
+      }
+  
+      try {
+        await api.delete(`/leagues/${leagueId}`);
+        toast.success('League deleted successfully.');
+        fetchLeagues();
+      } catch (err) {
+        // const errorMessage = 'Failed to delete League.';
+        let errorMessage = 'Failed to delete League.';
+        if (axios.isAxiosError(err) && err.response?.data?.message) {
+          errorMessage = err.response.data.message;
+        }
+        toast.error('Error deleting League', { description: errorMessage });
+        console.error('Delete League error:', err);
+      }
+    }, [fetchLeagues]);
+
     // Dynamically generate stat cards based on tenant data
     const statCards = [
         { title: "Ligues", value: tenant?.leagues?.length || 0, description: "Ligues Actives de l'organisation", trend: {isPositive: true, value: 3.6, timespan: "season"}, icon: Trophy, bgColorClass: "bg-blue-400", textColorClass: "text-white", href: buildLink("/tenant/leagues") },
@@ -244,7 +265,7 @@ export default function TenantDashboard() {
                                 </p> 
                                     :
                                 leagues.map((league: LeagueDetails) => (
-                                    <LeagueCard key={league.id} league={league} tenant={tenant!} />
+                                    <LeagueCard key={league.id} league={league} tenant={tenant!} onDeleteLeague={handleDeleteLeague} />
                                 ))
                             }
                         </CardContent>
