@@ -35,7 +35,8 @@ const publicPaths = [
    '/docs', '/docs/', '/docs/*',
    '/contact', '/contact/', '/contact/*',
    '/welcome', '/welcome/', '/welcome/*',
-   '/plans', '/plans/', '/plans/*'
+   '/plans', '/plans/', '/plans/*',
+   '/ads', '/ads/'
 ];
 
 export async function middleware(request: NextRequest) {

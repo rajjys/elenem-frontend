@@ -6,6 +6,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next"
 import React, { ReactNode } from 'react';
 import { Inter } from 'next/font/google'; // Example font
 import { Toaster } from "sonner";
+import Script from 'next/script';
 
 const inter = Inter({ subsets: ['latin'] , variable: '--font-inter'});
 /*
@@ -36,6 +37,13 @@ export default function PublicLayout({ children }: { children: ReactNode }) {
         />
         <Analytics/>
         <SpeedInsights/>
+        {/* Global AdSense Script */}
+        <Script
+          id="adsbygoogle-init"
+          strategy="afterInteractive"
+          crossOrigin="anonymous"
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9564658530773384"
+        />
       </body>
     </html>
   );

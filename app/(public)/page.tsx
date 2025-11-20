@@ -20,6 +20,7 @@ import axios from "axios";
 import Link from "next/link";
 import Image from "next/image";
 import { useAuthStore } from "@/store/auth.store";
+import GoogleAdUnit from "@/components/google-ad-unit";
 
 const features = [
   { icon: <CalendarDays className="w-5 h-5 text-blue-500"/>, title: "Planification Intelligente", desc: "Vérifications automatiques des conflits, dates d'interdiction et lieux." },
@@ -276,6 +277,15 @@ export default function PublicLandingPage() {
           </div>
         </div>
       </section>
+      <>
+        <div className="my-8">
+         <GoogleAdUnit 
+            slotId="YOUR_GENERATED_SLOT_ID_HERE" 
+            format="auto" 
+            responsive={true} 
+         />
+      </div>
+      </>
       {/* Teaser de l'annuaire des Organisations */}
       <section id="tenants" className="mx-auto max-w-7xl px-4 pt-12 md:pt-16">
         <div className="flex items-end justify-between flex-wrap mb-4">
