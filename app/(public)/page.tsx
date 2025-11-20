@@ -280,7 +280,7 @@ export default function PublicLandingPage() {
       <>
         <div className="my-8">
          <GoogleAdUnit 
-            slotId="YOUR_GENERATED_SLOT_ID_HERE" 
+            slotId="8918454579" 
             format="auto" 
             responsive={true} 
          />
