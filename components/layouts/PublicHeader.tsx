@@ -19,6 +19,7 @@ import { useAuthStore } from "@/store/auth.store";
 import { Skeleton } from "../ui";
 import { AudienceToggle } from "../landing/AudienceToggle";
 import UserDropdown from "./user-dropdown";
+import useI18n from '@/hooks/useI18n';
 
 interface NavLink { label: string; href: string; }
 interface PublicHeaderProps {
@@ -111,7 +112,10 @@ export const PublicHeader = ({
             </nav>
             {/* Right area: search + login (visible on all sizes) */}
             <div className="flex items-center gap-2">
-              {pathname === "/" && <AudienceToggle />}
+              {/* Language switcher */}
+              <div className="flex items-center">
+                <LanguageSwitcher />
+              </div>
               {loadingUser ? (
                 <div className="flex items-center gap-2">
                   <Skeleton className="h-10 w-10 rounded-full" />
@@ -155,3 +159,18 @@ export const PublicHeader = ({
   );
 };
 export default PublicHeader;
+
+function LanguageSwitcher() {
+  const { locale, setLocale } = useI18n();
+  return (
+    <div className="flex items-center">
+      <button
+        aria-label="Select language"
+        onClick={() => setLocale(locale === 'en' ? 'fr' : 'en')}
+        className="text-sm px-2 py-1 rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900"
+      >
+        {locale === 'en' ? 'EN' : 'FR'}
+      </button>
+    </div>
+  );
+}
