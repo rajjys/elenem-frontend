@@ -10,13 +10,6 @@ import Script from 'next/script';
 
 const inter = Inter({ subsets: ['latin'] , variable: '--font-inter'});
 
-const poppins = Poppins({
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-poppins',
-  weight: ['100', '200', '300', '400', '500', '600', '700', '800', '900']
-});
-
 export const metadata = {
   title: 'Elenem Systems',
   description: 'Elenem Systems. Run your sport League without chaos.',

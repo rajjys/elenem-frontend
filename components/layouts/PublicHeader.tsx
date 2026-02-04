@@ -17,7 +17,6 @@ import {
 import { SportType } from "@/schemas";
 import { useAuthStore } from "@/store/auth.store";
 import { Skeleton } from "../ui";
-import { AudienceToggle } from "../landing/AudienceToggle";
 import UserDropdown from "./user-dropdown";
 import useI18n from '@/hooks/useI18n';
 

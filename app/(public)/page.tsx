@@ -1,5 +1,5 @@
 import Container from '@/components/ui/container';
-import { CheckCircle2, XCircle, ArrowRight, ShieldCheck } from 'lucide-react'; // Suggested icons
+import { CheckCircle2, XCircle, ArrowRight } from 'lucide-react'; // Suggested icons
 
 export default function HomePage() {
   return (
