@@ -1,7 +1,8 @@
 // app/(app)/layout.tsx
 // app/layout.tsx (if this is the root layout) or a specific public group layout
 import React, { ReactNode } from 'react';
-import { PublicFooter, PublicHeader } from '@/components/layouts/';
+import { PublicFooter } from '@/components/layouts/';
+import PublicHeader from '@/components/layouts/PublicHeader';
 
 export default function PublicLayout({ children }: { children: ReactNode }) {
   return (

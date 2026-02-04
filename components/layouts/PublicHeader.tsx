@@ -1,164 +1,142 @@
-// components/layouts/PublicHeader.tsx
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
-import React, { useState, useEffect, useRef } from "react";
-import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
-import { useScrollDirection } from "@/hooks";
-import { FiUser } from "react-icons/fi";
-import { 
-  Users,
-  ShieldCheck,
-  Home,
-  CalendarDays
-} from "lucide-react";
+import { usePathname } from "next/navigation";
+import { Menu, X } from "lucide-react";
 
 import { useAuthStore } from "@/store/auth.store";
-import { Skeleton } from "../ui";
+import useI18n from "@/hooks/useI18n";
 import UserDropdown from "./user-dropdown";
-import useI18n from '@/hooks/useI18n';
 
-export const PublicHeader = () => {
-
-  const logoUrl = "/logos/elenem-sport.png";
-
+export default function PublicHeader() {
   const pathname = usePathname();
-  const router = useRouter();
-  const { user: userAuth, logout, fetchUser } = useAuthStore();
-  const [loadingUser, setLoadingUser] = useState(true);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-  const scrollDir = useScrollDirection();
+  const { user } = useAuthStore();
+  const { locale, setLocale } = useI18n();
+  const [open, setOpen] = useState(false);
 
-  const navLinks = [
-  { label: 'Accueil', href: '/'},
-  { label: 'Matchs', href: '/games'},
-  { label: 'Organisations', href: '/tenants'},
-  { separator: true },
-  { label: 'Logiciel', href: '/features'},
-  { label: 'Plans', href: '/plans' },
-  { label: 'API', href: '/api' },
-  { label: 'Docs', href: '/docs' },
-];
-
-  useEffect(() => {
-    const loadUser = async () => {
-      try { await fetchUser(); } finally { setLoadingUser(false); }
-    };
-    if (userAuth === undefined || userAuth === null) loadUser();
-    else setLoadingUser(false);
-  }, [userAuth, fetchUser]);
-
-  useEffect(() => {
-    const onDoc = (e: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) setDropdownOpen(false);
-    };
-    if (dropdownOpen) document.addEventListener("mousedown", onDoc);
-    return () => document.removeEventListener("mousedown", onDoc);
-  }, [dropdownOpen]);
-
-  const handleLogout = () => { logout(); router.push("/"); };
+  const nav = [
+    { label: "Solution", href: "/features" },
+    { label: "Comment ça marche", href: "/how-it-works" },
+    { label: "Tarifs", href: "/pricing" },
+    { label: "Ressources", href: "/docs" },
+  ];
 
   return (
-    <>
-      <header className={`sticky top-0 z-50 w-full border-b border-gray-200 bg-slate-50 dark:bg-slate-950 dark:border-gray-700 backdrop-blur-md
-                            transition-transform duration-300
-                          ${scrollDir === "down" ? "-translate-y-full" : "translate-y-0"}`}>
-        <div className="mx-auto max-w-8xl px-2 md:px-6 py-1">
-          <div className="flex h-14 items-center justify-between gap-4">
-            {/* BRAND */}
-            <div className="flex items-center gap-3">
-              <Link href="/" className="flex items-center gap-3">
-                <Image src={logoUrl} alt="Elenem" width={120} height={48} className="object-contain" />
-              </Link>
-            </div>
-            {/* Desktop nav */}
-            <nav className="hidden lg:flex lg:items-center lg:gap-6 text-sm">
-              {navLinks.map((link, index) => {
-                if (link.separator) {
-                  return (
-                    <span key={`sep-${index}`} className="h-5 w-px bg-slate-300/70 dark:bg-slate-700" />
-                  );
-                }
-                const isActive = pathname === link.href;
+    <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/80 backdrop-blur">
+      <div className="mx-auto max-w-7xl px-4">
+        <div className="flex h-16 items-center justify-between">
+          
+          {/* Brand */}
+          <Link href="/" className="flex items-center">
+            <Image
+              src="/logos/elenem-sport.png"
+              alt="Elenem"
+              width={120}
+              height={40}
+              priority
+            />
+          </Link>
 
-                return (
-                  <Link
-                    key={link.href}
-                    href={link.href || "/"}
-                    className={`flex items-center gap-2 px-3 py-2 rounded-md transition-colors duration-200 ${
-                      isActive
-                        ? 'font-semibold text-sky-700 bg-sky-50 dark:text-sky-200 dark:bg-blue-900/50'
-                        : 'text-slate-600 hover:bg-sky-50 hover:text-blue-600 dark:text-gray-200 dark:hover:text-blue-400 dark:hover:bg-slate-900/100'
-                    }`}
-                  >
-                    <span>{link.label}</span>
-                  </Link>
-                );
-              })}
-            </nav>
-            {/* Right area: search + login (visible on all sizes) */}
-            <div className="flex items-center gap-2">
-              {/* Language switcher */}
-              <div className="flex items-center">
-                <LanguageSwitcher />
-              </div>
-              {loadingUser ? (
-                <div className="flex items-center gap-2">
-                  <Skeleton className="h-10 w-10 rounded-full" />
-                </div>
-              ) : userAuth ? (
-                // Use the new reusable UserDropdown
-                <UserDropdown handleLogout={handleLogout} />
-              ) : (
-                // LOGIN always visible (mobile & desktop)
-                <Link href="/login" className="inline-flex items-center gap-2 px-3 py-2 rounded-full border border-gray-200 hover:bg-gray-50" aria-disabled>
-                  <FiUser className="w-5 h-5 p-1 rounded-full border border-gray-200 dark:text-white" />
-                  <span className="hidden sm:inline text-sm font-semibold text-sky-500">Se connecter</span>
+          {/* Desktop nav */}
+          <nav className="hidden lg:flex items-center gap-8 text-sm font-medium text-slate-700">
+            {nav.map((item) => (
+              <NavLink key={item.href} {...item} />
+            ))}
+          </nav>
+
+          {/* Right cluster */}
+          <div className="flex items-center gap-4">
+            {/* Language */}
+            <button
+              onClick={() => setLocale(locale === "fr" ? "en" : "fr")}
+              className="hidden lg:block text-xs text-slate-500 hover:text-slate-700"
+            >
+              {locale === "fr" ? "EN" : "FR"}
+            </button>
+
+            {/* Auth */}
+            {user ? (
+              <UserDropdown />
+            ) : (
+              <Link
+                href="/login"
+                className="hidden lg:inline-flex rounded-md bg-sky-600 px-4 py-2 text-sm font-semibold text-white hover:bg-sky-700"
+              >
+                Tableau de bord
+              </Link>
+            )}
+
+            {/* Mobile toggle */}
+            <button
+              onClick={() => setOpen(!open)}
+              className="lg:hidden p-2 text-slate-700"
+              aria-label="Toggle menu"
+            >
+              {open ? <X size={20} /> : <Menu size={20} />}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile menu */}
+      {open && (
+        <div className="lg:hidden border-t border-slate-200 bg-white">
+          <div className="px-4 py-6 space-y-4 text-sm font-medium">
+            {nav.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={() => setOpen(false)}
+                className="block text-slate-700"
+              >
+                {item.label}
+              </Link>
+            ))}
+
+            <div className="pt-4 border-t border-slate-200 flex items-center justify-between">
+              <button
+                onClick={() => setLocale(locale === "fr" ? "en" : "fr")}
+                className="text-xs text-slate-500"
+              >
+                {locale === "fr" ? "EN" : "FR"}
+              </button>
+
+              {!user && (
+                <Link
+                  href="/login"
+                  className="rounded-md bg-sky-600 px-4 py-2 text-sm font-semibold text-white"
+                >
+                  Tableau de bord
                 </Link>
               )}
             </div>
           </div>
         </div>
-      </header>
-
-      {/* Bottom nav only for small screens */}
-      <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white dark:bg-slate-950 dark:border-gray-700 border-t border-gray-200 lg:hidden">
-        <div className="flex items-center justify-around h-16">
-          {[
-              { label: "Accueil", href: "/", icon: Home},
-              { label: "Matchs", href: "/games", icon: CalendarDays},
-              { label: "Organisations", href: "/tenants", icon: Users },
-              { label: "Logiciel", href: "/features", icon: ShieldCheck },
-            ].map((link) => {
-            const Icon = link.icon;
-            const isActive = pathname === link.href;
-            return (
-              <Link key={link.href} href={link.href} className={`flex flex-col items-center gap-1 text-xs ${isActive ? "text-sky-600" : "text-gray-600 dark:text-gray-200"}`}>
-                {Icon && <Icon className="w-5 h-5" />}
-                <span>{link.label}</span>
-              </Link>
-            );
-          })}
-        </div>
-      </nav>
-    </>
+      )}
+    </header>
   );
-};
-export default PublicHeader;
+}
 
-function LanguageSwitcher() {
-  const { locale, setLocale } = useI18n();
+function NavLink({
+  href,
+  label,
+}: {
+  href: string;
+  label: string;
+}) {
+  const pathname = usePathname();
+  const active = pathname === href;
+
   return (
-    <div className="flex items-center">
-      <button
-        aria-label="Select language"
-        onClick={() => setLocale(locale === 'en' ? 'fr' : 'en')}
-        className="text-sm px-2 py-1 rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900"
-      >
-        {locale === 'en' ? 'EN' : 'FR'}
-      </button>
-    </div>
+    <Link
+      href={href}
+      className={`transition-colors ${
+        active ? "text-sky-600" : "hover:text-sky-600"
+      }`}
+    >
+      {label}
+    </Link>
   );
 }

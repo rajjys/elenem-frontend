@@ -21,14 +21,14 @@ export default function HomePage() {
             <div className="mt-10 flex flex-col sm:flex-row justify-center items-center gap-4">
               <a
                 href="/contact"
-                className="w-full sm:w-auto inline-flex items-center justify-center rounded-full bg-primary px-6 py-2 text-white font-bold transition-transform hover:scale-105 active:scale-95 shadow-lg shadow-primary/20"
+                className="w-auto inline-flex items-center justify-center rounded-full bg-primary px-6 py-2 text-white font-bold transition-transform hover:scale-105 active:scale-95 shadow-lg shadow-primary/20"
               >
                 Request a demo
               </a>
 
               <a
                 href="#how-it-works"
-                className="w-full sm:w-auto inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-6 py-2 font-semibold text-slate-600 hover:bg-slate-50 transition-colors"
+                className="w-auto inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-6 py-2 font-semibold text-slate-600 hover:bg-slate-50 transition-colors"
               >
                 See how it works
               </a>
@@ -342,12 +342,12 @@ export default function HomePage() {
               <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-6">
                 <a
                   href="/contact"
-                  className="w-full sm:w-auto inline-flex items-center justify-center rounded-full bg-primary px-6 py-2 text-white font-bold transition-transform hover:scale-105 active:scale-95 shadow-lg shadow-primary/20"
+                  className="w-auto inline-flex items-center justify-center rounded-full bg-primary px-6 py-2 text-white font-bold transition-transform hover:scale-105 active:scale-95 shadow-lg shadow-primary/20"
                 >
                   Request a demo
                 </a>
                 
-                <a href="/pricing" className="w-full sm:w-auto inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-6 py-2 font-semibold text-slate-600 hover:bg-slate-50 transition-colors">
+                <a href="/pricing" className="w-auto inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-6 py-2 font-semibold text-slate-600 hover:bg-slate-50 transition-colors">
                   See all plans <span aria-hidden="true" className='pl-1'>→</span>
                 </a>
               </div>

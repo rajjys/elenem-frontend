@@ -9,19 +9,13 @@ import { FiChevronDown, FiUser } from 'react-icons/fi';
 import { Button } from '@/components/ui/button';
 import { useAuthStore } from '@/store/auth.store'; // Assuming this store provides userAuth
 import { Roles } from '@/schemas';
+import { useRouter } from 'next/navigation';
 
-interface UserDropdownProps {
-  handleLogout: () => void;
-  // userAuth should be passed if the parent component already has it,
-  // but for simplicity and to keep the logic self-contained, we can rely on useAuthStore here,
-  // or pass an optional user object if not all parents use the same store structure.
-  // For this scenario, we'll rely on useAuthStore.userAuth
-}
-
-export const UserDropdown: FC<UserDropdownProps> = ({ handleLogout }) => {
-  const { user: userAuth } = useAuthStore();
+export const UserDropdown = ({ }) => {
+  const { user: userAuth, logout } = useAuthStore();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
   const isSystemAdmin = userAuth?.roles?.includes(Roles.SYSTEM_ADMIN);
   const isTenantAdmin = userAuth?.roles?.includes(Roles.TENANT_ADMIN);
@@ -59,7 +53,10 @@ export const UserDropdown: FC<UserDropdownProps> = ({ handleLogout }) => {
   }
 
   const closeDropdown = () => setDropdownOpen(false);
-
+  const handleLogout = () => {
+    logout();
+    router.push('/');
+  };
   return (
     <div className="relative" ref={dropdownRef}>
       <button
