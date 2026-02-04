@@ -3,22 +3,10 @@
 import React, { ReactNode } from 'react';
 import { PublicFooter, PublicHeader } from '@/components/layouts/';
 
-interface NavLink {
-  label: string;
-  href: string;
-}
-
-const navLinks: NavLink[] = [
-  { label: 'Accueil', href: '/' },
-  { label: 'Matchs', href: '/games' },
-  { label: 'Organisations', href: '/tenants' },
-  { label: 'Actualites', href: '/news' },
-];
-
 export default function PublicLayout({ children }: { children: ReactNode }) {
   return (
           <div className="flex min-h-screen flex-col bg-gray-50 text-gray-800">
-            <PublicHeader navLinks={navLinks}/>
+            <PublicHeader />
               <main className="flex-grow">{children}</main>
             { <PublicFooter /> }
           </div>
