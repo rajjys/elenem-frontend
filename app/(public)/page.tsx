@@ -104,13 +104,13 @@ export default function HomePage() {
                 </h2>
                 <p className='text-muted'>
                   Elenem centralizes fixtures, results, standings, and communication into one official system -
-                  powering your league’s digital presence while keeping your identity.
+                  powering your league&apos;s digital presence while keeping your identity.
                 </p>
               </div>
               
               
               <div className="space-y-8">
-                <div className=' hidden md:block'>
+                <div className='hidden md:block'>
                   <h3 className="text-xl font-bold text-slate-900">Total Brand Ownership</h3>
                   <p className="text-muted mt-2 leading-relaxed">
                     Elenem lives on <strong> your website</strong>. It looks like you, feels like you, 
@@ -118,7 +118,7 @@ export default function HomePage() {
                   </p>
                 </div>
 
-                <div className=' hidden md:block'>
+                <div className='hidden md:block'>
                   <h3 className="text-xl font-bold text-slate-900">Automated league operations</h3>
                   <p className="text-muted mt-2 leading-relaxed">
                     When a score is entered, your entire league updates instantly. 
@@ -242,7 +242,7 @@ export default function HomePage() {
             <Step
               number="03"
               title="Fans follow officially"
-              text="Schedules, tables, and news are pushed to your league's public portal instantly."
+              text="Schedules, tables, and news are pushed to your league&apos;s public portal instantly."
             />
           </div>
         </Container>
@@ -256,7 +256,7 @@ export default function HomePage() {
                 Plans built for every level of play
               </h2>
               <p className="text-lg text-muted mb-8 leading-relaxed">
-                Whether you're running a local 8-team tournament or a national 
+                Whether you&apos;re running a local 8-team tournament or a national 
                 football federation, Elenem scales with you. 
               </p>
               
