@@ -375,12 +375,3 @@ function Step({ number, title, text }: { number: string; title: string; text: st
     </div>
   );
 }
-
-function PricingFeature({ text, muted = false, white = false }: { text: string, muted?: boolean, white?: boolean }) {
-  return (
-    <li className={`flex items-center gap-3 ${muted ? 'opacity-50' : ''} ${white ? 'text-slate-300' : 'text-slate-600'}`}>
-      <CheckCircle2 className={`w-4 h-4 shrink-0 ${white ? 'text-primary-foreground' : 'text-primary'}`} />
-      {text}
-    </li>
-  );
-}

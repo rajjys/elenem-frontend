@@ -14,24 +14,15 @@ import {
   CalendarDays
 } from "lucide-react";
 
-import { SportType } from "@/schemas";
 import { useAuthStore } from "@/store/auth.store";
 import { Skeleton } from "../ui";
 import UserDropdown from "./user-dropdown";
 import useI18n from '@/hooks/useI18n';
 
-interface NavLink { label: string; href: string; }
-interface PublicHeaderProps {
-  logoUrl?: string;
-  sportType?: SportType;
-  navLinks?: NavLink[];
-  primaryColor?: string;
-  onSearch?: () => void;
-}
+export const PublicHeader = () => {
 
-export const PublicHeader = ({
-  logoUrl = "/logos/elenem-sport.png",
-}: PublicHeaderProps) => {
+  const logoUrl = "/logos/elenem-sport.png";
+
   const pathname = usePathname();
   const router = useRouter();
   const { user: userAuth, logout, fetchUser } = useAuthStore();
@@ -44,7 +35,6 @@ export const PublicHeader = ({
   { label: 'Accueil', href: '/'},
   { label: 'Matchs', href: '/games'},
   { label: 'Organisations', href: '/tenants'},
-  //{ label: 'Actualités', href: '/news'},
   { separator: true },
   { label: 'Logiciel', href: '/features'},
   { label: 'Plans', href: '/plans' },
@@ -68,7 +58,6 @@ export const PublicHeader = ({
     return () => document.removeEventListener("mousedown", onDoc);
   }, [dropdownOpen]);
 
-  //const updatedNavLinks = extendNavLinksWithIcons(navLinks, sportType);
   const handleLogout = () => { logout(); router.push("/"); };
 
   return (

@@ -4,7 +4,7 @@ import { Analytics } from "@vercel/analytics/next" ///Vercel Analytics
 import { SpeedInsights } from "@vercel/speed-insights/next"
 // app/layout.tsx (if this is the root layout) or a specific public group layout
 import React, { ReactNode } from 'react';
-import { Inter, Poppins } from 'next/font/google'; // Example font
+import { Inter } from 'next/font/google'; // Example font
 import { Toaster } from "sonner";
 import Script from 'next/script';
 
