@@ -79,7 +79,7 @@ export function AppLayoutHeader({
           <Skeleton className="h-10 w-10 rounded-full" />
         ) : userAuth ? (
           // Use the new reusable UserDropdown
-          <UserDropdown handleLogout={handleLogout} />
+          <UserDropdown />
         ) : (
           <Link
             href="/login"
