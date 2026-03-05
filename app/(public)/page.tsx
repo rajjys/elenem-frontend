@@ -1,5 +1,6 @@
 import Container from '@/components/ui/container';
 import { CheckCircle2, XCircle, ArrowRight } from 'lucide-react'; // Suggested icons
+import Link from 'next/link';
 
 export default function HomePage() {
   return (
@@ -19,19 +20,19 @@ export default function HomePage() {
                - games, standings, and communication in one place.
             </p>
             <div className="mt-10 flex flex-col sm:flex-row justify-center items-center gap-4">
-              <a
+              <Link
                 href="/contact"
                 className="w-auto inline-flex items-center justify-center rounded-full bg-primary px-6 py-2 text-white font-bold transition-transform hover:scale-105 active:scale-95 shadow-lg shadow-primary/20"
               >
                 Request a demo
-              </a>
+              </Link>
 
-              <a
+              <Link
                 href="#how-it-works"
                 className="w-auto inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-6 py-2 font-semibold text-slate-600 hover:bg-slate-50 transition-colors"
               >
                 See how it works
-              </a>
+              </Link>
             </div>
           </div>
         </Container>
@@ -340,21 +341,21 @@ export default function HomePage() {
               </p>
 
               <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-6">
-                <a
+                <Link
                   href="/contact"
                   className="w-auto inline-flex items-center justify-center rounded-full bg-primary px-6 py-2 text-white font-bold transition-transform hover:scale-105 active:scale-95 shadow-lg shadow-primary/20"
                 >
                   Request a demo
-                </a>
+                </Link>
                 
-                <a href="/pricing" className="w-auto inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-6 py-2 font-semibold text-slate-600 hover:bg-slate-50 transition-colors">
+                <Link href="/pricing" className="w-auto inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-6 py-2 font-semibold text-slate-600 hover:bg-slate-50 transition-colors">
                   See all plans <span aria-hidden="true" className='pl-1'>→</span>
-                </a>
+                </Link>
               </div>
             </div>
 
             {/* Subtle "Trusted By" label to lower the barrier */}
-            <p className="mt-12 text-xs font-medium uppercase tracking-[0.2em] text-slate-500">
+            <p className="mt-12 text-xs font-medium uppercase tracking-[0.2em] text-slate-900">
               Configuration and onboarding included
             </p>
           </div>
