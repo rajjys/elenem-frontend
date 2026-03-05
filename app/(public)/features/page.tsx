@@ -1,107 +1,323 @@
-'use client'
-import React, { useEffect } from "react";
-import { motion } from "framer-motion";
-import { Users2, CalendarDays, ShieldCheck, Smartphone, Globe2, Network, Layers, ChartBar, Phone } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
-import Link from "next/link";
-import { useAuthStore } from "@/store/auth.store";
+import Container from '@/components/ui/container';
 
-// --------------------------------------------------
-// Données de démonstration (à remplacer plus tard)
-// --------------------------------------------------
-const features = [
-  { icon: <CalendarDays className="w-6 h-6"/>, title: "Planification intelligente", desc: "Calendrier automatique, gestion des conflits et disponibilité des terrains." },
-  { icon: <Users2 className="w-6 h-6"/>, title: "Gestion des effectifs", desc: "Licences, transferts, suspensions et suivi des joueurs." },
-  { icon: <ShieldCheck className="w-6 h-6"/>, title: "Fair-play et discipline", desc: "Désignation des arbitres, rapports de matchs et sanctions disciplinaires." },
-  { icon: <Globe2 className="w-6 h-6"/>, title: "Sites dédiés par ligue", desc: "Chaque organisation obtient un sous-domaine personnalisé, avec possibilité de nom de domaine pro." },
-  { icon: <Network className="w-6 h-6"/>, title: "API et intégrations", desc: "Accès aux données en temps réel via API et webhooks pour vos applications." },
-  { icon: <Smartphone className="w-6 h-6"/>, title: "Expérience mobile", desc: "Une interface optimisée pour les supporters sur smartphones." },
-  { icon: <Layers className="w-6 h-6"/>, title: "Multi-compétitions", desc: "Support de plusieurs ligues, divisions et saisons simultanément." },
-  { icon: <ChartBar className="w-6 h-6"/>, title: "Statistiques avancées", desc: "Analyse des performances des équipes, joueurs et compétitions." },
-];
-
-// --------------------------------------------------
-// Composant principal
-// --------------------------------------------------
 export default function FeaturesPage() {
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const [Motion, setMotion] = React.useState<any>(null);
-    const { user: userAuth } = useAuthStore()
-    const getStartedCTALink = userAuth ? '/welcome' : '/register'
-    useEffect(() => {
-        import("framer-motion").then((mod) => setMotion(mod));
-      }, []);
-    if (!Motion) return null;  
-
   return (
-    <div className="min-h-screen bg-white text-zinc-900 dark:bg-slate-900 dark:text-slate-100">
-      {/* Hero section */}
-      <section className="relative border-b border-slate-200 dark:border-slate-700">
-        <div className="mx-auto max-w-7xl px-4 pt-12 pb-16 text-center">
-          <motion.h1
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="text-4xl md:text-5xl font-bold"
-          >
-            Fonctionnalités principales
-          </motion.h1>
-          <p className="mt-4 text-lg text-zinc-600 dark:text-slate-400 max-w-2xl mx-auto">
-            Elenem est conçu pour simplifier la gestion des ligues et offrir une expérience moderne aux supporters.
-          </p>
-        </div>
+    <div className="bg-white">
+      {/* Page intro */}
+      <section className="relative pt-24 pb-32 overflow-hidden bg-slate-900 text-white">
+        <Container>
+          <div className="max-w-4xl text-center mx-auto">
+            <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight leading-[1.1]">
+              League management, <br />
+              <span className="text-primary italic font-medium">done properly.</span>
+            </h1>
+            <p className="mt-8 text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed">
+              Elenem replaces fragmented tools with one authoritative system 
+              designed specifically for the high stakes of sports competition.
+            </p>
+          </div>
+          
+          {/* Visual Anchor: The "Command Center" Bar */}
+          <div className="mt-16 bg-white/5 border border-white/10 rounded-2xl p-4 hidden md:flex flex-wrap gap-8 items-center backdrop-blur-sm max-w-3xl mx-auto">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+              <span className="text-xs font-bold uppercase tracking-widest text-slate-400">System Live</span>
+            </div>
+            <div className="h-4 w-px bg-white/10 hidden md:block" />
+            <div className="text-sm font-medium"><span className="text-primary">1,240</span> Matches Scheduled</div>
+            <div className="text-sm font-medium"><span className="text-primary">84</span> Active Divisions</div>
+            <div className="text-sm font-medium"><span className="text-primary">0</span> Calculation Errors</div>
+          </div>
+        </Container>
       </section>
-    
-      {/* Features grid */}
-      <section className="mx-auto max-w-7xl px-4 py-12">
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {features.map((f, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: i * 0.05 }}
-            >
-              <Card className="rounded-2xl h-full bg-white dark:bg-slate-800">
-                <CardContent className="p-6 flex flex-col items-start gap-3">
-                  <div className="p-3 rounded-xl bg-sky-50 text-sky-600 dark:bg-sky-900/30 dark:text-sky-300">
-                    {f.icon}
-                  </div>
-                  <h3 className="font-semibold text-lg">{f.title}</h3>
-                  <p className="text-sm text-zinc-600 dark:text-slate-400">{f.desc}</p>
-                </CardContent>
-              </Card>
-            </motion.div>
-          ))}
-        </div>
-      </section>
-        
-      {/* CTA section */}
-      <section className="mx-auto max-w-7xl px-4 py-16 text-center">
-        <h2 className="text-2xl md:text-3xl font-semibold">
-          Prêt à gérer votre ligue avec intelligence ?
-        </h2>
-        <p className="mt-2 text-zinc-600 dark:text-slate-400 max-w-xl mx-auto">
-          Découvrez comment Elenem peut transformer la gestion de votre organisation sportive.
-        </p>
-        <div className="mt-6 flex justify-center gap-4">
-          <Link
-            href={getStartedCTALink}
-            className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-500 ease-in-out"
-          >
-            Commencer gratuitement
-          </Link>
-          <Link
-            href="/contact-us"
-            className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-md text-blue-700 border border-blue-600 bg-transparent hover:bg-blue-50 dark:text-blue-300 dark:border-blue-500 dark:hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-500 ease-in-out"
-          >
-            <Phone className="mr-2 w-4 h-4" />
-            Parler avec l’équipe
-          </Link>
-        </div>
-      </section>
-    </div>
-);
 
+      {/* Sections */}
+      <FeatureSection {...leagueConfiguration} />
+      <FeatureSection {...fixturesManagement} />
+      <FeatureSection {...resultsAndStandings} />
+      <FeatureSection {...publicPortal} />
+      <FeatureSection {...administration} />
+      <FeatureSection {...reliability} />
+    </div>
+  )
 }
+
+type PlanTier = 'Basic' | 'Pro' | 'Federation'
+
+interface FeatureSectionProps {
+  eyebrow: string
+  title: string
+  description: string
+  bullets: string[]
+  plans: {
+    tier: PlanTier
+    features: string[]
+  }[]
+}
+
+function FeatureSection({
+  eyebrow,
+  title,
+  description,
+  bullets,
+  plans,
+}: FeatureSectionProps) {
+  return (
+    <section className="py-24 border-b last:border-none">
+      <Container>
+        <div className="grid lg:grid-cols-2 gap-16 items-start">
+          
+          {/* LEFT – Value */}
+          <div>
+            <p className="text-sm uppercase tracking-wider font-semibold text-primary mb-3">
+              {eyebrow}
+            </p>
+            <h2 className="text-4xl font-extrabold tracking-tight text-slate-900 mb-6">
+              {title}
+            </h2>
+            <p className="text-lg text-muted mb-8">
+              {description}
+            </p>
+
+            <ul className="space-y-4">
+              {bullets.map((b, i) => (
+                <li
+                  key={i}
+                  className="flex items-start gap-3 text-slate-700"
+                >
+                  <span className="mt-1 h-2 w-2 rounded-full bg-primary" />
+                  <span>{b}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* RIGHT – Plan mapping */}
+          <div className="space-y-6">
+            {plans.map((plan) => (
+              <div
+                key={plan.tier}
+                className="rounded-2xl border bg-slate-50 p-6"
+              >
+                <h3 className="font-bold text-slate-900 mb-3">
+                  Included in {plan.tier}
+                </h3>
+                <ul className="space-y-2 text-sm text-slate-700">
+                  {plan.features.map((f, i) => (
+                    <li key={i}>– {f}</li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+
+        </div>
+      </Container>
+    </section>
+  )
+}
+
+const leagueConfiguration = {
+  eyebrow: 'League configuration',
+  title: 'Define the rules once',
+  description:
+    'Elenem starts by structuring your league correctly so everything else works automatically.',
+  bullets: [
+    'Teams, divisions, seasons, and competition rules',
+    'Points system and tie-break logic',
+    'Single authoritative structure for the entire season',
+  ],
+  plans: [
+    {
+      tier: 'Basic' as PlanTier,
+      features: [
+        'Single league configuration',
+        'Standard competition rules',
+        'Manual adjustments',
+      ],
+    },
+    {
+      tier: 'Pro' as PlanTier,
+      features: [
+        'Multiple competitions per league',
+        'Advanced rules and formats',
+      ],
+    },
+    {
+      tier: 'Federation' as PlanTier,
+      features: [
+        'Standardized configuration across leagues',
+        'Central governance controls',
+      ],
+    },
+  ],
+}
+
+const fixturesManagement = {
+  eyebrow: 'Fixtures management',
+  title: 'One official match calendar',
+  description:
+    'Fixtures are created, updated, and published from one place, without conflicting versions.',
+  bullets: [
+    'Centralized match scheduling',
+    'Live updates to fixtures',
+    'Single authoritative calendar',
+  ],
+  plans: [
+    {
+      tier: 'Basic' as PlanTier,
+      features: [
+        'Manual fixture creation',
+        'Centralized calendar',
+      ],
+    },
+    {
+      tier: 'Pro' as PlanTier,
+      features: [
+        'Automatic fixture generation',
+        'Rescheduling tools',
+      ],
+    },
+    {
+      tier: 'Federation' as PlanTier,
+      features: [
+        'Cross-league calendar coordination',
+      ],
+    },
+  ],
+}
+
+const resultsAndStandings = {
+  eyebrow: 'Results and standings',
+  title: 'Standings update automatically',
+  description:
+    'Results are entered once. The system applies league rules instantly.',
+  bullets: [
+    'Automatic points calculation',
+    'Tie-breaks enforced by the system',
+    'Standings update everywhere',
+  ],
+  plans: [
+    {
+      tier: 'Basic' as PlanTier,
+      features: [
+        'Manual result entry',
+        'Automatic standings',
+      ],
+    },
+    {
+      tier: 'Pro' as PlanTier,
+      features: [
+        'Advanced tie-break rules',
+        'Multiple standings tables',
+      ],
+    },
+    {
+      tier: 'Federation' as PlanTier,
+      features: [
+        'Standardized standings across leagues',
+      ],
+    },
+  ],
+}
+
+const publicPortal = {
+  eyebrow: 'Public league portal',
+  title: 'Your league’s official home',
+  description:
+    'Fans and clubs follow your league from one reliable source.',
+  bullets: [
+    'Fixtures, results, and standings',
+    'Mobile-ready by default',
+    'Always synced with official data',
+  ],
+  plans: [
+    {
+      tier: 'Basic' as PlanTier,
+      features: [
+        'Public league website',
+        'Core league data',
+      ],
+    },
+    {
+      tier: 'Pro' as PlanTier,
+      features: [
+        'Custom domain',
+        'Visual branding',
+      ],
+    },
+    {
+      tier: 'Federation' as PlanTier,
+      features: [
+        'Multi-league public portals',
+      ],
+    },
+  ],
+}
+
+const administration = {
+  eyebrow: 'Administration',
+  title: 'Structured control without complexity',
+  description:
+    'League management happens in one interface with clear authority.',
+  bullets: [
+    'Centralized administration',
+    'Controlled updates',
+    'Reduced human error',
+  ],
+  plans: [
+    {
+      tier: 'Basic' as PlanTier,
+      features: [
+        'Single admin role',
+        'Central management',
+      ],
+    },
+    {
+      tier: 'Pro' as PlanTier,
+      features: [
+        'Multiple admin roles',
+      ],
+    },
+    {
+      tier: 'Federation' as PlanTier,
+      features: [
+        'Multi-league administration',
+      ],
+    },
+  ],
+}
+
+const reliability = {
+  eyebrow: 'Reliability',
+  title: 'Built for consistency',
+  description:
+    'Elenem enforces rules and consistency by design.',
+  bullets: [
+    'Single source of truth',
+    'Automated rule enforcement',
+    'Consistent public and internal data',
+  ],
+  plans: [
+    {
+      tier: 'Basic' as PlanTier,
+      features: [
+        'Centralized data model',
+        'Secure access',
+      ],
+    },
+    {
+      tier: 'Pro' as PlanTier,
+      features: [
+        'Enhanced validation',
+      ],
+    },
+    {
+      tier: 'Federation' as PlanTier,
+      features: [
+        'Governance-level controls',
+      ],
+    },
+  ],
+}
+

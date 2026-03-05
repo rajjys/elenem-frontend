@@ -18,7 +18,7 @@ export default function PublicHeader() {
 
   const nav = [
     { label: "Solution", href: "/features" },
-    { label: "Comment ça marche", href: "/how-it-works" },
+    { label: "Comment ça marche", href: "/#how-it-works" },
     { label: "Tarifs", href: "/pricing" },
     { label: "Ressources", href: "/docs" },
   ];
