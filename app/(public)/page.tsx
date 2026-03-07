@@ -28,10 +28,10 @@ export default function HomePage() {
               </Link>
 
               <Link
-                href="#how-it-works"
+                href="/features"
                 className="w-auto inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-6 py-2 font-semibold text-slate-600 hover:bg-slate-50 transition-colors"
               >
-                See how it works
+                See the solution
               </Link>
             </div>
           </div>
@@ -93,7 +93,7 @@ export default function HomePage() {
         </Container>
       </section>
         {/* SOLUTION - Emphasizing Automation, Integrity and Brand Ownership */}
-      <section className="py-18 bg-white">
+      <section className="py-12 bg-white">
         <Container>
           <div className="grid lg:grid-cols-2 gap-20 items-center">
             {/* LEFT: THE TEXT (League Manager Centered) */}
@@ -107,9 +107,7 @@ export default function HomePage() {
                   Elenem centralizes fixtures, results, standings, and communication into one official system -
                   powering your league&apos;s digital presence while keeping your identity.
                 </p>
-              </div>
-              
-              
+              </div>          
               <div className="space-y-8">
                 <div className='hidden md:block'>
                   <h3 className="text-xl font-bold text-slate-900">Total Brand Ownership</h3>
@@ -136,6 +134,10 @@ export default function HomePage() {
                     ✓ Automated Logic
                   </div>
                 </div>
+                <Link href="/features" className="inline-flex items-center gap-2 text-primary font-bold text-lg hover:underline">
+                  See how Elenem will work for your league
+                  <ArrowRight size={20} />
+                </Link>
               </div>
             </div>
 
@@ -285,14 +287,13 @@ export default function HomePage() {
                   </div>
                 </div>
               </div>
-
-              <a
+              <Link
                 href="/pricing"
                 className="inline-flex items-center gap-2 text-primary font-bold text-lg hover:underline"
               >
                 Compare all features and pricing
                 <ArrowRight size={20} />
-              </a>
+              </Link>
             </div>
 
             <div className="flex-1 bg-primary rounded-[2rem] p-12 text-white relative overflow-hidden">
@@ -306,16 +307,16 @@ export default function HomePage() {
                 <li className="flex items-center gap-2"><CheckCircle2 size={18} /> Dedicated Support</li>
                 <li className="flex items-center gap-2"><CheckCircle2 size={18} /> Regular Security Updates</li>
               </ul>
-              <a href="/contact" className="block w-full text-center py-4 bg-white text-primary font-bold rounded-xl hover:bg-slate-50 transition-colors">
+              <Link href="/contact" className="block w-full text-center py-4 bg-white text-primary font-bold rounded-xl hover:bg-slate-50 transition-colors">
                 Request a Custom Quote
-              </a>
+              </Link>
             </div>
           </div>
         </Container>
       </section>
         {/* FINAL CTA - High Contrast */}
       {/* FINAL CTA - The "Season Ready" Impact Zone */}
-      <section className="py-12">
+      <section className="pb-12">
         <Container>
           <div className="relative isolate overflow-hidden  px-6 py-12 sm:px-24 sm:py-24 text-center">           
             {/* Background Decorative Elements - Subtle "System Grid" */}
