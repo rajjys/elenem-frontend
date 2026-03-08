@@ -136,6 +136,9 @@
 
 @theme {
   --color-primary: #0a3a8d;
+  --color-primary-light: #e0e0ff;
+  --color-primary-dark: #1e40af;
+  --color-muted-foreground: #9ca3af;
   --color-muted: #6b7280;
 }
 

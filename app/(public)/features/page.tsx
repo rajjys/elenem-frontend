@@ -8,7 +8,11 @@ import {
   Database, 
   TrendingUp,
   ArrowRight,
-  CheckCircle2
+  CheckCircle2,
+  UserCircle,
+  Users,
+  Menu,
+  ShieldUser,
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -43,10 +47,48 @@ export default function FeaturesPage() {
           </div>
         </Container>
       </section>
-      {/* SECTION 1: LEAGUE CONFIGURATION */}
-      <section className="py-24 bg-white">
+      {/* THE BRIDGE: THE ARCHITECTURE */}
+      <section className="pb-12">
         <Container>
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
+          <div className="bg-slate-900 rounded-[2.5rem] p-8 md:p-12 text-white relative overflow-hidden">
+            {/* Subtle background text for "Official" feel */}
+            <div className="absolute top-4 right-8 text-[120px] font-black opacity-[0.03] select-none pointer-events-none">
+              FLOW
+            </div>
+
+            <div className="relative z-10 grid md:grid-cols-3 gap-12">
+              <div>
+                <h3 className="text-primary-light font-bold mb-2">01. Setup</h3>
+                <p className="text-muted-foreground text-sm leading-relaxed">
+                  Translate your league’s unique rules and structure into a 
+                  digital foundation that enforces consistency.
+                </p>
+              </div>
+              <div>
+                <h3 className="text-primary-light font-bold mb-2">02. Execute</h3>
+                <p className="text-muted-foreground text-sm leading-relaxed">
+                  Manage matches and results with a system that detects 
+                  conflicts and updates standings in real-time.
+                </p>
+              </div>
+              <div>
+                <h3 className="text-primary-light font-bold mb-2">03. Scale</h3>
+                <p className="text-muted-foreground text-sm leading-relaxed">
+                  Own your brand, grow your fan base, and maintain 
+                  an undisputed official record of every season.
+                </p>
+              </div>
+            </div>
+            
+            {/* Visual Connector Line (Desktop Only) */}
+            <div className="hidden md:block mt-12 h-px w-full bg-gradient-to-r from-primary/50 via-slate-700 to-transparent" />
+          </div>
+        </Container>
+      </section>
+      {/* SECTION 1: LEAGUE CONFIGURATION */}
+      <section className="py-16 bg-white"> {/* Tighter vertical padding */}
+        <Container>
+          <div className="grid lg:grid-cols-2 gap-12 items-start"> {/* Reduced gap, aligned to start */}
             
             {/* TEXT: The "Proof of Seriousness" */}
             <div className="max-w-xl order-2 lg:order-1">
@@ -68,71 +110,122 @@ export default function FeaturesPage() {
                 final matchday.
               </p>
 
-              <ul className="grid sm:grid-cols-2 gap-4">
+              <ul className="grid gap-y-3">
                 {[
-                  'Team & season configuration',
-                  'Competition formats & schedules',
-                  'League rules defined once',
-                  'Season-ready structure'
-                ].map((point, i) => (
-                  <li key={i} className="flex items-center gap-3 text-slate-700 text-sm font-semibold">
-                    <div className="w-1.5 h-1.5 rounded-full bg-primary shrink-0" />
-                    {point}
+                  { label: 'Structure', desc: 'Define divisions, teams, and seasons.' },
+                  { label: 'Rules', desc: 'Set points for wins, draws, and specific bonuses.' },
+                  { label: 'Tie-Breakers', desc: 'Most Wins, GD, Goals For, or H2H.' },
+                  { label: 'Authority', desc: 'One central ruleset enforced across the system.' }
+                ].map((item, i) => (
+                  <li key={i} className="flex items-start gap-3">
+                    <div className="mt-1.5 h-1.5 w-1.5 rounded-full bg-primary shrink-0" />
+                    <p className="text-sm text-slate-700">
+                      <span className="font-bold text-slate-900">{item.label}:</span> {item.desc}
+                    </p>
                   </li>
                 ))}
               </ul>
             </div>
 
-            {/* VISUAL: The Rule-Builder Skeleton */}
+            {/* VISUAL: The "Operational Window" Skeleton */}
             <div className="order-1 lg:order-2">
-              <div className="relative p-8 bg-slate-50 rounded-[2.5rem] border border-slate-200 shadow-inner">
-                <div className="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
+              <div className="bg-slate-50 rounded-3xl p-3 border border-slate-100 shadow-inner"> {/* Tightened outer container */}
+                <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden">
                   
-                  {/* Mock Header */}
-                  <div className="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-                    <div className="h-2 w-32 bg-slate-200 rounded-full" />
-                    <div className="h-6 w-16 bg-primary/10 rounded-full border border-primary/20" />
+                  {/* macOS Style Window Header: Establishing "Real Software" Feel */}
+                  <div className="px-4 py-3 border-b border-slate-100 flex items-center gap-2 bg-slate-50/50">
+                    <div className="flex gap-1.5">
+                      <div className="w-2.5 h-2.5 rounded-full bg-slate-200/70" /> {/* Close */}
+                      <div className="w-2.5 h-2.5 rounded-full bg-slate-200/70" /> {/* Minimize */}
+                      <div className="w-2.5 h-2.5 rounded-full bg-slate-200/70" /> {/* Expand */}
+                    </div>
+                    <div className="flex-1 text-center pr-10"> {/* Offset for balance */}
+                      <div className="h-2 w-28 bg-slate-200 rounded-full mx-auto" /> {/* Window Title Placeholder */}
+                    </div>
                   </div>
 
-                  <div className="p-8 space-y-8">
-                    {/* Abstract Rule 1: Points Logic */}
-                    <div className="space-y-4">
-                      <div className="flex justify-between items-end">
-                        <div className="space-y-2">
-                          <div className="h-3 w-40 bg-slate-900 rounded-full" />
-                          <div className="h-2 w-24 bg-slate-300 rounded-full" />
-                        </div>
-                        <div className="h-8 w-12 bg-slate-50 border rounded-md" />
-                      </div>
-                      <div className="grid grid-cols-3 gap-3">
-                        <div className="h-10 rounded-lg border-2 border-primary/20 bg-primary/5 flex items-center justify-center">
-                          <div className="h-2 w-4 bg-primary/40 rounded-full" />
-                        </div>
-                        <div className="h-10 rounded-lg border border-slate-100 bg-slate-50" />
-                        <div className="h-10 rounded-lg border border-slate-100 bg-slate-50" />
-                      </div>
-                    </div>
+                  {/* Content: Tightened vertical flow (divide-y ensures clean logic breaks) */}
+                  <div className="divide-y divide-slate-100">
 
-                    {/* Abstract Rule 2: Tie-Breaker Hierarchy */}
-                    <div className="space-y-4 pt-6 border-t border-slate-100">
-                      <div className="h-3 w-48 bg-slate-900 rounded-full" />
-                      <div className="space-y-3">
-                        {[1, 2].map((i) => (
-                          <div key={i} className="flex items-center gap-4 p-3 bg-slate-50 rounded-xl border border-slate-100">
-                            <span className="text-[10px] font-bold text-slate-400">0{i}</span>
-                            <div className="h-2 flex-1 bg-slate-200 rounded-full" />
-                            <div className="w-4 h-4 rounded-full bg-white border border-slate-200" />
+                    {/* Step 1: Points Logic */}
+                    <div className="p-3 space-y-4">
+                      <div className="h-2 w-24 bg-slate-300 rounded-full mb-3" />
+                      <div className="grid grid-cols-3 gap-3"> {/* Use grid for strict 3-col layout */}
+                        {[
+                          { val: '3', sub: 'Win' },
+                          { val: '1', sub: 'Draw' },
+                          { val: '0', sub: 'Loss' }
+                        ].map((item, i) => (
+                          <div key={i} className="p-3 rounded-lg bg-slate-50 border border-slate-100 text-center">
+                            <div className="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">{item.sub}</div>
+                            <div className="text-sm font-black text-slate-900 italic">{item.val}</div>
                           </div>
                         ))}
                       </div>
                     </div>
-                  </div>
-                </div>
 
-                {/* Floating "Status" Badge */}
-                <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-6 py-3 rounded-2xl shadow-2xl flex items-center gap-3">
-                  <div className="w-2 h-2 rounded-full bg-green-400 shadow-[0_0_8px_rgba(74,222,128,0.5)]" />
-                  <span className="text-xs font-bold uppercase">System Updated</span>
+                    {/* Step 2: Tie-Breaker Hierarchy */}
+                    <div className="p-5 space-y-4 pt-4"> {/* Slight pt-4 to give breathing room after divide-y */}
+                      <div className="h-2 w-32 bg-slate-300 rounded-full mb-4" />
+                      <div className="space-y-3">
+                        {[
+                          { label: 'Goal Difference', active: true },
+                          { label: 'Goals Scored', active: false },
+                          { label: 'Head-to-Head', active: false }
+                        ].map((rule, i) => (
+                          <div key={i} className="flex items-center justify-between text-[11px] font-bold">
+                            <div className="flex items-center gap-3">
+                              <div className="text-slate-300 font-mono flex gap-1"><Menu className='w-4 h-4'/> 0{i+1}</div>
+                              <span className={rule.active ? 'text-slate-900' : 'text-slate-400'}>{rule.label}</span>
+                            </div>
+                            <div className={`w-3 h-3 rounded-full border-2 ${rule.active ? 'bg-primary border-primary shadow-inner' : 'border-slate-200 bg-white'}`} />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Step 3: Team Registry (Using Lucide Users icon) */}
+                    <div className="p-4 flex items-center justify-between gap-4 bg-slate-50/50">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/20">
+                          <Users className="w-4 h-4 text-primary" />
+                        </div>
+                        <div className="space-y-1">
+                          <div className="h-2 w-16 bg-slate-300 rounded-full" />
+                          <div className='flex justify-between'>
+                            <div className="h-1.5 w-6 bg-slate-200 rounded-full" />
+                            <div className="h-1.5 w-5 bg-slate-200 rounded-full" />
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex -space-x-2.5">
+                        {[1, 2, 3, 4].map(i => (
+                          <div key={i} className="w-8 h-8 rounded-full border-2 border-white bg-slate-200/70" />
+                        ))}
+                        <div className="w-8 h-8 rounded-full border-2 border-white bg-slate-200 flex items-center justify-center text-[10px] font-black text-slate-600">+12</div>
+                      </div>
+                    </div>
+
+                    {/* Step 4: Athlete Registry (Using Lucide User icon) */}
+                    <div className="p-4 flex items-center justify-between gap-4 bg-slate-50/50">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-lg bg-slate-900 flex items-center justify-center">
+                          <ShieldUser className="w-5.5 h-5.5 text-primary-light" />
+                        </div>
+                        <div className="space-y-1">
+                          <div className="h-2 w-20 bg-slate-900 rounded-full" />
+                          <div className="h-1.5 w-12 bg-slate-700 rounded-full" />
+                        </div>
+                      </div>
+                      <div className="flex -space-x-3.5">
+                        {[1, 2, 3, 4, 5, 6].map(i => (
+                          <div key={i} className="w-8 h-8 rounded-full border-2 border-white bg-slate-200/70" />
+                        ))}
+                        <div className="w-8 h-8 rounded-full border-2 border-slate-50 bg-primary/20 flex items-center justify-center text-[10px] font-black text-primary">+80</div>
+                      </div>
+                    </div>
+
+                  </div> {/* End Divide-y */}
                 </div>
               </div>
             </div>
@@ -326,7 +419,6 @@ export default function FeaturesPage() {
       <section className="py-24 bg-slate-900 text-white overflow-hidden">
         <Container>
           <div className="grid lg:grid-cols-2 gap-16 items-center">
-            
             {/* VISUAL: The Mobile-First Fan Portal */}
             <div className="relative flex justify-center lg:justify-start order-2 lg:order-1">
               {/* Decorative Glow */}
