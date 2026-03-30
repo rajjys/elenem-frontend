@@ -357,10 +357,6 @@ export default function FeaturesPage() {
                     <div className="space-y-2">
                       <div className="flex items-center justify-between px-1">
                         <div className="h-1.5 w-16 bg-slate-200 rounded-full" />
-                        <div className="flex items-center gap-1">
-                          <div className="w-1 h-1 rounded-full bg-red-400 animate-pulse" />
-                          <span className="text-[9px] font-black text-red-400 uppercase tracking-widest">Live</span>
-                        </div>
                       </div>
 
                       {/* Live Match Card with softer contrast */}
