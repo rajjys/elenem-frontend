@@ -243,8 +243,8 @@ export default function FeaturesPage() {
             <div className="max-w-xl pt-2 order-1 lg:order-2">
               <div className="flex items-center gap-2 text-primary mb-3">
                 <CalendarDays className="w-4 h-4" />
-                <p className="text-[10px] uppercase tracking-[0.2em] font-bold">
-                  Phase 02: Execute
+                <p className="text-sm uppercase tracking-widest font-bold">
+                  Step 02: Execute
                 </p>
               </div>
               
@@ -376,11 +376,11 @@ export default function FeaturesPage() {
           <div className="grid lg:grid-cols-2 gap-10 items-start">
             
             {/* TEXT: The Logic Engine */}
-            <div className="max-w-xl order-2 lg:order-1 pt-2">
+            <div className="max-w-xl pt-2">
               <div className="flex items-center gap-2 text-primary mb-3">
                 <Activity className="w-4 h-4" />
-                <p className="text-[10px] uppercase tracking-[0.2em] font-bold">
-                  Phase 03: Ensure correctness
+                <p className="text-sm uppercase tracking-widest font-bold">
+                  Step 03: Ensure correctness
                 </p>
               </div>
               
@@ -412,7 +412,7 @@ export default function FeaturesPage() {
             </div>
 
             {/* VISUAL: The Professional Standings Table */}
-            <div className="order-1 lg:order-2">
+            <div className="">
               <div className="bg-slate-100/50 rounded-3xl p-4 border border-slate-200 shadow-inner">
                 <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden">
                   
@@ -476,7 +476,7 @@ export default function FeaturesPage() {
                   <div className="p-3 bg-slate-50 border-t border-slate-100 flex justify-center">
                     <div className="px-3 py-1 rounded-full border border-slate-200 bg-white shadow-sm flex items-center gap-2">
                         <div className="w-1.5 h-1.5 rounded-full bg-primary" />
-                        <span className="text-[8px] font-bold text-slate-500 uppercase tracking-widest">Logic Engine: Active</span>
+                        <span className="text-[8px] font-bold text-slate-500 uppercase tracking-widest">Updated 3 mins ago</span>
                     </div>
                   </div>
 
@@ -488,109 +488,129 @@ export default function FeaturesPage() {
         </Container>
       </section>
       {/* SECTION 4: OFFICIAL PUBLIC PORTAL */}
-      <section className="py-24 bg-slate-900 text-white overflow-hidden">
+      <section className="py-12 lg:py-2 bg-slate-950 text-white overflow-hidden">
         <Container>
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-            {/* VISUAL: The Mobile-First Fan Portal */}
+          <div className="grid lg:grid-cols-2 gap-12 items-center">           
+            {/* VISUAL: The Mobile Browser Portal */}
             <div className="relative flex justify-center lg:justify-start order-2 lg:order-1">
-              {/* Decorative Glow */}
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-primary/20 rounded-full blur-[80px]" />
+              {/* Subtle Glow to make the phone pop against dark bg */}
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-primary/10 rounded-full blur-[100px]" />
               
-              {/* Smartphone Mockup */}
-              <div className="relative w-full max-w-[280px] aspect-[9/19] bg-slate-800 rounded-[3rem] p-3 shadow-2xl border-4 border-slate-700">
-                <div className="bg-white h-full w-full rounded-[2.2rem] overflow-hidden flex flex-col">
+              {/* Smartphone Mockup with Browser UI */}
+              <div className="relative w-full max-w-[260px] aspect-[9/19] bg-slate-800 rounded-[2.5rem] p-2.5 shadow-2xl border border-slate-700">
+                <div className="bg-white h-full w-full rounded-[2rem] overflow-hidden flex flex-col">
                   
-                  {/* Status Bar */}
-                  <div className="h-6 w-full bg-white flex justify-center items-end pb-1">
-                    <div className="w-12 h-1 bg-slate-100 rounded-full" />
+                  {/* Mobile Browser URL Bar */}
+                  <div className="px-4 pt-4 pb-2 bg-slate-50 border-b border-slate-100">
+                    <div className="bg-white border border-slate-200 rounded-full py-1 px-3 flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-green-500" />
+                        <div className="h-1.5 w-24 bg-slate-100 rounded-full" /> {/* URL: yourleague.com */}
+                    </div>
                   </div>
 
-                  {/* Public App Interface */}
-                  <div className="p-4 space-y-5">
-                    {/* Header/Logo Skeleton */}
-                    <div className="flex justify-between items-center">
-                      <div className="h-3 w-20 bg-slate-100 rounded-full" />
-                      <div className="w-6 h-6 rounded-full bg-primary/10" />
-                    </div>
-
-                    {/* Match Card (The "Live" Experience) */}
-                    <div className="space-y-3">
-                      <div className="h-2 w-16 bg-slate-200 rounded-full" />
-                      <div className="p-4 rounded-2xl border border-slate-100 shadow-sm space-y-4">
-                        <div className="flex justify-between items-center">
-                          <div className="flex flex-col items-center gap-2">
-                            <div className="w-8 h-8 rounded-full bg-slate-100" />
-                            <div className="h-1.5 w-10 bg-slate-200 rounded-full" />
-                          </div>
-                          <div className="text-xl font-black text-slate-900 italic">2 - 1</div>
-                          <div className="flex flex-col items-center gap-2">
-                            <div className="w-8 h-8 rounded-full bg-slate-100" />
-                            <div className="h-1.5 w-10 bg-slate-200 rounded-full" />
-                          </div>
-                        </div>
-                        <div className="h-1.5 w-full bg-green-50 rounded-full border border-green-100" />
+                  {/* Public Website Content */}
+                  <div className="flex-1 overflow-hidden p-4 space-y-5">
+                    {/* Custom Branding Header */}
+                    <div className="flex justify-between items-center px-1">
+                      <div className="w-6 h-6 rounded bg-slate-900 flex items-center justify-center text-[8px] font-bold text-white italic">L</div>
+                      <div className="flex gap-2">
+                          <div className="w-4 h-4 rounded-full bg-slate-100" />
+                          <div className="w-4 h-4 rounded-full bg-slate-100" />
                       </div>
                     </div>
 
-                    {/* Mini Standings Sneak-Peak */}
-                    <div className="space-y-3 pt-2">
-                      <div className="h-2 w-24 bg-slate-200 rounded-full" />
-                      {[1, 2, 3].map((i) => (
-                        <div key={i} className="flex items-center gap-3 py-2 border-b border-slate-50">
-                          <div className="h-1.5 w-3 bg-slate-200 rounded-full" />
-                          <div className="h-1.5 w-full bg-slate-100 rounded-full" />
-                          <div className="h-1.5 w-4 bg-slate-900/10 rounded-full" />
+                    {/* Featured "Next Match" Card */}
+                    <div className="space-y-2">
+                      <div className="h-1.5 w-16 bg-slate-200 rounded-full ml-1" />
+                      <div className="p-4 rounded-xl bg-slate-900 text-white shadow-lg space-y-4">
+                        <div className="flex justify-between items-center">
+                          <div className="flex flex-col items-center gap-1.5">
+                            <div className="w-8 h-8 rounded-full bg-white/10" />
+                            <div className="h-1 w-8 bg-white/20 rounded-full" />
+                          </div>
+                          <div className="text-sm font-black italic tracking-tighter text-primary">VS</div>
+                          <div className="flex flex-col items-center gap-1.5">
+                            <div className="w-8 h-8 rounded-full bg-white/10" />
+                            <div className="h-1 w-8 bg-white/20 rounded-full" />
+                          </div>
+                        </div>
+                        <div className="h-1 w-full bg-white/5 rounded-full relative overflow-hidden">
+                          <div className="absolute inset-y-0 left-0 w-1/3 bg-primary" />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Match Day Schedule List (Multiple Games) */}
+                    <div className="space-y-3">
+                      <div className="h-1.5 w-24 bg-slate-200 rounded-full ml-1" />
+                      {[1, 2].map((i) => (
+                        <div key={i} className="p-3 rounded-lg border border-slate-100 flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <div className="w-4 h-4 rounded bg-slate-50 border border-slate-100" />
+                            <div className="h-1 w-10 bg-slate-200 rounded-full" />
+                          </div>
+                          <div className="h-1.5 w-6 bg-slate-900 rounded-full" />
+                          <div className="flex items-center gap-2">
+                            <div className="h-1 w-10 bg-slate-200 rounded-full" />
+                            <div className="w-4 h-4 rounded bg-slate-50 border border-slate-100" />
+                          </div>
                         </div>
                       ))}
                     </div>
+
+                    {/* Mini Table Snippet */}
+                    <div className="p-3 bg-slate-50 rounded-lg border border-slate-100">
+                      <div className="h-1 w-full bg-slate-200 rounded-full mb-2" />
+                      <div className="h-1 w-2/3 bg-slate-200 rounded-full" />
+                    </div>
                   </div>
 
-                  {/* Nav Bar */}
-                  <div className="mt-auto h-12 bg-slate-50 border-t border-slate-100 flex justify-around items-center px-6">
-                    <div className="w-4 h-4 rounded bg-primary/20" />
-                    <div className="w-4 h-4 rounded bg-slate-200" />
-                    <div className="w-4 h-4 rounded bg-slate-200" />
+                  {/* Simple Mobile Nav */}
+                  <div className="h-12 border-t border-slate-100 flex justify-around items-center px-6">
+                    <div className="w-1 h-1 rounded-full bg-primary" />
+                    <div className="w-1 h-1 rounded-full bg-slate-200" />
+                    <div className="w-1 h-1 rounded-full bg-slate-200" />
                   </div>
                 </div>
               </div>
-              
-              {/* Floating "Official" Label */}
-              <div className="absolute top-12 -right-4 bg-white/10 backdrop-blur-md border border-white/20 px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest text-white shadow-xl">
-                Public Portal
+
+              {/* Floating Tag: "Fan View" */}
+              <div className="absolute top-16 -right-6 bg-primary text-white px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest shadow-2xl">
+                Live Fan Portal
               </div>
             </div>
 
             {/* TEXT: The "Fan Experience" */}
-            <div className="max-w-xl order-1 lg:order-2">
-              <div className="flex items-center gap-2 text-primary mb-4">
-                <Globe className="w-5 h-5" />
-                <p className="text-sm uppercase tracking-widest font-bold text-primary-foreground/60">
-                  Step 4: Publish officially
+            <div className="max-w-xl order-1 lg:order-2 pt-4">
+              <div className="flex items-center gap-2 text-primary-light mb-3">
+                <Globe className="w-4 h-4" />
+                <p className="text-sm uppercase tracking-widest font-bold">
+                  Step 04: Publish officially
                 </p>
               </div>
               
-              <h2 className="text-4xl font-black text-white tracking-tight mb-6">
+              <h2 className="text-4xl font-black text-white tracking-tight mb-6 leading-[1.15]">
                 One official place <br /> for fans and clubs
               </h2>
               
               <p className="text-lg text-slate-400 mb-8 leading-relaxed">
-                Elenem provides a public league portal where fixtures, standings, 
-                and results are always up to date. Information is published once 
-                and remains accessible to everyone.
+                Elenem provides a dedicated public portal where fixtures, standings, 
+                and results are always live. Information is published once 
+                and remains accessible to everyone on any device.
               </p>
 
               <ul className="grid gap-y-4">
                 {[
-                  'Custom public league website',
-                  'Schedules and tables always in sync',
-                  'Designed for mobile devices by default',
-                  'Replace informal WhatsApp channels with authority'
-                ].map((point, i) => (
-                  <li key={i} className="flex items-center gap-3 text-slate-300 text-sm font-semibold">
-                    <div className="w-5 h-5 rounded-full bg-white/5 border border-white/10 flex items-center justify-center">
-                      <CheckCircle2 size={12} className="text-primary" />
-                    </div>
-                    {point}
+                  { label: 'Custom URL', desc: 'Host your league on your own domain (yourleague.com).' },
+                  { label: 'Mobile-First', desc: 'Optimized for players and fans checking scores on the pitch.' },
+                  { label: 'Automatic Sync', desc: 'Changes in the admin reflect on the public site instantly.' },
+                  { label: 'Brand Authority', desc: 'Replace informal WhatsApp chats with an official home.' }
+                ].map((item, i) => (
+                  <li key={i} className="flex items-start gap-3">
+                    <div className="mt-1.5 h-1 w-1 rounded-full bg-primary shrink-0" />
+                    <p className="text-sm text-slate-300">
+                      <span className="font-bold text-white">{item.label}:</span> {item.desc}
+                    </p>
                   </li>
                 ))}
               </ul>
