@@ -363,7 +363,7 @@ export default function FeaturesPage() {
                       <div className="p-2.5 rounded-lg border border-slate-200 bg-slate-50 shadow-sm">
                         <div className="flex justify-between items-center mb-1">
                           <div className="h-1 w-10 bg-slate-200 rounded-full" />
-                          <div className="px-1.5 py-0.5 rounded bg-green-200 text-green-700 text-[8px] font-bold tracking-widest italic">82'</div>
+                          <div className="px-1.5 py-0.5 rounded bg-green-400/20 text-green-900/60 text-[8px] font-bold tracking-widest italic">82'</div>
                         </div>
                         <div className="flex items-center justify-between gap-2">
                           <div className="flex-1 flex items-center gap-2">
@@ -466,10 +466,10 @@ export default function FeaturesPage() {
                       <div key={i} className="grid grid-cols-12 gap-2 px-4 py-2.5 items-center hover:bg-slate-50/50 transition-colors">
                         {/* Rank & Trend */}
                         <div className="col-span-1 flex items-center gap-1.5">
-                          <span className="text-[10px] font-black text-slate-500">{row.rank}</span>
+                          <span className="text-[10px] font-black text-slate-400">{row.rank}</span>
                           <div className={`w-1 h-1 rounded-full ${
-                            row.trend === 'up' ? 'bg-green-500' : 
-                            row.trend === 'down' ? 'bg-red-500' : 'bg-slate-200'
+                            row.trend === 'up' ? 'bg-green-200' : 
+                            row.trend === 'down' ? 'bg-red-200' : 'bg-slate-200'
                           }`} />
                         </div>
                         
@@ -482,7 +482,7 @@ export default function FeaturesPage() {
                         {/* Stats: Played, Goal Diff, Points */}
                         <div className="col-span-2 text-center text-[10px] font-medium text-slate-400 tabular-nums">18</div>
                         <div className="col-span-2 text-center text-[10px] font-medium text-slate-400 tabular-nums">{row.gd}</div>
-                        <div className="col-span-2 text-center text-[10px] font-black text-slate-900 tabular-nums">{row.pts}</div>
+                        <div className="col-span-2 text-center text-[10px] font-black text-slate-400 tabular-nums">{row.pts}</div>
                       </div>
                     ))}
                   </div>
@@ -490,8 +490,8 @@ export default function FeaturesPage() {
                   {/* Subtle Footer: Logic Enforcement Badge */}
                   <div className="p-3 bg-slate-50 border-t border-slate-100 flex justify-center">
                     <div className="px-3 py-1 rounded-full border border-slate-200 bg-white shadow-sm flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 rounded-full bg-primary" />
-                        <span className="text-[8px] font-bold text-slate-500 uppercase tracking-widest">Updated 3 mins ago</span>
+                        <div className="w-1.5 h-1.5 rounded-full bg-green-200" />
+                        <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">Updated 3 mins ago</span>
                     </div>
                   </div>
 
@@ -938,7 +938,7 @@ export default function FeaturesPage() {
                   <div className="flex-1 p-5 space-y-4 font-mono text-[9px] text-slate-400">
                     <div className="flex items-center justify-between pb-3 border-b border-slate-100">
                         <div className="h-2 w-28 bg-slate-400 rounded-full" />
-                        <div className="px-2 py-0.5 rounded bg-green-50 text-green-600 font-bold uppercase tracking-widest text-[8px]">Synced ✓</div>
+                        <div className="px-2 py-0.5 rounded bg-green-400/20 text-green-900/60 font-bold uppercase tracking-widest text-[8px]">Synced ✓</div>
                     </div>
 
                     {/* Log Entries: Abstracted Git/Audit feel */}
