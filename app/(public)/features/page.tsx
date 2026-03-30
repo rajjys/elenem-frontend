@@ -25,6 +25,11 @@ import {
   Settings,
   Terminal,
   MonitorCheck,
+  UserPlus,
+  Palette,
+  CloudDownload,
+  RefreshCcw,
+  DatabaseZap,
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -874,75 +879,95 @@ export default function FeaturesPage() {
           </div>
         </Container>
       </section>
-      {/* SECTION 7: RELIABILITY & SECURITY */}
-      <section className="py-24 bg-white">
+      {/* SECTION 7: DATA RELIABILITY & SAFETY */}
+      <section className="py-16 bg-white border-b border-slate-200">
         <Container>
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
             
-            {/* TEXT: The "Safety" Pitch */}
-            <div className="max-w-xl">
-              <div className="flex items-center gap-2 text-primary mb-4">
-                <ShieldCheck className="w-5 h-5" />
+            {/* TEXT: The "Peace of Mind" Pitch */}
+            <div className="max-w-xl pb-6">
+              <div className="flex items-center gap-2 text-primary mb-3">
+                <DatabaseZap className="w-4 h-4" />
                 <p className="text-sm uppercase tracking-widest font-bold">
-                  Step 7: Reliability by design
+                  Step 07: Operate securely
                 </p>
               </div>
               
-              <h2 className="text-4xl font-black text-slate-900 tracking-tight mb-6">
-                Reliable by design
+              <h2 className="text-4xl font-black text-slate-900 tracking-tight mb-6 leading-[1.15] text-balance">
+                Data you can trust, <br /> season after season.
               </h2>
               
               <p className="text-lg text-slate-600 mb-8 leading-relaxed">
-                League data is stored centrally and handled consistently. 
-                Elenem reduces dependency on personal files, spreadsheets, 
-                and individual devices. No more "who has the latest version?"
+                League history is too valuable to risk on personal spreadsheets. 
+                Our foundational architecture treats your standings as an immutable 
+                system of record—ensuring every score is validated, encrypted, and backed up.
               </p>
 
               <ul className="grid gap-y-3">
                 {[
-                  'Centralized, secure data storage',
-                  'Multi-layer encrypted access',
-                  'Regular system and security updates',
-                  'Consistent availability throughout the season'
-                ].map((point, i) => (
-                  <li key={i} className="flex items-start gap-3 text-slate-700 text-sm font-semibold">
-                    <div className="mt-1.5 h-1.5 w-1.5 rounded-full bg-primary shrink-0" />
-                    {point}
+                  { label: 'Immutable Logs', desc: 'Every score entry and rule change is tracked and audited.' },
+                  { label: 'Versioned State', desc: 'Instantly recalculate or verify any past result or standing.' },
+                  { label: 'Automatic Backups', desc: 'Real-time database snapshots prevent data loss.' },
+                  { label: 'Encrypted Access', desc: 'Industrial-grade security for internal league administration.' }
+                ].map((item, i) => (
+                  <li key={i} className="flex items-start gap-3 text-sm text-slate-700">
+                    <div className="mt-1.5 h-1 w-1 rounded-full bg-primary shrink-0" />
+                    <p><span className="font-bold text-slate-900">{item.label}:</span> {item.desc}</p>
                   </li>
                 ))}
               </ul>
             </div>
 
-            {/* VISUAL: The Centralized Data Vault */}
+            {/* VISUAL: The Immutable Audit Vault (Git-like Log) */}
             <div className="relative">
-              <div className="bg-slate-50 rounded-[2.5rem] p-12 border border-slate-100 flex items-center justify-center">
-                
-                {/* The "Vault" Skeleton */}
-                <div className="relative w-48 h-48 bg-white rounded-3xl shadow-xl border border-slate-200 flex items-center justify-center">
-                  <div className="space-y-3 w-2/3">
-                    <div className="h-2 w-full bg-slate-100 rounded-full" />
-                    <div className="h-2 w-3/4 bg-slate-100 rounded-full" />
-                    <div className="h-2 w-full bg-primary/20 rounded-full" />
-                    <div className="h-2 w-1/2 bg-slate-100 rounded-full" />
-                  </div>
+              <div className="bg-slate-100/50 rounded-[2.5rem] p-4 border border-slate-100 shadow-inner">
+                <div className="bg-white rounded-xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col min-h-[360px]">
                   
-                  {/* Pulsing Sync Rings */}
-                  <div className="absolute -inset-4 border-2 border-primary/10 rounded-[2.5rem] animate-pulse" />
-                  <div className="absolute -inset-8 border border-slate-200/50 rounded-[3rem]" />
-                </div>
+                  {/* macOS Window Header (Consistent Style) */}
+                  <div className="px-4 py-2.5 border-b border-slate-100 flex items-center gap-2 bg-slate-50/80">
+                    <div className="flex gap-1.5">
+                      <div className="w-2.5 h-2.5 rounded-full bg-slate-300" />
+                      <div className="w-2.5 h-2.5 rounded-full bg-slate-300" />
+                      <div className="w-2.5 h-2.5 rounded-full bg-slate-300" />
+                    </div>
+                    <div className="flex-1 text-center pr-10">
+                      <div className="h-1.5 w-32 bg-slate-200 rounded-full mx-auto" />
+                    </div>
+                  </div>
 
-                {/* Connected "Device" Skeletons (Representing Tablets/Mobiles syncing) */}
-                <div className="absolute top-8 right-8 w-12 h-16 bg-white rounded-lg border border-slate-200 shadow-sm flex items-center justify-center">
-                  <div className="w-6 h-1 bg-slate-100 rounded-full" />
-                </div>
-                <div className="absolute bottom-12 left-8 w-16 h-12 bg-white rounded-lg border border-slate-200 shadow-sm flex items-center justify-center">
-                  <div className="w-8 h-1 bg-slate-100 rounded-full" />
-                </div>
-              </div>
+                  {/* Audit Feed: High Density, Low Contrast */}
+                  <div className="flex-1 p-5 space-y-4 font-mono text-[9px] text-slate-400">
+                    <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                        <div className="h-2 w-28 bg-slate-400 rounded-full" />
+                        <div className="px-2 py-0.5 rounded bg-green-50 text-green-600 font-bold uppercase tracking-widest text-[8px]">Synced ✓</div>
+                    </div>
 
-              {/* Floating Security Badge */}
-              <div className="absolute top-1/2 -right-4 -translate-y-1/2 bg-green-500 text-white p-3 rounded-full shadow-2xl">
-                <ShieldCheck size={24} />
+                    {/* Log Entries: Abstracted Git/Audit feel */}
+                    {[
+                      { hash: 'e5a1b3', event: 'STANDINGS_RECALCULATED', icon: RefreshCcw, color: 'text-primary' },
+                      { hash: '8c9d2f', event: 'MATCH_RESULT_VERIFIED (TIGvLIO)', icon: CheckCircle2, color: 'text-green-500' },
+                      { hash: 'SYSTEM', event: 'AUTOMATIC_BACKUP_COMPLETED', icon: CloudDownload, color: 'text-slate-400' },
+                      { hash: '4f1a0b', event: 'IDENTITY_THEME_UPDATED', icon: Palette, color: 'text-primary' },
+                      { hash: '7d6e5a', event: 'ADMIN_ROLE_ASSIGNED (REF_04)', icon: UserPlus, color: 'text-slate-400' },
+                      { hash: 'b9c2d1', event: 'LEAGUE_RULES_LOCKED (24/25)', icon: Lock, color: 'text-slate-900' }
+                    ].map((log, i) => (
+                        <div key={i} className={`flex items-start gap-3 py-1 ${i > 0 ? 'opacity-70' : ''}`}>
+                          <span className="text-slate-300 w-10 shrink-0 tabular-nums">[{log.hash}]</span>
+                          <div className="w-4 h-4 rounded-md border border-slate-100 bg-slate-50 flex items-center justify-center shrink-0 mt-0.5">
+                              <log.icon size={12} className={log.color} />
+                          </div>
+                          <span className={`${i === 0 ? 'text-slate-600 font-medium' : 'text-slate-600'}`}>
+                              {log.event}
+                          </span>
+                        </div>
+                    ))}
+                  </div>
+
+                  {/* System Status Footer */}
+                  <div className="p-3 bg-slate-50 border-t border-slate-100 flex justify-center text-[8px] font-bold text-slate-400 uppercase tracking-widest">
+                    Uptime: 99.98% | Next Backup: 04:00 GMT
+                  </div>
+                </div>
               </div>
             </div>
 
