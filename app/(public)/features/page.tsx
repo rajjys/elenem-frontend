@@ -18,6 +18,13 @@ import {
   Trophy,
   User,
   Shield,
+  LayoutDashboard,
+  Calendar,
+  Users2,
+  ShieldAlert,
+  Settings,
+  Terminal,
+  MonitorCheck,
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -248,7 +255,7 @@ export default function FeaturesPage() {
               <div className="flex items-center gap-2 text-primary mb-3">
                 <CalendarDays className="w-4 h-4" />
                 <p className="text-sm uppercase tracking-widest font-bold">
-                  Step 02: Execute
+                  Step 02: Manage matches
                 </p>
               </div>
               
@@ -623,217 +630,242 @@ export default function FeaturesPage() {
           </div>
         </Container>
       </section>
-{/* SECTION 5: IDENTITY & OWNERSHIP */}
-<section className="py-16 bg-white overflow-hidden">
-  <Container>
-    <div className="grid lg:grid-cols-2 gap-12 items-center">
-      
-      {/* TEXT: The "White-Label" Pitch */}
-      <div className="max-w-xl">
-        <div className="flex items-center gap-2 text-primary mb-3">
-          <ShieldCheck className="w-4 h-4" />
-          <p className="text-sm uppercase tracking-widest font-bold">
-            Step 05: Own your identity
-          </p>
-        </div>
-        
-        <h2 className="text-4xl font-black text-slate-900 tracking-tight mb-6 leading-[1.15]">
-          Your League. Your Brand. <br /> Your Design.
-        </h2>
-        
-        <p className="text-lg text-slate-600 mb-8 leading-relaxed text-balance">
-          We provide the engine, but you keep the keys. Launch a clean 
-          digital home that lives on your own domain and reflects your 
-          unique identity — a premium experience that feels custom-built.
-        </p>
-
-        <ul className="grid gap-y-3">
-          {[
-            { label: 'Custom Domain', desc: 'Run everything on your own URL (e.g., league.com).' },
-            { label: 'White-Label', desc: 'Elenem works in the background; fans only see you.' },
-            { label: 'Theming', desc: 'Custom logos, colors, and fonts to match your brand.' },
-            { label: 'Ownership', desc: 'Full control over your data and public presence.' }
-          ].map((item, i) => (
-            <li key={i} className="flex items-start gap-3 text-sm text-slate-700">
-              <div className="mt-1.5 h-1 w-1 rounded-full bg-primary shrink-0" />
-              <p><span className="font-bold text-slate-900">{item.label}:</span> {item.desc}</p>
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      {/* VISUAL: Staggered "Branded" Windows */}
-      <div className="relative">
-        <div className="flex flex-col gap-6 scale-90 sm:scale-100 origin-center">
-          
-          {/* WINDOW 1: The "Elite League" (Dark/Neon) */}
-          <div className="w-full max-w-[360px] bg-slate-900 rounded-xl shadow-2xl border border-slate-800 overflow-hidden self-start">
-             {/* Header */}
-             <div className="px-3 py-2 border-b border-slate-800 bg-slate-950 flex gap-2 items-center">
-                <div className="flex gap-1">
-                   <div className="w-1.5 h-1.5 rounded-full bg-slate-800" />
-                   <div className="w-1.5 h-1.5 rounded-full bg-slate-800" />
-                </div>
-                <div className="flex-1 bg-white/5 border border-white/10 rounded-full py-0.5 px-3 flex items-center gap-2">
-                   <Lock size={8} className="text-green-500/70" />
-                   <span className="text-[9px] text-slate-400">https://<strong>elite-league.app</strong></span>
-                </div>
-             </div>
-             
-             {/* Navbar: Tightened and Realistic */}
-             <div className="px-4 py-1 flex justify-between items-center border-b border-slate-800/50 bg-slate-900">
-                <div className="flex items-center gap-2">
-                   <Trophy className="w-4 h-4 text-primary-light opacity-40" />
-                   <div className="h-1.5 w-12 bg-white/60 rounded-full" />
-                </div>
-                <div className="flex items-center gap-4">
-                   <div className="flex gap-2">
-                      <div className="w-5 h-1 bg-white/60 rounded-full" />
-                      <div className="w-5 h-1 bg-white/20 rounded-full" />
-                      <div className="w-5 h-1 bg-white/20 rounded-full" />
-                   </div>
-                   <div className="w-5 h-5 rounded-full bg-white/5 border border-white/40 flex items-center justify-center">
-                      <User size={10} className="text-white/40" />
-                   </div>
-                </div>
-             </div>
-             
-             {/* Content Area */}
-             <div className="p-4 space-y-3">
-                <div className="h-12 w-full bg-slate-950 rounded-lg border border-slate-800/50" />
-             </div>
-          </div>
-
-          {/* WINDOW 2: The "Community Cup" (Light/Classic) */}
-          <div className="w-full max-w-[360px] bg-white rounded-xl shadow-2xl border border-slate-200 overflow-hidden self-end -mt-12 relative z-10">
-             {/* Header */}
-             <div className="px-3 py-2 border-b border-slate-100 bg-slate-50/50 flex gap-2 items-center">
-                <div className="flex gap-1">
-                   <div className="w-1.5 h-1.5 rounded-full bg-slate-200" />
-                   <div className="w-1.5 h-1.5 rounded-full bg-slate-200" />
-                </div>
-                <div className="flex-1 bg-white border border-slate-200 rounded-full py-0.5 px-3 flex items-center gap-2">
-                   <Lock size={8} className="text-green-500" />
-                   <span className="text-[9px] font-medium text-slate-500">https://<strong className='text-slate-800'>community-cup.com</strong></span>
-                </div>
-             </div>
-
-             {/* Navbar: Tightened and Realistic */}
-             <div className="px-4 py-1 flex justify-between items-center border-b border-slate-50 bg-white">
-                <div className="flex items-center gap-2">
-                   <div className="w-5 h-5 rounded-md bg-primary/5 flex items-center justify-center border border-primary/10">
-                      <Shield className="w-3.5 h-3.5 text-primary opacity-40" />
-                   </div>
-                   <div className="h-1.5 w-16 bg-slate-900/60 rounded-full" />
-                </div>
-                <div className="flex items-center gap-4">
-                   <div className="flex gap-3">
-                      <div className="w-6 h-1 bg-slate-900/60 rounded-full" />
-                      <div className="w-6 h-1 bg-slate-300 rounded-full" />
-                      <div className="w-6 h-1 bg-slate-300 rounded-full" />
-                   </div>
-                   <div className="w-5 h-5 rounded-full bg-slate-50 border border-slate-400 flex items-center justify-center">
-                      <User size={10} className="text-slate-400" />
-                   </div>
-                </div>
-             </div>
-
-             {/* Content Area */}
-             <div className="p-4 space-y-3">
-                <div className="h-12 w-full bg-slate-50 rounded-lg border border-slate-100" />
-             </div>
-          </div>
-
-        </div>
-      </div>
-
-    </div>
-  </Container>
-</section>
-      {/* SECTION 6: ADMINISTRATION & CONTROL */}
-      <section className="py-24 bg-slate-50 border-y border-slate-200">
+      {/* SECTION 5: IDENTITY & OWNERSHIP */}
+      <section className="py-16 bg-white overflow-hidden">
         <Container>
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
             
-            {/* VISUAL: The Admin Sidebar vs. Public Toggle */}
-            <div className="relative order-2 lg:order-1">
-              <div className="bg-white rounded-[2.5rem] p-6 shadow-xl border border-slate-200 overflow-hidden">
-                <div className="flex gap-4">
-                  
-                  {/* Mock Sidebar (The Control) */}
-                  <div className="w-20 sm:w-32 bg-slate-900 rounded-2xl p-4 space-y-4">
-                    <div className="w-8 h-8 bg-primary rounded-lg mb-6" />
-                    {[1, 2, 3, 4].map((i) => (
-                      <div key={i} className="space-y-2">
-                        <div className={`h-1.5 rounded-full ${i === 1 ? 'bg-white w-full' : 'bg-white/20 w-3/4'}`} />
-                      </div>
-                    ))}
-                    <div className="pt-12">
-                      <div className="h-1.5 w-1/2 bg-red-400/40 rounded-full" />
-                    </div>
-                  </div>
-
-                  {/* Main Admin Panel Skeleton */}
-                  <div className="flex-1 py-2 space-y-6">
-                    <div className="flex justify-between items-center border-b border-slate-100 pb-4">
-                      <div className="h-3 w-32 bg-slate-200 rounded-full" />
-                      <div className="flex gap-2">
-                        <div className="w-4 h-4 rounded-full bg-slate-100" />
-                        <div className="w-4 h-4 rounded-full bg-slate-100" />
-                      </div>
-                    </div>
-
-                    {/* Secure Settings List */}
-                    <div className="space-y-4">
-                      {[1, 2, 3].map((i) => (
-                        <div key={i} className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100">
-                          <div className="h-2 w-24 bg-slate-200 rounded-full" />
-                          <div className="w-8 h-4 bg-slate-200 rounded-full relative">
-                            <div className={`absolute top-0.5 w-3 h-3 rounded-full bg-white shadow-sm transition-all ${i === 1 ? 'right-0.5' : 'left-0.5'}`} />
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Floating "Role" Indicator */}
-              <div className="absolute top-10 -right-4 bg-slate-900 text-white px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest shadow-2xl flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-primary" />
-                Admin Access Only
-              </div>
-            </div>
-
-            {/* TEXT: The "Back-Office" Pitch */}
-            <div className="max-w-xl order-1 lg:order-2">
-              <div className="flex items-center gap-2 text-primary mb-4">
-                <Database className="w-5 h-5" />
-                <p className="text-sm uppercase tracking-widest font-bold text-primary">
-                  Step 6: Operate securely
+            {/* TEXT: The "White-Label" Pitch */}
+            <div className="max-w-xl">
+              <div className="flex items-center gap-2 text-primary mb-3">
+                <ShieldCheck className="w-4 h-4" />
+                <p className="text-sm uppercase tracking-widest font-bold">
+                  Step 05: Own your identity
                 </p>
               </div>
               
-              <h2 className="text-4xl font-black text-slate-900 tracking-tight mb-6">
-                Simple administration, <br /> focused on essentials
+              <h2 className="text-4xl font-black text-slate-900 tracking-tight mb-6 leading-[1.15]">
+                Your League. Your Brand. <br /> Your Design.
               </h2>
               
-              <p className="text-lg text-slate-600 mb-8 leading-relaxed">
-                League officials manage everything from a secure dashboard 
-                hosted on <strong>elenem.site</strong>. The system keeps management 
-                separate from the public view while remaining easy to operate.
+              <p className="text-lg text-slate-600 mb-8 leading-relaxed text-balance">
+                We provide the engine, but you keep the keys. Launch a clean 
+                digital home that lives on your own domain and reflects your 
+                unique identity — a premium experience that feels custom-built.
               </p>
 
               <ul className="grid gap-y-3">
                 {[
-                  'Secure, encrypted access for officials',
-                  'Centralized multi-level management',
-                  'Clear separation of internal and public data',
-                  'Action logging for error detection and accountability'
-                ].map((point, i) => (
-                  <li key={i} className="flex items-start gap-3 text-slate-700 text-sm font-semibold">
-                    <div className="mt-1.5 h-1.5 w-1.5 rounded-full bg-primary shrink-0" />
-                    {point}
+                  { label: 'Custom Domain', desc: 'Run everything on your own URL (e.g., league.com).' },
+                  { label: 'White-Label', desc: 'Elenem works in the background; fans only see you.' },
+                  { label: 'Theming', desc: 'Custom logos, colors, and fonts to match your brand.' },
+                  { label: 'Ownership', desc: 'Full control over your data and public presence.' }
+                ].map((item, i) => (
+                  <li key={i} className="flex items-start gap-3 text-sm text-slate-700">
+                    <div className="mt-1.5 h-1 w-1 rounded-full bg-primary shrink-0" />
+                    <p><span className="font-bold text-slate-900">{item.label}:</span> {item.desc}</p>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* VISUAL: Staggered "Branded" Windows */}
+            <div className="relative">
+              <div className="flex flex-col gap-6 scale-90 sm:scale-100 origin-center">
+                
+                {/* WINDOW 1: The "Elite League" (Dark/Neon) */}
+                <div className="w-full max-w-[360px] bg-slate-900 rounded-xl shadow-2xl border border-slate-800 overflow-hidden self-start">
+                  {/* Header */}
+                  <div className="px-3 py-2 border-b border-slate-800 bg-slate-950 flex gap-2 items-center">
+                      <div className="flex gap-1">
+                        <div className="w-1.5 h-1.5 rounded-full bg-slate-800" />
+                        <div className="w-1.5 h-1.5 rounded-full bg-slate-800" />
+                      </div>
+                      <div className="flex-1 bg-white/5 border border-white/10 rounded-full py-0.5 px-3 flex items-center gap-2">
+                        <Lock size={8} className="text-green-500/70" />
+                        <span className="text-[9px] text-slate-400">https://<strong>elite-league.app</strong></span>
+                      </div>
+                  </div>
+                  
+                  {/* Navbar: Tightened and Realistic */}
+                  <div className="px-4 py-1 flex justify-between items-center border-b border-slate-800/50 bg-slate-900">
+                      <div className="flex items-center gap-2">
+                        <Trophy className="w-4 h-4 text-primary-light opacity-40" />
+                        <div className="h-1.5 w-12 bg-white/60 rounded-full" />
+                      </div>
+                      <div className="flex items-center gap-4">
+                        <div className="flex gap-2">
+                            <div className="w-5 h-1 bg-white/60 rounded-full" />
+                            <div className="w-5 h-1 bg-white/20 rounded-full" />
+                            <div className="w-5 h-1 bg-white/20 rounded-full" />
+                        </div>
+                        <div className="w-5 h-5 rounded-full bg-white/5 border border-white/40 flex items-center justify-center">
+                            <User size={10} className="text-white/40" />
+                        </div>
+                      </div>
+                  </div>
+                  
+                  {/* Content Area */}
+                  <div className="p-4 space-y-3">
+                      <div className="h-12 w-full bg-slate-950 rounded-lg border border-slate-800/50" />
+                  </div>
+                </div>
+
+                {/* WINDOW 2: The "Community Cup" (Light/Classic) */}
+                <div className="w-full max-w-[360px] bg-white rounded-xl shadow-2xl border border-slate-200 overflow-hidden self-end -mt-12 relative z-10">
+                  {/* Header */}
+                  <div className="px-3 py-2 border-b border-slate-100 bg-slate-50/50 flex gap-2 items-center">
+                      <div className="flex gap-1">
+                        <div className="w-1.5 h-1.5 rounded-full bg-slate-200" />
+                        <div className="w-1.5 h-1.5 rounded-full bg-slate-200" />
+                      </div>
+                      <div className="flex-1 bg-white border border-slate-200 rounded-full py-0.5 px-3 flex items-center gap-2">
+                        <Lock size={8} className="text-green-500" />
+                        <span className="text-[9px] font-medium text-slate-500">https://<strong className='text-slate-800'>community-cup.com</strong></span>
+                      </div>
+                  </div>
+
+                  {/* Navbar: Tightened and Realistic */}
+                  <div className="px-4 py-1 flex justify-between items-center border-b border-slate-50 bg-white">
+                      <div className="flex items-center gap-2">
+                        <div className="w-5 h-5 rounded-md bg-primary/5 flex items-center justify-center border border-primary/10">
+                            <Shield className="w-3.5 h-3.5 text-primary opacity-40" />
+                        </div>
+                        <div className="h-1.5 w-16 bg-slate-900/60 rounded-full" />
+                      </div>
+                      <div className="flex items-center gap-4">
+                        <div className="flex gap-3">
+                            <div className="w-6 h-1 bg-slate-900/60 rounded-full" />
+                            <div className="w-6 h-1 bg-slate-300 rounded-full" />
+                            <div className="w-6 h-1 bg-slate-300 rounded-full" />
+                        </div>
+                        <div className="w-5 h-5 rounded-full bg-slate-50 border border-slate-400 flex items-center justify-center">
+                            <User size={10} className="text-slate-400" />
+                        </div>
+                      </div>
+                  </div>
+
+                  {/* Content Area */}
+                  <div className="p-4 space-y-3">
+                      <div className="h-12 w-full bg-slate-50 rounded-lg border border-slate-100" />
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+          </div>
+        </Container>
+      </section>
+      {/* SECTION 6: ADMINISTRATION & CONTROL */}
+      <section className="py-16 bg-slate-50 border-y border-slate-200">
+        <Container>
+          <div className="grid lg:grid-cols-2 gap-12 items-start">
+            
+            {/* VISUAL: The Production Dashboard Cockpit */}
+            <div className="relative order-2 lg:order-1">
+              <div className="bg-slate-200/50 rounded-[2.5rem] p-4 border border-slate-200 shadow-inner">
+                <div className="bg-white rounded-xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col min-h-[380px]">
+                  
+                  {/* macOS Window Header (Consistent Style) */}
+                  <div className="px-4 py-2.5 border-b border-slate-100 flex items-center gap-2 bg-slate-50/80">
+                    <div className="flex gap-1.5">
+                      <div className="w-2.5 h-2.5 rounded-full bg-slate-300" />
+                      <div className="w-2.5 h-2.5 rounded-full bg-slate-300" />
+                      <div className="w-2.5 h-2.5 rounded-full bg-slate-300" />
+                    </div>
+                    <div className="flex-1 text-center pr-10">
+                      <div className="h-1.5 w-24 bg-slate-200 rounded-full mx-auto" />
+                    </div>
+                  </div>
+                  <div className="flex flex-1">
+                    {/* Sidebar: The Navigation Rail */}
+                    <div className="w-16 border-r border-slate-100 bg-slate-50/30 flex flex-col items-center py-6 gap-6">
+                      <div className="w-8 h-8 rounded-lg bg-slate-400 flex items-center justify-center text-white text-[10px] font-black">E</div>
+                      <div className="flex flex-col gap-4">
+                        {[LayoutDashboard, Calendar, Users2, ShieldAlert, Settings].map((Icon, i) => (
+                          <Icon key={i} size={18} className={i === 0 ? "text-slate-600" : "text-slate-300"} />
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Main Workspace */}
+                    <div className="flex-1 p-6 space-y-6">
+                      {/* Top Metrics: High-Level Pulse */}
+                      <div className="grid grid-cols-4 gap-3">
+                        {[
+                          { label: 'Active Teams', val: '24' },
+                          { label: 'Live Games', val: '03' },
+                          { label: 'Players', val: '34' },
+                          { label: 'Open Issues', val: '01' }
+                        ].map((stat, i) => (
+                          <div key={i} className="p-3 rounded-lg border border-slate-200 bg-white">
+                            <div className="h-1 w-5 md:w-10 bg-slate-300 rounded-full mb-2" />
+                            <div className="text-sm font-black text-slate-400 italic tracking-tighter">{stat.val}</div>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Task Feed: Actionable Items */}
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between px-1">
+                          <div className="h-2 w-24 bg-slate-400 rounded-full" />
+                          <div className="h-1.5 w-12 bg-slate-300 rounded-full" />
+                        </div>
+
+                        {[
+                          { task: 'Match Approval', type: 'Result', color: 'bg-blue-200' },
+                          { task: 'Venue Conflict', type: 'Alert', color: 'bg-red-200' },
+                          { task: 'Referee Assign', type: 'Schedule', color: 'bg-slate-200' },
+                          { task: 'Stadium Validation', type: 'Schedule', color: 'bg-slate-200' },
+                        ].map((item, i) => (
+                          <div key={i} className="flex items-center justify-between p-2 rounded-xl border border-slate-100 hover:border-primary/20 transition-colors bg-white">
+                            <div className="flex items-center gap-3">
+                                <div className={`w-1.5 h-1.5 rounded-full ${item.color}`} />
+                                <div className="space-y-1">
+                                  <div className="h-2 w-28 bg-slate-300 rounded-full" />
+                                  <div className="h-1 w-16 bg-slate-300 rounded-full" />
+                                </div>
+                            </div>
+                            <div className="px-2 py-1 rounded bg-slate-50 border border-slate-100 text-[8px] font-bold text-slate-400 uppercase tracking-widest">Action</div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* TEXT: The "Cockpit" Pitch */}
+            <div className="max-w-xl pt-4 order-1 lg:order-2">
+              <div className="flex items-center gap-2 text-primary mb-3">
+                <MonitorCheck className="w-4 h-4" />
+                <p className="text-sm uppercase tracking-widest font-bold">
+                  Step 06: Manage effortlessly
+                </p>
+              </div>
+              
+              <h2 className="text-4xl font-black text-slate-900 tracking-tight mb-6 leading-[1.15]">
+                A command center for <br /> every operational detail.
+              </h2>
+              
+              <p className="text-lg text-slate-600 mb-8 leading-relaxed">
+                Running a league is complex; managing it shouldn’t be. Our administrative 
+                dashboard brings every team, venue, and score into a unified workstation 
+                designed for speed and total oversight.
+              </p>
+
+              <ul className="grid gap-y-3">
+                {[
+                  { label: 'Role Management', desc: 'Assign admins, referees, and scorekeepers.' },
+                  { label: 'Task Automation', desc: 'Get alerts for schedule overlaps or missing scores.' },
+                  { label: 'Bulk Operations', desc: 'Update entire seasons or divisions in few clicks.' },
+                  { label: 'Reporting', desc: 'Export full season data and performance audits.' }
+                ].map((item, i) => (
+                  <li key={i} className="flex items-start gap-3 text-sm text-slate-700">
+                    <div className="mt-1.5 h-1 w-1 rounded-full bg-primary shrink-0" />
+                    <p><span className="font-bold text-slate-900">{item.label}:</span> {item.desc}</p>
                   </li>
                 ))}
               </ul>
