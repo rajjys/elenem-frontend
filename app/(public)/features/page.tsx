@@ -13,6 +13,7 @@ import {
   Users,
   Menu,
   ShieldUser,
+  Plus,
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -234,97 +235,143 @@ export default function FeaturesPage() {
         </Container>
       </section>
       {/* SECTION 2: FIXTURES & MATCH MANAGEMENT */}
-      <section className="py-24 bg-slate-50 border-y border-slate-200">
+      <section className="py-12 bg-slate-50 border-y border-slate-200">
         <Container>
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
+          <div className="grid lg:grid-cols-2 gap-10 items-start">
             
-            {/* VISUAL: The Conflict Detection Calendar */}
-            <div className="relative">
-              <div className="bg-white rounded-3xl p-8 shadow-xl border border-slate-200">
-                <div className="flex items-center justify-between mb-8">
-                  <div className="h-4 w-40 bg-slate-900 rounded-full" />
-                  <div className="flex gap-2">
-                    <div className="w-8 h-8 rounded-lg bg-slate-100" />
-                    <div className="w-8 h-8 rounded-lg bg-slate-100" />
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  {/* Standard Match Entry */}
-                  <div className="p-4 rounded-xl border border-slate-100 bg-slate-50/50 flex items-center gap-4">
-                    <div className="h-2 w-12 bg-slate-300 rounded-full" />
-                    <div className="flex-1 h-2 bg-slate-200 rounded-full" />
-                    <div className="w-16 h-6 rounded bg-primary/10 border border-primary/20" />
-                  </div>
-
-                  {/* THE "CONFLICT" HIGHLIGHT */}
-                  <div className="p-4 rounded-xl border-2 border-red-200 bg-red-50 flex flex-col gap-3 relative overflow-hidden">
-                    <div className="flex items-center gap-4">
-                      <div className="h-2 w-12 bg-red-300 rounded-full" />
-                      <div className="flex-1 h-2 bg-red-200 rounded-full" />
-                      <div className="w-6 h-6 rounded-full bg-red-500 flex items-center justify-center text-white text-[10px] font-bold">!</div>
-                    </div>
-                    <div className="pl-16">
-                      <div className="h-1.5 w-32 bg-red-200/60 rounded-full" />
-                    </div>
-                    {/* Alert Tooltip */}
-                    <div className="absolute top-2 right-2 bg-white px-2 py-1 rounded shadow-sm border border-red-100 text-[9px] font-black text-red-600 uppercase tracking-tighter">
-                      Venue Overlap Detected
-                    </div>
-                  </div>
-
-                  {/* Standard Match Entry */}
-                  <div className="p-4 rounded-xl border border-slate-100 bg-slate-50/50 flex items-center gap-4 opacity-50">
-                    <div className="h-2 w-12 bg-slate-300 rounded-full" />
-                    <div className="flex-1 h-2 bg-slate-200 rounded-full" />
-                    <div className="w-16 h-6 rounded bg-slate-200" />
-                  </div>
-                </div>
-              </div>
-
-              {/* Status Tag */}
-              <div className="absolute -top-4 -right-4 bg-primary text-white px-4 py-2 rounded-lg text-xs font-bold shadow-lg">
-                Master Calendar Syncing...
-              </div>
-            </div>
-
-            {/* TEXT: The "Source of Truth" */}
-            <div className="max-w-xl">
-              <div className="flex items-center gap-2 text-primary mb-4">
-                <CalendarDays className="w-5 h-5" />
-                <p className="text-sm uppercase tracking-widest font-bold">
-                  Step 2: Manage matches
+            {/* TEXT FIRST ON MOBILE */}
+            <div className="max-w-xl pt-2 order-1 lg:order-2">
+              <div className="flex items-center gap-2 text-primary mb-3">
+                <CalendarDays className="w-4 h-4" />
+                <p className="text-[10px] uppercase tracking-[0.2em] font-bold">
+                  Phase 02: Execute
                 </p>
               </div>
               
-              <h2 className="text-4xl font-black text-slate-900 tracking-tight mb-6">
+              <h2 className="text-4xl font-black text-slate-900 tracking-tight mb-5 leading-[1.15]">
                 Scheduling with flexibility <br /> and precision
               </h2>
               
               <p className="text-lg text-slate-600 mb-8 leading-relaxed">
                 Elenem centralizes your entire season into one <strong>"source of truth."</strong> 
-                Change a kickoff time, reschedule, or enter results in seconds — 
+                Reschedule games, enter results, or track live stats in seconds — 
                 every club, official, and fan stays synced automatically.
               </p>
 
               <ul className="grid gap-y-3">
                 {[
-                  'Automatic venue & timing conflict detection',
-                  'Update once; sync everywhere instantly',
-                  'Capture team, player, and sport-specific stats',
-                  'Frictionless game rescheduling tools'
-                ].map((point, i) => (
-                  <li key={i} className="flex items-start gap-3 text-slate-700 text-sm font-semibold">
-                    <CheckCircle2 className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-                    {point}
+                  { label: 'Conflicts', desc: 'Auto-detect venue and timing overlaps.' },
+                  { label: 'Real-time', desc: 'Updates reflect across your site instantly.' },
+                  { label: 'Stats', desc: 'Capture goals, fouls, and MVPs from match reports.' },
+                  { label: 'Master Calendar', desc: 'Rule out duplicate schedules and human error.' }
+                ].map((item, i) => (
+                  <li key={i} className="flex items-start gap-3">
+                    <div className="mt-1.5 h-1 w-1 rounded-full bg-primary shrink-0" />
+                    <p className="text-sm text-slate-700">
+                      <span className="font-bold text-slate-900">{item.label}:</span> {item.desc}
+                    </p>
                   </li>
                 ))}
               </ul>
             </div>
 
+            {/* VISUAL SECOND ON MOBILE */}
+            <div className="relative order-2 lg:order-1">
+              <div className="bg-slate-200/50 rounded-3xl p-4 border border-slate-200 shadow-inner">
+                <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden">
+                  
+                  {/* macOS Style Window Header */}
+                  <div className="px-4 py-2.5 border-b border-slate-100 flex items-center gap-2 bg-slate-50/80">
+                    <div className="flex gap-1.5">
+                      <div className="w-2.5 h-2.5 rounded-full bg-slate-300" />
+                      <div className="w-2.5 h-2.5 rounded-full bg-slate-300" />
+                      <div className="w-2.5 h-2.5 rounded-full bg-slate-300" />
+                    </div>
+                    <div className="flex-1 text-center pr-10">
+                      <div className="h-1.5 w-20 bg-slate-200 rounded-full mx-auto" />
+                    </div>
+                  </div>
+
+                  <div className="p-4 space-y-5">
+                    {/* Header: Compact Planning */}
+                    <div className="flex justify-between items-center">
+                      <div className="h-2.5 w-24 bg-slate-900 rounded-full" />
+                      <div className="w-7 h-7 rounded-lg bg-primary flex items-center justify-center text-white shadow-sm">
+                        <Plus size={14} strokeWidth={3} />
+                      </div>
+                    </div>
+
+                    {/* Part A: Calendar with Skeleton Weekdays */}
+                    <div>
+                      {/* Skeleton weekday row */}
+                      <div className="grid grid-cols-7 gap-1 mb-1">
+                        {Array.from({ length: 7 }).map((_, i) => (
+                          <div key={i} className="h-1 w-8 bg-slate-200 rounded mx-auto" />
+                        ))}
+                      </div>
+
+                      {/* Calendar Grid */}
+                      <div className="grid grid-cols-7 gap-1 pb-2 border-b border-slate-50">
+                        {Array.from({ length: 28 }).map((_, i) => {
+                          const gameDays = [2,4,7,10,12,15,18,21,24,26]; // 10 gamedays
+                          return (
+                            <div 
+                              key={i} 
+                              className="max-w-18 rounded-sm border border-slate-200 bg-slate-50 flex flex-col items-center justify-start py-1.5"
+                            >
+                              {/* Date number */}
+                              <span className="text-[10px] text-slate-400 leading-none">{i+1}</span>
+                              
+                              {/* Game badge below date */}
+                              {gameDays.includes(i) && (
+                                <span className="mt-1 text-[9px] font-bold text-primary bg-primary/10 rounded px-1">
+                                  {Math.floor(Math.random() * 3) + 1}
+                                </span>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Part B: Compact Match Feed */}
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between px-1">
+                        <div className="h-1.5 w-16 bg-slate-200 rounded-full" />
+                        <div className="flex items-center gap-1">
+                          <div className="w-1 h-1 rounded-full bg-red-400 animate-pulse" />
+                          <span className="text-[9px] font-black text-red-400 uppercase tracking-widest">Live</span>
+                        </div>
+                      </div>
+
+                      {/* Live Match Card with softer contrast */}
+                      <div className="p-2.5 rounded-lg border border-slate-200 bg-slate-50 shadow-sm">
+                        <div className="flex justify-between items-center mb-1">
+                          <div className="h-1 w-10 bg-slate-200 rounded-full" />
+                          <div className="px-1.5 py-0.5 rounded bg-green-200 text-green-700 text-[8px] font-bold tracking-widest italic">82'</div>
+                        </div>
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="flex-1 flex items-center gap-2">
+                            <div className="w-5 h-5 rounded-full bg-slate-100 shrink-0" />
+                            <div className="h-1.5 w-full bg-slate-300 rounded-full max-w-[40px]" />
+                          </div>
+                          <div className="text-sm font-bold italic tabular-nums tracking-tighter text-slate-500">3 - 2</div>
+                          <div className="flex-1 flex items-center justify-end gap-2">
+                            <div className="h-1.5 w-full bg-slate-300 rounded-full max-w-[40px]" />
+                            <div className="w-5 h-5 rounded-full bg-slate-100 shrink-0" />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </Container>
       </section>
+
+
       {/* SECTION 3: AUTOMATIC STANDINGS & ANALYTICS */}
       <section className="py-24 bg-white">
         <Container>
