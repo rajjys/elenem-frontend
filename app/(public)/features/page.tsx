@@ -30,6 +30,9 @@ import {
   CloudDownload,
   RefreshCcw,
   DatabaseZap,
+  Layers,
+  PlusCircle,
+  Zap,
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -974,94 +977,124 @@ export default function FeaturesPage() {
           </div>
         </Container>
       </section>
-      {/* SECTION 8: GROWING WITH YOUR LEAGUE */}
-      <section className="py-24 bg-slate-50 border-t border-slate-200">
-        <Container>
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-            
-            {/* VISUAL: The Scalability Staircase */}
-            <div className="relative order-2 lg:order-1">
-              <div className="flex flex-col gap-4">
-                
-                {/* Level 3: Federation / Large Org */}
-                <div className="ml-auto w-4/5 p-4 bg-white rounded-2xl border-l-4 border-primary shadow-sm flex items-center justify-between">
-                  <div className="space-y-2">
-                    <div className="h-2 w-32 bg-slate-900 rounded-full" />
-                    <div className="h-1.5 w-24 bg-slate-200 rounded-full" />
-                  </div>
-                  <div className="flex -space-x-2">
-                    {[1, 2, 3].map(i => (
-                      <div key={i} className="w-6 h-6 rounded-full border-2 border-white bg-slate-100" />
-                    ))}
-                  </div>
-                </div>
+{/* SECTION 8: GROWTH & SCALABILITY */}
+<section className="py-20 bg-slate-900 text-white overflow-hidden">
+  <Container>
+    <div className="grid lg:grid-cols-2 gap-16 items-center">
+      
+      {/* VISUAL: The Evolutionary Growth Path */}
+      <div className="relative h-[400px] flex items-center justify-center order-2 lg:order-1">
+        
+        {/* Ambient background "path" */}
+        <div className="absolute top-1/2 left-0 w-full h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
 
-                {/* Level 2: Growing League */}
-                <div className="mx-auto w-4/5 p-4 bg-white rounded-2xl border-l-4 border-primary/40 shadow-sm flex items-center gap-4">
-                  <div className="w-8 h-8 rounded bg-primary/5 flex items-center justify-center text-primary italic font-black text-[10px]">2</div>
-                  <div className="space-y-2">
-                    <div className="h-2 w-40 bg-slate-900 rounded-full" />
-                    <div className="h-1.5 w-16 bg-slate-200 rounded-full" />
-                  </div>
-                </div>
+        {/* 1. START SMALL: The "Basic" View */}
+        <div className="absolute left-0 bottom-12 w-40 h-52 bg-slate-800 rounded-2xl border border-slate-700 p-4 shadow-xl transform -rotate-6 hover:rotate-0 transition-transform duration-500 z-10">
+           <div className="flex flex-col h-full">
+              <div className="w-8 h-8 rounded bg-slate-700 mb-3 flex items-center justify-center">
+                 <Users size={14} className="text-slate-400" />
+              </div>
+              <div className="h-2 w-16 bg-white/20 rounded-full mb-1" />
+              <div className="h-1.5 w-10 bg-white/5 rounded-full mb-6" />
+              
+              <div className="mt-auto p-2 rounded bg-primary/10 border border-primary/20">
+                 <div className="h-1 w-full bg-primary/40 rounded-full" />
+              </div>
+              <p className="mt-2 text-[8px] font-bold text-center text-slate-500 uppercase tracking-widest">Single League</p>
+           </div>
+        </div>
 
-                {/* Level 1: Small/Starting League */}
-                <div className="mr-auto w-4/5 p-4 bg-slate-900 rounded-2xl shadow-xl flex items-center gap-4">
-                  <div className="w-8 h-8 rounded bg-white/10 flex items-center justify-center">
-                    <TrendingUp className="w-4 h-4 text-primary" />
-                  </div>
-                  <div className="space-y-2">
-                    <div className="h-2 w-28 bg-white rounded-full" />
-                    <div className="h-1.5 w-20 bg-white/20 rounded-full" />
-                  </div>
-                </div>
-
+        {/* 2. GROW: The "Pro" View */}
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-64 bg-slate-800 rounded-2xl border-2 border-slate-600 p-5 shadow-2xl z-20">
+           <div className="flex flex-col h-full">
+              <div className="flex justify-between items-start mb-4">
+                 <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center">
+                    <Trophy size={18} className="text-primary" />
+                 </div>
+                 <div className="px-2 py-0.5 rounded bg-primary text-[7px] font-bold">PRO</div>
+              </div>
+              <div className="space-y-2 mb-6">
+                 <div className="h-2 w-24 bg-white/20 rounded-full" />
+                 <div className="h-2 w-20 bg-white/10 rounded-full" />
+                 <div className="h-2 w-28 bg-white/10 rounded-full" />
               </div>
               
-              {/* Abstract "Future" Arrow */}
-              <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-slate-300">
-                <ArrowRight className="w-8 h-8 rotate-[-90deg] animate-bounce" />
+              <div className="mt-auto grid grid-cols-2 gap-2">
+                 <div className="h-8 rounded bg-white/5 border border-white/5" />
+                 <div className="h-8 rounded bg-white/5 border border-white/5" />
               </div>
-            </div>
+              <p className="mt-3 text-[9px] font-black text-center text-white italic tracking-tight">Multi-Division</p>
+           </div>
+        </div>
 
-            {/* TEXT: The "Scalability" Pitch */}
-            <div className="max-w-xl order-1 lg:order-2">
-              <div className="flex items-center gap-2 text-primary mb-4">
-                <TrendingUp className="w-5 h-5" />
-                <p className="text-sm uppercase tracking-widest font-bold">
-                  Step 8: Grow over time
-                </p>
+        {/* 3. EXPAND: The "Federation" View */}
+        <div className="absolute right-0 top-12 w-56 h-72 bg-white rounded-2xl border border-white p-6 shadow-[0_20px_50px_rgba(0,0,0,0.5)] transform rotate-6 hover:rotate-0 transition-all duration-500 z-30 group">
+           <div className="flex flex-col h-full">
+              <div className="flex items-center gap-3 mb-5">
+                 <div className="w-10 h-10 rounded-full bg-slate-900 flex items-center justify-center">
+                    <Globe size={20} className="text-primary" />
+                 </div>
+                 <div className="space-y-1">
+                    <div className="h-2 w-20 bg-slate-900 rounded-full" />
+                    <div className="h-1.5 w-12 bg-slate-200 rounded-full" />
+                 </div>
               </div>
               
-              <h2 className="text-4xl font-black text-slate-900 tracking-tight mb-6">
-                Designed to grow with <br /> your league
-              </h2>
-              
-              <p className="text-lg text-slate-600 mb-8 leading-relaxed">
-                Elenem starts with the core needs of league management and evolves 
-                as your organization grows. Additional workflows, configurations, 
-                and support are introduced based on real operational requirements.
-              </p>
-
-              <div className="space-y-6">
-                <div className="p-4 border-l-2 border-slate-200">
-                  <p className="text-sm font-bold text-slate-900">Small leagues start simple.</p>
-                  <p className="text-xs text-slate-500 mt-1">Focus on core standings and match schedules.</p>
-                </div>
-                <div className="p-4 border-l-2 border-slate-200">
-                  <p className="text-sm font-bold text-slate-900">Growing leagues gain structure.</p>
-                  <p className="text-xs text-slate-500 mt-1">Automated scheduling and venue management.</p>
-                </div>
-                <div className="p-4 border-l-2 border-primary">
-                  <p className="text-sm font-bold text-slate-900">Larger organizations collaborate.</p>
-                  <p className="text-xs text-slate-500 mt-1">Multi-league governance and custom federation tools.</p>
-                </div>
+              <div className="space-y-3">
+                 {[1,2,3,4].map(i => (
+                    <div key={i} className="flex items-center gap-2">
+                       <div className="w-2 h-2 rounded-full bg-primary" />
+                       <div className="h-1.5 flex-1 bg-slate-100 rounded-full" />
+                    </div>
+                 ))}
               </div>
-            </div>
 
-          </div>
-        </Container>
-      </section>
+              <div className="mt-auto pt-4 border-t border-slate-100 flex justify-center">
+                 <span className="text-[10px] font-black text-slate-900 uppercase tracking-[0.2em]">National Scale</span>
+              </div>
+           </div>
+        </div>
+
+      </div>
+
+      {/* TEXT: The "Evolution" Pitch */}
+      <div className="max-w-xl order-1 lg:order-2">
+        <div className="flex items-center gap-2 text-primary mb-3">
+          <TrendingUp className="w-4 h-4" />
+          <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-primary-foreground/60">
+            Phase 08: Grow over time
+          </p>
+        </div>
+        
+        <h2 className="text-4xl font-black text-white tracking-tight mb-6 leading-[1.15]">
+          Built for today, <br /> ready for tomorrow.
+        </h2>
+        
+        <p className="text-lg text-slate-400 mb-8 leading-relaxed">
+          Whether you’re launching your first tournament or managing a 
+          national federation, Elenem adapts to your scope. Start with 
+          the essentials and unlock advanced professional tools as your 
+          community expands.
+        </p>
+
+        <ul className="grid gap-y-4">
+          {[
+            { label: 'Basic Plan', desc: 'Everything you need to run your local league efficiently.' },
+            { label: 'Pro Plan', desc: 'Manage multiple divisions, venues, and advanced player stats.' },
+            { label: 'Federation', desc: 'Regional control for massive multi-league networks.' },
+            { label: 'Seamless Migration', desc: 'Upgrade your plan anytime without losing a single goal or stat.' }
+          ].map((item, i) => (
+            <li key={i} className="flex items-start gap-3 text-sm text-slate-300">
+              <div className="mt-1.5 h-1 w-1 rounded-full bg-primary shrink-0" />
+              <p><span className="font-bold text-white">{item.label}:</span> {item.desc}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+    </div>
+  </Container>
+</section>
       {/* FINAL CTA */}
       <section className="py-12">
         <Container>
