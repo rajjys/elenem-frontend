@@ -1119,7 +1119,7 @@ export default function FeaturesPage() {
                 Run your league with a professional system built for sport.
               </p>
               <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-6">
-                <Link href="/contact" className="w-auto inline-flex items-center justify-center rounded-full bg-primary px-6 py-2 text-white font-bold transition-transform hover:scale-105 active:scale-95 shadow-lg shadow-primary/20">
+                <Link href="/contact?intent=demo" className="w-auto inline-flex items-center justify-center rounded-full bg-primary px-6 py-2 text-white font-bold transition-transform hover:scale-105 active:scale-95 shadow-lg shadow-primary/20">
                   Request a demo
                 </Link>
                 <Link href="/pricing" className="w-auto inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-6 py-2 font-semibold text-slate-600 hover:bg-slate-50 transition-colors">

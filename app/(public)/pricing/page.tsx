@@ -27,7 +27,7 @@ export default function PricingPage() {
 
             <div className="mt-10 flex flex-col sm:flex-row gap-4 items-center justify-center">
               <a
-                href="/contact"
+                href="/contact?intent=demo"
                 className="inline-flex items-center justify-center gap-2 bg-slate-900 text-white px-8 py-4 rounded-full font-bold shadow-2xl hover:bg-primary transition-all duration-300 group"
               >
                 Request a demo 
@@ -132,7 +132,7 @@ export default function PricingPage() {
                   </div>
                   
                   <a
-                    href="/contact"
+                    href="/contact?intent=setup&plan=basic"
                     className="w-full bg-primary text-white px-8 py-4 rounded-xl font-black shadow-xl hover:scale-[1.02] active:scale-95 transition-all text-center flex items-center justify-center gap-2"
                   >
                     Request setup <ArrowRight size={18} />
@@ -180,7 +180,7 @@ export default function PricingPage() {
                     </li>
                   ))}
                 </ul>
-                <a href="/contact" className="inline-flex items-center gap-2 text-primary font-black uppercase tracking-widest text-[11px] group-hover:gap-4 transition-all">
+                <a href="/contact?intent=discussion&plan=pro" className="inline-flex items-center gap-2 text-primary font-black uppercase tracking-widest text-[11px] group-hover:gap-4 transition-all">
                   Discuss your league <ArrowRight size={14} />
                 </a>
               </div>
@@ -205,7 +205,7 @@ export default function PricingPage() {
                     </li>
                   ))}
                 </ul>
-                <a href="/contact" className="inline-flex items-center gap-2 text-primary font-black uppercase tracking-widest text-[11px] group-hover:gap-4 transition-all">
+                <a href="/contact?intent=discussion&plan=federation" className="inline-flex items-center gap-2 text-primary font-black uppercase tracking-widest text-[11px] group-hover:gap-4 transition-all">
                   Contact us <ArrowRight size={14} />
                 </a>
               </div>
@@ -293,7 +293,7 @@ export default function PricingPage() {
 
             <div className="flex flex-col sm:flex-row justify-center items-center gap-6">
               <a
-                href="/contact"
+                href="/contact?intent=demo"
                 className="w-full sm:w-auto bg-primary text-white px-10 py-5 rounded-full font-black shadow-2xl hover:scale-105 transition-all text-lg"
               >
                 Request a demo

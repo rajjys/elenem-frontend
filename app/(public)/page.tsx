@@ -21,7 +21,7 @@ export default function HomePage() {
             </p>
             <div className="mt-10 flex flex-col sm:flex-row justify-center items-center gap-4">
               <Link
-                href="/contact"
+                href="/contact?intent=demo"
                 className="w-auto inline-flex items-center justify-center rounded-full bg-primary px-6 py-2 text-white font-bold transition-transform hover:scale-105 active:scale-95 shadow-lg shadow-primary/20"
               >
                 Request a demo
@@ -307,7 +307,7 @@ export default function HomePage() {
                 <li className="flex items-center gap-2"><CheckCircle2 size={18} /> Dedicated Support</li>
                 <li className="flex items-center gap-2"><CheckCircle2 size={18} /> Regular Security Updates</li>
               </ul>
-              <Link href="/contact" className="block w-full text-center py-4 bg-white text-primary font-bold rounded-xl hover:bg-slate-50 transition-colors">
+              <Link href="/contact?intent=discussion" className="block w-full text-center py-4 bg-white text-primary font-bold rounded-xl hover:bg-slate-50 transition-colors">
                 Request a Custom Quote
               </Link>
             </div>
@@ -343,7 +343,7 @@ export default function HomePage() {
 
               <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-6">
                 <Link
-                  href="/contact"
+                  href="/contact?intent=demo"
                   className="w-auto inline-flex items-center justify-center rounded-full bg-primary px-6 py-2 text-white font-bold transition-transform hover:scale-105 active:scale-95 shadow-lg shadow-primary/20"
                 >
                   Request a demo
