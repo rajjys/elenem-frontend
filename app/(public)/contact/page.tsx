@@ -3,10 +3,11 @@
 import { useSearchParams } from 'next/navigation'
 import Container from '@/components/ui/container'
 import { ArrowRight, MessageSquare, ShieldCheck, CheckCircle2, Zap } from 'lucide-react'
+import { Suspense } from 'react'
 
 type Intent = 'demo' | 'setup' | 'discussion'
 
-export default function ContactPage() {
+function ContactContent() {
   const params = useSearchParams()
   const intent: Intent = (params.get('intent') as Intent) || 'demo'
 
@@ -178,4 +179,10 @@ export default function ContactPage() {
       </section>
     </div>
   )
+}
+
+export default function ContactPage() {
+  return <Suspense fallback={<div>Loading...</div>}>
+          <ContactContent />
+         </Suspense>
 }
