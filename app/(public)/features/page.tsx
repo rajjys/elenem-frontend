@@ -44,6 +44,10 @@ export default function FeaturesPage() {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-primary/5 via-transparent to-transparent -z-10" />
         <Container>
           <div className="max-w-4xl text-center mx-auto">
+            <div className="flex items-center gap-2 text-primary mb-6">
+              <Settings2 className="w-4 h-4" />
+              <p className="text-[10px] uppercase tracking-[0.2em] font-bold">Solution & Features</p>
+            </div>
             <h1 className="text-5xl sm:text-7xl font-extrabold tracking-tight text-slate-900 leading-[1.1]">
               The engine behind <br />
               <span className="text-primary">successful seasons.</span>
