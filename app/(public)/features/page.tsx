@@ -92,7 +92,7 @@ export default function FeaturesPage() {
           <div className="grid lg:grid-cols-2 gap-12 items-start"> {/* Reduced gap, aligned to start */}
             
             {/* TEXT: The "Proof of Seriousness" */}
-            <div className="max-w-xl order-2 lg:order-1">
+            <div className="max-w-xl">
               <div className="flex items-center gap-2 text-primary mb-4">
                 <Settings2 className="w-5 h-5" />
                 <p className="text-sm uppercase tracking-widest font-bold">
@@ -129,7 +129,7 @@ export default function FeaturesPage() {
             </div>
 
             {/* VISUAL: The "Operational Window" Skeleton */}
-            <div className="order-1 lg:order-2">
+            <div className="">
               <div className="bg-slate-50 rounded-3xl p-3 border border-slate-100 shadow-inner"> {/* Tightened outer container */}
                 <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden">
                   
@@ -370,23 +370,21 @@ export default function FeaturesPage() {
           </div>
         </Container>
       </section>
-
-
       {/* SECTION 3: AUTOMATIC STANDINGS & ANALYTICS */}
-      <section className="py-24 bg-white">
+      <section className="py-12 bg-white">
         <Container>
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
+          <div className="grid lg:grid-cols-2 gap-10 items-start">
             
-            {/* TEXT: The "Logic Engine" */}
-            <div className="max-w-xl order-2 lg:order-1">
-              <div className="flex items-center gap-2 text-primary mb-4">
-                <Activity className="w-5 h-5" />
-                <p className="text-sm uppercase tracking-widest font-bold">
-                  Step 3: Ensure correctness
+            {/* TEXT: The Logic Engine */}
+            <div className="max-w-xl order-2 lg:order-1 pt-2">
+              <div className="flex items-center gap-2 text-primary mb-3">
+                <Activity className="w-4 h-4" />
+                <p className="text-[10px] uppercase tracking-[0.2em] font-bold">
+                  Phase 03: Ensure correctness
                 </p>
               </div>
               
-              <h2 className="text-4xl font-black text-slate-900 tracking-tight mb-6">
+              <h2 className="text-4xl font-black text-slate-900 tracking-tight mb-5 leading-[1.15]">
                 Standings calculated <br /> automatically — every time
               </h2>
               
@@ -398,64 +396,91 @@ export default function FeaturesPage() {
 
               <ul className="grid gap-y-3">
                 {[
-                  'Automatic points, GD, and tie-breaker enforcement',
-                  'Real-time table updates for teams and fans',
-                  'Aggregate team and player stats (Scorers, MVPs)',
-                  'Error-free source of truth for league history'
-                ].map((point, i) => (
-                  <li key={i} className="flex items-start gap-3 text-slate-700 text-sm font-semibold">
-                    <div className="mt-1.5 h-1.5 w-1.5 rounded-full bg-primary shrink-0" />
-                    {point}
+                  { label: 'Automation', desc: 'Points, GD, and tie-breakers applied instantly.' },
+                  { label: 'Transparency', desc: 'The table reflects the new reality for teams and fans.' },
+                  { label: 'Player Stats', desc: 'Aggregate Top Scorers, MVPs, and Clean Sheets.' },
+                  { label: 'History', desc: 'Maintain one undisputed source of truth for the season.' }
+                ].map((item, i) => (
+                  <li key={i} className="flex items-start gap-3">
+                    <div className="mt-1.5 h-1 w-1 rounded-full bg-primary shrink-0" />
+                    <p className="text-sm text-slate-700">
+                      <span className="font-bold text-slate-900">{item.label}:</span> {item.desc}
+                    </p>
                   </li>
                 ))}
               </ul>
             </div>
 
-            {/* VISUAL: The Low-Contrast Standing Table */}
+            {/* VISUAL: The Professional Standings Table */}
             <div className="order-1 lg:order-2">
-              <div className="bg-slate-50 rounded-[2.5rem] p-8 border border-slate-100">
-                <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+              <div className="bg-slate-100/50 rounded-3xl p-4 border border-slate-200 shadow-inner">
+                <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden">
                   
-                  {/* Table Header */}
-                  <div className="grid grid-cols-12 gap-2 px-6 py-4 bg-slate-50 border-b border-slate-100">
-                    <div className="col-span-1 h-2 bg-slate-200 rounded-full" />
-                    <div className="col-span-5 h-2 bg-slate-200 rounded-full" />
-                    <div className="col-span-2 h-2 bg-slate-200 rounded-full" />
-                    <div className="col-span-2 h-2 bg-slate-200 rounded-full" />
-                    <div className="col-span-2 h-2 bg-slate-200 rounded-full" />
+                  {/* macOS Style Window Header: Consistent with Step 1 & 2 */}
+                  <div className="px-4 py-2.5 border-b border-slate-100 flex items-center gap-2 bg-slate-50/80">
+                    <div className="flex gap-1.5">
+                      <div className="w-2.5 h-2.5 rounded-full bg-slate-300" />
+                      <div className="w-2.5 h-2.5 rounded-full bg-slate-300" />
+                      <div className="w-2.5 h-2.5 rounded-full bg-slate-300" />
+                    </div>
+                    <div className="flex-1 text-center pr-10">
+                      <div className="h-1.5 w-24 bg-slate-200 rounded-full mx-auto" />
+                    </div>
                   </div>
 
-                  {/* Table Rows */}
+                  {/* Table Header: Mimicking La Liga / Google Search density */}
+                  <div className="grid grid-cols-12 gap-2 px-4 py-3 bg-slate-50 border-b border-slate-100">
+                    <div className="col-span-1 text-[9px] font-black text-slate-400 uppercase">#</div>
+                    <div className="col-span-5 text-[9px] font-black text-slate-400 uppercase">Team</div>
+                    <div className="col-span-2 text-[9px] font-black text-slate-400 uppercase text-center">PL</div>
+                    <div className="col-span-2 text-[9px] font-black text-slate-400 uppercase text-center">GD</div>
+                    <div className="col-span-2 text-[9px] font-black text-slate-400 uppercase text-center">PTS</div>
+                  </div>
+
+                  {/* Table Rows: Max 7 rows, abstract but meaningful */}
                   <div className="divide-y divide-slate-50">
                     {[
-                      { trend: 'up', color: 'text-green-500' },
-                      { trend: 'stay', color: 'text-slate-300' },
-                      { trend: 'down', color: 'text-red-500' },
-                      { trend: 'stay', color: 'text-slate-300' }
+                      { rank: 1, trend: 'stay', pts: 42, gd: '+18' },
+                      { rank: 2, trend: 'up', pts: 40, gd: '+12' },
+                      { rank: 3, trend: 'down', pts: 39, gd: '+14' },
+                      { rank: 4, trend: 'stay', pts: 35, gd: '+8' },
+                      { rank: 5, trend: 'stay', pts: 31, gd: '+2' },
+                      { rank: 6, trend: 'up', pts: 28, gd: '-1' },
+                      { rank: 7, trend: 'stay', pts: 25, gd: '-4' }
                     ].map((row, i) => (
-                      <div key={i} className="grid grid-cols-12 gap-2 px-6 py-4 items-center">
-                        <div className="col-span-1 flex items-center gap-1">
-                          <span className={`text-[10px] font-bold ${row.color}`}>
-                            {row.trend === 'up' && '▲'}
-                            {row.trend === 'down' && '▼'}
-                            {row.trend === 'stay' && '•'}
-                          </span>
+                      <div key={i} className="grid grid-cols-12 gap-2 px-4 py-2.5 items-center hover:bg-slate-50/50 transition-colors">
+                        {/* Rank & Trend */}
+                        <div className="col-span-1 flex items-center gap-1.5">
+                          <span className="text-[10px] font-black text-slate-500">{row.rank}</span>
+                          <div className={`w-1 h-1 rounded-full ${
+                            row.trend === 'up' ? 'bg-green-500' : 
+                            row.trend === 'down' ? 'bg-red-500' : 'bg-slate-200'
+                          }`} />
                         </div>
-                        <div className="col-span-5 flex items-center gap-3">
-                          <div className="w-5 h-5 rounded bg-slate-100" />
-                          <div className="h-2 w-24 bg-slate-100 rounded-full" />
+                        
+                        {/* Team: Round Logo + Name Skeleton */}
+                        <div className="col-span-5 flex items-center gap-2.5">
+                          <div className="w-5 h-5 rounded-full bg-slate-100 border border-slate-200 shrink-0" />
+                          <div className="h-1.5 w-full bg-slate-100 rounded-full max-w-[60px]" />
                         </div>
-                        <div className="col-span-2 h-2 bg-slate-50 rounded-full" />
-                        <div className="col-span-2 h-2 bg-slate-50 rounded-full" />
-                        <div className="col-span-2 h-2 bg-slate-900/5 rounded-full" />
+
+                        {/* Stats: Played, Goal Diff, Points */}
+                        <div className="col-span-2 text-center text-[10px] font-medium text-slate-400 tabular-nums">18</div>
+                        <div className="col-span-2 text-center text-[10px] font-medium text-slate-400 tabular-nums">{row.gd}</div>
+                        <div className="col-span-2 text-center text-[10px] font-black text-slate-900 tabular-nums">{row.pts}</div>
                       </div>
                     ))}
                   </div>
-                </div>
 
-                <p className="mt-4 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                  Rules Applied: Points {'>'} GD {'>'} Head-to-Head
-                </p>
+                  {/* Subtle Footer: Logic Enforcement Badge */}
+                  <div className="p-3 bg-slate-50 border-t border-slate-100 flex justify-center">
+                    <div className="px-3 py-1 rounded-full border border-slate-200 bg-white shadow-sm flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                        <span className="text-[8px] font-bold text-slate-500 uppercase tracking-widest">Logic Engine: Active</span>
+                    </div>
+                  </div>
+
+                </div>
               </div>
             </div>
 
