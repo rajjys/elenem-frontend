@@ -87,16 +87,28 @@ const GeneralUserDashboard = () => {
           </Card>
         ) : (
           <>
-            {/* General User without tenant */}
+            {/* General User without tenant — gated on email verification */}
             {isGeneralUser && !userAuth?.tenantId && (
-              <div className="my-6 text-gray-800 bg-gray-200 hover:bg-gray-300 transition-colors rounded-md w-auto max-w-xs text-center">
-                <Link href="/tenant/create" className=''>
+              userAuth?.isEmailVerified ? (
+                <div className="my-6 text-gray-800 bg-gray-200 hover:bg-gray-300 transition-colors rounded-md w-auto max-w-xs text-center">
+                  <Link href="/tenant/create">
+                    <div className='flex items-center justify-center pt-6'><Plus className='w-8 h-8' /></div>
+                    <div className="text-lg font-bold px-6 pt-3 pb-6">
+                      Créez Votre Organisation
+                    </div>
+                  </Link>
+                </div>
+              ) : (
+                <div
+                  className="my-6 text-gray-400 bg-gray-100 rounded-md w-auto max-w-xs text-center opacity-70 cursor-not-allowed select-none"
+                  aria-disabled="true"
+                  title="Vérifiez votre email pour créer une organisation"
+                >
                   <div className='flex items-center justify-center pt-6'><Plus className='w-8 h-8' /></div>
-                  <div className="text-lg font-bold px-6 pt-3 pb-6">
-                    Créez Votre Organisation
-                  </div>
-                </Link>
-              </div>
+                  <div className="text-lg font-bold px-6 pt-3">Créez Votre Organisation</div>
+                  <p className="text-xs pb-6 pt-1">Vérifiez votre email d&apos;abord</p>
+                </div>
+              )
             )}
             {/* General User with tenant OR Tenant Admin */}
             {(isGeneralUser && userAuth?.tenantId) || isTenantAdmin ? (

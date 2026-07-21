@@ -1,23 +1,39 @@
 'use client';
 
-import { Suspense, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { toast } from 'sonner';
+import { MailCheck, ArrowLeft } from 'lucide-react';
 import { Button, Input } from '@/components/ui';
 import { toastApiError, getPostAuthRedirect } from '@/utils';
 import { useVerifyEmail, useResendVerification } from '@/services/auth';
 import { useAuthStore } from '@/store/auth.store';
 
+const RESEND_SECONDS = 30;
+
 function VerifyEmailInner() {
   const router = useRouter();
-  const prefill = useSearchParams().get('email') ?? '';
-  const [email, setEmail] = useState(prefill);
-  const [otp, setOtp] = useState('');
   const user = useAuthStore((s) => s.user);
+  const emailFromQuery = useSearchParams().get('email') ?? '';
+  // Known email (from register redirect or the logged-in user) is shown as text,
+  // not an editable field. Only fall back to an input if we truly have none.
+  const knownEmail = emailFromQuery || user?.email || '';
+
+  const [otp, setOtp] = useState('');
+  const [manualEmail, setManualEmail] = useState('');
+  const [cooldown, setCooldown] = useState(RESEND_SECONDS);
 
   const verify = useVerifyEmail();
   const resend = useResendVerification();
+  const email = knownEmail || manualEmail;
+
+  // Resend cooldown so users can't trip the rate limiter.
+  useEffect(() => {
+    if (cooldown <= 0) return;
+    const t = setInterval(() => setCooldown((c) => (c <= 1 ? 0 : c - 1)), 1000);
+    return () => clearInterval(t);
+  }, [cooldown]);
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,8 +42,6 @@ function VerifyEmailInner() {
       {
         onSuccess: () => {
           toast.success('Email vérifié.');
-          // If already logged in (e.g. right after registering) go to their
-          // landing page; otherwise send them to log in.
           router.push(user ? getPostAuthRedirect(user) : '/login');
         },
         onError: (err) => toastApiError(err, 'Vérification impossible.'),
@@ -35,35 +49,82 @@ function VerifyEmailInner() {
     );
   };
 
+  const doResend = () => {
+    if (cooldown > 0 || !email) return;
+    resend.mutate(email, {
+      onSuccess: (d) => {
+        toast.success(d?.message ?? 'Nouveau code envoyé.');
+        setCooldown(RESEND_SECONDS);
+      },
+      onError: (err) => toastApiError(err),
+    });
+  };
+
   return (
-    <div className="mx-auto max-w-md p-6">
-      <h1 className="mb-1 text-xl font-semibold">Vérifier votre email</h1>
-      <p className="mb-6 text-sm text-gray-500">Entrez le code à 6 chiffres reçu par email.</p>
+    <div className="flex min-h-[70vh] items-center justify-center px-4 py-10">
+      <div className="w-full max-w-md rounded-2xl border border-gray-100 bg-white p-8 shadow-xl">
+        <div className="mb-6 flex flex-col items-center text-center">
+          <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-indigo-50 text-indigo-600">
+            <MailCheck size={22} />
+          </div>
+          <h1 className="text-xl font-semibold text-gray-900">Vérifiez votre email</h1>
+          <p className="mt-1 text-sm text-gray-500">
+            Un code à 6 chiffres a été envoyé à{' '}
+            <span className="font-medium text-gray-700">{email || 'votre adresse'}</span>. La
+            réception peut prendre quelques instants.
+          </p>
+        </div>
 
-      <form onSubmit={submit} className="space-y-4">
-        <Input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-        <Input inputMode="numeric" maxLength={6} placeholder="Code à 6 chiffres" value={otp} onChange={(e) => setOtp(e.target.value)} required />
-        <Button type="submit" variant="primary" className="w-full" disabled={verify.isPending}>
-          {verify.isPending ? 'Vérification…' : "Vérifier l'email"}
-        </Button>
-        <button
-          type="button"
-          className="text-sm text-indigo-600"
-          onClick={() =>
-            resend.mutate(email, {
-              onSuccess: (d) => toast.success(d?.message ?? 'Code renvoyé.'),
-              onError: (err) => toastApiError(err),
-            })
-          }
-        >
-          Renvoyer le code
-        </button>
-      </form>
+        <form onSubmit={submit} className="space-y-4">
+          {!knownEmail && (
+            <Input
+              type="email"
+              placeholder="votre@email.com"
+              value={manualEmail}
+              onChange={(e) => setManualEmail(e.target.value)}
+              required
+            />
+          )}
+          <Input
+            inputMode="numeric"
+            maxLength={6}
+            placeholder="• • • • • •"
+            value={otp}
+            onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
+            required
+            autoFocus
+            className="text-center text-lg tracking-[0.5em]"
+          />
+          <Button type="submit" variant="primary" className="w-full" disabled={verify.isPending}>
+            {verify.isPending ? 'Vérification…' : "Vérifier l'email"}
+          </Button>
+        </form>
 
-      <div className="mt-6 border-t pt-4 text-sm text-gray-600">
-        <Link href="/login" className="text-indigo-600 hover:text-indigo-500">
-          Retour à la connexion
-        </Link>
+        <div className="mt-4 text-center text-sm">
+          <button
+            type="button"
+            disabled={cooldown > 0 || resend.isPending}
+            onClick={doResend}
+            className="text-indigo-600 hover:text-indigo-500 disabled:cursor-not-allowed disabled:text-gray-400"
+          >
+            {cooldown > 0 ? `Renvoyer le code (${cooldown}s)` : 'Renvoyer le code'}
+          </button>
+        </div>
+
+        <div className="mt-6 border-t border-gray-100 pt-4 text-center text-sm">
+          {user ? (
+            <Link
+              href="/account/dashboard"
+              className="inline-flex items-center gap-1 text-gray-500 hover:text-gray-700"
+            >
+              <ArrowLeft size={14} /> Retour au tableau de bord
+            </Link>
+          ) : (
+            <Link href="/login" className="text-indigo-600 hover:text-indigo-500">
+              Retour à la connexion
+            </Link>
+          )}
+        </div>
       </div>
     </div>
   );
