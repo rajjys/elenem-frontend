@@ -72,7 +72,7 @@ export const LeagueDetailsSchema = z.object({
     id: z.string().cuid(),
     firstName: z.string().nullable().optional(),
     lastName: z.string().nullable().optional(),
-    email: z.string().email(),
+    email: z.string().email().nullable().optional(), // Player.email is optional in the backend
     profilePictureUrl: z.string().nullable().optional(),
   }))
 });
