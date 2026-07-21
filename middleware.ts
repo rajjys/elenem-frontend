@@ -90,10 +90,18 @@ export async function middleware(request: NextRequest) {
   // its next API call (a full navigation never reaches that interceptor, which
   // is why an expired token used to bounce the user to /login on every reload).
   // Only a genuinely invalid token (bad signature / malformed) forces re-login.
-  const { payload: user } = await verifyJWTForGate(
-    accessToken,
-    process.env.JWT_SECRET || 'your-secret', // Ensure JWT_SECRET is set
-  );
+  // Fail closed if the signing secret is not configured: never fall back to a
+  // well-known default, which would make forged tokens verifiable.
+  const jwtSecret = process.env.JWT_SECRET;
+  if (!jwtSecret) {
+    console.error('Middleware: JWT_SECRET is not configured; refusing to authorize.');
+    const redirectUrl = request.nextUrl.clone();
+    redirectUrl.pathname = '/login';
+    redirectUrl.searchParams.set('redirect', pathname + search);
+    return NextResponse.redirect(redirectUrl);
+  }
+
+  const { payload: user } = await verifyJWTForGate(accessToken, jwtSecret);
 
   // If the token is genuinely invalid or has no roles, redirect to login.
   if (!user || !Array.isArray(user.roles) || user.roles.length === 0) {

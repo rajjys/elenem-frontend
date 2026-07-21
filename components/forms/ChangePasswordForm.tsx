@@ -35,8 +35,8 @@ export function ChangePasswordForm() {
     setApiError(null);
     setSuccessMessage(null);
     try {
-      await api.post("/users/profile/change-password", {
-        oldPassword: data.oldPassword,
+      await api.put("/users/me/password", {
+        currentPassword: data.oldPassword,
         newPassword: data.newPassword,
       });
       setSuccessMessage("Password changed successfully!");
