@@ -214,11 +214,13 @@ Headline items (see the deep doc for detail and ordering):
 3. `[x]` **Password reuse prevention** — `PasswordHistory` activated (recorded on
    register/change/reset, checked against last 5); reset revokes sessions + unlocks + updates
    `lastPasswordChange`. Verified end-to-end.
-4. `[ ]` **Real invite flow** (tokenized set-password email) — current league/player invites
-   create users that can never log in.
-5. `[ ]` Frontend user management: `useCurrentUser()` hook (empty today); wire the orphaned
-   `UserForm` into `admin/users/create` + `[id]` (edit) + `[id]/roles`; implement `account/profile`,
-   `account/settings`, polish `account/security`; forgot/reset + verify-email pages.
+4. `[x]` **Real invite flow** — CreateUserDto password optional (omit = invite); admin-create &
+   league-admin invite email a set-password code + /accept-invite link; accepting sets the
+   password AND verifies the email. Verified end-to-end.
+5. `[~]` Frontend user management: `useCurrentUser/useHasRole` hook DONE; `admin/users/create` +
+   `[id]` wired to UserForm (404s killed); forgot/reset + verify-email + accept-invite pages DONE;
+   password show/hide DONE. TODO: UserForm invite/role option, `[id]/roles`, `admin/roles`,
+   `account/profile`, `account/settings`, adopt the hook app-wide.
 6. `[ ]` `admin/roles` read-only reference; per-scope member management (start with league admins).
 7. `[ ]` Migration-only future-proofing for OAuth: make `passwordHash` nullable, add
    `provider`/`providerId`. Full social login = later feature, not this phase.
