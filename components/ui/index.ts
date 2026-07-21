@@ -34,3 +34,4 @@ export * from './season-status-badge';
 export * from './post/post-rich-text-editor';
 export * from './post/lexical-renderer';
 export * from './error-state';
+export * from './password-input';

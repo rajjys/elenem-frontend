@@ -29,3 +29,10 @@ export function useResendVerification() {
       api.post('/auth/resend-verification', { email }).then((r) => r.data),
   });
 }
+
+export function useVerifyResetOtp() {
+  return useMutation({
+    mutationFn: (dto: { email: string; otp: string }) =>
+      api.post('/auth/verify-reset-otp', dto).then((r) => r.data),
+  });
+}

@@ -19,6 +19,7 @@ import {
   FormLabel,
   FormMessage,
   Input,
+  PasswordInput,
   Select,
   SelectContent,
   SelectItem,
@@ -36,7 +37,7 @@ import {
   PaginatedResponseDto,
   RegisterFormSchema,
 } from "@/schemas"; // Assuming you have these schemas/types exported
-import { ChevronDown, Eye, EyeOff, Loader2 } from "lucide-react";
+import { ChevronDown, Loader2 } from "lucide-react";
 import Link from "next/link";
 
 // Define the form schema for validation
@@ -48,7 +49,6 @@ export function RegisterForm() {
   const [loading, setLoading] = useState(false);
   const [tenants, setTenants] = useState<PublicTenantBasic[]>([]);
   const [tenantsLoading, setTenantsLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
   const [showMore, setShowMore] = useState(false);
   // Fetch tenants on component mount
   useEffect(() => {
@@ -157,22 +157,9 @@ export function RegisterForm() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel hidden>Mot de Passe</FormLabel>
-                  <div className="relative">
-                    <FormControl>
-                      <Input
-                        type={showPassword ? "text" : "password"}
-                        placeholder="Mot de Passe"
-                        {...field}
-                      />
-                    </FormControl>
-                    <button
-                      type="button"
-                      className="absolute right-2 top-2 text-gray-500"
-                      onClick={() => setShowPassword((prev) => !prev)}
-                    >
-                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                    </button>
-                  </div>
+                  <FormControl>
+                    <PasswordInput placeholder="Mot de Passe" {...field} />
+                  </FormControl>
                   <FormMessage name="password"/>
                 </FormItem>
               )}

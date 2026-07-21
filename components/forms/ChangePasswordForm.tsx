@@ -3,9 +3,9 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Button } from "@/components/ui/button";
-import { api } from "@/services/api";
+import { api, getApiErrorMessage } from "@/services/api";
 import { useState } from "react";
 
 // Matches ChangePasswordDto from backend
@@ -43,8 +43,7 @@ export function ChangePasswordForm() {
       form.reset(); // Clear form
       setTimeout(() => setSuccessMessage(null), 3000);
     } catch (error) {
-      setApiError("Failed to change password.");
-      console.log(error);
+      setApiError(getApiErrorMessage(error, "Failed to change password."));
     } finally {
       setIsLoading(false);
     }
@@ -54,23 +53,20 @@ export function ChangePasswordForm() {
     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
       {apiError && <p className="text-red-500 bg-red-100 p-3 rounded text-sm">{apiError}</p>}
       {successMessage && <p className="text-green-600 bg-green-100 p-3 rounded text-sm">{successMessage}</p>}
-      <Input
+      <PasswordInput
         label="Current Password"
-        type="password"
         {...form.register("oldPassword")}
         error={form.formState.errors.oldPassword?.message}
         disabled={isLoading}
       />
-      <Input
+      <PasswordInput
         label="New Password"
-        type="password"
         {...form.register("newPassword")}
         error={form.formState.errors.newPassword?.message}
         disabled={isLoading}
       />
-      <Input
+      <PasswordInput
         label="Confirm New Password"
-        type="password"
         {...form.register("confirmNewPassword")}
         error={form.formState.errors.confirmNewPassword?.message}
         disabled={isLoading}

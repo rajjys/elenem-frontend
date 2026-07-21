@@ -4,33 +4,51 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { toast } from 'sonner';
-import { Button, Input } from '@/components/ui';
+import { Mail, KeyRound, Lock, ArrowLeft, CheckCircle2 } from 'lucide-react';
+import { Button, Input, PasswordInput } from '@/components/ui';
 import { toastApiError } from '@/utils';
-import { useForgotPassword, useResetPassword } from '@/services/auth';
+import { useForgotPassword, useVerifyResetOtp, useResetPassword } from '@/services/auth';
 
-// Two-step OTP reset on one page: request a code, then set a new password.
+type Step = 'email' | 'otp' | 'password';
+const STEPS: Step[] = ['email', 'otp', 'password'];
+
 export default function ForgotPasswordPage() {
   const router = useRouter();
-  const [step, setStep] = useState<'request' | 'reset'>('request');
+  const [step, setStep] = useState<Step>('email');
   const [email, setEmail] = useState('');
   const [otp, setOtp] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirm, setConfirm] = useState('');
 
   const forgot = useForgotPassword();
+  const verifyOtp = useVerifyResetOtp();
   const reset = useResetPassword();
 
+  // Step 1 — request a code.
   const requestCode = (e: React.FormEvent) => {
     e.preventDefault();
     forgot.mutate(email, {
-      onSuccess: (data) => {
-        toast.success(data?.message ?? 'If the account exists, a code has been sent.');
-        setStep('reset');
+      onSuccess: () => {
+        toast.success('Si un compte existe, un code a été envoyé.');
+        setStep('otp');
       },
       onError: (err) => toastApiError(err, "Impossible d'envoyer le code."),
     });
   };
 
+  // Step 2 — verify the code BEFORE showing the password screen.
+  const checkCode = (e: React.FormEvent) => {
+    e.preventDefault();
+    verifyOtp.mutate(
+      { email, otp },
+      {
+        onSuccess: () => setStep('password'),
+        onError: (err) => toastApiError(err, 'Code invalide ou expiré.'),
+      },
+    );
+  };
+
+  // Step 3 — set the new password.
   const submitReset = (e: React.FormEvent) => {
     e.preventDefault();
     if (newPassword !== confirm) {
@@ -49,40 +67,93 @@ export default function ForgotPasswordPage() {
     );
   };
 
+  const stepIndex = STEPS.indexOf(step);
+
   return (
-    <div className="mx-auto max-w-md p-6">
-      <h1 className="mb-1 text-xl font-semibold">Mot de passe oublié</h1>
-      <p className="mb-6 text-sm text-gray-500">
-        {step === 'request'
-          ? 'Entrez votre email pour recevoir un code à 6 chiffres.'
-          : `Entrez le code envoyé à ${email} et votre nouveau mot de passe.`}
-      </p>
+    <div className="flex min-h-[70vh] items-center justify-center px-4 py-10">
+      <div className="w-full max-w-md rounded-2xl border border-gray-100 bg-white p-8 shadow-xl">
+        {/* header */}
+        <div className="mb-6 flex flex-col items-center text-center">
+          <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-indigo-50 text-indigo-600">
+            {step === 'email' ? <Mail size={22} /> : step === 'otp' ? <KeyRound size={22} /> : <Lock size={22} />}
+          </div>
+          <h1 className="text-xl font-semibold text-gray-900">Mot de passe oublié</h1>
+          <p className="mt-1 text-sm text-gray-500">
+            {step === 'email' && 'Entrez votre email pour recevoir un code à 6 chiffres.'}
+            {step === 'otp' && `Entrez le code envoyé à ${email}.`}
+            {step === 'password' && 'Choisissez un nouveau mot de passe.'}
+          </p>
+        </div>
 
-      {step === 'request' ? (
-        <form onSubmit={requestCode} className="space-y-4">
-          <Input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-          <Button type="submit" variant="primary" className="w-full" disabled={forgot.isPending}>
-            {forgot.isPending ? 'Envoi…' : 'Envoyer le code'}
-          </Button>
-        </form>
-      ) : (
-        <form onSubmit={submitReset} className="space-y-4">
-          <Input inputMode="numeric" maxLength={6} placeholder="Code à 6 chiffres" value={otp} onChange={(e) => setOtp(e.target.value)} required />
-          <Input type="password" placeholder="Nouveau mot de passe" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required />
-          <Input type="password" placeholder="Confirmer le mot de passe" value={confirm} onChange={(e) => setConfirm(e.target.value)} required />
-          <Button type="submit" variant="primary" className="w-full" disabled={reset.isPending}>
-            {reset.isPending ? 'Réinitialisation…' : 'Réinitialiser le mot de passe'}
-          </Button>
-          <button type="button" className="text-sm text-indigo-600" onClick={() => setStep('request')}>
-            Renvoyer un code
-          </button>
-        </form>
-      )}
+        {/* step indicator */}
+        <div className="mb-6 flex items-center justify-center gap-2">
+          {STEPS.map((s, i) => (
+            <div
+              key={s}
+              className={`h-1.5 w-10 rounded-full transition-colors ${
+                i <= stepIndex ? 'bg-indigo-600' : 'bg-gray-200'
+              }`}
+            />
+          ))}
+        </div>
 
-      <div className="mt-6 border-t pt-4 text-sm text-gray-600">
-        <Link href="/login" className="text-indigo-600 hover:text-indigo-500">
-          Retour à la connexion
-        </Link>
+        {step === 'email' && (
+          <form onSubmit={requestCode} className="space-y-4">
+            <Input type="email" placeholder="votre@email.com" value={email} onChange={(e) => setEmail(e.target.value)} required autoFocus />
+            <Button type="submit" variant="primary" className="w-full" disabled={forgot.isPending}>
+              {forgot.isPending ? 'Envoi…' : 'Envoyer le code'}
+            </Button>
+          </form>
+        )}
+
+        {step === 'otp' && (
+          <form onSubmit={checkCode} className="space-y-4">
+            <Input
+              inputMode="numeric"
+              maxLength={6}
+              placeholder="• • • • • •"
+              value={otp}
+              onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
+              required
+              autoFocus
+              className="text-center text-lg tracking-[0.5em]"
+            />
+            <Button type="submit" variant="primary" className="w-full" disabled={verifyOtp.isPending}>
+              {verifyOtp.isPending ? 'Vérification…' : 'Vérifier le code'}
+            </Button>
+            <div className="flex items-center justify-between text-sm">
+              <button type="button" className="flex items-center gap-1 text-gray-500 hover:text-gray-700" onClick={() => setStep('email')}>
+                <ArrowLeft size={14} /> Changer l&apos;email
+              </button>
+              <button
+                type="button"
+                className="text-indigo-600 hover:text-indigo-500"
+                onClick={() => forgot.mutate(email, { onSuccess: () => toast.success('Nouveau code envoyé.'), onError: (e) => toastApiError(e) })}
+              >
+                Renvoyer
+              </button>
+            </div>
+          </form>
+        )}
+
+        {step === 'password' && (
+          <form onSubmit={submitReset} className="space-y-4">
+            <div className="flex items-center gap-2 rounded-lg bg-green-50 px-3 py-2 text-sm text-green-700">
+              <CheckCircle2 size={16} /> Code vérifié
+            </div>
+            <PasswordInput placeholder="Nouveau mot de passe" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required autoFocus />
+            <PasswordInput placeholder="Confirmer le mot de passe" value={confirm} onChange={(e) => setConfirm(e.target.value)} required />
+            <Button type="submit" variant="primary" className="w-full" disabled={reset.isPending}>
+              {reset.isPending ? 'Réinitialisation…' : 'Réinitialiser le mot de passe'}
+            </Button>
+          </form>
+        )}
+
+        <div className="mt-6 border-t border-gray-100 pt-4 text-center text-sm">
+          <Link href="/login" className="text-indigo-600 hover:text-indigo-500">
+            Retour à la connexion
+          </Link>
+        </div>
       </div>
     </div>
   );
