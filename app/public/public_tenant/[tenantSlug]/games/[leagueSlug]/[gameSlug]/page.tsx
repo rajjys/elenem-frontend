@@ -160,7 +160,7 @@ export default function GamePage({
             {/* Score & status */}
             <div className="text-center">
               <p className="text-base md:text-lg font-semibold">{getStatusBadge(game.status)}</p>
-              {(game.status === GameStatus.IN_PROGRESS ||
+              {(game.status === GameStatus.LIVE ||
                 game.status === GameStatus.COMPLETED) && (
                 <p className="text-2xl md:text-3xl font-bold my-2">
                   {game.homeScore ?? "-"} : {game.awayScore ?? "-"}

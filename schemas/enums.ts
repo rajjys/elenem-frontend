@@ -17,12 +17,17 @@ export enum Gender {
   MIXED = 'MIXED',
   OTHER = 'OTHER',
 }
+// Must mirror the backend Prisma GameStatus enum exactly.
 export enum GameStatus {
+  DRAFT = 'DRAFT',
   SCHEDULED = 'SCHEDULED',
-  IN_PROGRESS = 'IN_PROGRESS',
+  CONFIRMED = 'CONFIRMED',
+  LIVE = 'LIVE',
+  PAUSED = 'PAUSED',
   COMPLETED = 'COMPLETED',
+  CANCELLED = 'CANCELLED',
   POSTPONED = 'POSTPONED',
-  CANCELLED = 'CANCELLED'
+  RESCHEDULED = 'RESCHEDULED',
 }
 export enum SupportedLanguages {
   ENGLISH = 'ENGLISH',

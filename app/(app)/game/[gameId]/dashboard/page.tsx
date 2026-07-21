@@ -157,8 +157,8 @@ export default function GameManagementDashboard() {
   const lastSentScores = React.useRef<{ home: number; away: number }>({ home: 0, away: 0 });
   // Effect to update live score when debounced scores change
   useEffect(() => {
-    // Only send updates if the user can edit, the game exists, is IN_PROGRESS, and scores have changed
-    if (!isTeamAdmin && game && game.status === GameStatus.IN_PROGRESS) {
+    // Only send updates if the user can edit, the game exists, is LIVE, and scores have changed
+    if (!isTeamAdmin && game && game.status === GameStatus.LIVE) {
       if (
         debouncedHomeScore !== lastSentScores.current.home ||
         debouncedAwayScore !== lastSentScores.current.away
@@ -177,7 +177,7 @@ export default function GameManagementDashboard() {
     );
   }
 
-  const isLive = game.status === GameStatus.IN_PROGRESS;
+  const isLive = game.status === GameStatus.LIVE;
   const canEdit = !isTeamAdmin;
 
   return (
@@ -197,13 +197,13 @@ export default function GameManagementDashboard() {
         <div>
           {game.status === GameStatus.SCHEDULED && canEdit && (
             <Button
-              onClick={() => handleStatusUpdate(GameStatus.IN_PROGRESS)}
+              onClick={() => handleStatusUpdate(GameStatus.LIVE)}
               variant='primary'
             >
               <Play className="w-4 h-4 mr-2" /> Démarrer le match
             </Button>
           )}
-          {game.status === GameStatus.IN_PROGRESS && canEdit && (
+          {game.status === GameStatus.LIVE && canEdit && (
             <AlertDialog>
               <AlertDialogTrigger asChild>
                 <Button variant='danger' className="bg-red-500 hover:bg-red-600 text-white rounded-xl">

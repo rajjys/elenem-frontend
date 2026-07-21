@@ -135,7 +135,7 @@ const TenantLandingPage = ({ params }: { params: Promise<{ tenantSlug: string }>
 
             const upcomingInProgress = fetchedGames.filter(
                 (game) =>
-                game.status === GameStatus.IN_PROGRESS ||
+                game.status === GameStatus.LIVE ||
                 (game.status === GameStatus.SCHEDULED && new Date(game.dateTime) > new Date())
             );
 

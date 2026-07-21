@@ -385,7 +385,7 @@ export function GameForm({ onSuccess, onCancel }: GameFormProps) {
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="SCHEDULED">Scheduled</SelectItem>
-                    <SelectItem value="IN_PROGRESS">In Progress</SelectItem>
+                    <SelectItem value="LIVE">Live</SelectItem>
                     <SelectItem value="COMPLETED">Completed</SelectItem>
                     <SelectItem value="POSTPONED">Postponed</SelectItem>
                     <SelectItem value="CANCELLED">Cancelled</SelectItem>

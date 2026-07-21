@@ -63,7 +63,7 @@ export const GameCard: React.FC<GameCardProps> = ({ game, buildLink }) => {
 
               {/* Score or VS */}
               <div className="text-center min-w-[80px] text-gray-700">
-                {game.status === GameStatus.IN_PROGRESS || game.status === GameStatus.COMPLETED ? (
+                {game.status === GameStatus.LIVE || game.status === GameStatus.COMPLETED ? (
                   <div className="text-xl font-bold">{game.homeScore} - {game.awayScore}</div>
                 ) : (
                   <div className="text-lg font-medium">VS</div>

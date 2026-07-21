@@ -110,7 +110,7 @@ export default function LeagueDashboard() {
             pageSize: 5,
             sortBy: 'dateTime',
             sortOrder: 'asc',
-            status: [GameStatus.SCHEDULED, GameStatus.IN_PROGRESS],
+            status: [GameStatus.SCHEDULED, GameStatus.LIVE],
             fromDate: new Date().toISOString(), // Only future games
           },
           paramsSerializer: (params) => qs.stringify(params, { arrayFormat: 'repeat' })
@@ -454,7 +454,7 @@ const MinimalGameCard = ({ game }: { game: GameDetails }) => {
         {/* Date & Status */}
         <div className="flex items-center justify-between text-xs text-gray-600 font-semibold">
           <span>{formatDateFr(game.dateTime)}</span>
-          {game.status === GameStatus.IN_PROGRESS && 
+          {game.status === GameStatus.LIVE && 
             <span className='text-red-500 bg-red-50 border border-red-200 rounded-full px-3 py-0.5 font-semibold animate-pulse'>
               Live
             </span>
