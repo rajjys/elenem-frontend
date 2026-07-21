@@ -138,6 +138,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/auth/verify-reset-otp": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Validate a reset OTP without consuming it (gates the password step) */
+        post: operations["AuthController_verifyResetOtp"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/auth/reset-password": {
         parameters: {
             query?: never;
@@ -1574,6 +1591,15 @@ export interface components {
             /** @example john@example.com */
             email: string;
         };
+        VerifyResetOtpDto: {
+            /** @example john@example.com */
+            email: string;
+            /**
+             * @description 6-digit reset code
+             * @example 123456
+             */
+            otp: string;
+        };
         ResetPasswordDto: {
             /** @example john@example.com */
             email: string;
@@ -1696,8 +1722,8 @@ export interface components {
             username: string;
             /** @description Unique email address for the new user. */
             email: string;
-            /** @description Password for the new user (minimum 8 characters). */
-            password: string;
+            /** @description Password (min 8 chars). Omit to send the user a set-password invite instead. */
+            password?: string;
             /** @description User's first name. */
             firstName: string;
             /** @description User's last name. */
@@ -3413,6 +3439,27 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": components["schemas"]["ForgotPasswordDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AuthController_verifyResetOtp: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VerifyResetOtpDto"];
             };
         };
         responses: {
