@@ -203,9 +203,10 @@ re-login loop in middleware. See git log for detail.
 two-agent audit, plus answers on email/OTP, cookie storage, social login, password reuse).
 
 Headline items (see the deep doc for detail and ordering):
-1. `[ ]` Fix the **global-guard wiring bug** (`auth.module.ts` uses the string `'APP_GUARD'`, not
-   the token → JwtAuthGuard/RolesGuard aren't global). Reconcile duplicate fields
-   (`isVerified`/`emailVerified`, `lastLogin`/`lastLoginAt`), fix `generateTokens` bad field reads.
+1. `[x]` Fixed the **global-guard wiring bug** (real `APP_GUARD` token → secure-by-default; added
+   `@Public()` to public-players/seasons/sport-rules). Reconciled duplicate fields
+   (`isVerified`→`isEmailVerified`, dropped `emailVerified`; login now writes `lastLoginAt`),
+   fixed `generateTokens` bad field reads. Verified: public 200, protected 401, spec 9/9.
 2. `[x]` **Forgot/reset password via OTP** — `/auth/forgot-password` (enumeration-safe 200) +
    `/auth/reset-password`, `/auth/verify-email` (OTP), `/auth/resend-verification`, all throttled;
    frontend `/forgot-password` + `/verify-email` pages + login link. Mail: Mailtrap-ready with an
