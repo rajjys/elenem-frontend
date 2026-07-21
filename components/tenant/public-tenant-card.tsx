@@ -3,15 +3,12 @@ import Link from "next/link";
 import { Card } from "../ui";
 import { PublicTenantBasic } from "@/schemas";
 import { ExternalLink, Shield, Users } from "lucide-react";
-import { countryNameToCode } from "@/utils";
+import { countryNameToCode, buildTenantUrl } from "@/utils";
 
 // --- Main Components ---
 function PublicTenantCard({ tenant }: { tenant: PublicTenantBasic }) {
 
-    const ROOT_DOMAIN = process.env.NODE_ENV === 'development' ? 
-                        process.env.NEXT_PUBLIC_HOME_URL_LOCAL : process.env.NEXT_PUBLIC_HOME_URL;
-    const protocol = process.env.NODE_ENV === 'development' ? 'http://' : 'https://';
-    const tenantUrl = `${protocol}${tenant.slug}.${ROOT_DOMAIN}`;
+    const tenantUrl = buildTenantUrl(tenant.slug);
     
     return (
         <Link href={tenantUrl} target="_blank" rel="noopener noreferrer">

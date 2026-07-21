@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { api } from '@/services/api';
+import { buildTenantUrl } from '@/utils';
 import { toast } from 'sonner';
 import { GameDetails } from '@/schemas';
 import { Avatar } from '@/components/ui';
@@ -30,9 +31,7 @@ export default function PublicGamesPage() {
   const [loadingDates, setLoadingDates] = useState(true);
   const [loadingGames, setLoadingGames] = useState(false);
   
-  const ROOT_DOMAIN = process.env.NODE_ENV === 'development' ? process.env.NEXT_PUBLIC_HOME_URL_LOCAL : process.env.NEXT_PUBLIC_HOME_URL;
-  const handler = (process.env.NODE_ENV === 'development' ) ? 'http://' : 'https://';
-
+  
   // Fetch available dates on initial load
   async function fetchDates() {
       try {
@@ -142,7 +141,7 @@ export default function PublicGamesPage() {
               <Card key={tenantId} className="overflow-hidden shadow-sm pb-2 bg-slate-200 dark:bg-slate-800">
                 <CardHeader>
                   <CardTitle>
-                    <Link href={`${handler}${tenantSlug}.${ROOT_DOMAIN}`} target="_blank" rel="noopener noreferrer" className="flex items-center justify-start space-x-2 text-slate-800 dark:text-slate-200">
+                    <Link href={buildTenantUrl(tenantSlug)} target="_blank" rel="noopener noreferrer" className="flex items-center justify-start space-x-2 text-slate-800 dark:text-slate-200">
                       <Avatar src={logoUrl} name={tenantName} size={35} />
                       <span>{tenantName}</span>
                     </Link>
@@ -150,7 +149,7 @@ export default function PublicGamesPage() {
                 </CardHeader>
                 <CardContent className="grid gap-2 grid-cols-1">
                   {games.map((game) => (
-                    <Link key={game.id} href={`${handler}${tenantSlug}.${ROOT_DOMAIN}/games/${game.league.slug}/${game.slug}`} target="_blank" rel="noopener noreferrer">
+                    <Link key={game.id} href={buildTenantUrl(tenantSlug, `/games/${game.league.slug}/${game.slug}`)} target="_blank" rel="noopener noreferrer">
                         <GamePublicCard game={game}/>
                     </Link>
                   ))}
