@@ -187,7 +187,9 @@ re-login loop in middleware. See git log for detail.
    `types/api.d.ts`, and `ApiSchema<'Dto'>` helper. Adopt incrementally in touched code.
 2. `[ ]` Introduce **React Query** + per-module service files (`services/games.ts`, …); adopt in
    each module as we touch it (no big-bang rewrite).
-3. `[ ]` ESLint `no-restricted-imports` on `axios`; migrate the ~20 offending files.
+3. `[x]` ESLint `no-restricted-imports` on `axios`; migrated the 20 files (18 only used
+   `axios.isAxiosError` → now `isAxiosError` from `@/services/api`; 2 upload pages keep raw
+   axios for S3 presigned-PUT/multipart with a documented eslint-disable). tsc clean.
 4. `[ ]` Shared axios-error → toast normalizer; `loading.tsx` / `error.tsx` per route group.
 5. `[ ]` Migrate hand-written response Zod schemas to derive from / validate against the generated
    types (kills the recurring runtime drift for good).
