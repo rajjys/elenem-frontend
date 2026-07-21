@@ -274,6 +274,29 @@ tenant mutations. Exit: full tenant lifecycle create→edit→deactivate→delet
 3. `[ ]` `resolveTenantSlugFromHostname` → host-to-tenant lookup (cached) instead of only
    stripping the root domain; dynamic backend CORS from registered domains.
 
+### Phase 13 — Observability & error tracking `[~]` (partially wired; deferred until functionality lands)
+Do the depth here **after** the functional phases — dashboards are only useful once the
+flows they watch exist. What's already in place vs. still to do:
+1. `[x]` **Sentry wired in both apps, DSN-driven** — backend `instrument.ts` (+ profiling,
+   structured logs, env-driven sample rates) and frontend `instrumentation*.ts`; dormant until
+   `SENTRY_DSN` / `NEXT_PUBLIC_SENTRY_DSN` is set. Backend DSN is live locally.
+2. `[ ]` **Source maps upload** — `@sentry/wizard -i sourcemaps` so production stack traces map
+   to TypeScript, not compiled `dist/` JS. Needs `SENTRY_AUTH_TOKEN`; touches the build.
+3. `[ ]` **Frontend Sentry project + DSN** — create the Next.js project in Sentry, set
+   `NEXT_PUBLIC_SENTRY_DSN`.
+4. `[ ]` **Review data scrubbing** — decide `dataCollection.userInfo` / `httpBodies` before real
+   user data flows to Sentry (PII).
+5. `[ ]` **Tune sample rates for prod** — traces/profiles are 1.0 in dev, 0.1 in prod; revisit
+   against Sentry quota once traffic is real.
+6. `[ ]` **Structured logging** — replace `console.log` with a JSON logger (pino/Nest Logger),
+   request-id correlation; ship to Sentry logs or a log drain.
+7. `[ ]` **Real health/readiness probes** — `@nestjs/terminus` with DB check (current
+   `/auth/health` is a bare 200); wire Railway healthcheck to it.
+8. `[ ]` **Release tracking + alerts** — tag Sentry releases on deploy; set alert rules
+   (error-rate spikes, new-issue notifications) to Slack/email.
+9. `[ ]` **Uptime + business metrics** — external uptime check; optional dashboards for
+   signups/active tenants/games-per-day once the SaaS layer exists.
+
 ---
 
 ## Appendix — Known-defect index (from the 2026-07 five-agent audit)
