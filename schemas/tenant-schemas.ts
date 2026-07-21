@@ -24,7 +24,7 @@ export const TenantDetailsSchema = z.object({
   tenantCode: z.string().min(3, "Tenant code must be at least 3 characters").max(12, "Tenant code must be at most 12 characters").regex(/^[A-Z0-9]+$/, "Tenant code must be uppercase alphanumeric"),
   tenantType: TenantTypeSchema,
   sportType: SportTypeSchema,
-  country: z.string().min(2, "Country is required"),//.max(2, "Country must be a 2-letter ISO code"), // ISO 2-letter code
+  country: z.string().optional(), // ISO 2-letter code; omitted by the list projection, present on detail
   businessProfile: CreateBusinessProfileSchema.extend({
     id: z.string(),
     logoAsset: z.object({ url: z.string().nullable().optional() }).optional().nullable(),
