@@ -185,8 +185,10 @@ re-login loop in middleware. See git log for detail.
 1. `[x]` **OpenAPI codegen** — fixed the duplicate `TenantResponseDto` and all dangling `$ref`s
    (leagues/teams/players `@ApiExtraModels`); added `openapi-typescript` + `npm run codegen` →
    `types/api.d.ts`, and `ApiSchema<'Dto'>` helper. Adopt incrementally in touched code.
-2. `[ ]` Introduce **React Query** + per-module service files (`services/games.ts`, …); adopt in
-   each module as we touch it (no big-bang rewrite).
+2. `[~]` Introduce **React Query** + per-module service files. Infra done: `QueryProvider` in
+   root layout; `services/tenants.ts` is the reference module (key factory + fetchers +
+   `useTenants`/`useTenant`/`useCreate`/`useDelete`); `app/admin/tenants` converted off the
+   useState/useEffect triad. Remaining modules adopt `services/<module>.ts` as they're worked.
 3. `[x]` ESLint `no-restricted-imports` on `axios`; migrated the 20 files (18 only used
    `axios.isAxiosError` → now `isAxiosError` from `@/services/api`; 2 upload pages keep raw
    axios for S3 presigned-PUT/multipart with a documented eslint-disable). tsc clean.
