@@ -181,13 +181,16 @@ tenant `ownerId` made optional; registration resilient to mail outage; several f
 drift fixes (tenant `country`, player `email`); tenant dashboard real counts; expired-token
 re-login loop in middleware. See git log for detail.
 
-### Phase 2 — Contract & data-layer foundation (makes every later phase cheaper) `[ ]`
-1. `[ ]` Generate types from the backend OpenAPI (`openapi-typescript` or `orval`); wire a
-   `npm run codegen` script; start consuming generated types in new/touched code.
+### Phase 2 — Contract & data-layer foundation (makes every later phase cheaper) `[~]`
+1. `[x]` **OpenAPI codegen** — fixed the duplicate `TenantResponseDto` and all dangling `$ref`s
+   (leagues/teams/players `@ApiExtraModels`); added `openapi-typescript` + `npm run codegen` →
+   `types/api.d.ts`, and `ApiSchema<'Dto'>` helper. Adopt incrementally in touched code.
 2. `[ ]` Introduce **React Query** + per-module service files (`services/games.ts`, …); adopt in
    each module as we touch it (no big-bang rewrite).
 3. `[ ]` ESLint `no-restricted-imports` on `axios`; migrate the ~20 offending files.
 4. `[ ]` Shared axios-error → toast normalizer; `loading.tsx` / `error.tsx` per route group.
+5. `[ ]` Migrate hand-written response Zod schemas to derive from / validate against the generated
+   types (kills the recurring runtime drift for good).
 
 ### Phase 3 — Auth & Users module `[ ]`
 1. `[ ]` Password **reset flow**: `POST /auth/forgot-password` + `POST /auth/reset-password`
