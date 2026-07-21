@@ -6,6 +6,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next"
 import React, { ReactNode } from 'react';
 import { Inter } from 'next/font/google'; // Example font
 import { Toaster } from "sonner";
+import { QueryProvider } from "@/components/providers/query-provider";
 import Script from 'next/script';
 
 const inter = Inter({ subsets: ['latin'] , variable: '--font-inter'});
@@ -22,8 +23,10 @@ export default function PublicLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" className={`${inter.variable}`} suppressHydrationWarning>
       <body>
-        {children}
-        <Toaster 
+        <QueryProvider>
+          {children}
+        </QueryProvider>
+        <Toaster
             position="top-center" 
             richColors // ✅ success = green, error = red, etc.
             closeButton // ✅ shows an X button on every toast

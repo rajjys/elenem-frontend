@@ -1,75 +1,37 @@
 // app/(admin)/tenants/page.tsx
 "use client";
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
-import { api, isAxiosError } from '@/services/api'; // Your actual API instance
-import { PaginatedTenantsResponseSchema, TenantFilterParams, TenantDetails } from '@/schemas'// Your actual Prisma types and schemas
-import { TenantFilters } from '@/components/tenant/tenant-filters'; // Your new TenantFilters component
-import { TenantsTable } from '@/components/tenant/tenants-table'; // Your new TenantsTable component
-import { Pagination } from '@/components/ui/'; // Your Pagination component
-import { LoadingSpinner } from '@/components/ui/'; // Your LoadingSpinner component
-import { Button } from '@/components/ui/button'; // Your Button component
-import { toast } from 'sonner'; // Your toast notification library (e.g., Sonner)
+import { isAxiosError } from '@/services/api';
+import { useTenants, useDeleteTenant } from '@/services/tenants';
+import { TenantFilterParams } from '@/schemas';
+import { TenantFilters } from '@/components/tenant/tenant-filters';
+import { TenantsTable } from '@/components/tenant/tenants-table';
+import { Pagination } from '@/components/ui/';
+import { LoadingSpinner } from '@/components/ui/';
+import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
 
 export default function AdminTenantsPage() {
-  const [tenants, setTenants] = useState<TenantDetails[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [totalItems, setTotalItems] = useState(0);
-  const [totalPages, setTotalPages] = useState(1);
   const [filters, setFilters] = useState<TenantFilterParams>({
     page: 1,
     pageSize: 10,
-    sortBy: 'createdAt', // Default sort
-    sortOrder: 'desc',   // Default sort order
+    sortBy: 'createdAt',
+    sortOrder: 'desc',
   });
 
-  const fetchTenants = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const params = new URLSearchParams();
-      // Append filters to URLSearchParams
-      if (filters.search) params.append('search', filters.search);
-      if (filters.isActive !== undefined) params.append('isActive', String(filters.isActive));
-      if (filters.tenantType) params.append('tenantType', filters.tenantType);
-      if (filters.sportType) params.append('sportType', filters.sportType);
-      if (filters.country) params.append('country', filters.country);
-      if (filters.page) params.append('page', String(filters.page));
-      if (filters.pageSize) params.append('pageSize', String(filters.pageSize));
-      if (filters.sortBy) params.append('sortBy', filters.sortBy);
-      if (filters.sortOrder) params.append('sortOrder', filters.sortOrder);
+  // Server state is owned by React Query: caching, dedup, loading/error, and
+  // keepPreviousData for smooth pagination — no useEffect/useState fetch triad.
+  const { data, isLoading, isError } = useTenants(filters);
+  const deleteTenant = useDeleteTenant();
 
-      const response = await api.get(`/tenants?${params.toString()}`);
-      // Validate data with Zod schema
-      // Assuming your backend response for tenants is paginated and directly maps to PaginatedTenantsResponseSchema
-      const validatedData = PaginatedTenantsResponseSchema.parse(response.data);
+  const tenants = data?.data ?? [];
+  const totalItems = data?.totalItems ?? 0;
+  const totalPages = data?.totalPages ?? 1;
 
-      setTenants(validatedData.data);
-      setTotalItems(validatedData.totalItems);
-      setTotalPages(validatedData.totalPages);
-    } catch (error) {
-      const errorMessage = 'Failed to fetch tenants.';
-      setError(errorMessage);
-      toast.error('Error fetching tenants', { description: errorMessage });
-      console.error('Fetch tenants error:', error);
-    } finally {
-      setLoading(false);
-    }
-  }, [filters]); // Dependency on filters to re-fetch when filters change
-
-  useEffect(() => {
-    fetchTenants();
-  }, [fetchTenants]); // Re-fetch when fetchTenants callback changes (due to filters)
-
-  // Use useCallback for handler functions to prevent unnecessary re-renders in child components
   const handleFilterChange = (newFilters: TenantFilterParams) => {
-    setFilters(prev => ({
-      ...prev,
-      ...newFilters,
-      page: 1, // Reset to first page on any filter change
-    }));
+    setFilters(prev => ({ ...prev, ...newFilters, page: 1 }));
   };
 
   const handlePageChange = (newPage: number) => {
@@ -77,44 +39,37 @@ export default function AdminTenantsPage() {
   };
 
   const handlePageSizeChange = (newSize: number) => {
-    setFilters(prev => ({ ...prev, pageSize: newSize, page: 1 })); // Reset page to 1
+    setFilters(prev => ({ ...prev, pageSize: newSize, page: 1 }));
   };
 
-  type SortableColumn = 'name' | 'tenantCode' | 'tenantType'| 'sportType' | 'country' | 'ownerUsername' | 'createdAt' | 'updatedAt';
+  type SortableColumn = 'name' | 'tenantCode' | 'tenantType' | 'sportType' | 'country' | 'ownerUsername' | 'createdAt' | 'updatedAt';
   const handleSort = (column: SortableColumn) => {
     setFilters(prev => ({
       ...prev,
       sortBy: column,
       sortOrder: prev.sortBy === column && prev.sortOrder === 'asc' ? 'desc' : 'asc',
-      page: 1, // Reset to first page on sort change
+      page: 1,
     }));
   };
 
-  const handleDeleteTenant = async (tenantId: string) => {
-    // Replacing window.confirm with a toast for non-blocking confirmation.
-    // In a production app, use a dedicated custom modal for user confirmation.
-    const confirmed = window.confirm('Are you sure you want to delete this tenant? This action cannot be undone.'); // Using window.confirm temporarily for demonstration
-    if (!confirmed) {
-      return;
-    }
+  const handleDeleteTenant = (tenantId: string) => {
+    const confirmed = window.confirm('Are you sure you want to delete this tenant? This action cannot be undone.');
+    if (!confirmed) return;
 
-    try {
-      await api.delete(`/tenants/${tenantId}`); // Your actual DELETE API call
-      toast.success('Organisation supprimee avec success.');
-      fetchTenants(); // Re-fetch tenants to update the list
-    } catch (error) {
-      let errorMessage = "Erreur lors de la suppression de l'organisation.";
-      if (isAxiosError(error)) {
-          errorMessage = error.response?.data?.message || errorMessage;
-      }
-      setError(errorMessage);
-      toast.error(errorMessage);
-    }
+    deleteTenant.mutate(tenantId, {
+      onSuccess: () => toast.success('Organisation supprimee avec success.'),
+      onError: (error) => {
+        const message = isAxiosError(error)
+          ? error.response?.data?.message || "Erreur lors de la suppression de l'organisation."
+          : "Erreur lors de la suppression de l'organisation.";
+        toast.error(message);
+      },
+    });
   };
 
   return (
     <div className="container mx-auto p-6">
-      {error && <p className='text-red-400 pb-2'>Erreur: {error}</p>}
+      {isError && <p className='text-red-400 pb-2'>Erreur: Failed to fetch tenants.</p>}
       <div className="flex justify-between items-center mb-4">
         <TenantFilters
           filters={filters}
@@ -126,10 +81,7 @@ export default function AdminTenantsPage() {
         </Link>
       </div>
 
-      {/* Tenant Filters component */}
-  
-
-      {loading ? (
+      {isLoading ? (
         <LoadingSpinner />
       ) : (
         <>
