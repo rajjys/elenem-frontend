@@ -150,29 +150,36 @@ Two cross-cutting rules adopted from Phase 2 onward:
 ### Phase 0 — Light the fires (infrastructure) `[ ]`
 Everything in Part A. Exit criteria = the five-step "definition of done" above.
 
-### Phase 1 — Security & correctness hotfixes (system-wide, before module work) `[ ]`
+### Phase 1 — Security & correctness hotfixes (system-wide, before module work) `[x]` DONE
 These are active defects; they block trusting anything else we test.
-1. `[ ]` **Games list scope leak** — in `games.service.ts listGamesScoped`, merge query-param
-   filters *inside* the role-derived scope (AND, never overwrite `where.tenantId` / `where.OR`).
-2. `[ ]` **Unify password hashing on argon2** — replace all `bcryptjs` usage (users, players,
-   referees, coaches, league-membership). Migration path: on login, if stored hash is bcrypt →
-   verify with bcrypt → rehash with argon2. Fixes: change-password always failing, and
-   referee/player/coach-created accounts being unable to log in.
-3. `[ ]` **Register the throttler** — import `ThrottlerModule` + global `ThrottlerGuard`; the
-   existing `@Throttle` decorators on login/register are currently inert.
-4. `[ ]` **Secrets hygiene** — set `JWT_REFRESH_SECRET`; remove the `'your-secret'` fallback in
-   frontend `middleware.ts` (fail closed); rotate the committed `JWT_SECRET`; add `.env.example`
-   to both repos; add Joi `validationSchema` to `ConfigModule` so missing vars fail at boot.
-5. `[ ]` **Contract fixes** — frontend password change → `PUT /users/me/password`; align cookie
-   name (`accessToken` vs `access_token`); remove or implement the dead `GET /venues` call.
-6. `[ ]` **GameStatus enum alignment** — frontend `schemas/enums.ts` gets the backend's real
-   9 states (`LIVE`, not `IN_PROGRESS`, plus DRAFT/CONFIRMED/PAUSED/RESCHEDULED). This alone
-   revives the score-entry dashboard.
-7. `[ ]` **Ops minimums** — `app.enableShutdownHooks()`; turn off Prisma query logging in prod;
-   tighten CORS (drop `*.vercel.app` wildcard once `FRONTEND_URL` is set); Sentry in both apps.
+1. `[x]` **Games list scope leak** — security scope + user filters are now independent AND
+   conditions in `listGamesScoped`. Verified with seeded data: DEMOKGL admin's `?tenantId=` /
+   `?search=` spoofs return 0.
+2. `[x]` **Unify password hashing on argon2** — `common/utils/password.util` (argon2 + legacy
+   bcrypt verify + rehash-on-login). Verified: planted bcrypt hash logs in and migrates to
+   argon2; change-password works (204).
+3. `[x]` **Register the throttler** — `ThrottlerModule` (300/min global) + `ThrottlerGuard`;
+   fixed the `ttl:60` (ms) bug to 60000 for a real 5/min on login. Verified 6th login → 429.
+4. `[x]` **Secrets hygiene** — `JWT_REFRESH_SECRET` set; `'your-secret'` fallback removed (fail
+   closed); `JWT_SECRET` rotated; `.env.example` in both repos; dependency-free `validateEnv`
+   (no joi) hard-fails at boot on missing critical vars.
+5. `[x]` **Contract fixes** — change-password → `PUT /users/me/password {currentPassword}`;
+   backend accepts `accessToken` cookie; dead `/venues` call was already commented out.
+6. `[x]` **GameStatus enum alignment** — frontend enum now mirrors the backend's 9 states
+   (`LIVE` not `IN_PROGRESS`). NOTE: driving a game to LIVE still needs SCHEDULED→CONFIRMED→LIVE
+   per the transition map — wiring that flow into the dashboard is a Phase 7 item.
+7. `[x]` **Ops minimums** — `enableShutdownHooks()`; Prisma query logging off in prod; CORS
+   rebuilt (env-driven root domain + subdomains + Vercel previews, anchored regexes); Sentry
+   wired in both apps, dormant until a DSN is set.
 
 **Match check:** login/refresh/logout/change-password as every role; attempt the cross-tenant
 `?tenantId=` exploit and confirm 403/filtered.
+
+**Also fixed in Phase 1 (surfaced by browsing seeded data):** 4× `@Transform` array-wrap bug
+(tenants/leagues/users list 400s); two undecorated DTO fields breaking team + game creation;
+tenant `ownerId` made optional; registration resilient to mail outage; several frontend Zod
+drift fixes (tenant `country`, player `email`); tenant dashboard real counts; expired-token
+re-login loop in middleware. See git log for detail.
 
 ### Phase 2 — Contract & data-layer foundation (makes every later phase cheaper) `[ ]`
 1. `[ ]` Generate types from the backend OpenAPI (`openapi-typescript` or `orval`); wire a
