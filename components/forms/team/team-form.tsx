@@ -11,7 +11,7 @@ import {
   LoadingSpinner,
 } from "@/components/ui";
 import { toast } from "sonner";
-import { api } from "@/services/api";
+import { api, isAxiosError } from '@/services/api';
 import { useAuthStore } from "@/store/auth.store";
 import {
   Roles,
@@ -22,7 +22,6 @@ import {
   VisibilityLevel,
 } from "@/schemas";
 import { CheckCircle, ChevronLeft, ChevronRight, ListTodo, Image as ImageIcon, Loader2, X } from "lucide-react";
-import axios from "axios";
 
 import Step1TeamDetails from "./Step1TeamDetails";
 import Step3_TeamReview from "./Step3TeamReview";
@@ -108,7 +107,7 @@ export function TeamForm({ onSuccess, onCancel }: TeamFormProps) {
         setTenants(res.data.data);
       } catch (error) {
         let errorMessage = "Failed to load tenants";
-        if (axios.isAxiosError(error)) errorMessage = error.response?.data?.message || errorMessage;
+        if (isAxiosError(error)) errorMessage = error.response?.data?.message || errorMessage;
         toast.error(errorMessage);
       }
     })();
@@ -126,7 +125,7 @@ export function TeamForm({ onSuccess, onCancel }: TeamFormProps) {
         setLeagues(res.data.data);
       } catch (error) {
         let errorMessage = "Failed to load leagues";
-        if (axios.isAxiosError(error)) errorMessage = error.response?.data?.message || errorMessage;
+        if (isAxiosError(error)) errorMessage = error.response?.data?.message || errorMessage;
         toast.error(errorMessage);
       }
     };
@@ -146,7 +145,7 @@ export function TeamForm({ onSuccess, onCancel }: TeamFormProps) {
         setAvailableOwners(res.data.data);
       } catch (error) {
           let errorMessage = "Failed to load users";
-          if (axios.isAxiosError(error)) errorMessage = error.response?.data?.message || errorMessage;
+          if (isAxiosError(error)) errorMessage = error.response?.data?.message || errorMessage;
           toast.error(errorMessage);
       }finally {
         setOwnersLoading(false);
@@ -168,7 +167,7 @@ export function TeamForm({ onSuccess, onCancel }: TeamFormProps) {
               setCountry(validatedTenant.country);
             } catch (error) {
                 let errorMessage = "Failed to fetch tenant details.";
-                if (axios.isAxiosError(error)) {
+                if (isAxiosError(error)) {
                     errorMessage = error.response?.data?.message || errorMessage;
                 }
                 toast.error(errorMessage);
@@ -225,7 +224,7 @@ export function TeamForm({ onSuccess, onCancel }: TeamFormProps) {
       onSuccess(res.data);
     } catch (error) {
         let errorMessage = "Team creation failed. Please try again.";
-        if (axios.isAxiosError(error)) errorMessage = error.response?.data?.message || errorMessage;
+        if (isAxiosError(error)) errorMessage = error.response?.data?.message || errorMessage;
         toast.error(errorMessage);
     } finally {
         setIsSubmitting(false);

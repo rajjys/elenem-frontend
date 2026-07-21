@@ -26,7 +26,7 @@ import {
   SelectValue,
 } from "@/components/ui/"; // Assuming your ui components are here
 import { toast } from "sonner";
-import { api } from "@/services/api";
+import { api, isAxiosError } from '@/services/api';
 import { useAuthStore } from "@/store/auth.store";
 import {
   //RegisterDto,
@@ -36,7 +36,6 @@ import {
   PaginatedResponseDto,
   RegisterFormSchema,
 } from "@/schemas"; // Assuming you have these schemas/types exported
-import axios from 'axios';
 import { ChevronDown, Eye, EyeOff, Loader2 } from "lucide-react";
 import Link from "next/link";
 
@@ -62,7 +61,7 @@ export function RegisterForm() {
         setTenants(response.data.data);
       } catch (error) {
         let errorMessage = "Failed to Fetch Tenants";
-      if (axios.isAxiosError(error)) {
+      if (isAxiosError(error)) {
         errorMessage = error.response?.data?.message || errorMessage;
       }
       toast.error(errorMessage);
@@ -110,7 +109,7 @@ export function RegisterForm() {
       router.push("/welcome"); // Redirect to dashboard
     } catch (error) {
       let errorMessage = "Registration failed. Please try again.";
-      if (axios.isAxiosError(error)) {
+      if (isAxiosError(error)) {
         errorMessage = error.response?.data?.message || errorMessage;
       }
       toast.error(errorMessage);

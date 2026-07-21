@@ -12,11 +12,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
-import { api } from "@/services/api";
+import { api, isAxiosError } from '@/services/api';
 import { useAuthStore } from "@/store/auth.store";
 import { LeagueDetails, Roles, SeasonDetails, TenantDetails } from "@/schemas";
 import { CreateSeasonSchema, SeasonStatus, CreateSeasonDto } from "@/schemas/";
-import axios from "axios";
 import { Button, Input, Label, TextArea } from "../ui";
 import { capitalizeFirst } from "@/utils";
 
@@ -92,7 +91,7 @@ export function SeasonForm({ onSuccess, onCancel, currentLeagueId, currentTenant
           // but there are tenants, ensure to set loading to false.
         } catch (error) {
           let errorMessage = "Failed to fetch organisations.";
-          if (axios.isAxiosError(error)) {
+          if (isAxiosError(error)) {
               errorMessage = error.response?.data?.message || errorMessage;
           }
           toast.error(errorMessage);
@@ -124,7 +123,7 @@ export function SeasonForm({ onSuccess, onCancel, currentLeagueId, currentTenant
         }
       } catch (error) {
         let errorMessage = "Failed to fetch leagues.";
-        if (axios.isAxiosError(error)) {
+        if (isAxiosError(error)) {
             errorMessage = error.response?.data?.message || errorMessage;
         }
         toast.error(errorMessage);
@@ -167,7 +166,7 @@ export function SeasonForm({ onSuccess, onCancel, currentLeagueId, currentTenant
       onSuccess(res.data);
     } catch (error) {
       let errorMessage = "Failed to create season.";
-      if (axios.isAxiosError(error)) {
+      if (isAxiosError(error)) {
           errorMessage = error.response?.data?.message || errorMessage;
       }
       toast.error(errorMessage);

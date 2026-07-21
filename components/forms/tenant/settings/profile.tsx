@@ -4,9 +4,8 @@ import { Button } from "@/components/ui";
 import { InlineEditField } from "@/components/ui/Inline-edit-field";
 import { TenantDetails } from "@/schemas";
 import { CreateBusinessProfileSchema } from "@/schemas/common-schemas";
-import { api } from "@/services/api";
+import { api, isAxiosError } from '@/services/api';
 import { zodResolver } from "@hookform/resolvers/zod";
-import axios from "axios";
 import { Loader2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Path, useForm } from "react-hook-form";
@@ -119,7 +118,7 @@ const onSubmit = async (data: ProfileFormValues) => {
 
         } catch (error) {
             let errorMessage = "Échec de la mise à jour des paramètres du locataire";
-            if (axios.isAxiosError(error)) {
+            if (isAxiosError(error)) {
                 errorMessage = error.response?.data?.message || errorMessage;
             }
             toast.error(errorMessage);

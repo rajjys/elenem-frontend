@@ -7,12 +7,11 @@ import TenantHeroSection from "@/components/public/tenant-hero-section";
 import GamePublicCard from '@/components/game/game-public-card'; // Assuming this is the correct path
 import { Skeleton } from "@/components/ui/skeleton";
 import { ChevronRight } from 'lucide-react'; // For the "details" icon
-import { api } from '@/services/api';
+import { api, isAxiosError } from '@/services/api';
 import { Card, CardContent, CardHeader } from '@/components/ui';
 import StandingsTable from '@/components/public/standings-table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import VerticalBlogPostCard from '@/components/ui/vertical-blogpost-card';
-import axios from 'axios';
 
 
 interface PublicTenantDetails {
@@ -185,7 +184,7 @@ const TenantLandingPage = ({ params }: { params: Promise<{ tenantSlug: string }>
                 setStandings(standingsResponse.data);
             } catch (error) {
                 let errorMessage = "Failed to load Standings"
-                if(axios.isAxiosError(error)){
+                if(isAxiosError(error)){
                     errorMessage = error.response?.data?.message || errorMessage;
                 }
                 //toast.error(errorMessage);

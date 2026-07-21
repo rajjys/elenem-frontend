@@ -3,7 +3,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { api } from '@/services/api'; // Your actual API instance
+import { api, isAxiosError } from '@/services/api'; // Your actual API instance
 import { PaginatedTenantsResponseSchema, TenantFilterParams, TenantDetails } from '@/schemas'// Your actual Prisma types and schemas
 import { TenantFilters } from '@/components/tenant/tenant-filters'; // Your new TenantFilters component
 import { TenantsTable } from '@/components/tenant/tenants-table'; // Your new TenantsTable component
@@ -11,7 +11,6 @@ import { Pagination } from '@/components/ui/'; // Your Pagination component
 import { LoadingSpinner } from '@/components/ui/'; // Your LoadingSpinner component
 import { Button } from '@/components/ui/button'; // Your Button component
 import { toast } from 'sonner'; // Your toast notification library (e.g., Sonner)
-import axios from 'axios';
 
 export default function AdminTenantsPage() {
   const [tenants, setTenants] = useState<TenantDetails[]>([]);
@@ -105,7 +104,7 @@ export default function AdminTenantsPage() {
       fetchTenants(); // Re-fetch tenants to update the list
     } catch (error) {
       let errorMessage = "Erreur lors de la suppression de l'organisation.";
-      if (axios.isAxiosError(error)) {
+      if (isAxiosError(error)) {
           errorMessage = error.response?.data?.message || errorMessage;
       }
       setError(errorMessage);

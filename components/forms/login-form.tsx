@@ -1,13 +1,13 @@
 // components/forms/loginForm.tsx
 "use client";
 import { useForm } from "react-hook-form";
+import { isAxiosError } from '@/services/api';
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { useAuthStore } from "@/store/auth.store";
 import { useState } from "react";
-import axios from "axios";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
@@ -63,7 +63,7 @@ export function LoginForm() {
       // Redirection is handled by login/page.tsx's useEffect and middleware
     } catch (error) {
       let errorMessage = "Login failed";
-      if (axios.isAxiosError(error)) {
+      if (isAxiosError(error)) {
         errorMessage = error.response?.data?.message || errorMessage;
       }
       toast.error(errorMessage);

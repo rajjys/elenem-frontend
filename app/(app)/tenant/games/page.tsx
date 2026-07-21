@@ -4,7 +4,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { api } from '@/services/api';
+import { api, isAxiosError } from '@/services/api';
 import { GameDetails, GameFilterParams, PaginatedGamesResponseSchema, GameFilterParamsSchema } from '@/schemas';
 import { GamesFilters } from '@/components/game/games-filters';
 import { Pagination, LoadingSpinner, Button } from '@/components/ui/';
@@ -13,7 +13,6 @@ import { toast } from 'sonner';
 import { Roles } from '@/schemas';
 import { useAuthStore } from '@/store/auth.store';
 import { useContextualLink } from '@/hooks';
-import axios from 'axios';
 
 export default function TenantGamesPage() {
   const router = useRouter();
@@ -80,7 +79,7 @@ export default function TenantGamesPage() {
       setTotalPages(validatedData.totalPages);
     } catch (error) {
         let errorMessage = "Error fetching games";
-        if (axios.isAxiosError(error)) {
+        if (isAxiosError(error)) {
           errorMessage = error.response?.data?.message || errorMessage;
         }
         toast.error(errorMessage);

@@ -2,13 +2,12 @@
 
 import React, { useState, useEffect, use } from "react";
 import { useRouter } from "next/navigation";
-import { api } from "@/services/api";
+import { api, isAxiosError } from '@/services/api';
 import { PostResponseDto } from "@/schemas";
 import { LexicalRenderer, LoadingSpinner } from "@/components/ui";
 import { toast } from "sonner";
 import Image from "next/image";
 import { Calendar, User, Building2 } from "lucide-react";
-import axios from "axios";
 
 /* ----------------------------------------------------------
  * Helper Components & Utils
@@ -83,7 +82,7 @@ export default function PublicPostPage({
         setPostData(data);
       } catch (error) {
         let message = "Unexpected error occurred.";
-        if (axios.isAxiosError(error)) {
+        if (isAxiosError(error)) {
           message =
             error.response?.status === 404
               ? "Post not found or not published."

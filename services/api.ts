@@ -14,6 +14,11 @@ export const api = axios.create({
   }
 });
 
+// Re-exported so error-handling code can type-guard axios errors without
+// importing `axios` directly (which the ESLint rule restricts — all API calls
+// should go through this shared `api` client for auth + token refresh).
+export const isAxiosError = axios.isAxiosError;
+
 export const setAuthToken = (token: string | null) => {
   if (token) {
     api.defaults.headers.common['Authorization'] = `Bearer ${token}`;

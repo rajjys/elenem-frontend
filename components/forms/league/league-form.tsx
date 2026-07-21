@@ -19,7 +19,7 @@ import {
   X,
 } from "lucide-react";
 import { toast } from "sonner";
-import { api } from "@/services/api";
+import { api, isAxiosError } from '@/services/api';
 import { useAuthStore } from "@/store/auth.store";
 
 import { CreateLeagueSchema } from "@/schemas/league-schemas";
@@ -31,7 +31,6 @@ import Step3Rules from "./step3-rules";
 import Step4Review from "./step4-review";
 import { BusinessProfileForm, TFormValues } from "../shared";
 import z from "zod";
-import axios from "axios";
 import { flattenErrors } from "@/utils";
 
 interface LeagueFormProps {
@@ -141,7 +140,7 @@ export function LeagueForm({ onSuccess, onCancel }: LeagueFormProps) {
             setCountry(validatedTenant.country);
           } catch (error) {
               let errorMessage = "Failed to fetch tenant details.";
-              if (axios.isAxiosError(error)) {
+              if (isAxiosError(error)) {
                   errorMessage = error.response?.data?.message || errorMessage;
               }
               toast.error(errorMessage);

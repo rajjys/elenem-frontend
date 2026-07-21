@@ -6,12 +6,11 @@ import Head from 'next/head';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useAuthStore } from '@/store/auth.store';
-import { api } from '@/services/api';
+import { api, isAxiosError } from '@/services/api';
 import { toast } from 'sonner';
 import { LeagueDetails, PaginatedLeaguesResponseSchema, Roles } from '@/schemas';
 import { useContextualLink } from '@/hooks';
 import { Trophy } from 'lucide-react';
-import axios from 'axios';
 import { LeagueCard } from '@/components/ui';
 
 // Define the League schema based on common data structures
@@ -61,7 +60,7 @@ export default function TenantLeaguesPage() {
       setTotalItems(validatedData.totalItems);
     } catch (error) {
       let errorMessage = "Failed to fetch leagues";
-      if (axios.isAxiosError(error)) {
+      if (isAxiosError(error)) {
           errorMessage = error.response?.data?.message || errorMessage;
       }
       setError(errorMessage);
@@ -84,7 +83,7 @@ export default function TenantLeaguesPage() {
       } catch (err) {
         // const errorMessage = 'Failed to delete League.';
         let errorMessage = 'Failed to delete League.';
-        if (axios.isAxiosError(err) && err.response?.data?.message) {
+        if (isAxiosError(err) && err.response?.data?.message) {
           errorMessage = err.response.data.message;
         }
         toast.error('Error deleting League', { description: errorMessage });

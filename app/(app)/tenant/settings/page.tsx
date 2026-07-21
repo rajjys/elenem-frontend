@@ -4,13 +4,12 @@ import TenantGeneralSettings from "@/components/forms/tenant/settings/general-se
 //import { TenantBusinessProfile } from './profile/page';
 //import { TenantOwnership } from './ownership/page';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { api } from "@/services/api";
+import { api, isAxiosError } from '@/services/api';
 import { LoadingSpinner } from '@/components/ui';
 import { useCallback, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Roles, TenantDetails, TenantDetailsSchema } from '@/schemas';
 import { useAuthStore } from '@/store/auth.store';
-import axios from 'axios';
 import { toast } from 'sonner';
 import { TenantBusinessProfile } from "@/components/forms/tenant/settings/profile";
 
@@ -42,7 +41,7 @@ export default function TenantSettingsPage() {
           setTenant(validatedTenant);
         } catch (error) {
             let errorMessage = "Failed to fetch tenant details.";
-            if (axios.isAxiosError(error)) {
+            if (isAxiosError(error)) {
                 errorMessage = error.response?.data?.message || errorMessage;
             }
             setError(errorMessage);

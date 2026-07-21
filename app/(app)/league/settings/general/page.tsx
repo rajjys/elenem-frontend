@@ -4,10 +4,9 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
-import { api } from "@/services/api";
+import { api, isAxiosError } from '@/services/api';
 import { Button, Input, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Switch, LoadingSpinner } from "@/components/ui"; // Added all necessary UI components
 import { LeagueDetails, Roles, SeasonDetails, UpdateLeagueSchema, Gender, VisibilityLevel, GenderSchema, VisibilityLevelSchema } from "@/schemas"; // Added Gender, VisibilityLevel, and their Schemas (assuming they are exported)
-import axios from "axios";
 import * as z from "zod";
 import { useAuthStore } from "@/store/auth.store";
 import { useForm, Controller } from "react-hook-form"; // Added react-hook-form imports
@@ -126,7 +125,7 @@ export default function GeneralLeagueSettingsPage() {
       reset(defaults); // Reset form with fetched data
     } catch (error) {
       let errorMessage = "Failed to fetch league details.";
-      if (axios.isAxiosError(error)) {
+      if (isAxiosError(error)) {
         errorMessage = error.response?.data?.message || errorMessage;
       }
       setError(errorMessage);
@@ -151,7 +150,7 @@ export default function GeneralLeagueSettingsPage() {
       setSeasons(res.data.data);
     } catch (error) {
       let errorMessage = "Failed to fetch Seasons.";
-      if (axios.isAxiosError(error)) {
+      if (isAxiosError(error)) {
         errorMessage = error.response?.data?.message || errorMessage;
       }
       toast.error(errorMessage);
@@ -254,7 +253,7 @@ export default function GeneralLeagueSettingsPage() {
 
     } catch (error) {
       let errorMessage = "Failed to update league settings";
-      if (axios.isAxiosError(error)) {
+      if (isAxiosError(error)) {
         errorMessage = error.response?.data?.message || errorMessage;
       }
       toast.error(errorMessage);

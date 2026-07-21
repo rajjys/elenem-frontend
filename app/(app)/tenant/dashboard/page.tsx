@@ -5,14 +5,13 @@ import React, { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useAuthStore } from '@/store/auth.store';
 import { GameDetails, LeagueDetails, PaginatedLeaguesResponseSchema, Roles, TenantDetails, TenantDetailsSchema } from '@/schemas';
-import { api } from '@/services/api';
+import { api, isAxiosError } from '@/services/api';
 import { toast } from 'sonner';
 import { useContextualLink } from '@/hooks';
 import { StatsCard } from '@/components/ui/stats-card';
 import { Building, CalendarPlus, Clock, Clock1, Newspaper, Plus, Ticket, TrendingUp, Trophy, UserPlus, Users } from 'lucide-react';
 import { Avatar, Card, CardContent, CardFooter, CardHeader, CardTitle, getStatusBadge, LeagueCard, LoadingSpinner } from '@/components/ui';
 import { capitalizeFirst, countryNameToCode } from '@/utils';
-import axios from 'axios';
 import Image from 'next/image';
 import CountryFlag from 'react-country-flag';
 import { format } from 'date-fns';
@@ -55,7 +54,7 @@ export default function TenantDashboard() {
           setTenant(validatedTenant);
         } catch (error) {
             let errorMessage = "Failed to fetch tenant details.";
-            if (axios.isAxiosError(error)) {
+            if (isAxiosError(error)) {
                 errorMessage = error.response?.data?.message || errorMessage;
             }
             setError(errorMessage);
@@ -197,7 +196,7 @@ export default function TenantDashboard() {
       } catch (err) {
         // const errorMessage = 'Failed to delete League.';
         let errorMessage = 'Failed to delete League.';
-        if (axios.isAxiosError(err) && err.response?.data?.message) {
+        if (isAxiosError(err) && err.response?.data?.message) {
           errorMessage = err.response.data.message;
         }
         toast.error('Error deleting League', { description: errorMessage });
@@ -240,7 +239,7 @@ export default function TenantDashboard() {
                         <p className="text-sm text-gray-500 flex items-center gap-1">
                             <span>{capitalizeFirst(tenant.tenantCode)}</span>
                             -
-                            <CountryFlag countryCode={countryNameToCode[tenant.country] || tenant.country} svg style={{ width: '2em', height: '1em' }} />
+                            <CountryFlag countryCode={countryNameToCode[tenant.country ?? ''] || tenant.country || ''} svg style={{ width: '2em', height: '1em' }} />
                         </p>
                     )}
                     </div>

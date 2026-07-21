@@ -18,9 +18,8 @@ import {
   getSportIcon
 } from "@/components/ui";
 import { CountryDropdown } from "react-country-region-selector"; // Add import for CountryDropdown
-import { api } from "@/services/api";
+import { api, isAxiosError } from '@/services/api';
 import { UpdateTenantSchema, VisibilityLevel, TenantDetails, SportType, TenantTypes } from "@/schemas"; // Add SportType, TenantTypes to imports
-import axios from "axios";
 import { Loader2 } from "lucide-react"; // Add Loader2 import
 import { countryCodeToName } from "@/utils";
 
@@ -121,7 +120,7 @@ export default function TenantGeneralSettings({ tenant, onSuccess  }: TenantGene
       if (onSuccess) onSuccess();
     } catch (error) {
       let errorMessage = "Failed to update tenant settings";
-      if (axios.isAxiosError(error)) {
+      if (isAxiosError(error)) {
           errorMessage = error.response?.data?.message || errorMessage;
       }
       toast.error(errorMessage)

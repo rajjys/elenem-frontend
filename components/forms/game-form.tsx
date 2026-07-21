@@ -21,7 +21,7 @@ import {
   TextArea,
 } from "@/components/ui";
 import { toast } from "sonner";
-import { api } from "@/services/api";
+import { api, isAxiosError } from '@/services/api';
 import { useAuthStore } from "@/store/auth.store";
 import { GameDetails, GameStatus, Roles } from "@/schemas";
 import {
@@ -38,7 +38,6 @@ import {
   FileText,
   Clock,
 } from "lucide-react";
-import axios from "axios";
 import Image from 'next/image';
 import { formatDateFr } from '@/utils';
 
@@ -248,7 +247,7 @@ export function GameForm({ onSuccess, onCancel }: GameFormProps) {
       onSuccess(res.data);
     } catch (error) {
       let errorMessage = "Failed to create game.";
-      if (axios.isAxiosError(error)) {
+      if (isAxiosError(error)) {
         errorMessage = error.response?.data?.message || errorMessage;
       }
       toast.error(errorMessage);

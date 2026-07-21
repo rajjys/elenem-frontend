@@ -14,10 +14,9 @@ import {
   Input,
   Skeleton
 } from ".";
-import { api } from "@/services/api";
+import { api, isAxiosError } from '@/services/api';
 import { TenantDetails } from "@/schemas";
 import Image from "next/image";
-import axios from "axios";
 import Link from "next/link";
 
 export default function GeneralSearchDialog() {
@@ -35,7 +34,7 @@ export default function GeneralSearchDialog() {
       setTenants(response.data.data);
     } catch (error) {
       let errorMessage = "Failed to fetch Tenants.";
-      if (axios.isAxiosError(error)) {
+      if (isAxiosError(error)) {
         errorMessage = error.response?.data?.message || errorMessage;
       }
       //toast.error(errorMessage);

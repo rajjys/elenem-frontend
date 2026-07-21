@@ -1,6 +1,9 @@
 'use client';
 
 import React, { useState, useRef } from 'react';
+// Direct file-upload page: raw axios is intentional for presigned-PUT-to-S3 /
+// multipart uploads with progress, which must NOT go through the JSON api client.
+// eslint-disable-next-line no-restricted-imports
 import axios from 'axios';
 import { api } from '@/services/api';
 

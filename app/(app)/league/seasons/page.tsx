@@ -4,7 +4,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { api } from '@/services/api';
+import { api, isAxiosError } from '@/services/api';
 import { SeasonFilterParams, SeasonFilterParamsSchema, SeasonSortableColumn, SeasonDetails, PaginatedSeasonsResponse } from '@/schemas';
 import { SeasonsFilters } from '@/components/season/seasons-filters';
 import { SeasonsTable } from '@/components/season/seasons-table';
@@ -14,7 +14,6 @@ import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { Roles } from '@/schemas';
 import { useAuthStore } from '@/store/auth.store';
-import axios from 'axios';
 
 export default function LeagueSeasonsPage() {
   const router = useRouter();
@@ -90,7 +89,7 @@ export default function LeagueSeasonsPage() {
       setTotalPages(response.data.totalPages);
     } catch (error) {
       let errorMessage = "Failed to fetch Seasons.";
-      if (axios.isAxiosError(error)) {
+      if (isAxiosError(error)) {
           errorMessage = error.response?.data?.message || errorMessage;
       }
       setError(errorMessage);
