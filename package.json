@@ -6,7 +6,8 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "codegen": "openapi-typescript ${API_URL:-http://localhost:3333}/api-json -o types/api.d.ts"
   },
   "dependencies": {
     "@hello-pangea/dnd": "^18.0.1",
@@ -71,6 +72,7 @@
     "eslint-config-next": "15.3.1",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^5.2.0",
+    "openapi-typescript": "^7.13.0",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
