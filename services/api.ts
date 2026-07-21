@@ -19,6 +19,21 @@ export const api = axios.create({
 // should go through this shared `api` client for auth + token refresh).
 export const isAxiosError = axios.isAxiosError;
 
+// Normalize any thrown error into a human-readable message. The backend returns
+// { message: string | string[] } (arrays for validation errors), so arrays are
+// joined. Use this in catch blocks / mutation onError instead of hand-rolling
+// `error.response?.data?.message` everywhere.
+export function getApiErrorMessage(error: unknown, fallback = 'Une erreur est survenue.'): string {
+  if (isAxiosError(error)) {
+    const data = error.response?.data as { message?: string | string[] } | undefined;
+    const msg = data?.message;
+    if (Array.isArray(msg)) return msg.filter(Boolean).join(' ');
+    if (typeof msg === 'string' && msg.trim()) return msg;
+  }
+  if (error instanceof Error && error.message) return error.message;
+  return fallback;
+}
+
 export const setAuthToken = (token: string | null) => {
   if (token) {
     api.defaults.headers.common['Authorization'] = `Bearer ${token}`;

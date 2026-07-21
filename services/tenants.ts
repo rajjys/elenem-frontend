@@ -10,6 +10,7 @@ import {
   keepPreviousData,
 } from '@tanstack/react-query';
 import { api } from './api';
+import { parseResponse } from './parse-response';
 import {
   PaginatedTenantsResponseSchema,
   TenantDetailsSchema,
@@ -47,17 +48,17 @@ export async function fetchTenants(
   params: TenantFilterParams,
 ): Promise<PaginatedTenantsResponseDto> {
   const res = await api.get(`/tenants?${toQuery(params)}`);
-  return PaginatedTenantsResponseSchema.parse(res.data);
+  return parseResponse(PaginatedTenantsResponseSchema, res.data);
 }
 
 export async function fetchTenant(id: string): Promise<TenantDetails> {
   const res = await api.get(`/tenants/${id}`);
-  return TenantDetailsSchema.parse(res.data);
+  return parseResponse(TenantDetailsSchema, res.data);
 }
 
 export async function createTenant(dto: CreateTenantDto): Promise<TenantDetails> {
   const res = await api.post('/tenants/create', dto);
-  return TenantDetailsSchema.parse(res.data);
+  return parseResponse(TenantDetailsSchema, res.data);
 }
 
 export async function deleteTenant(id: string): Promise<void> {

@@ -7,3 +7,4 @@ export * from './resolveTenantSlugFromHostname';
 export * from './tenant-url';
 export * from './formatDateFr';
 export * from './flatten-errors'
+export * from './toast-error';

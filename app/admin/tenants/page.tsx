@@ -3,8 +3,8 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { isAxiosError } from '@/services/api';
 import { useTenants, useDeleteTenant } from '@/services/tenants';
+import { toastApiError } from '@/utils';
 import { TenantFilterParams } from '@/schemas';
 import { TenantFilters } from '@/components/tenant/tenant-filters';
 import { TenantsTable } from '@/components/tenant/tenants-table';
@@ -58,12 +58,7 @@ export default function AdminTenantsPage() {
 
     deleteTenant.mutate(tenantId, {
       onSuccess: () => toast.success('Organisation supprimee avec success.'),
-      onError: (error) => {
-        const message = isAxiosError(error)
-          ? error.response?.data?.message || "Erreur lors de la suppression de l'organisation."
-          : "Erreur lors de la suppression de l'organisation.";
-        toast.error(message);
-      },
+      onError: (error) => toastApiError(error, "Erreur lors de la suppression de l'organisation."),
     });
   };
 
