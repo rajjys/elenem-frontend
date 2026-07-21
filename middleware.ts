@@ -16,7 +16,7 @@ const publicPaths = [
   '/seasons', '/seasons/', '/seasons/*', // Public season profiles on the root domain
   '/upload', '/upload/', '/upload/*',
   '/upload2', '/upload2/', '/upload2/*',
-  '/login', '/register', '/access-denied', 
+  '/login', '/register', '/access-denied', '/forgot-password', '/reset-password', '/verify-email',
   '/blogs',
   '/landing', '/landing/', '/landing/*',
   '/landing2', '/landin2/', '/landing2*',

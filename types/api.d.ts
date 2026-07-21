@@ -94,10 +94,61 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Verify user email using a token link */
-        get: operations["AuthController_verifyEmail"];
+        get?: never;
         put?: never;
-        post?: never;
+        /** Verify email with the 6-digit OTP */
+        post: operations["AuthController_verifyEmail"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/resend-verification": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Resend the email-verification OTP */
+        post: operations["AuthController_resendVerification"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/forgot-password": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Request a password-reset OTP (always 200) */
+        post: operations["AuthController_forgotPassword"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/reset-password": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reset password with the OTP + new password */
+        post: operations["AuthController_resetPassword"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1506,6 +1557,34 @@ export interface components {
         RefreshTokenDto: {
             refreshToken: string;
         };
+        VerifyEmailDto: {
+            /** @example john@example.com */
+            email: string;
+            /**
+             * @description 6-digit code from the email
+             * @example 123456
+             */
+            otp: string;
+        };
+        ResendVerificationDto: {
+            /** @example john@example.com */
+            email: string;
+        };
+        ForgotPasswordDto: {
+            /** @example john@example.com */
+            email: string;
+        };
+        ResetPasswordDto: {
+            /** @example john@example.com */
+            email: string;
+            /**
+             * @description 6-digit code from the email
+             * @example 123456
+             */
+            otp: string;
+            /** @example StrongP@ss1 */
+            newPassword: string;
+        };
         UserTenantLiteDto: {
             id: string;
             name: string;
@@ -1538,7 +1617,7 @@ export interface components {
             lastName?: string | null;
             roles: ("SYSTEM_ADMIN" | "TENANT_ADMIN" | "LEAGUE_ADMIN" | "TEAM_ADMIN" | "GENERAL_USER" | "PLAYER" | "COACH" | "REFEREE")[];
             isActive: boolean;
-            isVerified: boolean;
+            isEmailVerified: boolean;
             gender?: Record<string, never> | null;
             preferredLanguage?: Record<string, never> | null;
             /** Format: date-time */
@@ -1650,7 +1729,7 @@ export interface components {
             /** @description Whether the user account is active. Defaults to true. */
             isActive?: boolean;
             /** @description Whether the user's email has been verified. Defaults to false. */
-            isVerified?: boolean;
+            isEmailVerified?: boolean;
             /** @description The ID of the tenant the user belongs to (optional, for tenant-scoped users). Null for SYSTEM_ADMIN or un-tenanted GENERAL_USER. Only assignable by SYSTEM_ADMIN. */
             tenantId?: Record<string, never>;
             /** @description If user is LEAGUE_ADMIN, the ID of the league they manage (required if LEAGUE_ADMIN role is present). Only assignable by SYSTEM_ADMIN. */
@@ -1716,7 +1795,7 @@ export interface components {
             /** @description Whether the user account is active. */
             isActive?: boolean;
             /** @description Whether the user's email has been verified. */
-            isVerified?: boolean;
+            isEmailVerified?: boolean;
             /** @description Provide Init password for user account */
             password?: Record<string, never>;
             /** @description Lock or unlock the user's account. */
@@ -3289,7 +3368,74 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VerifyEmailDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AuthController_resendVerification: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ResendVerificationDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AuthController_forgotPassword: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ForgotPasswordDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AuthController_resetPassword: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ResetPasswordDto"];
+            };
+        };
         responses: {
             200: {
                 headers: {
@@ -3549,7 +3695,7 @@ export interface operations {
                 /** @description Optional: Filter users by active status */
                 isActive?: boolean;
                 /** @description Optional: Filter users by verified status */
-                isVerified?: boolean;
+                isEmailVerified?: boolean;
                 /** @description Optional: Filter users by a specific tenant ID (including null for platform users). */
                 tenantId?: string;
                 /** @description Optional: Filter users by managing league ID (null for unassigned) */

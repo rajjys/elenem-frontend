@@ -85,6 +85,9 @@ export function LoginForm() {
         <label htmlFor="password" className="block text-sm font-medium text-gray-700">Mot de passe</label>
         <Input id="password" type="password" autoComplete="current-password" placeholder="********"{...form.register("password")} />
         {form.formState.errors.password && <p className="text-red-500 text-xs mt-1">{form.formState.errors.password.message}</p>}
+        <div className="mt-1 text-right">
+          <Link href="/forgot-password" className="text-xs text-indigo-600 hover:text-indigo-500">Mot de passe oublié?</Link>
+        </div>
       </div>
 
       <div className="flex items-center space-x-2">
