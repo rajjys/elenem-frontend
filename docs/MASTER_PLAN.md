@@ -206,10 +206,13 @@ Headline items (see the deep doc for detail and ordering):
 1. `[ ]` Fix the **global-guard wiring bug** (`auth.module.ts` uses the string `'APP_GUARD'`, not
    the token → JwtAuthGuard/RolesGuard aren't global). Reconcile duplicate fields
    (`isVerified`/`emailVerified`, `lastLogin`/`lastLoginAt`), fix `generateTokens` bad field reads.
-2. `[ ]` **Forgot/reset password via OTP** (6-digit code, not a link — host-independent for local
-   dev); wire the existing token fields + mail method.
-3. `[ ]` **Password reuse prevention** — activate the existing `PasswordHistory` table; update
-   `lastPasswordChange` + revoke `hashedRt` on change/reset.
+2. `[x]` **Forgot/reset password via OTP** — `/auth/forgot-password` (enumeration-safe 200) +
+   `/auth/reset-password`, `/auth/verify-email` (OTP), `/auth/resend-verification`, all throttled;
+   frontend `/forgot-password` + `/verify-email` pages + login link. Mail: Mailtrap-ready with an
+   Ethereal dev fallback (preview URLs). `isVerified`→`isEmailVerified` standardized.
+3. `[x]` **Password reuse prevention** — `PasswordHistory` activated (recorded on
+   register/change/reset, checked against last 5); reset revokes sessions + unlocks + updates
+   `lastPasswordChange`. Verified end-to-end.
 4. `[ ]` **Real invite flow** (tokenized set-password email) — current league/player invites
    create users that can never log in.
 5. `[ ]` Frontend user management: `useCurrentUser()` hook (empty today); wire the orphaned
