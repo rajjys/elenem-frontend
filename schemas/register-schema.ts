@@ -13,8 +13,8 @@ export const RegisterFormSchema = z.object({
   dateOfBirth: z.string().optional().or(z.literal("")),
   gender: z.nativeEnum(Gender).optional().or(z.literal("")),
   nationality: z.string().optional().or(z.literal("")),
-  profileImageUrl: z.string().url({ message: "Invalid URL" }).optional().or(z.literal("")),
-  preferredLanguage: z.nativeEnum(SupportedLanguages).optional(),
+  avatarUrl: z.string().url({ message: "Invalid URL" }).optional().or(z.literal("")),
+  preferredLanguages: z.array(z.nativeEnum(SupportedLanguages)).optional(),
   timezone: z.string().optional(),
   tenantId: z.string().optional().or(z.literal("")),
 });

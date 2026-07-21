@@ -86,8 +86,8 @@ export function RegisterForm() {
       dateOfBirth: "",
       gender: undefined,
       nationality: "",
-      profileImageUrl: "",
-      preferredLanguage: SupportedLanguages.FRANCAIS,
+      avatarUrl: "",
+      preferredLanguages: [SupportedLanguages.FRANCAIS],
       timezone: "UTC+2",
       tenantId: "",
     },
@@ -96,7 +96,16 @@ export function RegisterForm() {
   const onSubmit = async (values: RegisterFormValues) => {
     setLoading(true);
     try {
-      await register(values);   // 👈 authStore does everything (API call + set tokens + set user -> login)
+      // Strip empty optionals so backend @IsUrl / optional validators don't reject "".
+      const payload: RegisterFormValues = {
+        ...values,
+        avatarUrl: values.avatarUrl || undefined,
+        nationality: values.nationality || undefined,
+        phone: values.phone || undefined,
+        tenantId:
+          values.tenantId && values.tenantId !== "null" ? values.tenantId : undefined,
+      };
+      await register(payload);   // 👈 authStore does everything (API call + set tokens + set user -> login)
       toast.success("Registration successful!");
       router.push("/welcome"); // Redirect to dashboard
     } catch (error) {
@@ -285,7 +294,7 @@ export function RegisterForm() {
                   />
                   <FormField
                     control={form.control}
-                    name="profileImageUrl"
+                    name="avatarUrl"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Profile Image URL</FormLabel>
@@ -302,13 +311,13 @@ export function RegisterForm() {
                   <h2 className="text-xl font-semibold">Preferences</h2>
                   <FormField
                     control={form.control}
-                    name="preferredLanguage"
+                    name="preferredLanguages"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Preferred Language</FormLabel>
                         <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
+                          onValueChange={(val) => field.onChange([val])}
+                          defaultValue={field.value?.[0]}
                         >
                           <FormControl>
                             <SelectTrigger>
