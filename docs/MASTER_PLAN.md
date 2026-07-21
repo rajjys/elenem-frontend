@@ -192,17 +192,33 @@ re-login loop in middleware. See git log for detail.
 3. `[x]` ESLint `no-restricted-imports` on `axios`; migrated the 20 files (18 only used
    `axios.isAxiosError` → now `isAxiosError` from `@/services/api`; 2 upload pages keep raw
    axios for S3 presigned-PUT/multipart with a documented eslint-disable). tsc clean.
-4. `[ ]` Shared axios-error → toast normalizer; `loading.tsx` / `error.tsx` per route group.
-5. `[ ]` Migrate hand-written response Zod schemas to derive from / validate against the generated
-   types (kills the recurring runtime drift for good).
+4. `[x]` `getApiErrorMessage`/`toastApiError` normalizer; `ErrorState` + `loading.tsx`/`error.tsx`
+   for (app)/admin/(public)/public_tenant route groups.
+5. `[x]` `parseResponse(schema, data)` — safeParse + graceful fallback so response drift no longer
+   white-screens; adopted in tenants service. Per-module migration onto `ApiSchema<>` continues.
 
-### Phase 3 — Auth & Users module `[ ]`
-1. `[ ]` Password **reset flow**: `POST /auth/forgot-password` + `POST /auth/reset-password`
-   (mailer method + token fields already exist), plus frontend pages.
-2. `[ ]` Enforce email verification where it matters (or consciously decide not to).
-3. `[ ]` Users admin UI: wire `PUT :id/promote`; audit-log user mutations.
-4. `[ ]` Decision: move tokens out of localStorage → httpOnly cookies (backend sets them; the
-   strategy already reads a cookie). Do it here while auth is in scope.
+### Phase 3 — Auth & User Management `[ ]`
+**→ Full analysis, audit findings, and the ordered build plan live in
+[`PHASE3_AUTH_USER_MANAGEMENT.md`](PHASE3_AUTH_USER_MANAGEMENT.md)** (deep-dive from the 2026-07
+two-agent audit, plus answers on email/OTP, cookie storage, social login, password reuse).
+
+Headline items (see the deep doc for detail and ordering):
+1. `[ ]` Fix the **global-guard wiring bug** (`auth.module.ts` uses the string `'APP_GUARD'`, not
+   the token → JwtAuthGuard/RolesGuard aren't global). Reconcile duplicate fields
+   (`isVerified`/`emailVerified`, `lastLogin`/`lastLoginAt`), fix `generateTokens` bad field reads.
+2. `[ ]` **Forgot/reset password via OTP** (6-digit code, not a link — host-independent for local
+   dev); wire the existing token fields + mail method.
+3. `[ ]` **Password reuse prevention** — activate the existing `PasswordHistory` table; update
+   `lastPasswordChange` + revoke `hashedRt` on change/reset.
+4. `[ ]` **Real invite flow** (tokenized set-password email) — current league/player invites
+   create users that can never log in.
+5. `[ ]` Frontend user management: `useCurrentUser()` hook (empty today); wire the orphaned
+   `UserForm` into `admin/users/create` + `[id]` (edit) + `[id]/roles`; implement `account/profile`,
+   `account/settings`, polish `account/security`; forgot/reset + verify-email pages.
+6. `[ ]` `admin/roles` read-only reference; per-scope member management (start with league admins).
+7. `[ ]` Migration-only future-proofing for OAuth: make `passwordHash` nullable, add
+   `provider`/`providerId`. Full social login = later feature, not this phase.
+8. `[ ]` (Later) httpOnly-cookie session hardening — see deep doc §8; not urgent for local stability.
 
 **Match check + role-matrix login test.**
 
