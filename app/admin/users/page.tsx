@@ -37,7 +37,7 @@ export default function AdminUsersPage() {
         filters.roles.forEach(role => params.append('roles', role));
       }
       if (filters.isActive !== undefined) params.append('isActive', String(filters.isActive));
-      if (filters.isVerified !== undefined) params.append('isVerified', String(filters.isVerified));
+      if (filters.isEmailVerified !== undefined) params.append('isEmailVerified', String(filters.isEmailVerified));
       if (filters.gender) params.append('gender', filters.gender);
       if (filters.preferredLanguage) params.append('preferredLanguage', filters.preferredLanguage);
       if (filters.tenantId) params.append('tenantId', filters.tenantId);

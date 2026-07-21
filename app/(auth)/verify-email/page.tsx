@@ -5,14 +5,16 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { toast } from 'sonner';
 import { Button, Input } from '@/components/ui';
-import { toastApiError } from '@/utils';
+import { toastApiError, getPostAuthRedirect } from '@/utils';
 import { useVerifyEmail, useResendVerification } from '@/services/auth';
+import { useAuthStore } from '@/store/auth.store';
 
 function VerifyEmailInner() {
   const router = useRouter();
   const prefill = useSearchParams().get('email') ?? '';
   const [email, setEmail] = useState(prefill);
   const [otp, setOtp] = useState('');
+  const user = useAuthStore((s) => s.user);
 
   const verify = useVerifyEmail();
   const resend = useResendVerification();
@@ -24,7 +26,9 @@ function VerifyEmailInner() {
       {
         onSuccess: () => {
           toast.success('Email vérifié.');
-          router.push('/login');
+          // If already logged in (e.g. right after registering) go to their
+          // landing page; otherwise send them to log in.
+          router.push(user ? getPostAuthRedirect(user) : '/login');
         },
         onError: (err) => toastApiError(err, 'Vérification impossible.'),
       },

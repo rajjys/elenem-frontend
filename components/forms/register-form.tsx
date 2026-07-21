@@ -105,8 +105,9 @@ export function RegisterForm() {
           values.tenantId && values.tenantId !== "null" ? values.tenantId : undefined,
       };
       await register(payload);   // 👈 authStore does everything (API call + set tokens + set user -> login)
-      toast.success("Registration successful!");
-      router.push("/welcome"); // Redirect to dashboard
+      toast.success("Compte créé ! Vérifiez votre email pour l'activer.");
+      // Transition to the email-verification step (a code was just emailed).
+      router.push(`/verify-email?email=${encodeURIComponent(values.email)}`);
     } catch (error) {
       let errorMessage = "Registration failed. Please try again.";
       if (isAxiosError(error)) {

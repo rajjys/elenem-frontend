@@ -2,7 +2,7 @@
 'use client'; // THIS IS CRUCIAL: Marks this as a Client Component
 
 import { LoginForm } from "@/components/forms/login-form";
-import { Roles } from "@/schemas";
+import { getPostAuthRedirect } from "@/utils";
 import { useAuthStore } from "@/store/auth.store";
 import { ArrowLeft } from "lucide-react";
 import Image from "next/image";
@@ -18,23 +18,7 @@ export default function LoginClientPage() {
   useEffect(() => {
     if (tokens?.accessToken && user) {
       const redirectUrl = searchParams.get('redirect');
-      if (redirectUrl) {
-        router.push(redirectUrl);
-      } else {
-        const userRoles = user.roles || [];
-
-        if (userRoles.includes(Roles.SYSTEM_ADMIN)) {
-          router.push("/admin/dashboard");
-        } else if (userRoles.includes(Roles.TENANT_ADMIN)) {
-          router.push("/tenant/dashboard");
-        } else if (userRoles.includes(Roles.LEAGUE_ADMIN)) {
-          router.push("/league/dashboard");
-        } else if (userRoles.includes(Roles.TEAM_ADMIN)) {
-          router.push("/team/dashboard");
-        } else {
-          router.push("/welcome");
-        }
-      }
+      router.push(redirectUrl || getPostAuthRedirect(user));
     }
   }, [user, tokens, router, searchParams]);
 

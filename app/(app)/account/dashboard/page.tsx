@@ -61,6 +61,14 @@ const GeneralUserDashboard = () => {
 
   return (
     <div>
+      {userAuth && !userAuth.isEmailVerified && (
+        <div className="mb-4 flex flex-col gap-2 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 sm:flex-row sm:items-center sm:justify-between">
+          <span>Votre email n&apos;est pas encore vérifié. Vérifiez-le pour créer une organisation.</span>
+          <Link href={`/verify-email?email=${encodeURIComponent(userAuth.email)}`} className="font-medium text-amber-900 underline">
+            Vérifier maintenant
+          </Link>
+        </div>
+      )}
       <h1 className="text-xl md:text-2xl lg:text-3xl">
         Bienvenue
         <span className="bg-gradient-to-r from-blue-500 via-green-600 to-purple-700 bg-clip-text text-transparent ml-2 pr-2 border-b-2 border-gray-400">

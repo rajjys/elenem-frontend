@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -s -o /dev/null -w \"verify-reset-otp \\(bad otp\\) -> %{http_code}\\\\n\" -X POST http://localhost:3333/auth/verify-reset-otp -H \"Content-Type: application/json\" -d '{\"email\":\"x@y.com\",\"otp\":\"000000\"}')",
+      "Bash(lsof -ti:3333)"
+    ]
+  }
+}

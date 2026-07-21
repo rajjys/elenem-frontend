@@ -23,7 +23,7 @@ export function UserFilters({ filters, onFilterChange, onPageSizeChange }: UserF
   const [search, setSearch] = useState(filters.search || '');
   const [selectedRoles, setSelectedRoles] = useState<Roles[]>(filters.roles || []);
   const [isActive, setIsActive] = useState<boolean | undefined>(filters.isActive);
-  const [isVerified, setIsVerified] = useState<boolean | undefined>(filters.isVerified);
+  const [isEmailVerified, setIsVerified] = useState<boolean | undefined>(filters.isEmailVerified);
   const [selectedGender, setSelectedGender] = useState<Gender | undefined>(filters.gender);
   const [selectedLanguage, setSelectedLanguage] = useState<SupportedLanguages | undefined>(filters.preferredLanguage);
   const [pageSizeInput, setPageSizeInput] = useState(String(filters.pageSize || 10));
@@ -71,7 +71,7 @@ export function UserFilters({ filters, onFilterChange, onPageSizeChange }: UserF
     const newSearch = debouncedSearch === '' ? undefined : debouncedSearch;
     const newRoles = selectedRoles.length > 0 ? selectedRoles : undefined;
     const newIsActive = isActive;
-    const newIsVerified = isVerified;
+    const newIsVerified = isEmailVerified;
     const newGender = selectedGender;
     const newLanguage = selectedLanguage;
 
@@ -79,7 +79,7 @@ export function UserFilters({ filters, onFilterChange, onPageSizeChange }: UserF
     const hasSearchChanged = newSearch !== (filters.search || undefined);
     const hasRolesChanged = !arraysEqual(newRoles, filters.roles);
     const hasIsActiveChanged = newIsActive !== filters.isActive;
-    const hasIsVerifiedChanged = newIsVerified !== filters.isVerified;
+    const hasIsVerifiedChanged = newIsVerified !== filters.isEmailVerified;
     const hasGenderChanged = newGender !== filters.gender;
     const hasLanguageChanged = newLanguage !== filters.preferredLanguage;
 
@@ -90,7 +90,7 @@ export function UserFilters({ filters, onFilterChange, onPageSizeChange }: UserF
         search: newSearch,
         roles: newRoles,
         isActive: newIsActive,
-        isVerified: newIsVerified,
+        isEmailVerified: newIsVerified,
         gender: newGender,
         preferredLanguage: newLanguage,
         page: 1, // Reset to first page on filter change
@@ -100,7 +100,7 @@ export function UserFilters({ filters, onFilterChange, onPageSizeChange }: UserF
     debouncedSearch,
     selectedRoles,
     isActive,
-    isVerified,
+    isEmailVerified,
     selectedGender,
     selectedLanguage,
     filters, // This must be a dependency as we are comparing against it
@@ -135,7 +135,7 @@ export function UserFilters({ filters, onFilterChange, onPageSizeChange }: UserF
       search: undefined,
       roles: undefined,
       isActive: undefined,
-      isVerified: undefined,
+      isEmailVerified: undefined,
       gender: undefined,
       preferredLanguage: undefined,
       page: 1, // Reset page to 1
@@ -249,18 +249,18 @@ export function UserFilters({ filters, onFilterChange, onPageSizeChange }: UserF
             {/* Is Verified Switch */}
             <div className="flex items-center space-x-2 mt-2">
               <Switch
-                id="isVerified"
-                checked={isVerified || false}
+                id="isEmailVerified"
+                checked={isEmailVerified || false}
                 onCheckedChange={setIsVerified}
                 className="data-[state=checked]:bg-blue-500 data-[state=unchecked]:bg-gray-200"
               />
-              <Label htmlFor="isVerified" className="text-sm font-medium text-gray-700">Verified Users</Label>
+              <Label htmlFor="isEmailVerified" className="text-sm font-medium text-gray-700">Verified Users</Label>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => setIsVerified(undefined)}
                 className="ml-2 text-gray-500 hover:bg-gray-100 rounded-md px-2 py-1"
-                disabled={isVerified === undefined}
+                disabled={isEmailVerified === undefined}
               >
                 Clear
               </Button>

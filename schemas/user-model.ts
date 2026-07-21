@@ -59,7 +59,7 @@ export interface User {
   preferredLanguage?: string | null;
   timezone?: string | null;
   isActive: boolean;
-  isVerified: boolean;
+  isEmailVerified: boolean;
   createdAt: string;
   updatedAt: string;
   lastLoginAt?: string | null; // Added from backend response
@@ -106,7 +106,7 @@ export const UserSchema = z.object({
   preferredLanguage: z.string().nullable().optional(),
   timezone: z.string().nullable().optional(),
   isActive: z.boolean(),
-  isVerified: z.boolean(),
+  isEmailVerified: z.boolean(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
   lastLoginAt: z.string().datetime().nullable().optional(),

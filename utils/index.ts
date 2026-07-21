@@ -8,3 +8,5 @@ export * from './tenant-url';
 export * from './formatDateFr';
 export * from './flatten-errors'
 export * from './toast-error';
+
+export * from './post-auth-redirect';

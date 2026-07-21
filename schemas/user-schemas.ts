@@ -44,7 +44,7 @@ export const UserDetailSchema = UserBasicSchema.extend({
   notificationPreferences: z.record(z.string(), z.any()).optional().nullable(), // For flexible JSON object
   profileVisibility: z.record(z.string(), z.any()).optional().nullable(), // For flexible JSON object
 
-  isVerified: z.boolean(),
+  isEmailVerified: z.boolean(),
   lastLoginAt: z.preprocess((arg) => (typeof arg === 'string' ? new Date(arg) : arg), z.date()).optional().nullable(),
 
   // Audit fields, typically read-only on frontend forms
@@ -95,7 +95,7 @@ export const CreateUserSchema = z.object({
   // roles are handled contextually or by separate API for System Admin
   roles: z.array(RoleSchema).optional(), // Only for System Admin direct creation
   isActive: z.boolean().default(true).optional(),
-  isVerified: z.boolean().default(false).optional(),
+  isEmailVerified: z.boolean().default(false).optional(),
   // No direct creation of managingLeagueId, tenantId here; these are set by association flows
 });
 
@@ -116,7 +116,7 @@ export const UpdateUserSchema = z.object({
   preferredLanguage: SupportedLanguageSchema.optional(),
   timezone: z.string().optional().or(z.literal('')),
   isActive: z.boolean().optional(),
-  isVerified: z.boolean().optional(),
+  isEmailVerified: z.boolean().optional(),
 });
 
 export type UpdateUserDto = z.infer<typeof UpdateUserSchema>;
@@ -146,7 +146,7 @@ export const UserFilterSchema = z.object({
   search: z.string().optional(), // General search term (username, email, first/last name)
   roles: z.array(RoleSchema).optional(), // Filter by one or more roles
   isActive: z.boolean().optional(), // Filter by active status
-  isVerified: z.boolean().optional(), // Filter by verification status
+  isEmailVerified: z.boolean().optional(), // Filter by verification status
   tenantId: z.string().cuid().optional().nullable(), // Filter by association with a specific tenant (can be null for unassigned)
   managingLeagueId: z.string().cuid().optional().nullable(), // Filter by association as league admin (can be null for unassigned)
   managingTeamId: z.string().cuid().optional().nullable(), // Filter by association as team admin (can be null for unassigned)
