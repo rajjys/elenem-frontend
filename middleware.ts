@@ -2,8 +2,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { Roles } from './schemas'; // Assuming Role enum is imported from Prisma or shared types
-import { resolveTenantSlugFromHostname, verifyJWT } from './utils'; // Your utility to verify JWT
-import { JwtPayload } from './types';
+import { resolveTenantSlugFromHostname, verifyJWTForGate } from './utils'; // Your utility to verify JWT
 
 // Define public paths that are accessible to everyone, regardless of authentication status.
 // These are typically paths on the root domain (e.g., website.com/login, website.com/leagues)
@@ -85,22 +84,18 @@ export async function middleware(request: NextRequest) {
   }
 
   // --- 6. Decode JWT to get user roles and details. ---
-  // Cast the result of verifyJWT to our JwtPayload type.
-  let user: JwtPayload | null = null;
-  try {
-    user = await verifyJWT(accessToken, process.env.JWT_SECRET || 'your-secret'); // Ensure JWT_SECRET is set
-  } catch (error) {
-    console.error('Middleware: JWT verification failed:', error);
-    // If JWT verification fails, clear cookie and redirect to login.
-    const redirectUrl = request.nextUrl.clone();
-    redirectUrl.pathname = '/login';
-    redirectUrl.searchParams.set('redirect', pathname + search);
-    const response = NextResponse.redirect(redirectUrl);
-    response.cookies.delete('accessToken'); // Clear invalid token
-    return response;
-  }
+  // We tolerate an expired-but-authentic access token here: the signature is
+  // still valid, so we trust its claims for UI role-gating and let the request
+  // through. The client-side axios interceptor then refreshes the session on
+  // its next API call (a full navigation never reaches that interceptor, which
+  // is why an expired token used to bounce the user to /login on every reload).
+  // Only a genuinely invalid token (bad signature / malformed) forces re-login.
+  const { payload: user } = await verifyJWTForGate(
+    accessToken,
+    process.env.JWT_SECRET || 'your-secret', // Ensure JWT_SECRET is set
+  );
 
-  // If JWT verification fails or user roles are invalid/empty, redirect to login.
+  // If the token is genuinely invalid or has no roles, redirect to login.
   if (!user || !Array.isArray(user.roles) || user.roles.length === 0) {
     console.warn('Middleware: Invalid or empty user roles found for authenticated request.');
     const redirectUrl = request.nextUrl.clone();
