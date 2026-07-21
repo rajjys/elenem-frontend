@@ -23,6 +23,7 @@ export default function TenantDashboard() {
     const currentUserRoles = userAuth?.roles || [];
     const [tenant, setTenant] = useState<TenantDetails | null>(null);
     const [leagues, setLeagues] = useState<LeagueDetails[]>([]);
+    const [counts, setCounts] = useState<{ leagues: number; teams: number; players: number }>({ leagues: 0, teams: 0, players: 0 });
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -91,13 +92,35 @@ export default function TenantDashboard() {
               setLoading(false);
             }
       }, [currentTenantId, isSystemAdmin]);
+
+    // Real counts for the stat cards. List endpoints differ in envelope:
+    // /leagues and /teams return { totalItems }, /players returns { total }.
+    const fetchCounts = useCallback(async () => {
+        if (!currentTenantId) return;
+        try {
+            const [lg, tm, pl] = await Promise.all([
+                api.get(`/leagues?tenantId=${currentTenantId}&pageSize=1`),
+                api.get(`/teams?tenantId=${currentTenantId}&pageSize=1`),
+                api.get(`/players?tenantId=${currentTenantId}&pageSize=1`),
+            ]);
+            setCounts({
+                leagues: lg.data?.totalItems ?? lg.data?.total ?? 0,
+                teams: tm.data?.totalItems ?? tm.data?.total ?? 0,
+                players: pl.data?.total ?? pl.data?.totalItems ?? 0,
+            });
+        } catch (error) {
+            console.error('Fetch counts error:', error);
+        }
+    }, [currentTenantId]);
+
     useEffect(() => {
         // Fetch tenant-specific data if needed, e.g., tenant name, logo, etc.
         if (currentTenantId) {
             fetchTenantDetails();
             fetchLeagues();
+            fetchCounts();
         }
-    }, [currentTenantId, fetchLeagues, fetchTenantDetails]);
+    }, [currentTenantId, fetchLeagues, fetchTenantDetails, fetchCounts]);
     
     // Fetch available dates on initial load
       const fetchDates = useCallback( async () => {
@@ -184,9 +207,9 @@ export default function TenantDashboard() {
 
     // Dynamically generate stat cards based on tenant data
     const statCards = [
-        { title: "Ligues", value: tenant?.leagues?.length || 0, description: "Ligues Actives de l'organisation", trend: {isPositive: true, value: 3.6, timespan: "season"}, icon: Trophy, bgColorClass: "bg-blue-400", textColorClass: "text-white", href: buildLink("/tenant/leagues") },
-        { title: "Equipes", value: tenant?.teams?.length || 0, description: "Equipes actives de l'organisation", trend: {isPositive: false, value: 2.6, timespan: "season"}, icon: Building, bgColorClass: "bg-green-400", textColorClass: "text-white", href: buildLink("/tenant/teams") },
-        { title: "Athletes", value: 0, description: "Athletes actifs dans l'organisation", trend: {isPositive: true, value: 0, timespan: "season"}, icon: Users, bgColorClass: "bg-orange-400", textColorClass: "text-white", href: buildLink("/tenant/players") },
+        { title: "Ligues", value: counts.leagues, description: "Ligues Actives de l'organisation", trend: {isPositive: true, value: 3.6, timespan: "season"}, icon: Trophy, bgColorClass: "bg-blue-400", textColorClass: "text-white", href: buildLink("/tenant/leagues") },
+        { title: "Equipes", value: counts.teams, description: "Equipes actives de l'organisation", trend: {isPositive: false, value: 2.6, timespan: "season"}, icon: Building, bgColorClass: "bg-green-400", textColorClass: "text-white", href: buildLink("/tenant/teams") },
+        { title: "Athletes", value: counts.players, description: "Athletes actifs dans l'organisation", trend: {isPositive: true, value: 0, timespan: "season"}, icon: Users, bgColorClass: "bg-orange-400", textColorClass: "text-white", href: buildLink("/tenant/players") },
         { title: "Ventes (Aujourdh'hui)", value: 0, description: "Billets Vendus Aujourd'hui", trend: {isPositive: true, value: 0, timespan: "season"}, icon: Ticket, bgColorClass: "bg-red-400", textColorClass: "text-white", href: buildLink("/tenant/tickets") }, // Keeping mock for now as per request
     ]
 
