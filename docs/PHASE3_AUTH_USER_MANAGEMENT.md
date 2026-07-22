@@ -312,3 +312,60 @@ flows** on top of it.
 7. FE: `admin/roles` read-only reference + role assignment page (§4B.3, 4B.6).
 8. Migration only: `passwordHash` nullable + `provider/providerId` columns (future OAuth) (§9).
 9. Later/optional: httpOnly-cookie session hardening (§8), followers concept, MFA.
+
+---
+
+## 12. User-detail architecture: view vs edit, and the multi-scope routes (analysis)
+
+The concern: we have (or are heading toward) `/admin/users/[id]`, `/tenant/users/[id]`,
+`/league/users/[id]`, `/team/users/[id]` — four parallel user areas — and the current
+`[id]` page drops you straight into an edit form even when you only want to *view* a rich
+user profile (roles, status, activity, footprint). Is this over-engineered?
+
+**Verdict: the SCOPES are legitimate; the DUPLICATION and the view/edit conflation are the
+real problems.** Fix those two and the complexity collapses.
+
+### What production systems do (GitHub / Stripe / Linear / any mature admin)
+1. **List** — scoped to what *you* can manage (the backend already scopes `GET /users` by the
+   caller's role: a team admin only sees their team's people). Filters, search, pagination.
+2. **Detail page = READ-first hub.** Shows the full profile (identity, roles, status, tenant/
+   league/team, verified, last login, activity/audit log, sessions). It is *not* a form. It
+   carries **action buttons** (Edit, Reset password, Change roles, Suspend) that are shown/
+   enabled by *your* permissions over *that* user.
+3. **Edit is an ACTION, not a destination.** It opens a focused edit form (modal, side panel, or
+   an `/edit` sub-route) launched from the detail page. You never land "blind" in a form.
+4. **Roles/permissions** are a section/tab of the detail (or a small modal), not a separate page.
+
+Our current `UserForm` conflates view and edit via an `isEditMode` flag — that's exactly why
+"viewing" feels wrong: you're always in a form.
+
+### The `?ctxUserId=` "one screen for everyone" idea — half right
+- **Right:** the *profile view* of a user can be ONE reusable component regardless of who's
+  looking. What differs is how much you see and what you can do — driven by **permissions**, not
+  by separate screens.
+- **Trap:** overloading `/account/dashboard?ctxUserId=X` mixes two different mental models —
+  *self-service* ("manage MY account") and *administration* ("manage SOMEONE ELSE"). Production
+  systems keep these **route families separate** even when they reuse components, because the
+  intent (and the permission context) is different. Don't collapse them into one context param.
+
+### Recommendation for Elenem (pragmatic, not over-engineered)
+Build the pieces **once**, mount them at thin scope-specific routes:
+- **Reusable components:** `UsersTable` (have it), `UserSummary` (new — the read-first detail),
+  `UserEditForm` (today's `UserForm`, used purely as an edit *action*).
+- **Two route families, clear intent:**
+  - **Self-service:** `/account/*` (profile, security, settings) — a person managing themselves.
+  - **Administration:** `/[scope]/users` + `/[scope]/users/[id]` (scope ∈ admin/tenant/league/
+    team). Each is a ~10-line wrapper mounting the SAME components with a scope context. The
+    detail is read-first; **Edit** opens `UserEditForm` (modal or `/[id]/edit`). The backend
+    already enforces scoping + permissions, so there is **no per-scope logic to duplicate** — only
+    the route wrapper differs.
+- **Split-view/sidebar** (list + selected-user summary in a panel + "view full") is a great polish
+  once `UserSummary` exists — it's just `UserSummary` rendered in a drawer. Edit stays a button.
+- **Activity/footprint:** the `AuditLog` model exists (write-only today) — the detail's "Activity"
+  tab reads it later.
+
+**So:** don't build four implementations, and don't build one magic context route. Build **one set
+of components + thin scope wrappers**, and make **view the default, edit an action.** That is both
+simpler than what we have drifting and matches production norms. Concrete near-term step: turn
+`/admin/users/[id]` into a read `UserSummary` with an "Edit" button that opens the form, instead of
+the form being the page.
