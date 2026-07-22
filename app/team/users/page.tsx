@@ -2,5 +2,5 @@
 import { UsersListView } from '@/components/users/users-list-view';
 
 export default function Page() {
-  return <UsersListView basePath="/admin/users" createHref="/admin/users/create" />;
+  return <UsersListView basePath="/team/users" />;
 }

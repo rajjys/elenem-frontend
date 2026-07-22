@@ -23,10 +23,10 @@ interface UsersTableProps {
   sortBy: string;
   onDelete: (userId: string) => void;
   onManageRoles: (userId: string) => void;
-  // onEdit and onView would typically be handled by Next.js Link
+  basePath?: string; // detail route base, e.g. '/admin/users' or '/tenant/users'
 }
 
-export function UsersTable({ users, onSort, sortBy, sortOrder, onDelete, onManageRoles }: UsersTableProps) {
+export function UsersTable({ users, onSort, sortBy, sortOrder, onDelete, onManageRoles, basePath = '/admin/users' }: UsersTableProps) {
 
   const getSortIndicator = (column: string) => {
     if (sortBy === column) {
@@ -135,7 +135,7 @@ export function UsersTable({ users, onSort, sortBy, sortOrder, onDelete, onManag
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
                     <DropdownMenuItem asChild>
-                      <Link href={`/admin/users/${user.id}/`} className="flex items-center">
+                      <Link href={`${basePath}/${user.id}`} className="flex items-center">
                         <Pencil className="mr-2 h-4 w-4" /> View/Edit
                       </Link>
                     </DropdownMenuItem>
