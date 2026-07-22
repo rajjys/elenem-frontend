@@ -16,6 +16,7 @@ import {
   Label,
   TextArea
 } from "@/components/ui/";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useState, useEffect, useCallback } from "react";
 import { Gender, SupportedLanguages, Roles, UserDetail, PaginatedTenantsResponseDto, TenantDetails } from "@/schemas"; // Import UserDetail
 import { api } from '@/services/api';
@@ -288,10 +289,17 @@ export function UserForm({
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 p-6 bg-white rounded-lg shadow-md max-w-2xl mx-auto">
-      <h2 className="text-2xl font-bold text-gray-800 mb-6">
-        {isEditMode ? `Edit User: ${initialUserData?.username}` : 'Create New User'}
-      </h2>
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      {!isEditMode && (
+        <h2 className="text-2xl font-bold text-gray-800 mb-6">Create New User</h2>
+      )}
+
+      <Tabs defaultValue="identity">
+        <TabsList className="mb-4">
+          <TabsTrigger value="identity">Identité</TabsTrigger>
+          <TabsTrigger value="preferences">Préférences</TabsTrigger>
+        </TabsList>
+        <TabsContent value="identity" className="space-y-4">
 
       {isSystemAdmin && (
         <div>
@@ -470,6 +478,9 @@ export function UserForm({
         )}
       </div>
 
+        </TabsContent>
+        <TabsContent value="preferences" className="space-y-4">
+
       <div>
         <Label htmlFor="bio">Bio</Label>
         <TextArea
@@ -521,6 +532,9 @@ export function UserForm({
           <p className="text-red-500 text-xs mt-1">{errors.timezone.message}</p>
         )}
       </div>
+
+        </TabsContent>
+      </Tabs>
 
       <div className="flex justify-end space-x-4 mt-8">
         {onCancel && (

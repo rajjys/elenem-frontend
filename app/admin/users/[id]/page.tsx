@@ -1,35 +1,31 @@
 'use client';
 
-import { use } from 'react';
+import { use, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { toast } from 'sonner';
 import { ArrowLeft, Pencil, Trash2, MailCheck } from 'lucide-react';
-import { Button, LoadingSpinner } from '@/components/ui';
+import { Button, LoadingSpinner, Modal, ConfirmDialog } from '@/components/ui';
 import { UserSummary } from '@/components/users/user-summary';
-import { useUser, useDeleteUser, useSetUserEmailVerified } from '@/services/users';
+import { UserForm } from '@/components/forms/user-form';
+import { useUser, useDeleteUser, useSetUserEmailVerified, userKeys } from '@/services/users';
 import { useIsSystemAdmin } from '@/hooks';
 import { toastApiError } from '@/utils';
+import { useQueryClient } from '@tanstack/react-query';
 
-// Read-first detail hub. Edit is an action (-> /[id]/edit), not the page itself.
+// Read-first detail hub. Edit opens a tabbed modal; verify/delete confirm first.
 export default function UserDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const router = useRouter();
+  const qc = useQueryClient();
   const { data: user, isLoading, isError } = useUser(id);
   const del = useDeleteUser();
   const verify = useSetUserEmailVerified();
   const isSystemAdmin = useIsSystemAdmin();
 
-  const onDelete = () => {
-    if (!window.confirm('Supprimer cet utilisateur ? Cette action est irréversible.')) return;
-    del.mutate(id, {
-      onSuccess: () => {
-        toast.success('Utilisateur supprimé.');
-        router.push('/admin/users');
-      },
-      onError: (e) => toastApiError(e),
-    });
-  };
+  const [editOpen, setEditOpen] = useState(false);
+  const [confirmVerify, setConfirmVerify] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   return (
     <div className="container mx-auto max-w-2xl p-6">
@@ -47,22 +43,14 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
             <h1 className="text-2xl font-semibold">Profil</h1>
             <div className="flex flex-wrap gap-2">
               {isSystemAdmin && !user.isEmailVerified && (
-                <Button
-                  variant="secondary"
-                  onClick={() =>
-                    verify.mutate(
-                      { id, value: true },
-                      { onSuccess: () => toast.success('Email marqué comme vérifié.'), onError: (e) => toastApiError(e) },
-                    )
-                  }
-                >
+                <Button variant="secondary" onClick={() => setConfirmVerify(true)}>
                   <MailCheck size={16} className="mr-1" /> Vérifier l&apos;email
                 </Button>
               )}
-              <Link href={`/admin/users/${id}/edit`}>
-                <Button variant="primary"><Pencil size={16} className="mr-1" /> Modifier</Button>
-              </Link>
-              <Button variant="danger" onClick={onDelete}>
+              <Button variant="primary" onClick={() => setEditOpen(true)}>
+                <Pencil size={16} className="mr-1" /> Modifier
+              </Button>
+              <Button variant="danger" onClick={() => setConfirmDelete(true)}>
                 <Trash2 size={16} className="mr-1" /> Supprimer
               </Button>
             </div>
@@ -70,6 +58,52 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
           <UserSummary user={user} />
         </div>
       )}
+
+      {/* Edit — tabbed modal */}
+      <Modal open={editOpen} onOpenChange={setEditOpen} title="Modifier l'utilisateur">
+        <UserForm
+          userId={id}
+          isEditMode
+          onSuccess={() => {
+            setEditOpen(false);
+            qc.invalidateQueries({ queryKey: userKeys.detail(id) });
+          }}
+          onCancel={() => setEditOpen(false)}
+        />
+      </Modal>
+
+      {/* Verify email — confirm */}
+      <ConfirmDialog
+        open={confirmVerify}
+        onOpenChange={setConfirmVerify}
+        title="Marquer l'email comme vérifié ?"
+        description="L'utilisateur pourra créer une organisation sans confirmer son email lui-même."
+        confirmLabel="Vérifier"
+        onConfirm={() =>
+          verify.mutate(
+            { id, value: true },
+            { onSuccess: () => toast.success('Email marqué comme vérifié.'), onError: (e) => toastApiError(e) },
+          )
+        }
+      />
+
+      {/* Delete — confirm */}
+      <ConfirmDialog
+        open={confirmDelete}
+        onOpenChange={setConfirmDelete}
+        title="Supprimer cet utilisateur ?"
+        description="Cette action est irréversible."
+        confirmLabel="Supprimer"
+        onConfirm={() =>
+          del.mutate(id, {
+            onSuccess: () => {
+              toast.success('Utilisateur supprimé.');
+              router.push('/admin/users');
+            },
+            onError: (e) => toastApiError(e),
+          })
+        }
+      />
     </div>
   );
 }

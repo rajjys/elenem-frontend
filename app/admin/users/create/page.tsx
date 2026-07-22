@@ -13,7 +13,9 @@ export default function CreateUserPage() {
         <ArrowLeft size={14} /> Retour aux utilisateurs
       </Link>
       <h1 className="mb-6 text-2xl font-semibold">Créer un utilisateur</h1>
-      <UserForm onSuccess={() => router.push('/admin/users')} onCancel={() => router.push('/admin/users')} />
+      <div className="rounded-lg bg-white p-6 shadow-md">
+        <UserForm onSuccess={() => router.push('/admin/users')} onCancel={() => router.push('/admin/users')} />
+      </div>
     </div>
   );
 }

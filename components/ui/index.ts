@@ -1,6 +1,5 @@
 export * from './button';
 export * from './input';
-export * from './modal';
 export * from './select';
 export * from './textarea';
 export * from './loading-spinner';
@@ -36,3 +35,5 @@ export * from './post/lexical-renderer';
 export * from './error-state';
 export * from './password-input';
 export * from './otp-input';
+export * from './dialog-modal';
+export * from './confirm-dialog';
