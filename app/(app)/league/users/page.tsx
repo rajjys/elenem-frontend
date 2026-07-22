@@ -1,11 +1,6 @@
-import React from 'react'
+'use client';
+import { UsersListView } from '@/components/users/users-list-view';
 
-const LeagueUsersPage = () => {
-  return (
-    <div>
-      League Users Page
-    </div>
-  )
+export default function Page() {
+  return <UsersListView basePath="/league/users" />;
 }
-
-export default LeagueUsersPage
