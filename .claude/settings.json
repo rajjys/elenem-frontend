@@ -2,7 +2,13 @@
   "permissions": {
     "allow": [
       "Bash(curl -s -o /dev/null -w \"verify-reset-otp \\(bad otp\\) -> %{http_code}\\\\n\" -X POST http://localhost:3333/auth/verify-reset-otp -H \"Content-Type: application/json\" -d '{\"email\":\"x@y.com\",\"otp\":\"000000\"}')",
-      "Bash(lsof -ti:3333)"
+      "Bash(lsof -ti:3333)",
+      "Bash(curl -s -o /dev/null -w '%{http_code}' 'http://localhost:3000/verify-email?email=test%40x.com')",
+      "Bash(echo \"verify-email: $\\(curl -s -o /dev/null -w '%{http_code}' 'http://localhost:3000/verify-email?email=test%40x.com'\\)\")",
+      "Bash(perl -pi -e 's/await this\\\\.mail\\\\.sendInviteOtp\\\\\\(created\\\\.email, inviteOtp, league\\\\.name\\\\\\)/await this.mail.sendInviteOtp\\(created.email, inviteOtp, league.slug\\)/' src/leagues/services/league-membership.service.ts)",
+      "Bash(curl -s -o /dev/null -w '%{http_code}' http://localhost:3000/admin/users/create)",
+      "Bash(echo \"create page \\(auth-gated, 307 expected\\): $\\(curl -s -o /dev/null -w '%{http_code}' http://localhost:3000/admin/users/create\\)\")",
+      "Bash(awk 'NR>=280 && NR<=420 && /password/{print NR\": \"$0}' components/forms/user-form.tsx)"
     ]
   }
 }

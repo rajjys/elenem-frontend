@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { toast } from 'sonner';
 import { Mail, KeyRound, Lock, ArrowLeft, CheckCircle2 } from 'lucide-react';
-import { Button, Input, PasswordInput } from '@/components/ui';
+import { Button, Input, PasswordInput, OtpInput } from '@/components/ui';
 import { toastApiError } from '@/utils';
 import { useForgotPassword, useVerifyResetOtp, useResetPassword } from '@/services/auth';
 
@@ -108,16 +108,7 @@ export default function ForgotPasswordPage() {
 
         {step === 'otp' && (
           <form onSubmit={checkCode} className="space-y-4">
-            <Input
-              inputMode="numeric"
-              maxLength={6}
-              placeholder="• • • • • •"
-              value={otp}
-              onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
-              required
-              autoFocus
-              className="text-center text-lg tracking-[0.5em]"
-            />
+            <OtpInput value={otp} onChange={setOtp} autoFocus />
             <Button type="submit" variant="primary" className="w-full" disabled={verifyOtp.isPending}>
               {verifyOtp.isPending ? 'Vérification…' : 'Vérifier le code'}
             </Button>

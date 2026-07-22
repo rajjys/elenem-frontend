@@ -7,6 +7,7 @@ import * as z from "zod";
 import {
   Button,
   Input,
+  PasswordInput,
   Select,
   SelectContent,
   SelectItem,
@@ -67,6 +68,13 @@ export function UserForm({
   const [availableTenants, setAvailableTenants] = useState<TenantDetails[]>([]);
   const [initialUserData, setInitialUserData] = useState<UserDetail | null>(null); // To store fetched user data for edit
 
+  // Create-mode options: how to give the user access, and which role.
+  const [creationMethod, setCreationMethod] = useState<'invite' | 'password'>('invite');
+  const [selectedRole, setSelectedRole] = useState<Roles>(Roles.GENERAL_USER);
+  // Non-scoped roles safe to assign from this generic form (scoped admin roles
+  // are handled by their dedicated invite/promote flows).
+  const assignableRoles = [Roles.GENERAL_USER, Roles.PLAYER, Roles.COACH, Roles.REFEREE];
+
   const form = useForm<UserFormValues>({
     resolver: zodResolver(userFormSchema),
     defaultValues: {
@@ -98,18 +106,17 @@ export function UserForm({
     reset,
   } = form;
 
-  // Dynamically set password field as required only for create mode
+  // Password is required only when creating with the "set password" method.
   useEffect(() => {
-    if (!isEditMode) {
+    if (!isEditMode && creationMethod === 'password') {
       register("password", {
         required: "Password is required for new users.",
         minLength: { value: 8, message: "Password must be at least 8 characters." },
       });
     } else {
-      // For edit mode, password is optional and not required
-      // The schema already defines it as optional.
+      register("password", { required: false });
     }
-  }, [isEditMode, register]);
+  }, [isEditMode, creationMethod, register]);
 
   // Fetch initial user data for edit mode
   useEffect(() => {
@@ -202,13 +209,19 @@ export function UserForm({
       profileImageUrl: data.profileImageUrl || undefined, // Ensure this is correctly mapped if your DTO uses it
       preferredLanguage: data.preferredLanguage || undefined,
       timezone: data.timezone || undefined,
-      // Roles are handled by backend or default to GENERAL_USER for creation
-      roles: [Roles.GENERAL_USER], // Always send GENERAL_USER for creation via this form
       tenantId: data.tenantId === "" ? null : data.tenantId, // Convert empty string to null for backend DTO
     };
 
-    if (data.password) {
-      payload.password = data.password; // Only include password if provided (for create or update)
+    if (!isEditMode) {
+      // On create: pick the role, and either set a password or (omit it to) send an invite.
+      payload.roles = [selectedRole];
+      if (creationMethod === 'password' && data.password) {
+        payload.password = data.password;
+      }
+      // creationMethod === 'invite' -> no password -> backend emails a set-password invite.
+    } else if (data.password) {
+      // On edit: only send a password if the admin is explicitly changing it (roles left untouched).
+      payload.password = data.password;
     }
 
     try {
@@ -230,7 +243,7 @@ export function UserForm({
       toast.error(`Error ${isEditMode ? 'updating' : 'creating'} user`, { description: errorMessage });
       console.error(`${isEditMode ? 'Update' : 'Create'} user error:`, error);
     }
-  }, [isEditMode, userId, onSuccess, reset, user]); // Add userAuth to dependencies
+  }, [isEditMode, userId, onSuccess, reset, user, creationMethod, selectedRole]);
 
   // Overall loading state for the form
   const overallLoading = isSubmitting || loadingForm || loadingTenants || user === undefined;
@@ -332,15 +345,58 @@ export function UserForm({
         )}
       </div>
 
-      <div>
-        <Label htmlFor="password">
-          Password {isEditMode ? "(Leave blank to keep current)" : ""}
-        </Label>
-        <Input id="password" type="password" {...register("password")} disabled={overallLoading} />
-        {errors.password && (
-          <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>
-        )}
-      </div>
+      {!isEditMode && (
+        <>
+          <div>
+            <Label htmlFor="role">Rôle</Label>
+            <select
+              id="role"
+              value={selectedRole}
+              onChange={(e) => setSelectedRole(e.target.value as Roles)}
+              disabled={overallLoading}
+              className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+            >
+              {assignableRoles.map((r) => (
+                <option key={r} value={r}>{r}</option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <Label>Accès</Label>
+            <div className="mt-1 grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => setCreationMethod('invite')}
+                className={`rounded-md border px-3 py-2 text-sm transition-colors ${creationMethod === 'invite' ? 'border-indigo-500 bg-indigo-50 text-indigo-700' : 'border-gray-300 text-gray-600 hover:bg-gray-50'}`}
+              >
+                Envoyer une invitation
+              </button>
+              <button
+                type="button"
+                onClick={() => setCreationMethod('password')}
+                className={`rounded-md border px-3 py-2 text-sm transition-colors ${creationMethod === 'password' ? 'border-indigo-500 bg-indigo-50 text-indigo-700' : 'border-gray-300 text-gray-600 hover:bg-gray-50'}`}
+              >
+                Définir un mot de passe
+              </button>
+            </div>
+            {creationMethod === 'invite' && (
+              <p className="mt-1 text-xs text-gray-500">
+                L&apos;utilisateur recevra un email pour activer son compte et définir son mot de passe.
+              </p>
+            )}
+          </div>
+        </>
+      )}
+
+      {(isEditMode || creationMethod === 'password') && (
+        <div>
+          <Label htmlFor="password">
+            Password {isEditMode ? "(Leave blank to keep current)" : ""}
+          </Label>
+          <PasswordInput id="password" {...register("password")} disabled={overallLoading} error={errors.password?.message} />
+        </div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>

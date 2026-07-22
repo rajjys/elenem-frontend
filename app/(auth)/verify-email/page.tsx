@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { toast } from 'sonner';
 import { MailCheck, ArrowLeft } from 'lucide-react';
-import { Button, Input } from '@/components/ui';
+import { Button, Input, OtpInput } from '@/components/ui';
 import { toastApiError, getPostAuthRedirect } from '@/utils';
 import { useVerifyEmail, useResendVerification } from '@/services/auth';
 import { useAuthStore } from '@/store/auth.store';
@@ -14,8 +14,12 @@ const RESEND_SECONDS = 30;
 
 function VerifyEmailInner() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const user = useAuthStore((s) => s.user);
-  const emailFromQuery = useSearchParams().get('email') ?? '';
+  const fetchUser = useAuthStore((s) => s.fetchUser);
+  const emailFromQuery = searchParams.get('email') ?? '';
+  // `sent=1` means register just emailed a code, so we don't re-send on mount.
+  const justSent = searchParams.get('sent') === '1';
   // Known email (from register redirect or the logged-in user) is shown as text,
   // not an editable field. Only fall back to an input if we truly have none.
   const knownEmail = emailFromQuery || user?.email || '';
@@ -35,14 +39,25 @@ function VerifyEmailInner() {
     return () => clearInterval(t);
   }, [cooldown]);
 
+  // Ensure a fresh code is actually sent when landing here (e.g. from the
+  // dashboard "verify now" link, where any register-time code has expired).
+  // Skipped when register just sent one (sent=1).
+  useEffect(() => {
+    if (justSent || !knownEmail) return;
+    resend.mutate(knownEmail);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     verify.mutate(
       { email, otp },
       {
-        onSuccess: () => {
+        onSuccess: async () => {
           toast.success('Email vérifié.');
-          router.push(user ? getPostAuthRedirect(user) : '/login');
+          // Refresh the cached user so the verified state shows immediately.
+          const fresh = await fetchUser().catch(() => user);
+          router.push(fresh ? getPostAuthRedirect(fresh) : user ? getPostAuthRedirect(user) : '/login');
         },
         onError: (err) => toastApiError(err, 'Vérification impossible.'),
       },
@@ -85,16 +100,7 @@ function VerifyEmailInner() {
               required
             />
           )}
-          <Input
-            inputMode="numeric"
-            maxLength={6}
-            placeholder="• • • • • •"
-            value={otp}
-            onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
-            required
-            autoFocus
-            className="text-center text-lg tracking-[0.5em]"
-          />
+          <OtpInput value={otp} onChange={setOtp} autoFocus />
           <Button type="submit" variant="primary" className="w-full" disabled={verify.isPending}>
             {verify.isPending ? 'Vérification…' : "Vérifier l'email"}
           </Button>

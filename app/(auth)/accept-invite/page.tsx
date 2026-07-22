@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { toast } from 'sonner';
 import { KeyRound, Lock, CheckCircle2 } from 'lucide-react';
-import { Button, Input, PasswordInput } from '@/components/ui';
+import { Button, Input, PasswordInput, OtpInput } from '@/components/ui';
 import { toastApiError } from '@/utils';
 import { useVerifyResetOtp, useResetPassword } from '@/services/auth';
 
@@ -70,16 +70,7 @@ function AcceptInviteInner() {
             {!emailFromQuery && (
               <Input type="email" placeholder="votre@email.com" value={email} onChange={(e) => setEmail(e.target.value)} required />
             )}
-            <Input
-              inputMode="numeric"
-              maxLength={6}
-              placeholder="• • • • • •"
-              value={otp}
-              onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
-              required
-              autoFocus
-              className="text-center text-lg tracking-[0.5em]"
-            />
+            <OtpInput value={otp} onChange={setOtp} autoFocus />
             <Button type="submit" variant="primary" className="w-full" disabled={verify.isPending}>
               {verify.isPending ? 'Vérification…' : 'Continuer'}
             </Button>

@@ -35,3 +35,4 @@ export * from './post/post-rich-text-editor';
 export * from './post/lexical-renderer';
 export * from './error-state';
 export * from './password-input';
+export * from './otp-input';

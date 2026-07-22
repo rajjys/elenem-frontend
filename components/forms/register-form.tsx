@@ -107,7 +107,7 @@ export function RegisterForm() {
       await register(payload);   // 👈 authStore does everything (API call + set tokens + set user -> login)
       toast.success("Compte créé ! Vérifiez votre email pour l'activer.");
       // Transition to the email-verification step (a code was just emailed).
-      router.push(`/verify-email?email=${encodeURIComponent(values.email)}`);
+      router.push(`/verify-email?email=${encodeURIComponent(values.email)}&sent=1`);
     } catch (error) {
       let errorMessage = "Registration failed. Please try again.";
       if (isAxiosError(error)) {
