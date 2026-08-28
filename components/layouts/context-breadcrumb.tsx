@@ -6,6 +6,7 @@ import { ChevronRight } from 'lucide-react';
 import { useScopeContext } from '@/hooks/useScopeContext';
 import { useCurrentUser } from '@/hooks';
 import { Roles } from '@/schemas';
+import { ScopeSwitcher, type ScopeKind } from './scope-switcher';
 
 /**
  * The trail back up the chain.
@@ -69,6 +70,8 @@ interface Crumb {
   label: string;
   title?: string;
   href?: string;
+  /** Set on the deepest entity: it renders as a sibling switcher instead of plain text. */
+  switcher?: { kind: ScopeKind; id: string; parentId?: string };
 }
 
 export function ContextBreadcrumb() {
@@ -91,6 +94,8 @@ export function ContextBreadcrumb() {
   const canManageTenant =
     (user?.roles ?? []).some((r) => r === Roles.SYSTEM_ADMIN || r === Roles.TENANT_ADMIN);
 
+  // The deepest entity for the surface you are on is the one you may switch between; everything
+  // above it stays a link. Managing a team is not the moment to change organisation.
   if (scope.tenant && (isTenantSurface || isLeagueSurface || isTeamSurface)) {
     crumbs.push({
       label: scope.tenant.short,
@@ -98,6 +103,11 @@ export function ContextBreadcrumb() {
       href: isTenantSurface || !canManageTenant
         ? undefined
         : `/tenant/dashboard?ctxTenantId=${scope.tenant.id}`,
+      // Only a system admin has sibling organisations to move between.
+      switcher:
+        isTenantSurface && (user?.roles ?? []).includes(Roles.SYSTEM_ADMIN)
+          ? { kind: 'tenant', id: scope.tenant.id }
+          : undefined,
     });
   }
 
@@ -106,11 +116,18 @@ export function ContextBreadcrumb() {
       label: scope.league.short,
       title: scope.league.name,
       href: isLeagueSurface ? undefined : `/league/dashboard?ctxLeagueId=${scope.league.id}`,
+      switcher: isLeagueSurface
+        ? { kind: 'league', id: scope.league.id, parentId: scope.tenantId }
+        : undefined,
     });
   }
 
   if (scope.team && isTeamSurface) {
-    crumbs.push({ label: scope.team.short, title: scope.team.name });
+    crumbs.push({
+      label: scope.team.short,
+      title: scope.team.name,
+      switcher: { kind: 'team', id: scope.team.id, parentId: scope.leagueId },
+    });
   }
 
   const page = currentPageTitle(pathname);
@@ -123,7 +140,13 @@ export function ContextBreadcrumb() {
       <ol className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-sm">
         {crumbs.map((c, i) => (
           <li key={`${c.label}-${i}`} className="flex items-center gap-1.5">
-            {c.href ? (
+            {c.switcher ? (
+              <ScopeSwitcher
+                kind={c.switcher.kind}
+                current={{ id: c.switcher.id, name: c.title ?? c.label, short: c.label }}
+                parentId={c.switcher.parentId}
+              />
+            ) : c.href ? (
               <Link
                 href={c.href}
                 title={c.title}

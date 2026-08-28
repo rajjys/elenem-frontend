@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { cn } from '@/utils/cn';
+import { Tooltip } from '@/components/ui/tooltip';
 
 interface NavLinkProps {
   item: { label: string; basePath: string; icon: React.ElementType };
@@ -32,12 +33,11 @@ export const NavLink: React.FC<NavLinkProps> = ({
   const Icon = item.icon;
   const showLabel = isSidebarOpen || isFlyout;
 
-  return (
+  const link = (
     <Link
       href={finalHref}
       onClick={onClick}
       aria-current={isActive ? 'page' : undefined}
-      title={showLabel ? undefined : item.label}
       className={cn(
         'flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors',
         'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-accent',
@@ -53,5 +53,13 @@ export const NavLink: React.FC<NavLinkProps> = ({
       <Icon className="h-[18px] w-[18px] shrink-0" />
       {showLabel && <span className="truncate">{item.label}</span>}
     </Link>
+  );
+
+  // Collapsed, the label is the only thing distinguishing one icon from the next, so the native
+  // `title` delay (roughly a second) made the rail unusable. Tooltip shows in 150ms.
+  return (
+    <Tooltip label={item.label} disabled={showLabel}>
+      {link}
+    </Tooltip>
   );
 };

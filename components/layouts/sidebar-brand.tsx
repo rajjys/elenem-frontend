@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { PanelLeft, PanelLeftClose } from 'lucide-react';
 import { cn } from '@/utils/cn';
+import { Tooltip } from '@/components/ui/tooltip';
 
 /**
  * The top of the sidebar: brand, then the dock control.
@@ -49,16 +50,17 @@ export function SidebarBrand({
           />
         </Link>
       )}
-      <button
-        type="button"
-        onClick={onToggle}
-        aria-label={isOpen ? 'Réduire le menu' : 'Déployer le menu'}
-        aria-expanded={isOpen}
-        title={isOpen ? 'Réduire le menu' : 'Déployer le menu'}
-        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-ink-subtle transition-colors hover:bg-surface-sunk hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-accent"
-      >
-        <Icon className="h-[18px] w-[18px]" />
-      </button>
+      <Tooltip label={isOpen ? 'Réduire le menu' : 'Déployer le menu'}>
+        <button
+          type="button"
+          onClick={onToggle}
+          aria-label={isOpen ? 'Réduire le menu' : 'Déployer le menu'}
+          aria-expanded={isOpen}
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-ink-subtle transition-colors hover:bg-surface-sunk hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-accent"
+        >
+          <Icon className="h-[18px] w-[18px]" />
+        </button>
+      </Tooltip>
     </div>
   );
 }

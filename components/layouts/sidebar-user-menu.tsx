@@ -74,11 +74,13 @@ export function SidebarUserMenu({
             isSidebarOpen ? 'left-2 right-2' : 'left-2 w-64',
           )}
         >
-          <Link href={buildLink('/account/profile')} onClick={close} className={itemClass} role="menuitem">
+          {/* Account routes are personal: /account/profile?ctxLeagueId=… is meaningless, and the
+              contextual builder was appending whatever league you happened to be inside. */}
+          <Link href="/account/profile" onClick={close} className={itemClass} role="menuitem">
             <User className="h-4 w-4 shrink-0" />
             Mon profil
           </Link>
-          <Link href={buildLink('/account/security')} onClick={close} className={itemClass} role="menuitem">
+          <Link href="/account/security" onClick={close} className={itemClass} role="menuitem">
             <Shield className="h-4 w-4 shrink-0" />
             Sécurité
           </Link>

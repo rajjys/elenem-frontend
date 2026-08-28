@@ -332,5 +332,35 @@ parked itself in the queue that only the awaiting refresh could drain — a prom
 settled. Auth endpoints are now excluded and a failed refresh clears the session. Any user whose
 token went bad would have hit this, not just a developer who reset their database.
 
-**Next: Stage 2** — dashboard remodel and the onboarding wizard, built for LIPROBAKIN
+### Navigation foundation (2026-08-28, third pass)
+
+Routes here are **flat and self-owned**: `/league/*` is a root, not `/tenant/leagues/[id]/*`.
+That buys one UI per resource shared by every role, at the cost of the path not saying *which*
+league you mean. Context travels in `ctx*Id` query params, with the JWT as the floor.
+
+The rules that make it safe:
+
+1. **The URL wins, the JWT is the floor.** `useScopeContext()` is the single resolver: ctx param
+   → JWT → nothing. Every list screen pins its filters from it, so drilling down actually narrows
+   (verified: players 220 → 100 → 10, users 3 → 1 → 0 for a tenant admin).
+2. **No silent fallback.** When a surface needs a scope it cannot resolve, it says so and offers
+   the way back (`ContextRequired`). Falling back to "whatever the role permits" is how a tenant
+   admin saw all 220 organisation players on a page titled *Joueurs de la ligue* — numbers that
+   look authoritative while answering a different question.
+3. **Superiors are links; the current level is a switcher.** `LIBAGO > D1 M > VIR` gives a team
+   dropdown on VIR and plain links above it. One dropdown on screen at a time — managing a team is
+   not the moment to change organisation. Switching preserves the page you are on, so
+   `/league/teams` stays `/league/teams` for the new league.
+4. **The sibling list scales in three steps:** everything up to 5; 5 plus a "show the other N" for
+   6–10; a search box past 10.
+5. **Account routes carry no competition context.** `/account/profile?ctxLeagueId=…` was
+   meaningless — the contextual link builder was appending whatever league you happened to be
+   inside.
+
+Still open, deliberately deferred to Stage 2: migrating `/tenant/users/[id]` to `/user?ctxUserId`
+and `/player?ctxPlayerId`, and the modal-first pattern (quick view in a dialog, CTA to the
+extended page, most work never leaving the list).
+
+**Next: Stage 2** — dashboard remodel, the onboarding wizard, the `/user` + `/player` route
+migration with modal-first lists, and the `Stage` migration for playoffs. Built for LIPROBAKIN
 specifically.

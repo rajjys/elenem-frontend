@@ -40,3 +40,5 @@ export * from './confirm-dialog';
 export * from './theme-toggle';
 export * from './page-header';
 export * from './page-templates';
+export * from './tooltip';
+export * from './context-required';
