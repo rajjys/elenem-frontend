@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import { Plus, Search, Trash2, Pencil, Users } from 'lucide-react';
-import { Button, Input, LoadingSpinner, Pagination, ConfirmDialog, ErrorState } from '@/components/ui';
+import { Button, Input, ConfirmDialog, ListPage } from '@/components/ui';
 import { usePlayers, useDeletePlayer } from '@/services/players';
 import { useDebounce } from 'use-debounce';
 import { toastApiError } from '@/utils';
@@ -61,35 +61,16 @@ export function PlayersListView({
     setToDelete(null);
   };
 
-  if (isError) {
-    return <ErrorState title="Impossible de charger les joueurs." reset={() => refetch()} />;
-  }
-
   return (
-    <div className="p-6">
-      <header className="mb-6 flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-semibold text-ink">{title}</h1>
-          <p className="text-sm text-ink-muted">
-            {total} {total === 1 ? 'joueur enregistré' : 'joueurs enregistrés'}
-          </p>
-        </div>
-        {canManage && (
-          <div className="flex gap-2">
-            <Button variant="outline" onClick={() => setBulkOpen(true)}>
-              <Users className="mr-2 h-4 w-4" />
-              Ajouter une liste
-            </Button>
-            <Button variant="primary" onClick={() => setCreating(true)}>
-              <Plus className="mr-2 h-4 w-4" />
-              Nouveau joueur
-            </Button>
-          </div>
-        )}
-      </header>
-
-      <div className="mb-4 max-w-sm">
-        <div className="relative">
+    <ListPage
+      title={title}
+      description={`${total} ${total === 1 ? 'joueur enregistré' : 'joueurs enregistrés'}`}
+      action={canManage ? { label: 'Nouveau joueur', onClick: () => setCreating(true) } : undefined}
+      secondaryAction={
+        canManage ? { label: 'Ajouter une liste', onClick: () => setBulkOpen(true), icon: Users } : undefined
+      }
+      filters={
+        <div className="relative max-w-sm">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-subtle" />
           <Input
             value={search}
@@ -101,15 +82,17 @@ export function PlayersListView({
             className="pl-9"
           />
         </div>
-      </div>
-
-      {isLoading ? (
-        <div className="py-16">
-          <LoadingSpinner />
-        </div>
-      ) : players.length === 0 ? (
-        <EmptyRoster canManage={canManage} searching={!!debouncedSearch} onAdd={() => setBulkOpen(true)} />
-      ) : (
+      }
+      isLoading={isLoading}
+      isError={isError}
+      onRetry={() => refetch()}
+      isEmpty={players.length === 0}
+      empty={<EmptyRoster canManage={canManage} searching={!!debouncedSearch} onAdd={() => setBulkOpen(true)} />}
+      page={page}
+      totalPages={totalPages}
+      onPageChange={setPage}
+    >
+      <>
         <div className="overflow-x-auto rounded-lg border border-line bg-surface">
           <table className="w-full min-w-[720px] text-sm">
             <thead className="border-b border-line bg-surface-sunk text-left text-xs uppercase tracking-wide text-ink-muted">
@@ -167,13 +150,6 @@ export function PlayersListView({
             </tbody>
           </table>
         </div>
-      )}
-
-      {totalPages > 1 && (
-        <div className="mt-4">
-          <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
-        </div>
-      )}
 
       {(creating || editing) && (
         <PlayerFormDialog
@@ -213,7 +189,8 @@ export function PlayersListView({
         confirmLabel="Retirer"
         onConfirm={confirmDelete}
       />
-    </div>
+      </>
+    </ListPage>
   );
 }
 

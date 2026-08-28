@@ -1,31 +1,29 @@
-'use client'
+'use client';
 
-import { Menu } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Skeleton } from '@/components/ui/'
-import Link from 'next/link'
-import Image from 'next/image'
-import { useAuthStore } from '@/store/auth.store'
-import { useEffect, useState, useRef } from 'react'
-import { FiUser } from 'react-icons/fi'
-import UserDropdown from './user-dropdown'
-import { ThemeToggle } from '@/components/ui/theme-toggle'
+import { useEffect, useState } from 'react';
+import Link from 'next/link';
+import { Menu } from 'lucide-react';
+import { useAuthStore } from '@/store/auth.store';
+import { Skeleton } from '@/components/ui/';
+import { NavbarProfile } from './navbar-profile';
 
 interface AppLayoutNavbarProps {
-  logoUrl?: string;
   onMobileMenuToggle: () => void;
   handleLogout: () => void;
 }
 
-export function AppLayoutHeader({
-  logoUrl = "/logos/elenem-sport.png",
-  onMobileMenuToggle,
-  handleLogout,
-}: AppLayoutNavbarProps) {
+/**
+ * A thin strip of tools, not a second identity bar.
+ *
+ * The brand moved to the sidebar, which is the permanent frame — this row holds only what belongs
+ * to the *current view*. Today that is the mobile menu trigger and the profile avatar; search,
+ * notifications and help slot in beside them without changing the shape. The theme control is
+ * gone from here: it lives in the sidebar account menu, and having it in both places meant the
+ * same preference had two homes.
+ */
+export function AppLayoutHeader({ onMobileMenuToggle }: AppLayoutNavbarProps) {
   const { user: userAuth, fetchUser } = useAuthStore();
   const [loadingUser, setLoadingUser] = useState(true);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const loadUser = async () => {
@@ -39,61 +37,34 @@ export function AppLayoutHeader({
     else setLoadingUser(false);
   }, [userAuth, fetchUser]);
 
-  useEffect(() => {
-    const onDoc = (e: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
-        setDropdownOpen(false);
-      }
-    };
-    if (dropdownOpen) document.addEventListener("mousedown", onDoc);
-    return () => document.removeEventListener("mousedown", onDoc);
-  }, [dropdownOpen]);
-
   return (
-    <header className="bg-surface border-b border-line h-16 flex items-center justify-between px-2 sm:px-6 md:px-12 sticky top-0 z-30">
-      {/* Left Section */}
-      <div className="flex items-center gap-4">
-        {/* Mobile menu toggle */}
-        <Button
-          variant="ghost"
-          size="sm"
+    <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-line bg-surface px-3 sm:px-6">
+      <div className="flex items-center gap-2">
+        <button
+          type="button"
           onClick={onMobileMenuToggle}
-          className="md:hidden nav-hover p-2 rounded-md"
+          aria-label="Ouvrir le menu"
+          className="flex h-9 w-9 items-center justify-center rounded-md text-ink-muted transition-colors hover:bg-surface-sunk hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-accent md:hidden"
         >
-          <Menu className="h-6 w-6" />
-        </Button>
-
-        <Link href="/" className="flex items-center gap-3">
-          <Image
-            src={logoUrl}
-            alt="Elenem"
-            width={120}
-            height={48}
-            className="object-contain"
-          />
-        </Link>
+          <Menu className="h-5 w-5" />
+        </button>
       </div>
 
-      {/* Right Section */}
       <div className="flex items-center gap-2">
-        <ThemeToggle className="hidden sm:inline-flex" />
+        {/* Search, notifications and help belong here as they arrive. */}
         {loadingUser ? (
-          <Skeleton className="h-10 w-10 rounded-full" />
+          <Skeleton className="h-9 w-9 rounded-full" />
         ) : userAuth ? (
-          // Use the new reusable UserDropdown
-          <UserDropdown />
+          <NavbarProfile />
         ) : (
           <Link
             href="/login"
-            className="inline-flex items-center gap-2 px-3 py-2 rounded-md border border-line nav-hover transition-all duration-150"
+            className="rounded-md border border-line px-3 py-1.5 text-sm font-medium text-ink transition-colors hover:bg-surface-sunk"
           >
-            <FiUser className="w-5 h-5 p-1 rounded-full border border-line" />
-            <span className="hidden sm:inline text-sm font-semibold">
-              Se connecter
-            </span>
+            Se connecter
           </Link>
         )}
       </div>
     </header>
-  )
+  );
 }

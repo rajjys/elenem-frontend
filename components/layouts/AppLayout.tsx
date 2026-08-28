@@ -6,12 +6,13 @@ import { FiLogOut, FiX } from 'react-icons/fi';
 import { useAuthStore } from '@/store/auth.store'; // Assuming this path is correct
 // Import your existing components. Replace these with your actual paths.
 import { NavLink } from '.';
+import { SidebarBrand } from './sidebar-brand';
 import type { NavGroup } from './nav-items';
 import { SidebarUserMenu } from './sidebar-user-menu';
 import { useContextualLink, useDashboardLinkEligibillity, useSidebarEligibility } from '@/hooks';
 import { Roles } from '@/schemas'; // Assuming Role enum is here
 import { AppLayoutHeader } from './AppLayoutHeader'; // Import the updated Navbar
-import { ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 
 // Type for a React Icon component
 type IconType = React.ComponentType<React.SVGProps<SVGSVGElement>>;
@@ -146,7 +147,7 @@ export default function AppLayout({ children, navItems }: AppLayoutProps) {
   // they read tokens now rather than a palette shade, so nav hover follows the theme.
   return (
     <div
-      className="flex h-screen flex-col bg-canvas"
+      className="h-screen bg-canvas"
       style={{
         ['--hover-bg' as string]: 'var(--t-accent-soft)',
         ['--hover-text' as string]: 'var(--t-accent-text)',
@@ -158,26 +159,18 @@ export default function AppLayout({ children, navItems }: AppLayoutProps) {
         ['--color-theme-hover-text' as string]: 'var(--t-accent)',
       }}
     >
-      {/* Navbar is always visible */}
-      <AppLayoutHeader onMobileMenuToggle={toggleMobileMenu} handleLogout={handleLogout}/>
-      <div className='flex flex-1 overflow-hidden'> {/* This flex container holds sidebar and main content */}
-        {/* Sidebar (desktop) */}
-        {shouldShowSidebar 
+      <div className="flex flex-1 overflow-hidden">
+        {/* Sidebar (desktop). It starts at the top of the viewport rather than under the navbar:
+            it is the permanent frame, and it owns the brand. */}
+        {shouldShowSidebar
           && (
-              <aside className={`bg-surface shadow-lg transition-all duration-300 ease-in-out hidden md:flex flex-col sticky top-16 h-[calc(100vh-4rem)]
+              <aside className={`hidden h-screen shrink-0 flex-col border-r border-line bg-surface transition-[width] duration-200 ease-in-out md:flex
                                 ${isSidebarOpen ? "w-64" : "w-20"}`}>
-                {shouldShowDashboardLink && (
-                  <div className={`flex items-center p-2 border-b border-line ${isSidebarOpen ? "justify-start" : "justify-center"}`}>
-                    {/* Logo and Title in Desktop Sidebar (Only shows when open) */}
-                      <Link href={buildLink(dashboard.link)} className="flex items-center" onClick={closeFlyout}>
-                        <div className={`p-2`}>
-                          <ChevronLeft className="h-5 w-5 text-ink-subtle font-bold" />
-                        </div>
-                        {isSidebarOpen && (<span className="text-sm text-ink-muted nav-hover">{dashboard.label}</span>)}
-                      </Link>
-                    {/* The space will be empty when collapsed, but the button is gone */}
-                  </div>
-                )}
+                <SidebarBrand
+                  isOpen={isSidebarOpen}
+                  onToggle={toggleSidebar}
+                  href={buildLink(dashboard.link)}
+                />
                 <nav className="flex flex-1 flex-col overflow-y-auto p-2">
                   {navItems.map((group, gi) => (
                     <SidebarGroup
@@ -242,37 +235,11 @@ export default function AppLayout({ children, navItems }: AppLayoutProps) {
           </div>
         )}
 
-        {shouldShowSidebar && (
-          <button
-            onClick={toggleSidebar}
-            className={`
-              hidden md:flex items-center justify-center w-6 h-6 z-30
-              font-bold text-ink-subtle hover:text-ink transition-all duration-300 ease-in-out
-              bg-transparent cursor-pointer absolute
-            `}
-            style={{
-              // Position it vertically centered on the screen,
-              // and horizontally right next to the sidebar's edge.
-              top: 'calc(50% + 2rem)', // + 2rem to account for the fixed Navbar (4rem) / 2
-              left: isSidebarOpen ? '16rem' : '5rem', // 16rem = w-64, 5rem = w-20
-              transform: 'translateY(-50%)',
-            }}
-            aria-label={isSidebarOpen ? 'Collapse sidebar' : 'Expand sidebar'}
-          >
-            {isSidebarOpen ? (
-              <ChevronLeft className="w-6 h-6" />
-            ) : (
-              <ChevronRight className="w-6 h-6" /> // You need to import ArrowRight from 'lucide-react'
-            )}
-          </button>
-        )}
-
-        {/* Main Content Area */}
-        <div className="flex-1 flex flex-col overflow-hidden">
-          {/* Main content area no longer has its own header, as AppLayoutNavbar handles it */}
-          <main className="flex-1 p-6 overflow-y-auto bg-surface-sunk">
-            {children}
-          </main>
+        {/* Main column: the navbar belongs to the content, not to the whole shell, so it can be
+            removed later without the app losing its frame. */}
+        <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
+          <AppLayoutHeader onMobileMenuToggle={toggleMobileMenu} handleLogout={handleLogout} />
+          <main className="flex-1 overflow-y-auto bg-canvas p-6">{children}</main>
         </div>
 
       </div>

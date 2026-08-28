@@ -62,6 +62,23 @@ api.interceptors.response.use(
   async error => {
     const originalRequest = error.config;
 
+    // The refresh call goes through this same axios instance, so its own 401 would re-enter this
+    // interceptor, see `isRefreshing === true`, and park itself in failedQueue — a queue that is
+    // only drained by the refresh that is currently awaiting it. The result was a promise that
+    // never settled: a stale session left every page spinning on "Loading…" forever instead of
+    // sending the user to sign in. Auth endpoints must never be retried here.
+    const url: string = originalRequest?.url ?? '';
+    const isAuthEndpoint = /\/auth\/(refresh|login|register)/.test(url);
+
+    if (error.response?.status === 401 && isAuthEndpoint) {
+      // A failed refresh means the session is genuinely gone. Clear it and let the caller
+      // (middleware or the page) send the user to /login.
+      useAuthStore.getState().logout();
+      processQueue(error);
+      isRefreshing = false;
+      return Promise.reject(error);
+    }
+
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 

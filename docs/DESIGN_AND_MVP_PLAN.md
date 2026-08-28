@@ -273,7 +273,7 @@ onboarding wizard is much easier when there's a specific person on the other sid
 | 1 | Token layer, light + dark, one neutral (slate) | `9198138` |
 | 2 | Colour codemod — 2,275 raw utilities → 60 | `9198138` |
 | 3 | Primitives on tokens; real Radix dialog | `9198138`, `2a5c9f5` |
-| 4 | Page templates — `PageHeader` landed; List/Detail/Form next | `f-next` |
+| 4 | Page templates — `PageHeader`, `ListPage`, `DetailPage`, `FormPage` | done |
 | 5 | Both themes verified; every pairing clears WCAG AA | `9198138` |
 
 **Also fixed, from testing the built result rather than the plan:**
@@ -307,5 +307,30 @@ LIPROBAKIN's published table settled a default I had guessed at. Their scoring i
 reproduces 4/14. The default changed accordingly (`bfceb6a`); win% stays available for leagues
 that rank the NBA way. Detail in `ANALYSIS_2026-08.md`.
 
-**Next: Stage 1 item 4** — `ListPage`, `DetailPage` and `FormPage` templates, then Stage 2
-(dashboard remodel and the onboarding wizard, built for LIPROBAKIN specifically).
+### Shell rework (2026-08-28, second pass)
+
+- **The sidebar owns the brand and starts at the top of the viewport.** The navbar moved inside
+  the main column, so it is a strip of view-level tools that can be removed later without the app
+  losing its frame.
+- **Dock control** (`PanelLeft` / `PanelLeftClose`) sits beside the logo and replaces the floating
+  chevron. Docked, the brand disappears and only the control remains, centred on the same axis as
+  the nav icons.
+- **The navbar is no longer a second identity bar.** It carries the mobile menu trigger and one
+  avatar; search, notifications and help slot in beside them later. The avatar opens a profile
+  card showing what the sidebar has no room for — photo, full email, every role, the organisation —
+  plus one action: change your picture. The theme control is gone from here; it lives in the
+  sidebar account menu, and one preference should not have two homes.
+- **Account menu breaks out of the docked rail** instead of being squeezed into 5rem.
+- **Active links lost the left border.** The tinted fill alone carries "current"; the border was a
+  second signal and it broke the icon column's alignment.
+
+### A real bug behind the blank pages
+
+Pages hung on "Loading…" forever with a stale session. The token-refresh call goes through the
+same axios instance, so *its own* 401 re-entered the interceptor, saw `isRefreshing === true`, and
+parked itself in the queue that only the awaiting refresh could drain — a promise that never
+settled. Auth endpoints are now excluded and a failed refresh clears the session. Any user whose
+token went bad would have hit this, not just a developer who reset their database.
+
+**Next: Stage 2** — dashboard remodel and the onboarding wizard, built for LIPROBAKIN
+specifically.

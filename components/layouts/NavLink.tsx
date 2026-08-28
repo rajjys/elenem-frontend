@@ -39,11 +39,13 @@ export const NavLink: React.FC<NavLinkProps> = ({
       aria-current={isActive ? 'page' : undefined}
       title={showLabel ? undefined : item.label}
       className={cn(
-        'flex items-center gap-3 rounded-md border-l-2 px-3 py-2 text-sm transition-colors',
+        'flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors',
         'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-accent',
+        // The tinted fill alone carries "current" — a left border on top of it was one signal too
+        // many, and it broke the alignment of the icon column.
         isActive
-          ? 'border-accent bg-accent-soft font-medium text-accent-text'
-          : 'border-transparent text-ink-muted hover:bg-surface-sunk hover:text-ink',
+          ? 'bg-accent-soft font-medium text-accent-text'
+          : 'text-ink-muted hover:bg-surface-sunk hover:text-ink',
         !showLabel && 'justify-center',
         isFlyout && 'w-full',
       )}

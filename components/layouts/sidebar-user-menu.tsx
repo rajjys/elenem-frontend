@@ -67,7 +67,12 @@ export function SidebarUserMenu({
       {open && (
         <div
           role="menu"
-          className="absolute bottom-full left-2 right-2 mb-2 overflow-hidden rounded-lg border border-line bg-elevated py-1 shadow-e2"
+          className={cn(
+            'absolute bottom-full mb-2 overflow-hidden rounded-lg border border-line bg-elevated py-1 shadow-e2',
+            // Docked, the rail is 5rem wide — the menu has to break out of it rather than be
+            // squeezed into a column two letters wide.
+            isSidebarOpen ? 'left-2 right-2' : 'left-2 w-64',
+          )}
         >
           <Link href={buildLink('/account/profile')} onClick={close} className={itemClass} role="menuitem">
             <User className="h-4 w-4 shrink-0" />
