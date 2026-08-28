@@ -8,7 +8,7 @@ interface SkeletonProps {
 export function Skeleton({ className = "", style }: SkeletonProps) {
   return (
     <div
-      className={`animate-pulse bg-gray-200 rounded ${className}`}
+      className={`animate-pulse bg-line rounded ${className}`}
       style={style}
       aria-busy="true"
       aria-label="Loading"

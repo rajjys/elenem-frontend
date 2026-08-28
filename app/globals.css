@@ -134,6 +134,183 @@
   --font-mono: var(--font-geist-mono);
 }
 
+
+/* ============================================================================
+   DESIGN TOKENS
+   ============================================================================
+   Every colour in the product resolves through this block. Components must
+   never name a raw palette colour (bg-slate-100, text-gray-600 …): that is how
+   we ended up with 2,275 hardcoded colour utilities across 13 colour families,
+   two competing neutral greys, and a dark mode that half-shipped to anyone whose
+   phone was set to dark. See docs/DESIGN_AND_MVP_PLAN.md §2.
+
+   Light and dark are equals. Three states, matching how viewers actually arrive:
+     :root                                   — light (the default)
+     @media (prefers-color-scheme: dark)     — the OS asked for dark
+     [data-theme="dark" | "light"]           — the viewer chose explicitly, wins over the OS
+
+   `@theme inline` at the bottom is what makes this work: it emits var(--token)
+   into the utilities rather than resolving hex at build time, so a theme change
+   is a live re-cascade with no rebuild and no flash.
+
+   Neutral is slate throughout — one ramp, slightly blue, so it sits under the
+   federation-blue accent rather than fighting it.
+   ========================================================================= */
+
+:root {
+  color-scheme: light;
+
+  /* Surfaces, back to front */
+  --t-canvas:        #f5f7fa;   /* the page itself */
+  --t-surface:       #ffffff;   /* cards, tables, panels */
+  --t-surface-sunk:  #eef2f7;   /* table headers, inset wells */
+  --t-elevated:      #ffffff;   /* dialogs, menus, popovers */
+
+  /* Text, most to least prominent */
+  --t-ink:           #0f172a;
+  --t-ink-muted:     #475569;
+  --t-ink-subtle:    #5f6e85;
+  --t-ink-inverted:  #ffffff;
+
+  /* Rules and dividers */
+  --t-line:          #e2e8f0;
+  --t-line-strong:   #cbd5e1;
+
+  /* Accent. Marks the primary action and the current item — never decoration. */
+  --t-accent:        #0a3a8d;
+  --t-accent-hover:  #082e6f;
+  --t-accent-ink:    #ffffff;   /* text sitting on the accent fill */
+  --t-accent-text:   #0a3a8d;   /* the accent used as text or an icon on canvas */
+  --t-accent-soft:   #e6edf9;   /* selected rows, active nav, subtle tints */
+  --t-accent-line:   #aec6ea;
+
+  /* Semantic. A colour appears only when it means something:
+     a win, a loss, something that needs attention. */
+  --t-positive:      #15803d;
+  --t-positive-soft: #dcfce7;
+  --t-negative:      #b91c1c;
+  --t-negative-soft: #fee2e2;
+  --t-caution:       #8a5306;
+  --t-caution-soft:  #fef3c7;
+
+  /* Elevation. Two levels: things that rest, and things that float. */
+  --t-shadow-1: 0 1px 2px rgb(15 23 42 / 0.06), 0 1px 3px rgb(15 23 42 / 0.04);
+  --t-shadow-2: 0 4px 6px -2px rgb(15 23 42 / 0.08), 0 12px 28px -8px rgb(15 23 42 / 0.18);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+
+    --t-canvas:        #0b1017;
+    --t-surface:       #131a24;
+    --t-surface-sunk:  #0f151d;
+    --t-elevated:      #1a222e;
+
+    --t-ink:           #e6ebf2;
+    --t-ink-muted:     #a3b2c6;
+    --t-ink-subtle:    #7a8ba3;
+    --t-ink-inverted:  #0b1017;
+
+    --t-line:          #263244;
+    --t-line-strong:   #35455c;
+
+    /* The accent lifts on a dark ground — #0a3a8d is unreadable there. */
+    --t-accent:        #2f6fd0;
+    --t-accent-hover:  #4d8ae4;
+    --t-accent-ink:    #ffffff;
+    --t-accent-text:   #86b0ec;
+    --t-accent-soft:   #15263c;
+    --t-accent-line:   #2c4a72;
+
+    --t-positive:      #5cc98d;
+    --t-positive-soft: #10281c;
+    --t-negative:      #f08a8a;
+    --t-negative-soft: #2c1718;
+    --t-caution:       #d9a441;
+    --t-caution-soft:  #2b2214;
+
+    --t-shadow-1: 0 1px 2px rgb(0 0 0 / 0.4), 0 1px 3px rgb(0 0 0 / 0.3);
+    --t-shadow-2: 0 4px 6px -2px rgb(0 0 0 / 0.5), 0 12px 28px -8px rgb(0 0 0 / 0.7);
+  }
+}
+
+/* An explicit choice beats the OS, in both directions. */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --t-canvas:        #0b1017;
+  --t-surface:       #131a24;
+  --t-surface-sunk:  #0f151d;
+  --t-elevated:      #1a222e;
+
+  --t-ink:           #e6ebf2;
+  --t-ink-muted:     #a3b2c6;
+  --t-ink-subtle:    #7a8ba3;
+  --t-ink-inverted:  #0b1017;
+
+  --t-line:          #263244;
+  --t-line-strong:   #35455c;
+
+  --t-accent:        #2f6fd0;
+  --t-accent-hover:  #4d8ae4;
+  --t-accent-ink:    #ffffff;
+  --t-accent-text:   #86b0ec;
+  --t-accent-soft:   #15263c;
+  --t-accent-line:   #2c4a72;
+
+  --t-positive:      #5cc98d;
+  --t-positive-soft: #10281c;
+  --t-negative:      #f08a8a;
+  --t-negative-soft: #2c1718;
+  --t-caution:       #d9a441;
+  --t-caution-soft:  #2b2214;
+
+  --t-shadow-1: 0 1px 2px rgb(0 0 0 / 0.4), 0 1px 3px rgb(0 0 0 / 0.3);
+  --t-shadow-2: 0 4px 6px -2px rgb(0 0 0 / 0.5), 0 12px 28px -8px rgb(0 0 0 / 0.7);
+}
+
+/* Bind the tokens to Tailwind utilities. `inline` keeps var() in the output so a
+   theme switch re-cascades live: bg-surface, text-ink, border-line, and so on. */
+@theme inline {
+  --color-canvas:       var(--t-canvas);
+  --color-surface:      var(--t-surface);
+  --color-surface-sunk: var(--t-surface-sunk);
+  --color-elevated:     var(--t-elevated);
+
+  --color-ink:          var(--t-ink);
+  --color-ink-muted:    var(--t-ink-muted);
+  --color-ink-subtle:   var(--t-ink-subtle);
+  --color-ink-inverted: var(--t-ink-inverted);
+
+  --color-line:         var(--t-line);
+  --color-line-strong:  var(--t-line-strong);
+
+  --color-accent:       var(--t-accent);
+  --color-accent-hover: var(--t-accent-hover);
+  --color-accent-ink:   var(--t-accent-ink);
+  --color-accent-text:  var(--t-accent-text);
+  --color-accent-soft:  var(--t-accent-soft);
+  --color-accent-line:  var(--t-accent-line);
+
+  --color-positive:      var(--t-positive);
+  --color-positive-soft: var(--t-positive-soft);
+  --color-negative:      var(--t-negative);
+  --color-negative-soft: var(--t-negative-soft);
+  --color-caution:       var(--t-caution);
+  --color-caution-soft:  var(--t-caution-soft);
+
+  --shadow-e1: var(--t-shadow-1);
+  --shadow-e2: var(--t-shadow-2);
+}
+
+/* Shape and type scale. Three radii (from ten), six type steps (from eleven). */
+@theme {
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+}
+
 @theme {
   /* The `primary` ramp. tailwind.config.ts declares these too, but that file is Tailwind v3
      syntax and v4 never loads it without an @config directive — so until this block existed,
@@ -162,8 +339,8 @@
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--t-canvas);
+  color: var(--t-ink);
   font-family: var(--font-inter), Arial, Helvetica, sans-serif;
 }
 @keyframes progress {
@@ -227,10 +404,10 @@ body {
     var(--color-theme-light-from, hsl(0 0% 100% / 0.9)),
     var(--color-theme-light-to, hsl(0 0% 98% / 1))
   );
-  color: var(--color-theme, var(--color-indigo-600));
-  border: 1px solid hsl(0 0% 90% / 1);
+  color: var(--color-theme, var(--t-accent-text));
+  border: 1px solid var(--t-line);
   transition: all 0.2s ease;
-  box-shadow: 0 1px 2px hsl(0 0% 0% / 0.05);
+  box-shadow: var(--t-shadow-1);
 }
 
 /* Hover state: subtle tint */
@@ -242,7 +419,7 @@ body {
     var(--color-theme-hover-to, hsl(var(--theme-hue, 200) 100% 95%))
   );
   color: var(--color-theme-hover-text, var(--color-theme));
-  border-color: hsl(0 0% 85%);
+  border-color: var(--t-line-strong);
   transform: translateY(-1px);
 }
 

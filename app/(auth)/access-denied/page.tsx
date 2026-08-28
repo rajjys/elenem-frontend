@@ -33,7 +33,7 @@ if (reason === 'team_admin_only') errorMessage = "Seuls les administrateurs d'é
 
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-surface-sunk flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="flex items-center justify-center mb-4 pb-8">
         <Image
           src='/logos/elenem-sport.png'
@@ -47,7 +47,7 @@ if (reason === 'team_admin_only') errorMessage = "Seuls les administrateurs d'é
         <div className="text-center">
           {/* Warning icon */}
           <svg
-            className="mx-auto h-12 w-12 text-red-500"
+            className="mx-auto h-12 w-12 text-negative"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -60,22 +60,22 @@ if (reason === 'team_admin_only') errorMessage = "Seuls les administrateurs d'é
               d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
             />
           </svg>
-          <h2 className="mt-4 text-3xl font-extrabold text-gray-900">
+          <h2 className="mt-4 text-3xl font-extrabold text-ink">
             Acces Refusé
           </h2>
         </div>
 
-        <div className="mt-4 bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+        <div className="mt-4 bg-surface py-8 px-4 shadow sm:rounded-lg sm:px-10">
           <div className="text-center">
-            <p className="text-gray-600 mb-6">
+            <p className="text-ink-muted mb-6">
               {errorMessage || `You don't have permission to access this page. If you believe this is an error, please contact your administrator.`}
             </p>
             <div className="mt-6 flex flex-col sm:flex-row sm:justify-center gap-8">
-              <Link href='/' className="flex items-center justify-center  w-full sm:w-auto px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-blue-600 bg-white hover:bg-gray-100 hover:text-blue-700 transition-all duration-300 ease-in-out">
+              <Link href='/' className="flex items-center justify-center  w-full sm:w-auto px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-accent-text bg-surface hover:bg-surface-sunk hover:text-accent-text transition-all duration-300 ease-in-out">
                 <Desktop className="w-5 h-5 font-bold" />
                 <span className='pl-2'>Page d&apos;accueil</span>
               </Link>
-              <Link href={dashboardLink} className="flex items-center justify-center w-full sm:w-auto px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 transition-all duration-300 ease-in-out">
+              <Link href={dashboardLink} className="flex items-center justify-center w-full sm:w-auto px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-accent hover:bg-accent transition-all duration-300 ease-in-out">
                 <LayoutDashboard className="w-5 h-5 font-bold" />
                 <span className='pl-2'>Tableau de bord</span>
               </Link>
@@ -83,12 +83,12 @@ if (reason === 'team_admin_only') errorMessage = "Seuls les administrateurs d'é
           </div>
         </div>
 
-        <div className="mt-8 text-center text-sm text-gray-600">
+        <div className="mt-8 text-center text-sm text-ink-muted">
           <p>
             Besoin d&apos;aide?{' '}
             <Link
               href="mailto:support@yourdomain.com"
-              className="font-medium text-blue-600 hover:text-blue-500"
+              className="font-medium text-accent-text hover:text-accent-text"
             >
               Contactez le support
             </Link>

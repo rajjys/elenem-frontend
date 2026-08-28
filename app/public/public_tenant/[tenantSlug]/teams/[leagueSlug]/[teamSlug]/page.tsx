@@ -154,7 +154,7 @@ const fetchStandings = useCallback(async () => {
     return (
       <div className="text-center py-20">
         <h2 className="text-xl font-semibold">Équipe introuvable</h2>
-        <p className="text-gray-500 mt-2">Vérifiez le lien ou réessayez plus tard.</p>
+        <p className="text-ink-muted mt-2">Vérifiez le lien ou réessayez plus tard.</p>
       </div>
     );
   }
@@ -173,7 +173,7 @@ const fetchStandings = useCallback(async () => {
               className="w-full h-60 object-cover rounded-lg"
             />
           ) : (
-            <div className="w-full h-48 bg-gray-200 rounded-lg" />
+            <div className="w-full h-48 bg-line rounded-lg" />
           )}
           <div className="absolute bottom-0 left-4 flex items-center gap-4">
             {team.businessProfile?.logoAsset?.url ? (
@@ -186,7 +186,7 @@ const fetchStandings = useCallback(async () => {
               />
             ) :
             (
-              <div className="h-20 w-20 rounded-full bg-gray-300 border-4 border-white" />
+              <div className="h-20 w-20 rounded-full bg-line border-4 border-white" />
             )
             }
             <div className="text-white drop-shadow-md">
@@ -200,8 +200,8 @@ const fetchStandings = useCallback(async () => {
         <Card className="py-2">
           <CardHeader>
             <CardTitle className="px-2 flex justify-between pb-1">
-              <span className="text-gray-700">Statistiques de l&apos;équipe</span>
-              <Link href='/standings' className="flex justify-center items-center text-gray-500 hover:text-gray-700 transition-colors duration-300 ease-in-out">
+              <span className="text-ink">Statistiques de l&apos;équipe</span>
+              <Link href='/standings' className="flex justify-center items-center text-ink-muted hover:text-ink transition-colors duration-300 ease-in-out">
                 Classememnts <ArrowRight className="h-4 w-4"/>
               </Link>
             </CardTitle>
@@ -219,19 +219,19 @@ const fetchStandings = useCallback(async () => {
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 text-center">
                 <div className="">
                   <p className="text-2xl font-bold">{standings?.rank}</p>
-                  <p className="text-sm text-gray-500">Rang</p>
+                  <p className="text-sm text-ink-muted">Rang</p>
                 </div>
                 <div>
                   <p className="text-2xl font-bold">{standings?.points}</p>
-                  <p className="text-sm text-gray-500">Points</p>
+                  <p className="text-sm text-ink-muted">Points</p>
                 </div>
                 <div>
                   <p className="text-2xl font-bold">{standings?.wins}</p>
-                  <p className="text-sm text-gray-500">Victoires</p>
+                  <p className="text-sm text-ink-muted">Victoires</p>
                 </div>
                 <div>
                   <p className="text-2xl font-bold">{standings?.losses}</p>
-                  <p className="text-sm text-gray-500">Défaites</p>
+                  <p className="text-sm text-ink-muted">Défaites</p>
                 </div>
               </div>
             }
@@ -241,7 +241,7 @@ const fetchStandings = useCallback(async () => {
         {/* Games Section */}
         <Card className="pb-2">
           <CardHeader>
-            <CardTitle className="text-gray-700">Matchs</CardTitle>
+            <CardTitle className="text-ink">Matchs</CardTitle>
           </CardHeader>
           <CardContent>
             {availableDates.length > 0 && (
@@ -266,7 +266,7 @@ const fetchStandings = useCallback(async () => {
                 ))}
               </div>
             ) : (
-              <p className="text-center text-gray-500 mt-6">Aucun match trouvé.</p>
+              <p className="text-center text-ink-muted mt-6">Aucun match trouvé.</p>
             )}
           </CardContent>
         </Card>

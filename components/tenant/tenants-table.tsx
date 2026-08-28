@@ -30,58 +30,58 @@ export function TenantsTable({ tenants, onSort, sortBy, sortOrder, onDelete }: T
   };
 
   if (tenants.length === 0) {
-    return <p className="text-center text-gray-500 mt-8">No tenants found matching your criteria.</p>;
+    return <p className="text-center text-ink-muted mt-8">No tenants found matching your criteria.</p>;
   }
 
   return (
     <div className="rounded-lg shadow-md overflow-hidden">
       <Table>
-        <TableHeader className="bg-gray-50">
+        <TableHeader className="bg-surface-sunk">
           <TableRow>
-            <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <TableHead className="px-6 py-3 text-left text-xs font-medium text-ink-muted uppercase tracking-wider">
               Status
             </TableHead>
-            <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <TableHead className="px-6 py-3 text-left text-xs font-medium text-ink-muted uppercase tracking-wider">
               <Button variant="ghost" onClick={() => onSort('name')}>
                 Name {getSortIndicator('name')}
                 <ArrowUpDown className="ml-2 h-4 w-4" />
               </Button>
             </TableHead>
-            <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <TableHead className="px-6 py-3 text-left text-xs font-medium text-ink-muted uppercase tracking-wider">
               <Button variant="ghost" onClick={() => onSort('tenantCode')}>
                 Code {getSortIndicator('tenantCode')}
                 <ArrowUpDown className="ml-2 h-4 w-4" />
               </Button>
             </TableHead>
-            <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <TableHead className="px-6 py-3 text-left text-xs font-medium text-ink-muted uppercase tracking-wider">
               <Button variant="ghost" onClick={() => onSort('sportType')}>
                 Sport Type {getSortIndicator('sportType')}
                 <ArrowUpDown className="ml-2 h-4 w-4" />
               </Button>
             </TableHead>
-            <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <TableHead className="px-6 py-3 text-left text-xs font-medium text-ink-muted uppercase tracking-wider">
               <Button variant="ghost" onClick={() => onSort('country')}>
                 Country {getSortIndicator('country')}
                 <ArrowUpDown className="ml-2 h-4 w-4" />
               </Button>
             </TableHead>
-            <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <TableHead className="px-6 py-3 text-left text-xs font-medium text-ink-muted uppercase tracking-wider">
               <Button variant="ghost" onClick={() => onSort('ownerUsername')}>
                 Owner {getSortIndicator('ownerUsername')}
                 <ArrowUpDown className="ml-2 h-4 w-4" />
               </Button>
             </TableHead>
-            <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <TableHead className="px-6 py-3 text-left text-xs font-medium text-ink-muted uppercase tracking-wider">
               Actions
             </TableHead>
           </TableRow>
         </TableHeader>
-        <TableBody className="bg-white divide-y divide-gray-200">
+        <TableBody className="bg-surface divide-y divide-line">
           {tenants.map((tenant) => (
             <TableRow key={tenant.id}>
               <TableCell className="px-6 py-4 whitespace-nowrap">
                 <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                  tenant.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                  tenant.isActive ? 'bg-positive-soft text-positive' : 'bg-negative-soft text-negative'
                 }`}>
                   {tenant.isActive ? 'Active' : 'Inactive'}
                 </span>
@@ -98,29 +98,29 @@ export function TenantsTable({ tenants, onSort, sortBy, sortOrder, onDelete }: T
                     </div>
                   )}
                   <div className="ml-4">
-                    <div className="text-sm font-medium text-gray-900">
+                    <div className="text-sm font-medium text-ink">
                       <Link
                         href={`/tenant/dashboard?ctxTenantId=${tenant.id}`}
-                        className="text-indigo-600 hover:text-indigo-900"
+                        className="text-accent-text hover:text-indigo-900"
                       >
                         {tenant.name}
                       </Link>
                     </div>
-                    <div className="text-sm text-gray-500">{tenant.tenantCode}</div>
+                    <div className="text-sm text-ink-muted">{tenant.tenantCode}</div>
                   </div>
                 </div>
               </TableCell>
               <TableCell className="px-6 py-4 whitespace-nowrap">
-                <div className="text-sm text-gray-900">{tenant.tenantCode}</div>
+                <div className="text-sm text-ink">{tenant.tenantCode}</div>
               </TableCell>
               <TableCell className="px-6 py-4 whitespace-nowrap">
-                <div className="text-sm text-gray-900">{tenant.sportType}</div>
+                <div className="text-sm text-ink">{tenant.sportType}</div>
               </TableCell>
               <TableCell className="px-6 py-4 whitespace-nowrap">
-                <div className="text-sm text-gray-900">{tenant.country}</div>
+                <div className="text-sm text-ink">{tenant.country}</div>
               </TableCell>
               <TableCell className="px-6 py-4 whitespace-nowrap">
-                <div className="text-sm text-gray-900">
+                <div className="text-sm text-ink">
                   {tenant.owner ? (
                     <Link href={`/admin/users/${tenant.owner.id}`}>
                       {tenant.owner.username}
@@ -144,7 +144,7 @@ export function TenantsTable({ tenants, onSort, sortBy, sortOrder, onDelete }: T
                         <Pencil className="mr-2 h-4 w-4" /> View Tenant
                       </Link>
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => onDelete(tenant.id)} className="flex items-center text-red-600 cursor-pointer">
+                    <DropdownMenuItem onClick={() => onDelete(tenant.id)} className="flex items-center text-negative cursor-pointer">
                       <Trash className="mr-2 h-4 w-4" /> Delete Tenant
                     </DropdownMenuItem>
                   </DropdownMenuContent>

@@ -53,7 +53,7 @@ export default function CreateTeamPage() {
 
   return (
     <div className="container mx-auto max-w-2xl">
-      <h1 className="text-3xl font-bold text-gray-900 text-center">Creer une Equipe</h1>
+      <h1 className="text-3xl font-bold text-ink text-center">Creer une Equipe</h1>
 
       <AccessGate allowedRoles={[Roles.SYSTEM_ADMIN, Roles.TENANT_ADMIN, Roles.LEAGUE_ADMIN]}>
         <TeamForm onSuccess={handleSuccess} onCancel={handleCancel} />

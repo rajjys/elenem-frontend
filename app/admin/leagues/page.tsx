@@ -137,7 +137,7 @@ export default function AdminLeaguesPage() {
       {loading ? (
         <LoadingSpinner />
       ) : error ? (
-        <p className="text-red-500 text-center mt-8">Error: {error}</p>
+        <p className="text-negative text-center mt-8">Error: {error}</p>
       ) : (
         <>
         <span hidden>{totalItems} leagues</span>

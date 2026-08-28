@@ -107,7 +107,7 @@ const TenantHeroSection: React.FC<TenantHeroSectionProps> = ({ primaryColor, sec
       <div className="relative z-10 hidden h-full w-full flex-col justify-end p-8 md:flex">
         <div className="mb-8 max-w-4xl transition-all duration-500 ease-in-out">
           <Link href={`/news/${currentPost?.slug}`}>
-            <h1 className="text-5xl font-bold text-gray-100 hover:text-white transition-all duration-300 ease-in-out ">
+            <h1 className="text-5xl font-bold text-ink-inverted hover:text-white transition-all duration-300 ease-in-out ">
               {currentPost?.title}
             </h1>
           </Link>
@@ -124,7 +124,7 @@ const TenantHeroSection: React.FC<TenantHeroSectionProps> = ({ primaryColor, sec
         <div className="flex w-full max-w-4xl items-start justify-start space-x-4">
           {blogPosts.map((post, index) => (
             <div key={post.id} className="group space-x-2">
-              <div className="h-1 flex-grow cursor-pointer rounded-full bg-gray-500/50">
+              <div className="h-1 flex-grow cursor-pointer rounded-full bg-ink-subtle/50">
                 <div
                   className={`h-full rounded-full bg-${secondaryColor}-400 transition-all duration-200 ease-in-out`}
                   style={{
@@ -135,7 +135,7 @@ const TenantHeroSection: React.FC<TenantHeroSectionProps> = ({ primaryColor, sec
               </div>
               <p
                 className={`w-32 cursor-pointer text-sm  transition-colors duration-300 ease-in-out group-hover:text-white ${
-                  index === currentPostIndex ? 'text-white font-bold' : 'text-gray-300 font-medium'
+                  index === currentPostIndex ? 'text-white font-bold' : 'text-ink-subtle font-medium'
                 }`}
                 onClick={() => handlePostChange(index)}
               >
@@ -165,7 +165,7 @@ const TenantHeroSection: React.FC<TenantHeroSectionProps> = ({ primaryColor, sec
         {/* Text content below the image */}
         <div className={`flex h-1/5 flex-col z-12 justify-end bg-${primaryColor}-900 p-4 transition-all duration-500 ease-in-out`}>
           <Link href={`/news/${currentPost?.slug}`}>
-            <h2 className="text-2xl font-bold text-white transition-all duration-500 ease-in-out hover:text-gray-300">
+            <h2 className="text-2xl font-bold text-white transition-all duration-500 ease-in-out hover:text-ink-subtle">
               {currentPost?.title}
             </h2>
           </Link>
@@ -178,7 +178,7 @@ const TenantHeroSection: React.FC<TenantHeroSectionProps> = ({ primaryColor, sec
                 onClick={() => handlePostChange(index)}
               >
                 <div
-                  className={`h-1 flex-grow cursor-pointer rounded-full bg-gray-500/50`}
+                  className={`h-1 flex-grow cursor-pointer rounded-full bg-ink-subtle/50`}
                 >
                   <div
                     className={`h-full rounded-full bg-${secondaryColor}-400 transition-all duration-100 ease-in-out`}

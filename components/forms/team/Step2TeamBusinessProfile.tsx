@@ -84,7 +84,7 @@ export default function Step2_TeamBusinessProfile({
     <div>
       {/* Banner area */}
       <div className="relative mb-12">
-        <div className="relative w-full h-48 bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center">
+        <div className="relative w-full h-48 bg-surface-sunk rounded-lg overflow-hidden flex items-center justify-center">
           {bannerPreview || watch("businessProfile.bannerAsset.url") ? (
             <Image
               src={bannerPreview ?? (watch("businessProfile.bannerAsset.url") as string)}
@@ -94,11 +94,11 @@ export default function Step2_TeamBusinessProfile({
               className="w-full h-full object-cover"
             />
           ) : (
-            <div className="text-gray-400">No banner yet — upload one</div>
+            <div className="text-ink-subtle">No banner yet — upload one</div>
           )}
 
           <div className="absolute top-3 right-3 flex items-center space-x-2">
-            <button type="button" onClick={() => bannerInputRef.current?.click()} className="bg-white p-2 rounded-full shadow hover:bg-gray-50 cursor-pointer">
+            <button type="button" onClick={() => bannerInputRef.current?.click()} className="bg-surface p-2 rounded-full shadow hover:bg-surface-sunk cursor-pointer">
               <Camera className="w-5 h-5" />
             </button>
 
@@ -109,7 +109,7 @@ export default function Step2_TeamBusinessProfile({
                   setValue("businessProfile.bannerAsset.url", "");
                   setBannerPreview(null);
                 }}
-                className="bg-white p-2 rounded-full shadow hover:bg-gray-50"
+                className="bg-surface p-2 rounded-full shadow hover:bg-surface-sunk"
               >
                 <Trash className="w-4 h-4" />
               </button>
@@ -125,19 +125,19 @@ export default function Step2_TeamBusinessProfile({
 
         {/* Logo */}
         <div className="absolute left-4 -bottom-10">
-          <div className="relative w-28 h-28 rounded-full border-4 border-white shadow-md overflow-hidden bg-gray-100">
+          <div className="relative w-28 h-28 rounded-full border-4 border-white shadow-md overflow-hidden bg-surface-sunk">
             {logoPreview || watch("businessProfile.logoAsset.url") ? (
               <Image src={logoPreview ?? (watch("businessProfile.logoAsset.url") as string)} alt="Logo preview" width={112} height={112} className="w-full h-full object-cover" />
             ) : (
-              <div className="w-full h-full flex items-center justify-center text-gray-400">Logo</div>
+              <div className="w-full h-full flex items-center justify-center text-ink-subtle">Logo</div>
             )}
 
             <div className="absolute bottom-1 right-1 flex space-x-2 z-50">
-              <button type="button" onClick={() => logoInputRef.current?.click()} className="bg-white p-2 rounded-full shadow hover:bg-gray-50 cursor-pointer">
+              <button type="button" onClick={() => logoInputRef.current?.click()} className="bg-surface p-2 rounded-full shadow hover:bg-surface-sunk cursor-pointer">
                 <Camera className="w-5 h-5" />
               </button>
               {(logoPreview || watch("businessProfile.logoAsset.url")) && (
-                <button type="button" onClick={() => { setValue("businessProfile.logoAsset.url", ""); setLogoPreview(null); }} className="bg-white p-2 rounded-full shadow hover:bg-gray-50">
+                <button type="button" onClick={() => { setValue("businessProfile.logoAsset.url", ""); setLogoPreview(null); }} className="bg-surface p-2 rounded-full shadow hover:bg-surface-sunk">
                   <Trash className="w-4 h-4" />
                 </button>
               )}
@@ -181,7 +181,7 @@ export default function Step2_TeamBusinessProfile({
         <div className="space-y-2 md:col-span-2">
           <Label>Description</Label>
           <Input {...register("businessProfile.description")} placeholder="Short description…" />
-          {errors.businessProfile?.description && <p className="text-xs text-red-500">{errors.businessProfile.description.message as string}</p>}
+          {errors.businessProfile?.description && <p className="text-xs text-negative">{errors.businessProfile.description.message as string}</p>}
         </div>
 
         {/* Owner selection (keeps same role logic in parent) */}

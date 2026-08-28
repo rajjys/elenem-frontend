@@ -8,7 +8,7 @@ const  { buildLink } = useContextualLink();
   //router.redirect('/dashboard');
   return (
     <div>
-      <Link href={buildLink('/tenant/dashboard')} className='font-bold text-emerald-600 hover:text-emerald-500 px-1'>
+      <Link href={buildLink('/tenant/dashboard')} className='font-bold text-positive hover:text-positive px-1'>
         Click Here
       </Link> to Redirect to Dashboard
     </div>

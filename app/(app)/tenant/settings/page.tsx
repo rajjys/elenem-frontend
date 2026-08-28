@@ -63,7 +63,7 @@ export default function TenantSettingsPage() {
       await fetchTenantDetails();
     };
 
-  if(!tenant) return loading ? <LoadingSpinner message="Loading tenant settings..." /> : <div className="text-red-600 font-semibold">Error: {error || "Tenant not found or access denied."}</div>;
+  if(!tenant) return loading ? <LoadingSpinner message="Loading tenant settings..." /> : <div className="text-negative font-semibold">Error: {error || "Tenant not found or access denied."}</div>;
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
       <h1 className="text-3xl font-bold">Parametres: {tenant?.name}</h1>

@@ -105,12 +105,12 @@ export default function PublicGamesPage({ params }: { params: Promise<{ tenantSl
     <div className="min-h-screen max-w-2xl mx-auto">
       <div className="container mx-auto p-4 sm:p-6 space-y-8">
         <header>
-          <h1 className="text-2xl font-bold tracking-tight text-gray-800">Matchs et Résultats: {tenantData?.tenantName}</h1>
-          <p className="mt-2 text-md text-gray-500">Parcourez les Matchs publics de: {tenantData?.tenantName}.</p>
+          <h1 className="text-2xl font-bold tracking-tight text-ink">Matchs et Résultats: {tenantData?.tenantName}</h1>
+          <p className="mt-2 text-md text-ink-muted">Parcourez les Matchs publics de: {tenantData?.tenantName}.</p>
         </header>
         <Card className="overflow-hidden shadow-sm">
           <CardHeader>
-            <CardTitle className='text-gray-500 text-base px-2'>Selectionner une date</CardTitle>
+            <CardTitle className='text-ink-muted text-base px-2'>Selectionner une date</CardTitle>
           </CardHeader>
           <CardContent className="grid gap-4 md:gap-6 grid-cols-1">
             <DateCarousel dates={availableDates} selectedDate={selectedDate} onDateSelect={setSelectedDate} />
@@ -131,7 +131,7 @@ export default function PublicGamesPage({ params }: { params: Promise<{ tenantSl
             </div>
         ) : tenantData ? (
           <div className="space-y-8">
-              <Card className="overflow-hidden shadow-sm bg-gray-400 pb-2">
+              <Card className="overflow-hidden shadow-sm bg-ink-subtle pb-2">
                 <CardHeader>
                   <CardTitle className='text-white text-center font-semibold text-lg'>
                     Matchs du {selectedDate ? format(new Date(selectedDate), 'dd MMMM yyyy', { locale: fr }) : 'Sélectionnez une date'}
@@ -147,7 +147,7 @@ export default function PublicGamesPage({ params }: { params: Promise<{ tenantSl
               </Card>
           </div>
         ) : (
-            <div className="text-center py-16 bg-white rounded-lg border">
+            <div className="text-center py-16 bg-surface rounded-lg border">
                 <h3 className="text-xl font-semibold">Pas des Matchs Disponible</h3>
                 <p className="text-muted-foreground mt-2">Pas de matchs Disponible a la date selectionnee.</p>
             </div>

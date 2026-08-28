@@ -231,10 +231,10 @@ export function TeamsFilters({ filters, onFilterChange, onPageSizeChange, fixedT
             Filtres
           </Button>
         </DialogTrigger>
-        <DialogContent className="sm:max-w-[700px] rounded-lg shadow-xl p-6 bg-white">
+        <DialogContent className="sm:max-w-[700px] rounded-lg shadow-xl p-6 bg-surface">
           <DialogHeader className="mb-4">
-            <DialogTitle className="text-2xl font-bold text-gray-800">Advanced Team Filters</DialogTitle>
-            <DialogDescription className="text-gray-600">
+            <DialogTitle className="text-2xl font-bold text-ink">Advanced Team Filters</DialogTitle>
+            <DialogDescription className="text-ink-muted">
               Apply additional filters to refine your team list.
             </DialogDescription>
           </DialogHeader>
@@ -244,15 +244,15 @@ export function TeamsFilters({ filters, onFilterChange, onPageSizeChange, fixedT
             {/* Tenant Selection (System Admin only) */}
             {isSystemAdmin && (
               <div>
-                <Label htmlFor="tenantId" className="block text-sm font-medium text-gray-700 mb-1">Tenant</Label>
+                <Label htmlFor="tenantId" className="block text-sm font-medium text-ink mb-1">Tenant</Label>
                 <Select
                   value={selectedTenantId}
                   onValueChange={(value) => setSelectedTenantId(value === 'clear_selection' ? '' : value)}
                 >
-                  <SelectTrigger className="w-full border-gray-300 rounded-md shadow-sm focus:border-primary-500 focus:ring-primary-500">
+                  <SelectTrigger className="w-full border-line rounded-md shadow-sm focus:border-accent focus:ring-accent">
                     <SelectValue placeholder="Select Tenant" />
                   </SelectTrigger>
-                  <SelectContent className='bg-white rounded-md shadow-lg z-50'>
+                  <SelectContent className='bg-surface rounded-md shadow-lg z-50'>
                     <SelectItem value="clear_selection">Clear Selection</SelectItem>
                     {availableTenants?.map(tenant => (
                       <SelectItem key={tenant.id} value={tenant.id}>{tenant.name}</SelectItem>
@@ -265,24 +265,24 @@ export function TeamsFilters({ filters, onFilterChange, onPageSizeChange, fixedT
             {/* League Selection (System Admin, Tenant Admin) */}
             {(isSystemAdmin || isTenantAdmin) && !fixedLeagueId && (
               <div>
-                <Label htmlFor="leagueId" className="block text-sm font-medium text-gray-700 mb-1">League</Label>
+                <Label htmlFor="leagueId" className="block text-sm font-medium text-ink mb-1">League</Label>
                 <Select
                   value={selectedLeagueId}
                   onValueChange={(value) => setSelectedLeagueId(value === 'clear_selection' ? '' : value)}
                   disabled={!selectedTenantId && !fixedTenantId && (isSystemAdmin || isTenantAdmin)} // Disable if no tenant selected/fixed
                 >
-                  <SelectTrigger className="w-full border-gray-300 rounded-md shadow-sm focus:border-primary-500 focus:ring-primary-500">
+                  <SelectTrigger className="w-full border-line rounded-md shadow-sm focus:border-accent focus:ring-accent">
                     <SelectValue placeholder="Select League" />
                   </SelectTrigger>
-                  <SelectContent className='bg-white rounded-md shadow-lg z-50'>
+                  <SelectContent className='bg-surface rounded-md shadow-lg z-50'>
                     <SelectItem value="clear_selection">Clear Selection</SelectItem>
                     {availableLeagues?.map(league => (
                       <SelectItem key={league.id} value={league.id}>{league.name}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
-                {(!selectedTenantId && isSystemAdmin) && <p className="text-gray-500 text-xs mt-1">Select a tenant to load leagues.</p>}
-                {(selectedTenantId || fixedTenantId) && availableLeagues?.length === 0 && <p className="text-gray-500 text-xs mt-1">No leagues found for this tenant.</p>}
+                {(!selectedTenantId && isSystemAdmin) && <p className="text-ink-muted text-xs mt-1">Select a tenant to load leagues.</p>}
+                {(selectedTenantId || fixedTenantId) && availableLeagues?.length === 0 && <p className="text-ink-muted text-xs mt-1">No leagues found for this tenant.</p>}
               </div>
             )}
 
@@ -293,12 +293,12 @@ export function TeamsFilters({ filters, onFilterChange, onPageSizeChange, fixedT
                 checked={isActive || false}
                 onCheckedChange={setIsActive}
               />
-              <Label htmlFor="teamStatus" className="text-sm font-medium text-gray-700">Active Teams</Label>
+              <Label htmlFor="teamStatus" className="text-sm font-medium text-ink">Active Teams</Label>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => setIsActive(undefined)}
-                className="ml-2 text-gray-500 hover:bg-gray-100 rounded-md px-2 py-1"
+                className="ml-2 text-ink-muted hover:bg-surface-sunk rounded-md px-2 py-1"
                 disabled={isActive === undefined}
               >
                 Clear
@@ -307,15 +307,15 @@ export function TeamsFilters({ filters, onFilterChange, onPageSizeChange, fixedT
 
             {/* Visibility Select */}
             <div>
-              <Label htmlFor="visibility" className="block text-sm font-medium text-gray-700 mb-1">Visibility</Label>
+              <Label htmlFor="visibility" className="block text-sm font-medium text-ink mb-1">Visibility</Label>
               <Select
                 value={selectedVisibility || ''}
                 onValueChange={(value: VisibilityLevel) => setSelectedVisibility(!value ? undefined : value)}
               >
-                <SelectTrigger className="w-full border-gray-300 rounded-md shadow-sm focus:border-primary-500 focus:ring-primary-500">
+                <SelectTrigger className="w-full border-line rounded-md shadow-sm focus:border-accent focus:ring-accent">
                   <SelectValue placeholder="Select Visibility" />
                 </SelectTrigger>
-                <SelectContent className='bg-white rounded-md shadow-lg z-50'>
+                <SelectContent className='bg-surface rounded-md shadow-lg z-50'>
                   <SelectItem value="clear_selection">Clear Selection</SelectItem>
                   {visibilityOptions.map(option => (
                     <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
@@ -326,49 +326,49 @@ export function TeamsFilters({ filters, onFilterChange, onPageSizeChange, fixedT
 
             {/* Country Input */}
             <div>
-              <Label htmlFor="country" className="block text-sm font-medium text-gray-700 mb-1">Country</Label>
+              <Label htmlFor="country" className="block text-sm font-medium text-ink mb-1">Country</Label>
               <CountryDropdown
                 value={selectedCountry}
                 onChange={(val) => setSelectedCountry(val)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                className="w-full px-3 py-2 border border-line rounded-md shadow-sm focus:outline-none focus:ring-accent focus:border-accent sm:text-sm"
               />
             </div>
 
             {/* City Input */}
             <div>
-              <Label htmlFor="city" className="block text-sm font-medium text-gray-700 mb-1">City</Label>
+              <Label htmlFor="city" className="block text-sm font-medium text-ink mb-1">City</Label>
               <Input
                 id="city"
                 placeholder="e.g., London"
                 value={selectedCity}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSelectedCity(e.target.value)}
-                className="w-full border-gray-300 rounded-md shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                className="w-full border-line rounded-md shadow-sm focus:border-accent focus:ring-accent"
               />
             </div>
 
             {/* State/Region Input */}
             <div>
-              <Label htmlFor="state" className="block text-sm font-medium text-gray-700 mb-1">State/Region</Label>
+              <Label htmlFor="state" className="block text-sm font-medium text-ink mb-1">State/Region</Label>
               <Input
                 id="state"
                 placeholder="e.g., California"
                 value={selectedState}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSelectedState(e.target.value)}
-                className="w-full border-gray-300 rounded-md shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                className="w-full border-line rounded-md shadow-sm focus:border-accent focus:ring-accent"
               />
             </div>
 
             {/* Gender Select (Inherited from League) */}
             <div>
-              <Label htmlFor="gender" className="block text-sm font-medium text-gray-700 mb-1">Gender</Label>
+              <Label htmlFor="gender" className="block text-sm font-medium text-ink mb-1">Gender</Label>
               <Select
                 value={selectedGender || ''}
                 onValueChange={(value: Gender) => setSelectedGender(!value ? undefined : value)}
               >
-                <SelectTrigger className="w-full border-gray-300 rounded-md shadow-sm focus:border-primary-500 focus:ring-primary-500">
+                <SelectTrigger className="w-full border-line rounded-md shadow-sm focus:border-accent focus:ring-accent">
                   <SelectValue placeholder="Select Gender" />
                 </SelectTrigger>
-                <SelectContent className='bg-white rounded-md shadow-lg z-50'>
+                <SelectContent className='bg-surface rounded-md shadow-lg z-50'>
                   <SelectItem value="clear_selection">Clear Selection</SelectItem>
                   {genderOptions.map(option => (
                     <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
@@ -379,15 +379,15 @@ export function TeamsFilters({ filters, onFilterChange, onPageSizeChange, fixedT
 
             {/* Sport Type Select (Inherited from League) */}
             <div>
-              <Label htmlFor="sportType" className="block text-sm font-medium text-gray-700 mb-1">Sport Type</Label>
+              <Label htmlFor="sportType" className="block text-sm font-medium text-ink mb-1">Sport Type</Label>
               <Select
                 value={selectedSportType || ''}
                 onValueChange={(value: SportType) => setSelectedSportType(!value ? undefined : value)}
               >
-                <SelectTrigger className="w-full border-gray-300 rounded-md shadow-sm focus:border-primary-500 focus:ring-primary-500">
+                <SelectTrigger className="w-full border-line rounded-md shadow-sm focus:border-accent focus:ring-accent">
                   <SelectValue placeholder="Select Sport Type" />
                 </SelectTrigger>
-                <SelectContent className='bg-white rounded-md shadow-lg z-50'>
+                <SelectContent className='bg-surface rounded-md shadow-lg z-50'>
                   <SelectItem value="clear_selection">Clear Selection</SelectItem>
                   {sportTypeOptions.map(option => (
                     <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
@@ -398,19 +398,19 @@ export function TeamsFilters({ filters, onFilterChange, onPageSizeChange, fixedT
 
             {/* Division Input (Inherited from League) */}
             <div>
-              <Label htmlFor="division" className="block text-sm font-medium text-gray-700 mb-1">Division</Label>
+              <Label htmlFor="division" className="block text-sm font-medium text-ink mb-1">Division</Label>
               <Input
                 id="division"
                 placeholder="e.g., Premier, A-League"
                 value={selectedDivision}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSelectedDivision(e.target.value)}
-                className="w-full border-gray-300 rounded-md shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                className="w-full border-line rounded-md shadow-sm focus:border-accent focus:ring-accent"
               />
             </div>
 
             {/* Established Year Input */}
             <div>
-              <Label htmlFor="establishedYear" className="block text-sm font-medium text-gray-700 mb-1">Established Year</Label>
+              <Label htmlFor="establishedYear" className="block text-sm font-medium text-ink mb-1">Established Year</Label>
               <Input
                 id="establishedYear"
                 type="number"
@@ -419,13 +419,13 @@ export function TeamsFilters({ filters, onFilterChange, onPageSizeChange, fixedT
                 placeholder="e.g., 1990"
                 value={establishedYearInput}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEstablishedYearInput(e.target.value)}
-                className="w-full border-gray-300 rounded-md shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                className="w-full border-line rounded-md shadow-sm focus:border-accent focus:ring-accent"
               />
             </div>
 
             {/* Page Size Control */}
             <div className="flex items-center space-x-2 mt-4">
-              <Label htmlFor="pageSize" className="text-sm font-medium text-gray-700">Teams per page</Label>
+              <Label htmlFor="pageSize" className="text-sm font-medium text-ink">Teams per page</Label>
               <Input
                 id="pageSize"
                 type="number"

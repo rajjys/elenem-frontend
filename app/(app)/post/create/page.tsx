@@ -59,7 +59,7 @@ export default function CreatePostPage() {
   return (
     <AccessGate allowedRoles={[Roles.SYSTEM_ADMIN, Roles.TENANT_ADMIN, Roles.LEAGUE_ADMIN, Roles.TEAM_ADMIN]}>
       <div className="container mx-auto max-w-3xl my-6">
-        <h1 className="text-3xl font-bold text-gray-900 text-center">Creer un Article</h1>
+        <h1 className="text-3xl font-bold text-ink text-center">Creer un Article</h1>
         <PostForm onSuccess={handleSuccess} onCancel={handleCancel} />
       </div>
     </AccessGate>

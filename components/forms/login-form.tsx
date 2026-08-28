@@ -76,18 +76,18 @@ export function LoginForm() {
 
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-      {error && <p className="text-red-500 text-sm">{error}</p>}
+      {error && <p className="text-negative text-sm">{error}</p>}
       <div>
-        <label htmlFor="usernameOrEmail" className="block text-sm font-medium text-gray-700">Identifiant ou Email</label>
+        <label htmlFor="usernameOrEmail" className="block text-sm font-medium text-ink">Identifiant ou Email</label>
         <Input id="usernameOrEmail" type="text" autoComplete="username" placeholder="jonathan" {...form.register("usernameOrEmail")} />
-        {form.formState.errors.usernameOrEmail && <p className="text-red-500 text-xs mt-1">{form.formState.errors.usernameOrEmail.message}</p>}
+        {form.formState.errors.usernameOrEmail && <p className="text-negative text-xs mt-1">{form.formState.errors.usernameOrEmail.message}</p>}
       </div>
       <div>
-        <label htmlFor="password" className="block text-sm font-medium text-gray-700">Mot de passe</label>
+        <label htmlFor="password" className="block text-sm font-medium text-ink">Mot de passe</label>
         <PasswordInput id="password" autoComplete="current-password" placeholder="********"{...form.register("password")} />
-        {form.formState.errors.password && <p className="text-red-500 text-xs mt-1">{form.formState.errors.password.message}</p>}
+        {form.formState.errors.password && <p className="text-negative text-xs mt-1">{form.formState.errors.password.message}</p>}
         <div className="mt-1 text-right">
-          <Link href="/forgot-password" className="text-xs text-indigo-600 hover:text-indigo-500">Mot de passe oublié?</Link>
+          <Link href="/forgot-password" className="text-xs text-accent-text hover:text-accent-text">Mot de passe oublié?</Link>
         </div>
       </div>
 
@@ -105,16 +105,16 @@ export function LoginForm() {
                 form.setValue("tenantCode", ""); // Reset for re-entry if unchecked
             }
           }}
-          className="h-4 w-4 text-indigo-600 border border-gray-300 rounded focus:ring-indigo-500"
+          className="h-4 w-4 text-accent-text border border-line rounded focus:ring-accent"
         />
-        <label htmlFor="systemAdminLogin" className="text-sm text-gray-700">Pas de code d&apos;organisation</label>
+        <label htmlFor="systemAdminLogin" className="text-sm text-ink">Pas de code d&apos;organisation</label>
       </div>
 
       {!isSystemAdminLogin && (
         <div>
-          <label htmlFor="tenantCode" className="block text-sm font-medium text-gray-700">Code d&apos;organisation</label>
+          <label htmlFor="tenantCode" className="block text-sm font-medium text-ink">Code d&apos;organisation</label>
           <Input id="tenantCode" placeholder="LIGUE1"{...form.register("tenantCode")} />
-          {form.formState.errors.tenantCode && <p className="text-red-500 text-xs mt-1">{form.formState.errors.tenantCode.message}</p>}
+          {form.formState.errors.tenantCode && <p className="text-negative text-xs mt-1">{form.formState.errors.tenantCode.message}</p>}
         </div>
       )}
       <Button type="submit" variant='primary' disabled={loading} className="w-full">{loading ? 
@@ -127,8 +127,8 @@ export function LoginForm() {
           <span>Se connecter</span>
         )}</Button>
         {/* Need an account? Register */}
-        <div className="mt-4 py-8 border-t border-indigo-200">
-          <p className="text-sm text-gray-600">Vous n&apos;avez pas de compte? <Link href="/register" className="text-indigo-600 hover:text-indigo-500 transition-all duration-300 ease-in-out font-medium pl-2">Inscrivez-vous</Link></p>
+        <div className="mt-4 py-8 border-t border-accent-line">
+          <p className="text-sm text-ink-muted">Vous n&apos;avez pas de compte? <Link href="/register" className="text-accent-text hover:text-accent-text transition-all duration-300 ease-in-out font-medium pl-2">Inscrivez-vous</Link></p>
         </div>
     </form>
   );

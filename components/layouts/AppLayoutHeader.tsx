@@ -9,6 +9,7 @@ import { useAuthStore } from '@/store/auth.store'
 import { useEffect, useState, useRef } from 'react'
 import { FiUser } from 'react-icons/fi'
 import UserDropdown from './user-dropdown'
+import { ThemeToggle } from '@/components/ui/theme-toggle'
 
 interface AppLayoutNavbarProps {
   logoUrl?: string;
@@ -49,7 +50,7 @@ export function AppLayoutHeader({
   }, [dropdownOpen]);
 
   return (
-    <header className="bg-white border-b border-gray-200 h-16 flex items-center justify-between px-2 sm:px-6 md:px-12 sticky top-0 z-30">
+    <header className="bg-surface border-b border-line h-16 flex items-center justify-between px-2 sm:px-6 md:px-12 sticky top-0 z-30">
       {/* Left Section */}
       <div className="flex items-center gap-4">
         {/* Mobile menu toggle */}
@@ -75,6 +76,7 @@ export function AppLayoutHeader({
 
       {/* Right Section */}
       <div className="flex items-center gap-2">
+        <ThemeToggle className="hidden sm:inline-flex" />
         {loadingUser ? (
           <Skeleton className="h-10 w-10 rounded-full" />
         ) : userAuth ? (
@@ -83,9 +85,9 @@ export function AppLayoutHeader({
         ) : (
           <Link
             href="/login"
-            className="inline-flex items-center gap-2 px-3 py-2 rounded-md border border-gray-200 nav-hover transition-all duration-150"
+            className="inline-flex items-center gap-2 px-3 py-2 rounded-md border border-line nav-hover transition-all duration-150"
           >
-            <FiUser className="w-5 h-5 p-1 rounded-full border border-gray-200" />
+            <FiUser className="w-5 h-5 p-1 rounded-full border border-line" />
             <span className="hidden sm:inline text-sm font-semibold">
               Se connecter
             </span>

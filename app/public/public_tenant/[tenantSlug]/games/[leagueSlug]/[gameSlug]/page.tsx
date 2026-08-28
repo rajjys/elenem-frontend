@@ -100,7 +100,7 @@ export default function GamePage({
     return (
       <div className="text-center py-20">
         <h2 className="text-xl font-semibold">Match introuvable</h2>
-        <p className="text-gray-500 mt-2">Vérifiez le lien ou réessayez plus tard.</p>
+        <p className="text-ink-muted mt-2">Vérifiez le lien ou réessayez plus tard.</p>
       </div>
     );
   }
@@ -118,7 +118,7 @@ export default function GamePage({
             className="w-full h-56 object-cover rounded-lg"
           />
         ) : (
-          <div className="w-full h-56 bg-gray-200 rounded-lg" />
+          <div className="w-full h-56 bg-line rounded-lg" />
         )}
       </div>
 
@@ -129,7 +129,7 @@ export default function GamePage({
           <div className="grid grid-cols-3 gap-3 items-center">
             {/* Home Team */}
             <div className="text-center">
-              {homeStanding && <span className="text-center text-base text-green-900 font-semibold py-1 flex items-center justify-center gap-1">
+              {homeStanding && <span className="text-center text-base text-positive font-semibold py-1 flex items-center justify-center gap-1">
                 {homeStanding.rank}
                 <ListBulletsIcon/>
               </span>}
@@ -142,17 +142,17 @@ export default function GamePage({
                   className="w-20 h-20 mx-auto rounded-full"
                 />
               ) :
-                <div className="h-20 w-20 rounded-full bg-gray-300 mx-auto border-4 border-white" />}
+                <div className="h-20 w-20 rounded-full bg-line mx-auto border-4 border-white" />}
               <Link href={`/teams/${leagueSlug}/${game.homeTeam.slug}`}>
-                <h3 className="mt-2 font-bold hover:text-green-700 transition-colors duration-300 ease-in-out">
+                <h3 className="mt-2 font-bold hover:text-positive transition-colors duration-300 ease-in-out">
                   {game.homeTeam.name}
                 </h3>
               </Link>
-              <p className="text-sm text-gray-500">{game.homeTeam.shortCode}</p>
+              <p className="text-sm text-ink-muted">{game.homeTeam.shortCode}</p>
               {loadingStandings ? (
                 <Skeleton className="h-4 w-20 mx-auto mt-1" />
               ) : homeStanding ? (
-                <p className="text-xs text-gray-600 mt-1">
+                <p className="text-xs text-ink-muted mt-1">
                   {homeStanding.wins}-{homeStanding.losses}-{homeStanding.forfeits}
                 </p>
               ) : null}
@@ -166,17 +166,17 @@ export default function GamePage({
                   {game.homeScore ?? "-"} : {game.awayScore ?? "-"}
                 </p>
               )}
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-ink-muted">
                   {formatDateFr(game.dateTime)}
               </p>
               {game.round && (
-                <p className="text-xs text-gray-500 mt-1">Round {game.round}</p>
+                <p className="text-xs text-ink-muted mt-1">Round {game.round}</p>
               )}
             </div>
 
             {/* Away Team */}
             <div className="text-center">
-              {awayStanding && <span className="text-center text-base text-green-900 font-semibold py-1 flex items-center justify-center gap-1">{awayStanding.rank}<ListBulletsIcon/></span>}
+              {awayStanding && <span className="text-center text-base text-positive font-semibold py-1 flex items-center justify-center gap-1">{awayStanding.rank}<ListBulletsIcon/></span>}
               {game.awayTeam.businessProfile.logoAsset?.url ? (
                 <Image
                   src={game.awayTeam.businessProfile.logoAsset.url}
@@ -186,18 +186,18 @@ export default function GamePage({
                   className="w-20 h-20 mx-auto rounded-full"
                 />
               ) :
-                <div className="h-20 w-20 rounded-full bg-gray-300 mx-auto border-4 border-white" />
+                <div className="h-20 w-20 rounded-full bg-line mx-auto border-4 border-white" />
               }
               <Link href={`/teams/${leagueSlug}/${game.awayTeam.slug}`}>
-                <h3 className="mt-2 font-bold hover:text-green-700 transition-colors duration-300 ease-in-out">
+                <h3 className="mt-2 font-bold hover:text-positive transition-colors duration-300 ease-in-out">
                   {game.awayTeam.name}
                 </h3>
               </Link>
-              <p className="text-sm text-gray-500">{game.awayTeam.shortCode}</p>
+              <p className="text-sm text-ink-muted">{game.awayTeam.shortCode}</p>
               {loadingStandings ? (
                 <Skeleton className="h-4 w-20 mx-auto mt-1" />
               ) : awayStanding ? (
-                <p className="text-xs text-gray-600 mt-1">
+                <p className="text-xs text-ink-muted mt-1">
                   {awayStanding.wins}-{awayStanding.losses}-{awayStanding.forfeits}
                 </p>
               ) : null}
@@ -205,7 +205,7 @@ export default function GamePage({
           </div>
 
           {/* Venue / notes */}
-          <div className="mt-6 text-center text-sm text-gray-600">
+          <div className="mt-6 text-center text-sm text-ink-muted">
             {game.homeVenue?.name && <p>Lieu: {game.homeVenue.name}</p>}
             {game.location && <p>Adresse: {game.location}</p>}
             {game.notes && <p className="italic mt-2">{game.notes}</p>}

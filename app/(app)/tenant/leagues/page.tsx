@@ -98,7 +98,7 @@ export default function TenantLeaguesPage() {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
-        <div className="text-xl text-gray-600">Loading leagues...</div>
+        <div className="text-xl text-ink-muted">Loading leagues...</div>
       </div>
     );
   }
@@ -106,32 +106,32 @@ export default function TenantLeaguesPage() {
   if (error) {
     return (
       <div className="flex justify-center items-center h-screen">
-        <div className="text-red-600 text-xl">Error: {error}</div>
+        <div className="text-negative text-xl">Error: {error}</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-surface-sunk">
       <Head>
         <title>Leagues - ELENEM Sports</title>
       </Head>
 
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-lg md:text-xl lg:text-2xl font-bold text-gray-800">{totalItems} Ligues</h1>
+        <h1 className="text-lg md:text-xl lg:text-2xl font-bold text-ink">{totalItems} Ligues</h1>
         <div className='flex whitespace-nowrap text-sm gap-3'>
           <Link
           href={buildLink("/league/create")}
-          className="flex items-center gap-2 bg-emerald-600 text-white px-3 py-2 rounded-md hover:bg-emerald-700 transition-colors">
+          className="flex items-center gap-2 bg-positive text-white px-3 py-2 rounded-md hover:bg-positive transition-colors">
               <Trophy className="h-4 w-4" />
               <span className="">Créer une Ligue</span>
           </Link>
         </div>
       </div>
       {leagues.length === 0 && !loading && !error ? (
-        <div className="text-center text-gray-500 text-lg mt-10">Pas de ligues disponibles pour cette organisation.</div>
+        <div className="text-center text-ink-muted text-lg mt-10">Pas de ligues disponibles pour cette organisation.</div>
       ) : (
-        <div className="bg-white p-2 md:p-6 rounded-lg shadow-md">
+        <div className="bg-surface p-2 md:p-6 rounded-lg shadow-md">
           <div className="overflow-x-auto">
             {leagues?.map((league: LeagueDetails) => (
                   <LeagueCard key={league.id} league={league} tenant={league.tenant} onDeleteLeague={handleDeleteLeague}/>

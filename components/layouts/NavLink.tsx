@@ -34,7 +34,7 @@ export const NavLink: React.FC<NavLinkProps> = ({
             className={`flex items-center py-2.5 px-4 rounded-md transition-all duration-200 ease-in-out border-l-4
                 ${isActive
                     ? "font-semibold bg-[var(--hover-bg)] text-[var(--hover-text)] border-[var(--hover-text)]"
-                    : "text-gray-600 border-transparent nav-hover"}
+                    : "text-ink-muted border-transparent nav-hover"}
                 ${!isSidebarOpen && !isFlyout ? "justify-center" : ""}
                 ${isFlyout ? "w-full" : ""}`}
             title={isSidebarOpen || isFlyout ? "" : item.label}

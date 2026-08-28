@@ -154,7 +154,7 @@ export default function LeagueSeasonsPage() {
   }
 
   if (error) {
-    return <p className="text-red-500 text-center mt-8">Error: {error}</p>;
+    return <p className="text-negative text-center mt-8">Error: {error}</p>;
   }
 
   return (

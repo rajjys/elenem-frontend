@@ -35,7 +35,7 @@ export default function CreateGamePage() {
 
   return (
     <div className="container mx-auto p-6 max-w-2xl">
-      <h1 className="text-3xl font-bold text-gray-900 mb-6 text-center">Create New Game</h1>
+      <h1 className="text-3xl font-bold text-ink mb-6 text-center">Create New Game</h1>
 
       {/* AccessGate to restrict who can access this creation form */}
       <AccessGate allowedRoles={[Roles.SYSTEM_ADMIN, Roles.TENANT_ADMIN, Roles.LEAGUE_ADMIN]}>

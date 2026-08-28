@@ -64,7 +64,7 @@ export default function AdminTenantsPage() {
 
   return (
     <div className="container mx-auto p-6">
-      {isError && <p className='text-red-400 pb-2'>Erreur: Failed to fetch tenants.</p>}
+      {isError && <p className='text-negative pb-2'>Erreur: Failed to fetch tenants.</p>}
       <div className="flex justify-between items-center mb-4">
         <TenantFilters
           filters={filters}

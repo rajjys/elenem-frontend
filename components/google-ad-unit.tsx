@@ -58,7 +58,7 @@ const GoogleAdUnit = ({
   if (process.env.NODE_ENV === 'development') {
     return (
       <div 
-        className={`bg-gray-200 border-2 border-dashed border-gray-400 flex items-center justify-center text-gray-500 ${className}`}
+        className={`bg-line border-2 border-dashed border-line-strong flex items-center justify-center text-ink-muted ${className}`}
         style={{ ...style, minHeight: '250px', width: '100%' }}
       >
         Dev Mode: Ad Unit {slotId}

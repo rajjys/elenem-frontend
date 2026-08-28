@@ -238,14 +238,14 @@ export function TeamForm({ onSuccess, onCancel }: TeamFormProps) {
       </div>
     )
   return (
-    <div className="flex justify-center p-4 bg-gray-50">
+    <div className="flex justify-center p-4 bg-surface-sunk">
       <Card className="w-full max-w-7xl shadow-lg rounded-xl">
         <form onSubmit={handleSubmit(onSubmit)}>
           {/* Error Monitor */}
           {Object.keys(form.formState.errors).length > 0 && (
-            <div className="my-4 p-4 bg-red-50 border border-red-200 rounded">
-              <h4 className="text-red-700 font-semibold mb-2">Veuillez corriger ces erreurs:</h4>
-              <ul className="list-disc pl-5 text-red-600 text-sm">
+            <div className="my-4 p-4 bg-negative-soft border border-negative rounded">
+              <h4 className="text-negative font-semibold mb-2">Veuillez corriger ces erreurs:</h4>
+              <ul className="list-disc pl-5 text-negative text-sm">
                 {
                   flattenErrors(form.formState.errors).map((msg, i) => (
                   <li key={i}>{msg}</li>

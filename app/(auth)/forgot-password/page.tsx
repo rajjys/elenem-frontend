@@ -71,14 +71,14 @@ export default function ForgotPasswordPage() {
 
   return (
     <div className="flex min-h-[70vh] items-center justify-center px-4 py-10">
-      <div className="w-full max-w-md rounded-2xl border border-gray-100 bg-white p-8 shadow-xl">
+      <div className="w-full max-w-md rounded-2xl border border-line bg-surface p-8 shadow-xl">
         {/* header */}
         <div className="mb-6 flex flex-col items-center text-center">
-          <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-indigo-50 text-indigo-600">
+          <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-accent-soft text-accent-text">
             {step === 'email' ? <Mail size={22} /> : step === 'otp' ? <KeyRound size={22} /> : <Lock size={22} />}
           </div>
-          <h1 className="text-xl font-semibold text-gray-900">Mot de passe oublié</h1>
-          <p className="mt-1 text-sm text-gray-500">
+          <h1 className="text-xl font-semibold text-ink">Mot de passe oublié</h1>
+          <p className="mt-1 text-sm text-ink-muted">
             {step === 'email' && 'Entrez votre email pour recevoir un code à 6 chiffres.'}
             {step === 'otp' && `Entrez le code envoyé à ${email}.`}
             {step === 'password' && 'Choisissez un nouveau mot de passe.'}
@@ -91,7 +91,7 @@ export default function ForgotPasswordPage() {
             <div
               key={s}
               className={`h-1.5 w-10 rounded-full transition-colors ${
-                i <= stepIndex ? 'bg-indigo-600' : 'bg-gray-200'
+                i <= stepIndex ? 'bg-accent' : 'bg-line'
               }`}
             />
           ))}
@@ -113,12 +113,12 @@ export default function ForgotPasswordPage() {
               {verifyOtp.isPending ? 'Vérification…' : 'Vérifier le code'}
             </Button>
             <div className="flex items-center justify-between text-sm">
-              <button type="button" className="flex items-center gap-1 text-gray-500 hover:text-gray-700" onClick={() => setStep('email')}>
+              <button type="button" className="flex items-center gap-1 text-ink-muted hover:text-ink" onClick={() => setStep('email')}>
                 <ArrowLeft size={14} /> Changer l&apos;email
               </button>
               <button
                 type="button"
-                className="text-indigo-600 hover:text-indigo-500"
+                className="text-accent-text hover:text-accent-text"
                 onClick={() => forgot.mutate(email, { onSuccess: () => toast.success('Nouveau code envoyé.'), onError: (e) => toastApiError(e) })}
               >
                 Renvoyer
@@ -129,7 +129,7 @@ export default function ForgotPasswordPage() {
 
         {step === 'password' && (
           <form onSubmit={submitReset} className="space-y-4">
-            <div className="flex items-center gap-2 rounded-lg bg-green-50 px-3 py-2 text-sm text-green-700">
+            <div className="flex items-center gap-2 rounded-lg bg-positive-soft px-3 py-2 text-sm text-positive">
               <CheckCircle2 size={16} /> Code vérifié
             </div>
             <PasswordInput placeholder="Nouveau mot de passe" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required autoFocus />
@@ -140,8 +140,8 @@ export default function ForgotPasswordPage() {
           </form>
         )}
 
-        <div className="mt-6 border-t border-gray-100 pt-4 text-center text-sm">
-          <Link href="/login" className="text-indigo-600 hover:text-indigo-500">
+        <div className="mt-6 border-t border-line pt-4 text-center text-sm">
+          <Link href="/login" className="text-accent-text hover:text-accent-text">
             Retour à la connexion
           </Link>
         </div>

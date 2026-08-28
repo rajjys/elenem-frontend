@@ -44,7 +44,7 @@ export function TeamsTable({ teams, onSort, sortBy, sortOrder, onDelete, current
   };
 
   if (teams.length === 0) {
-    return <p className="text-center text-gray-500 mt-8">No teams found matching your criteria.</p>;
+    return <p className="text-center text-ink-muted mt-8">No teams found matching your criteria.</p>;
   }
 
   // Function to build the dashboard link dynamically
@@ -78,25 +78,25 @@ export function TeamsTable({ teams, onSort, sortBy, sortOrder, onDelete, current
   return (
     <div className="rounded-lg shadow-md overflow-hidden">
       <Table>
-        <TableHeader className="bg-gray-50">
+        <TableHeader className="bg-surface-sunk">
           <TableRow>
-            <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <TableHead className="px-6 py-3 text-left text-xs font-medium text-ink-muted uppercase tracking-wider">
               Status
             </TableHead>
-            <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <TableHead className="px-6 py-3 text-left text-xs font-medium text-ink-muted uppercase tracking-wider">
               <Button variant="ghost" onClick={() => onSort('name')}>
                 Name {getSortIndicator('name')}
                 <ArrowUpDown className="ml-2 h-4 w-4" />
               </Button>
             </TableHead>
-            <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <TableHead className="px-6 py-3 text-left text-xs font-medium text-ink-muted uppercase tracking-wider">
               <Button variant="ghost" onClick={() => onSort('shortCode')}>
                 Code {getSortIndicator('shortCode')}
                 <ArrowUpDown className="ml-2 h-4 w-4" />
               </Button>
             </TableHead>
             {(isSystemAdmin || isTenantAdmin) && ( // Show Tenant column for SA/TA
-              <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <TableHead className="px-6 py-3 text-left text-xs font-medium text-ink-muted uppercase tracking-wider">
                 <Button variant="ghost" onClick={() => onSort('tenantName')}>
                   Tenant {getSortIndicator('tenantName')}
                   <ArrowUpDown className="ml-2 h-4 w-4" />
@@ -104,48 +104,48 @@ export function TeamsTable({ teams, onSort, sortBy, sortOrder, onDelete, current
               </TableHead>
             )}
             {(isSystemAdmin || isTenantAdmin || isLeagueAdmin) && ( // Show League column for SA/TA/LA
-              <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <TableHead className="px-6 py-3 text-left text-xs font-medium text-ink-muted uppercase tracking-wider">
                 <Button variant="ghost" onClick={() => onSort('leagueName')}>
                   League {getSortIndicator('leagueName')}
                   <ArrowUpDown className="ml-2 h-4 w-4" />
                 </Button>
               </TableHead>
             )}
-            <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <TableHead className="px-6 py-3 text-left text-xs font-medium text-ink-muted uppercase tracking-wider">
               Sport Type
             </TableHead>
-            <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <TableHead className="px-6 py-3 text-left text-xs font-medium text-ink-muted uppercase tracking-wider">
               Gender
             </TableHead>
-            <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <TableHead className="px-6 py-3 text-left text-xs font-medium text-ink-muted uppercase tracking-wider">
               Division
             </TableHead>
-            <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <TableHead className="px-6 py-3 text-left text-xs font-medium text-ink-muted uppercase tracking-wider">
               <Button variant="ghost" onClick={() => onSort('country')}>
                 Country {getSortIndicator('country')}
                 <ArrowUpDown className="ml-2 h-4 w-4" />
               </Button>
             </TableHead>
-            <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <TableHead className="px-6 py-3 text-left text-xs font-medium text-ink-muted uppercase tracking-wider">
               <Button variant="ghost" onClick={() => onSort('establishedYear')}>
                 Est. Year {getSortIndicator('establishedYear')}
                 <ArrowUpDown className="ml-2 h-4 w-4" />
               </Button>
             </TableHead>
-            <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <TableHead className="px-6 py-3 text-left text-xs font-medium text-ink-muted uppercase tracking-wider">
               Team Admin
             </TableHead>
-            <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <TableHead className="px-6 py-3 text-left text-xs font-medium text-ink-muted uppercase tracking-wider">
               Actions
             </TableHead>
           </TableRow>
         </TableHeader>
-        <TableBody className="bg-white divide-y divide-gray-200">
+        <TableBody className="bg-surface divide-y divide-line">
           {teams.map((team) => (
             <TableRow key={team.id}>
               <TableCell className="px-6 py-4 whitespace-nowrap">
                 <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                  team.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                  team.isActive ? 'bg-positive-soft text-positive' : 'bg-negative-soft text-negative'
                 }`}>
                   {team.isActive ? 'Active' : 'Inactive'}
                 </span>
@@ -155,7 +155,7 @@ export function TeamsTable({ teams, onSort, sortBy, sortOrder, onDelete, current
                   {team.businessProfile.logoAsset?.url && (
                     <div className="flex-shrink-0 h-10 w-10">
                       <Image
-                        className='h-10 w-10 rounded-full object-cover border border-gray-400'
+                        className='h-10 w-10 rounded-full object-cover border border-line-strong'
                         src={team.businessProfile.logoAsset.url}
                         height={60}
                         width={60}
@@ -167,26 +167,26 @@ export function TeamsTable({ teams, onSort, sortBy, sortOrder, onDelete, current
                     </div>
                   )}
                   <div className="ml-4">
-                    <div className="text-sm font-medium text-gray-900">
+                    <div className="text-sm font-medium text-ink">
                       <Link
                         href={buildTeamDashboardLink(team)}
-                        className="text-primary-600 hover:text-primary-800"
+                        className="text-accent-text hover:text-accent-text"
                       >
                         {team.name}
                       </Link>
                     </div>
-                    <div className="text-sm text-gray-500">{team.slug}</div>
+                    <div className="text-sm text-ink-muted">{team.slug}</div>
                   </div>
                 </div>
               </TableCell>
               <TableCell className="px-6 py-4 whitespace-nowrap">
-                <div className="text-sm text-gray-900">{team.shortCode || 'N/A'}</div>
+                <div className="text-sm text-ink">{team.shortCode || 'N/A'}</div>
               </TableCell>
               {(isSystemAdmin || isTenantAdmin) && (
                 <TableCell className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">
+                  <div className="text-sm text-ink">
                     {team.tenant ? (
-                      <Link href={buildLink(`/admin/tenants/${team.tenant.id}`)} className="text-primary-600 hover:text-primary-800">
+                      <Link href={buildLink(`/admin/tenants/${team.tenant.id}`)} className="text-accent-text hover:text-accent-text">
                         {team.tenant.name}
                       </Link>
                     ) : 'N/A'}
@@ -195,9 +195,9 @@ export function TeamsTable({ teams, onSort, sortBy, sortOrder, onDelete, current
               )}
               {(isSystemAdmin || isTenantAdmin || isLeagueAdmin) && (
                 <TableCell className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">
+                  <div className="text-sm text-ink">
                     {team.league ? (
-                      <Link href={buildLink(`/admin/leagues/${team.league.id}`)} className="text-primary-600 hover:text-primary-800">
+                      <Link href={buildLink(`/admin/leagues/${team.league.id}`)} className="text-accent-text hover:text-accent-text">
                         {team.league.name}({team.league.slug})
                       </Link>
                     ) : 'N/A'}
@@ -205,24 +205,24 @@ export function TeamsTable({ teams, onSort, sortBy, sortOrder, onDelete, current
                 </TableCell>
               )}
               <TableCell className="px-6 py-4 whitespace-nowrap">
-                <div className="text-sm text-gray-900">{team.tenant?.sportType || 'N/A'}</div>
+                <div className="text-sm text-ink">{team.tenant?.sportType || 'N/A'}</div>
               </TableCell>
               <TableCell className="px-6 py-4 whitespace-nowrap">
-                <div className="text-sm text-gray-900">{team.league?.gender || 'N/A'}</div>
+                <div className="text-sm text-ink">{team.league?.gender || 'N/A'}</div>
               </TableCell>
               <TableCell className="px-6 py-4 whitespace-nowrap">
-                <div className="text-sm text-gray-900">{team.league?.division || 'N/A'}</div>
+                <div className="text-sm text-ink">{team.league?.division || 'N/A'}</div>
               </TableCell>
               <TableCell className="px-6 py-4 whitespace-nowrap">
-                <div className="text-sm text-gray-900">{team.businessProfile.city || 'N/A'}</div>
+                <div className="text-sm text-ink">{team.businessProfile.city || 'N/A'}</div>
               </TableCell>
               <TableCell className="px-6 py-4 whitespace-nowrap">
-                <div className="text-sm text-gray-900">{team.businessProfile.establishedYear || 'N/A'}</div>
+                <div className="text-sm text-ink">{team.businessProfile.establishedYear || 'N/A'}</div>
               </TableCell>
               <TableCell className="px-6 py-4 whitespace-nowrap">
-                <div className="text-sm text-gray-900">
+                <div className="text-sm text-ink">
                   {team.managers && team.managers.length > 0 ? (
-                    <Link href={buildLink(`/admin/users/${team.managers[0].id}`)} className="text-primary-600 hover:text-primary-800">
+                    <Link href={buildLink(`/admin/users/${team.managers[0].id}`)} className="text-accent-text hover:text-accent-text">
                       {team.managers[0].username}
                     </Link>
                   ) : (
@@ -245,7 +245,7 @@ export function TeamsTable({ teams, onSort, sortBy, sortOrder, onDelete, current
                       </Link>
                     </DropdownMenuItem>
                     {(isSystemAdmin || isTenantAdmin || isLeagueAdmin) && ( // Only higher admins can delete
-                      <DropdownMenuItem onClick={() => onDelete(team.id)} className="flex items-center text-red-600 cursor-pointer">
+                      <DropdownMenuItem onClick={() => onDelete(team.id)} className="flex items-center text-negative cursor-pointer">
                         <Trash className="mr-2 h-4 w-4" /> Delete Team
                       </DropdownMenuItem>
                     )}

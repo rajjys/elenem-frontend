@@ -188,15 +188,15 @@ export function LeagueFilters({ filters, onFilterChange, onPageSizeChange }: Lea
       {/* Filter Button and Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogTrigger asChild>
-          <Button variant="outline" className="rounded-md shadow-sm bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 transition duration-300 ease-in-out transform hover:scale-105">
+          <Button variant="outline" className="rounded-md shadow-sm bg-accent hover:bg-accent text-white font-semibold py-2 px-4 transition duration-300 ease-in-out transform hover:scale-105">
             <FilterIcon className="mr-2 h-4 w-4" />
             More Filters
           </Button>
         </DialogTrigger>
-        <DialogContent className="sm:max-w-[700px] rounded-lg shadow-xl p-6 bg-white">
+        <DialogContent className="sm:max-w-[700px] rounded-lg shadow-xl p-6 bg-surface">
           <DialogHeader className="mb-4">
-            <DialogTitle className="text-2xl font-bold text-gray-800">Advanced League Filters</DialogTitle>
-            <DialogDescription className="text-gray-600">
+            <DialogTitle className="text-2xl font-bold text-ink">Advanced League Filters</DialogTitle>
+            <DialogDescription className="text-ink-muted">
               Apply additional filters to refine your league list.
             </DialogDescription>
           </DialogHeader>
@@ -209,12 +209,12 @@ export function LeagueFilters({ filters, onFilterChange, onPageSizeChange }: Lea
                 checked={isActive || false}
                 onCheckedChange={setIsActive}
               />
-              <Label htmlFor="leagueStatus" className="text-sm font-medium text-gray-700">Active Leagues</Label>
+              <Label htmlFor="leagueStatus" className="text-sm font-medium text-ink">Active Leagues</Label>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => setIsActive(undefined)}
-                className="ml-2 text-gray-500 hover:bg-gray-100 rounded-md px-2 py-1"
+                className="ml-2 text-ink-muted hover:bg-surface-sunk rounded-md px-2 py-1"
                 disabled={isActive === undefined}
               >
                 Clear
@@ -223,15 +223,15 @@ export function LeagueFilters({ filters, onFilterChange, onPageSizeChange }: Lea
 
             {/* Sport Type Select */}
             <div>
-              <Label htmlFor="sportType" className="block text-sm font-medium text-gray-700 mb-1">Sport Type</Label>
+              <Label htmlFor="sportType" className="block text-sm font-medium text-ink mb-1">Sport Type</Label>
               <Select
                 value={selectedSportType || ''}
                 onValueChange={(value: SportType) => setSelectedSportType(!value ? undefined : value)}
               >
-                <SelectTrigger className="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                <SelectTrigger className="w-full border-line rounded-md shadow-sm focus:border-accent focus:ring-accent">
                   <SelectValue placeholder="Select Sport" />
                 </SelectTrigger>
-                <SelectContent className='bg-white rounded-md shadow-lg z-50'>
+                <SelectContent className='bg-surface rounded-md shadow-lg z-50'>
                   <SelectItem value="clear_selection">Clear Selection</SelectItem>
                   {sportTypeOptions.map(option => (
                     <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
@@ -242,15 +242,15 @@ export function LeagueFilters({ filters, onFilterChange, onPageSizeChange }: Lea
 
             {/* Country Select */}
             <div>
-              <Label htmlFor="country" className="block text-sm font-medium text-gray-700 mb-1">Country</Label>
+              <Label htmlFor="country" className="block text-sm font-medium text-ink mb-1">Country</Label>
               <Select
                 value={selectedCountry || ''}
                 onValueChange={(value: string) => setSelectedCountry(!value ? undefined : value)}
               >
-                <SelectTrigger className="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                <SelectTrigger className="w-full border-line rounded-md shadow-sm focus:border-accent focus:ring-accent">
                   <SelectValue placeholder="Select Country" />
                 </SelectTrigger>
-                <SelectContent className='bg-white rounded-md shadow-lg z-50'>
+                <SelectContent className='bg-surface rounded-md shadow-lg z-50'>
                   <SelectItem value="clear_selection">Clear Selection</SelectItem>
                   {countryOptions.map(option => (
                     <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
@@ -261,15 +261,15 @@ export function LeagueFilters({ filters, onFilterChange, onPageSizeChange }: Lea
 
             {/* Visibility Select */}
             <div>
-              <Label htmlFor="visibility" className="block text-sm font-medium text-gray-700 mb-1">Visibility</Label>
+              <Label htmlFor="visibility" className="block text-sm font-medium text-ink mb-1">Visibility</Label>
               <Select
                 value={selectedVisibility || ''}
                 onValueChange={(value: VisibilityLevel) => setSelectedVisibility(!value ? undefined : value)}
               >
-                <SelectTrigger className="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                <SelectTrigger className="w-full border-line rounded-md shadow-sm focus:border-accent focus:ring-accent">
                   <SelectValue placeholder="Select Visibility" />
                 </SelectTrigger>
-                <SelectContent className='bg-white rounded-md shadow-lg z-50'>
+                <SelectContent className='bg-surface rounded-md shadow-lg z-50'>
                   <SelectItem value="clear_selection">Clear Selection</SelectItem>
                   {visibilityOptions.map(option => (
                     <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
@@ -280,15 +280,15 @@ export function LeagueFilters({ filters, onFilterChange, onPageSizeChange }: Lea
 
             {/* Gender Select */}
             <div>
-              <Label htmlFor="gender" className="block text-sm font-medium text-gray-700 mb-1">Gender</Label>
+              <Label htmlFor="gender" className="block text-sm font-medium text-ink mb-1">Gender</Label>
               <Select
                 value={selectedGender}
                 onValueChange={(value: Gender) => setSelectedGender(!value ? undefined : value)}
               >
-                <SelectTrigger className="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                <SelectTrigger className="w-full border-line rounded-md shadow-sm focus:border-accent focus:ring-accent">
                   <SelectValue placeholder="Select Gender" />
                 </SelectTrigger>
-                <SelectContent className='bg-white rounded-md shadow-lg z-50'>
+                <SelectContent className='bg-surface rounded-md shadow-lg z-50'>
                   <SelectItem value="clear_selection">Clear Selection</SelectItem>
                   {genderOptions.map(option => (
                     <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
@@ -299,15 +299,15 @@ export function LeagueFilters({ filters, onFilterChange, onPageSizeChange }: Lea
 
             {/* Parent League ID Select 
             <div>
-              <Label htmlFor="parentLeague" className="block text-sm font-medium text-gray-700 mb-1">Parent League</Label>
+              <Label htmlFor="parentLeague" className="block text-sm font-medium text-ink mb-1">Parent League</Label>
               <Select
                 value={selectedParentLeagueId || ''}
                 onValueChange={(value: string) => setSelectedParentLeagueId(!value ? undefined : value)}
               >
-                <SelectTrigger className="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                <SelectTrigger className="w-full border-line rounded-md shadow-sm focus:border-accent focus:ring-accent">
                   <SelectValue placeholder="Select Parent League" />
                 </SelectTrigger>
-                <SelectContent className='bg-white rounded-md shadow-lg z-50'>
+                <SelectContent className='bg-surface rounded-md shadow-lg z-50'>
                   <SelectItem value="clear_selection">Clear Selection</SelectItem>
                   {/* You would fetch and populate parentLeagueOptions dynamically }
                   {parentLeagueOptions.length > 0 ? (
@@ -323,19 +323,19 @@ export function LeagueFilters({ filters, onFilterChange, onPageSizeChange }: Lea
                     */}
             {/* Division Input */}
             <div>
-              <Label htmlFor="division" className="block text-sm font-medium text-gray-700 mb-1">Division</Label>
+              <Label htmlFor="division" className="block text-sm font-medium text-ink mb-1">Division</Label>
               <Input
                 id="division"
                 placeholder="e.g., D1, Pro"
                 value={selectedDivision || ''}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSelectedDivision(e.target.value)}
-                className="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                className="w-full border-line rounded-md shadow-sm focus:border-accent focus:ring-accent"
               />
             </div>
 
             {/* Established Year Input */}
             <div>
-              <Label htmlFor="establishedYear" className="block text-sm font-medium text-gray-700 mb-1">Established Year</Label>
+              <Label htmlFor="establishedYear" className="block text-sm font-medium text-ink mb-1">Established Year</Label>
               <Input
                 id="establishedYear"
                 type="number"
@@ -344,12 +344,12 @@ export function LeagueFilters({ filters, onFilterChange, onPageSizeChange }: Lea
                 placeholder="e.g., 2005"
                 value={establishedYearInput}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEstablishedYearInput(e.target.value)}
-                className="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                className="w-full border-line rounded-md shadow-sm focus:border-accent focus:ring-accent"
               />
             </div>
             {/* Page Size Control - inside the dialog */}
             <div className="flex items-center space-x-2 mt-4">
-              <Label htmlFor="pageSize" className="text-sm font-medium text-gray-700">Leagues per page</Label>
+              <Label htmlFor="pageSize" className="text-sm font-medium text-ink">Leagues per page</Label>
               <Input
                 id="pageSize"
                 type="number"
@@ -366,14 +366,14 @@ export function LeagueFilters({ filters, onFilterChange, onPageSizeChange }: Lea
             <Button
               variant="outline"
               onClick={handleClearAllFilters}
-              className="bg-red-500 hover:bg-red-600 text-white rounded-md shadow-sm transition duration-300 ease-in-out"
+              className="bg-negative hover:bg-negative text-white rounded-md shadow-sm transition duration-300 ease-in-out"
             >
               Clear All Filters
             </Button>
             <Button
               type="button"
               onClick={() => setIsDialogOpen(false)}
-              className="bg-blue-500 hover:bg-blue-600 text-white rounded-md shadow-sm transition duration-300 ease-in-out"
+              className="bg-accent hover:bg-accent text-white rounded-md shadow-sm transition duration-300 ease-in-out"
             >
               Close
             </Button>

@@ -60,7 +60,7 @@ export const CollapsibleNavLink: React.FC<CollapsibleNavLinkProps> = ({
                 className={`flex items-center justify-between w-full py-2.5 px-4 rounded-md border-l-4 transition-all duration-200 ease-in-out
                             ${isSidebarOpen ? "" : "justify-center"}
                             ${isCategoryActive ? "bg-[var(--hover-bg)] text-[var(--hover-text)] border-[var(--hover-text)]"
-                                : "text-gray-700 border-transparent nav-hover"}`}
+                                : "text-ink border-transparent nav-hover"}`}
                 title={isSidebarOpen ? "" : category.label}
                 style={{
                     backgroundColor: isCategoryActive ? primary100 : undefined,

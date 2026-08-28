@@ -39,7 +39,7 @@ export const FlyoutMenu: React.FC<FlyoutMenuProps> = ({
     return (
         <div
             ref={flyoutRef}
-            className="absolute z-[100] w-56 bg-white shadow-2xl rounded-md py-2 mt-0.5 origin-top-left transition-all duration-200 ease-out transform opacity-0 scale-95 animate-fadeIn"
+            className="absolute z-[100] w-56 bg-surface shadow-2xl rounded-md py-2 mt-0.5 origin-top-left transition-all duration-200 ease-out transform opacity-0 scale-95 animate-fadeIn"
             style={{
                 top: `${position.top}px`,
                 left: `${position.left}px`,

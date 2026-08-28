@@ -41,44 +41,44 @@ export default function HealthClientPage() {
   const getStatusIcon = () => {
     switch (status) {
       case 'ok':
-        return <CheckCircleIcon className="w-12 h-12 text-green-500" />;
+        return <CheckCircleIcon className="w-12 h-12 text-positive" />;
       case 'error':
-        return <XCircleIcon className="w-12 h-12 text-red-500" />;
+        return <XCircleIcon className="w-12 h-12 text-negative" />;
       case 'loading':
       default:
         // Use animate-pulse for a fading effect or animate-spin for a classic spinner
-        return <ClockIcon className="w-12 h-12 text-blue-500 animate-pulse" />;
+        return <ClockIcon className="w-12 h-12 text-accent-text animate-pulse" />;
     }
   };
 
   const getStatusTextColor = () => {
     switch (status) {
-      case 'ok': return 'text-green-700';
-      case 'error': return 'text-red-700';
-      case 'loading': return 'text-blue-700';
-      default: return 'text-gray-700';
+      case 'ok': return 'text-positive';
+      case 'error': return 'text-negative';
+      case 'loading': return 'text-accent-text';
+      default: return 'text-ink';
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
-      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-sm text-center">
+    <div className="min-h-screen flex items-center justify-center bg-surface-sunk p-4">
+      <div className="bg-surface p-8 rounded-lg shadow-lg w-full max-w-sm text-center">
         <div className="mb-4 flex justify-center">
           {getStatusIcon()}
         </div>
         <h1 className={`text-2xl font-bold ${getStatusTextColor()} mb-2`}>
           Backend Health Check
         </h1>
-        <p className="text-gray-600 mb-4">{message}</p>
+        <p className="text-ink-muted mb-4">{message}</p>
         {status === 'loading' && (
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-ink-muted">
                 (Free-tier backends often have a cold start delay. Please wait up to 30 seconds for the first connection.)
             </p>
         )}
         {status === 'error' && (
             <button
                 onClick={checkHealth} // Corrected: Directly call the checkHealth function
-                className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+                className="mt-4 px-4 py-2 bg-accent text-white rounded hover:bg-accent focus:outline-none focus:ring-2 focus:ring-accent focus:ring-opacity-50"
             >
                 Retry
             </button>

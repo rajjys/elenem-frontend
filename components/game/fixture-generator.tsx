@@ -90,11 +90,11 @@ export function FixtureGenerator({ leagueId }: { leagueId?: string }) {
   return (
     <div className="p-6">
       <header className="mb-6">
-        <h1 className="flex items-center gap-2 text-2xl font-semibold text-gray-900">
-          <Wand2 className="h-6 w-6 text-primary-600" />
+        <h1 className="flex items-center gap-2 text-2xl font-semibold text-ink">
+          <Wand2 className="h-6 w-6 text-accent-text" />
           Générer le calendrier
         </h1>
-        <p className="mt-1 max-w-2xl text-sm text-gray-500">
+        <p className="mt-1 max-w-2xl text-sm text-ink-muted">
           Crée toutes les journées d&apos;une saison en une fois : chaque équipe rencontre toutes
           les autres, les réceptions sont réparties équitablement. Prévisualisez avant
           d&apos;enregistrer.
@@ -102,7 +102,7 @@ export function FixtureGenerator({ leagueId }: { leagueId?: string }) {
       </header>
 
       <div className="grid gap-6 lg:grid-cols-[380px_1fr]">
-        <section className="space-y-4 rounded-lg border border-gray-200 bg-white p-5">
+        <section className="space-y-4 rounded-lg border border-line bg-surface p-5">
           <div>
             <Label>Saison *</Label>
             {loadingSeasons ? (
@@ -111,7 +111,7 @@ export function FixtureGenerator({ leagueId }: { leagueId?: string }) {
               <select
                 value={seasonId}
                 onChange={(e) => { setSeasonId(e.target.value); setPreview(null); }}
-                className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                className="mt-1 w-full rounded-md border border-line px-3 py-2 text-sm focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
               >
                 <option value="">Choisir une saison…</option>
                 {seasons.map((s) => (
@@ -136,12 +136,12 @@ export function FixtureGenerator({ leagueId }: { leagueId?: string }) {
                   onClick={() => { setLegs(o.v); setPreview(null); }}
                   className={`rounded-md border p-3 text-left text-sm transition ${
                     legs === o.v
-                      ? 'border-primary-500 bg-primary-50 text-primary-800'
-                      : 'border-gray-300 hover:border-gray-400'
+                      ? 'border-accent bg-accent-soft text-accent-text'
+                      : 'border-line hover:border-line-strong'
                   }`}
                 >
                   <span className="block font-medium">{o.label}</span>
-                  <span className="mt-0.5 block text-xs text-gray-500">{o.hint}</span>
+                  <span className="mt-0.5 block text-xs text-ink-muted">{o.hint}</span>
                 </button>
               ))}
             </div>
@@ -154,7 +154,7 @@ export function FixtureGenerator({ leagueId }: { leagueId?: string }) {
                 type="date"
                 value={startDate}
                 onChange={(e) => { setStartDate(e.target.value); setPreview(null); }}
-                className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                className="mt-1 w-full rounded-md border border-line px-3 py-2 text-sm focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
               />
             </div>
             <div>
@@ -163,7 +163,7 @@ export function FixtureGenerator({ leagueId }: { leagueId?: string }) {
                 type="time"
                 value={kickOffTime}
                 onChange={(e) => { setKickOffTime(e.target.value); setPreview(null); }}
-                className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                className="mt-1 w-full rounded-md border border-line px-3 py-2 text-sm focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
               />
             </div>
           </div>
@@ -178,15 +178,15 @@ export function FixtureGenerator({ leagueId }: { leagueId?: string }) {
                   onClick={() => toggleDay(d.value)}
                   className={`rounded-md border px-3 py-1.5 text-sm transition ${
                     daysOfWeek.includes(d.value)
-                      ? 'border-primary-500 bg-primary-50 font-medium text-primary-800'
-                      : 'border-gray-300 text-gray-600 hover:border-gray-400'
+                      ? 'border-accent bg-accent-soft font-medium text-accent-text'
+                      : 'border-line text-ink-muted hover:border-line-strong'
                   }`}
                 >
                   {d.short}
                 </button>
               ))}
             </div>
-            <p className="mt-1.5 text-xs text-gray-500">
+            <p className="mt-1.5 text-xs text-ink-muted">
               {daysOfWeek.length === 0
                 ? 'Aucun jour sélectionné : une journée par semaine.'
                 : 'Les journées seront placées sur ces jours.'}
@@ -214,7 +214,7 @@ export function FixtureGenerator({ leagueId }: { leagueId?: string }) {
             </Button>
           </div>
           {!preview && seasonId && (
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-ink-muted">
               Prévisualisez d&apos;abord — rien n&apos;est enregistré avant votre confirmation.
             </p>
           )}
@@ -222,10 +222,10 @@ export function FixtureGenerator({ leagueId }: { leagueId?: string }) {
 
         <section>
           {!preview ? (
-            <div className="flex h-full min-h-[320px] flex-col items-center justify-center rounded-lg border border-dashed border-gray-300 bg-white text-center">
-              <CalendarDays className="mb-3 h-8 w-8 text-gray-300" />
-              <p className="font-medium text-gray-900">Aucun aperçu pour l&apos;instant</p>
-              <p className="mt-1 max-w-xs text-sm text-gray-500">
+            <div className="flex h-full min-h-[320px] flex-col items-center justify-center rounded-lg border border-dashed border-line bg-surface text-center">
+              <CalendarDays className="mb-3 h-8 w-8 text-ink-subtle" />
+              <p className="font-medium text-ink">Aucun aperçu pour l&apos;instant</p>
+              <p className="mt-1 max-w-xs text-sm text-ink-muted">
                 Choisissez une saison et un format, puis prévisualisez le calendrier.
               </p>
             </div>
@@ -252,40 +252,40 @@ function FixturePreview({ data, seasonName }: { data: GenerateFixturesResponse; 
   const written = !data.dryRun;
 
   return (
-    <div className="rounded-lg border border-gray-200 bg-white">
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-gray-200 px-5 py-4">
+    <div className="rounded-lg border border-line bg-surface">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line px-5 py-4">
         <div>
-          <p className="font-medium text-gray-900">
+          <p className="font-medium text-ink">
             {written ? 'Calendrier enregistré' : 'Aperçu du calendrier'}
-            {seasonName && <span className="text-gray-500"> · {seasonName}</span>}
+            {seasonName && <span className="text-ink-muted"> · {seasonName}</span>}
           </p>
-          <p className="mt-0.5 text-sm text-gray-500">
+          <p className="mt-0.5 text-sm text-ink-muted">
             {data.teamCount} équipes · {data.fixtureCount} matchs · {data.matchdayCount} journées
           </p>
         </div>
         {written ? (
           data.skippedCount > 0 ? (
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1 text-sm text-amber-800">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-caution-soft px-3 py-1 text-sm text-caution">
               <AlertTriangle className="h-4 w-4" />
               {data.createdCount} créés, {data.skippedCount} ignorés
             </span>
           ) : (
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-green-50 px-3 py-1 text-sm text-green-800">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-positive-soft px-3 py-1 text-sm text-positive">
               <CheckCircle2 className="h-4 w-4" />
               {data.createdCount} matchs créés
             </span>
           )
         ) : (
-          <span className="rounded-full bg-gray-100 px-3 py-1 text-sm text-gray-600">
+          <span className="rounded-full bg-surface-sunk px-3 py-1 text-sm text-ink-muted">
             Rien n&apos;est encore enregistré
           </span>
         )}
       </div>
 
       {data.skippedCount > 0 && (
-        <div className="border-b border-amber-200 bg-amber-50 px-5 py-3 text-sm text-amber-900">
+        <div className="border-b border-caution bg-caution-soft px-5 py-3 text-sm text-caution">
           <p className="font-medium">Certains matchs n&apos;ont pas pu être créés :</p>
-          <p className="mt-1 text-amber-800">
+          <p className="mt-1 text-caution">
             {data.fixtures.find((f) => f.error)?.error}
           </p>
         </div>
@@ -296,24 +296,24 @@ function FixturePreview({ data, seasonName }: { data: GenerateFixturesResponse; 
           {byMatchday.map(([matchday, fixtures]) => (
             <li key={matchday}>
               <div className="mb-2 flex items-baseline gap-2">
-                <h3 className="text-sm font-semibold text-gray-900">Journée {matchday}</h3>
-                <span className="text-xs text-gray-500">
+                <h3 className="text-sm font-semibold text-ink">Journée {matchday}</h3>
+                <span className="text-xs text-ink-muted">
                   {new Date(fixtures[0].dateTime).toLocaleDateString('fr-FR', {
                     weekday: 'long', day: 'numeric', month: 'long',
                   })}
                 </span>
               </div>
-              <ul className="divide-y divide-gray-100 rounded-md border border-gray-100">
+              <ul className="divide-y divide-line rounded-md border border-line">
                 {fixtures.map((f, i) => (
                   <li
                     key={`${matchday}-${i}`}
-                    className={`flex items-center gap-3 px-3 py-2 text-sm ${f.error ? 'bg-red-50' : ''}`}
+                    className={`flex items-center gap-3 px-3 py-2 text-sm ${f.error ? 'bg-negative-soft' : ''}`}
                   >
-                    <span className="flex-1 text-right text-gray-900">{f.homeTeamName}</span>
-                    <span className="text-xs text-gray-400">vs</span>
-                    <span className="flex-1 text-gray-900">{f.awayTeamName}</span>
+                    <span className="flex-1 text-right text-ink">{f.homeTeamName}</span>
+                    <span className="text-xs text-ink-subtle">vs</span>
+                    <span className="flex-1 text-ink">{f.awayTeamName}</span>
                     {f.error && (
-                      <span className="text-xs text-red-600" title={f.error}>ignoré</span>
+                      <span className="text-xs text-negative" title={f.error}>ignoré</span>
                     )}
                   </li>
                 ))}

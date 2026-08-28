@@ -37,3 +37,4 @@ export * from './password-input';
 export * from './otp-input';
 export * from './dialog-modal';
 export * from './confirm-dialog';
+export * from './theme-toggle';

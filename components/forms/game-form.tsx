@@ -80,8 +80,8 @@ interface GameFormProps {
 function GuardNotice({ leagueId, className = "" }: { leagueId?: string; className?: string }) {
   if (!leagueId) return null;
   return (
-    <div className={`border border-amber-300 bg-amber-50 text-amber-800 rounded-xl p-4 flex items-start gap-3 ${className}`}>
-      <AlertTriangle className="text-red-600" size={30} />
+    <div className={`border border-caution bg-caution-soft text-caution rounded-xl p-4 flex items-start gap-3 ${className}`}>
+      <AlertTriangle className="text-negative" size={30} />
       <div>
         <div className="font-semibold">No current season found for this league.</div>
         <p className="text-sm mt-1">
@@ -337,7 +337,7 @@ export function GameForm({ onSuccess, onCancel }: GameFormProps) {
                   </SelectItem>)}
                   </SelectContent>
                 </Select>
-                {errors.homeTeamId && <p className="text-xs text-red-500">{errors.homeTeamId.message as string}</p>}
+                {errors.homeTeamId && <p className="text-xs text-negative">{errors.homeTeamId.message as string}</p>}
               </div>
 
               <div className="space-y-2">
@@ -361,7 +361,7 @@ export function GameForm({ onSuccess, onCancel }: GameFormProps) {
                   </SelectItem>)}
                   </SelectContent>
                 </Select>
-                {errors.awayTeamId && <p className="text-xs text-red-500">{errors.awayTeamId.message as string}</p>}
+                {errors.awayTeamId && <p className="text-xs text-negative">{errors.awayTeamId.message as string}</p>}
               </div>
 
               <div className="space-y-2">
@@ -375,7 +375,7 @@ export function GameForm({ onSuccess, onCancel }: GameFormProps) {
               <div className="space-y-2">
                 <Label>Date & Time</Label>
                 <Input type="datetime-local" {...register("dateTime")} />
-                {errors.dateTime && <p className="text-xs text-red-500">{errors.dateTime.message as string}</p>}
+                {errors.dateTime && <p className="text-xs text-negative">{errors.dateTime.message as string}</p>}
               </div>
 
               <div className="space-y-2">
@@ -419,7 +419,7 @@ export function GameForm({ onSuccess, onCancel }: GameFormProps) {
                 <CardDescription>Scores appear when status is &quot;Completed&quot;.</CardDescription>
               </CardHeader>
               <CardContent>
-                <p className="text-center text-gray-500">Change the status to <span className="font-medium">Completed</span> to enter scores.</p>
+                <p className="text-center text-ink-muted">Change the status to <span className="font-medium">Completed</span> to enter scores.</p>
               </CardContent>
             </>
           );
@@ -478,10 +478,10 @@ export function GameForm({ onSuccess, onCancel }: GameFormProps) {
               <CardDescription>Confirm before creating game.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6 px-0">
-              <div className="bg-gray-50 rounded-2xl p-6 shadow-md space-y-4">
+              <div className="bg-surface-sunk rounded-2xl p-6 shadow-md space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4 text-sm">
                   <div className="flex items-center justify-between">
-                    <span className="flex items-center gap-2 text-gray-500">
+                    <span className="flex items-center gap-2 text-ink-muted">
                       <Trophy className="w-4 h-4" /> League:
                     </span>
                     <span className="font-medium text-center">
@@ -490,7 +490,7 @@ export function GameForm({ onSuccess, onCancel }: GameFormProps) {
                   </div>
 
                   <div className="flex items-center justify-between">
-                    <span className="flex items-center gap-2 text-gray-500">
+                    <span className="flex items-center gap-2 text-ink-muted">
                       <Calendar className="w-4 h-4" /> Date & Heure:
                     </span>
                     <span className="truncate font-medium text-center">
@@ -499,13 +499,13 @@ export function GameForm({ onSuccess, onCancel }: GameFormProps) {
                   </div>
 
                   <div className="flex items-center justify-between">
-                    <span className="flex items-center gap-2 text-gray-500">
+                    <span className="flex items-center gap-2 text-ink-muted">
                       <Clock className="w-4 h-4" /> Statut:
                     </span>
                     <span
                       className={`font-semibold px-2 py-0.5 rounded-md ${gameStatus === "COMPLETED"
-                        ? "bg-green-100 text-green-700"
-                        : "bg-yellow-100 text-yellow-700"
+                        ? "bg-positive-soft text-positive"
+                        : "bg-caution-soft text-caution"
                         }`}
                     >
                       {gameStatus}
@@ -513,7 +513,7 @@ export function GameForm({ onSuccess, onCancel }: GameFormProps) {
                   </div>
 
                   <div className="flex items-center justify-between">
-                    <span className="flex items-center gap-2 text-gray-500">
+                    <span className="flex items-center gap-2 text-ink-muted">
                       <FileText className="w-4 h-4" /> Notes:
                     </span>
                     <span className="font-medium text-right truncate max-w-[60%]">
@@ -523,7 +523,7 @@ export function GameForm({ onSuccess, onCancel }: GameFormProps) {
                 </div>
               </div>
 
-              <div className="bg-gray-50 rounded-2xl p-6 shadow-md">
+              <div className="bg-surface-sunk rounded-2xl p-6 shadow-md">
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-8">
                   <div className="flex flex-col items-center space-y-2">
                     {homeTeam?.businessProfile?.logoAsset?.url ? (
@@ -535,23 +535,23 @@ export function GameForm({ onSuccess, onCancel }: GameFormProps) {
                           height={20}
                           className="w-16 h-16 rounded-full object-cover border shadow-sm"
                         />
-                        <span className="font-semibold text-center text-gray-800">{homeTeam.name}</span>
+                        <span className="font-semibold text-center text-ink">{homeTeam.name}</span>
                       </div>) :
                       (homeTeam?.name)
                     }
                   </div>
                   {gameStatus === "COMPLETED" ? (
-                    <div className="flex items-center gap-3 bg-gray-100 px-6 py-3 rounded-xl">
-                      <span className="text-2xl font-bold text-gray-800">
+                    <div className="flex items-center gap-3 bg-surface-sunk px-6 py-3 rounded-xl">
+                      <span className="text-2xl font-bold text-ink">
                         {watch("homeScore") ?? "—"}
                       </span>
-                      <span className="text-gray-500 text-lg font-medium">:</span>
-                      <span className="text-2xl font-bold text-gray-800">
+                      <span className="text-ink-muted text-lg font-medium">:</span>
+                      <span className="text-2xl font-bold text-ink">
                         {watch("awayScore") ?? "—"}
                       </span>
                     </div>
                   ) : (
-                    <span className="text-sm text-gray-700">En attente de résultat</span>
+                    <span className="text-sm text-ink">En attente de résultat</span>
                   )}
 
                   <div className="flex flex-col items-center space-y-2">
@@ -564,7 +564,7 @@ export function GameForm({ onSuccess, onCancel }: GameFormProps) {
                           height={20}
                           className="w-16 h-16 rounded-full object-cover border shadow-sm"
                         />
-                        <span className="font-semibold text-center text-gray-800">{awayTeam.name}</span>
+                        <span className="font-semibold text-center text-ink">{awayTeam.name}</span>
                       </div>) :
                       (awayTeam?.name)
                     }
@@ -572,7 +572,7 @@ export function GameForm({ onSuccess, onCancel }: GameFormProps) {
                 </div>
 
                 {gameStatus === "COMPLETED" && (
-                  <div className="flex justify-center mt-4 text-green-600 gap-2 items-center text-sm">
+                  <div className="flex justify-center mt-4 text-positive gap-2 items-center text-sm">
                     <CheckCircle className="w-4 h-4" />
                     Match prêt à être enregistré.
                   </div>
@@ -602,18 +602,18 @@ export function GameForm({ onSuccess, onCancel }: GameFormProps) {
                     <div className="flex items-center justify-center">
                       <div
                         className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300
-                        ${i === currentStep ? "bg-blue-600 text-white shadow-lg" : "bg-gray-200 text-gray-500"}
-                        ${i < currentStep ? "bg-green-500 text-white" : ""}`}
+                        ${i === currentStep ? "bg-accent text-white shadow-lg" : "bg-line text-ink-muted"}
+                        ${i < currentStep ? "bg-positive text-white" : ""}`}
                       >
                         <s.icon size={20} />
                       </div>
                     </div>
-                    <span className={`text-sm hidden sm:inline-block ${i === currentStep ? "text-blue-600 font-semibold" : "text-gray-500"}`}>{s.name}</span>
+                    <span className={`text-sm hidden sm:inline-block ${i === currentStep ? "text-accent-text font-semibold" : "text-ink-muted"}`}>{s.name}</span>
                   </div>
                   {i < steps.length - 1 && (
-                    <div className="flex-1 h-1 bg-gray-200 mx-2 rounded-full">
+                    <div className="flex-1 h-1 bg-line mx-2 rounded-full">
                       <div
-                        className={`h-full transition-all duration-300 rounded-full ${i < currentStep ? "bg-blue-600" : ""}`}
+                        className={`h-full transition-all duration-300 rounded-full ${i < currentStep ? "bg-accent" : ""}`}
                         style={{ width: i < currentStep ? "100%" : "0%" }}
                       />
                     </div>

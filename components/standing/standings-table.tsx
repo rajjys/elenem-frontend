@@ -56,7 +56,7 @@ export function StandingsTable({ standings, managingTeamId }: StandingsTableProp
             const isMyTeam = managingTeamId === item.team.id;
             return (
               <TableRow key={item.team.id} onClick={() => router.push(`/team/dashboard?ctxTeamId=${item.team.id}`)}
-                className={`cursor-pointer hover:bg-gray-100 ${isMyTeam ? "bg-blue-50" : ""}`}>
+                className={`cursor-pointer hover:bg-surface-sunk ${isMyTeam ? "bg-accent-soft" : ""}`}>
                 <TableCell className="font-medium text-center">{item.rank}</TableCell>
                 <TableCell>
                   <div className="flex items-center gap-3">
@@ -84,9 +84,9 @@ export function StandingsTable({ standings, managingTeamId }: StandingsTableProp
                       <Badge
                         key={i}
                         className={`h-5 w-5 flex items-center justify-center text-xs font-semibold
-                          ${result === 'W' ? 'bg-green-500 hover:bg-green-500' : ''}
-                          ${result === 'D' ? 'bg-gray-400 hover:bg-gray-400' : ''}
-                          ${result === 'L' ? 'bg-red-500 hover:bg-red-500' : ''}
+                          ${result === 'W' ? 'bg-positive hover:bg-positive' : ''}
+                          ${result === 'D' ? 'bg-ink-subtle hover:bg-ink-subtle' : ''}
+                          ${result === 'L' ? 'bg-negative hover:bg-negative' : ''}
                         `}
                       >
                         {result}

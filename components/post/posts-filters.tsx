@@ -190,10 +190,10 @@ export function PostsFilters({
           </Button>
         </DialogTrigger>
 
-        <DialogContent className="sm:max-w-[700px] rounded-lg shadow-xl p-6 bg-white">
+        <DialogContent className="sm:max-w-[700px] rounded-lg shadow-xl p-6 bg-surface">
           <DialogHeader className="mb-4">
-            <DialogTitle className="text-2xl font-bold text-gray-800">Filtres avancés</DialogTitle>
-            <DialogDescription className="text-gray-600">
+            <DialogTitle className="text-2xl font-bold text-ink">Filtres avancés</DialogTitle>
+            <DialogDescription className="text-ink-muted">
               Apply additional filters to refine your posts.
             </DialogDescription>
           </DialogHeader>

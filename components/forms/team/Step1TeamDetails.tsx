@@ -50,19 +50,19 @@ export default function Step1TeamDetails({ form, tenants, leagues, venues, isSys
                 {leagues.map(l => <SelectItem key={l.id} value={l.id}>{l.name}</SelectItem>)}
               </SelectContent>
             </Select>
-            {errors.leagueId && <p className="text-xs text-red-500">{errors.leagueId.message}</p>}
+            {errors.leagueId && <p className="text-xs text-negative">{errors.leagueId.message}</p>}
           </div>
         )}
         <div className="space-y-2">
           <Label>Equipe</Label>
           <Input {...register("name")} placeholder="ex: Real Madrid F.C" />
-          {errors.name && <p className="text-xs text-red-500">{errors.name.message}</p>}
+          {errors.name && <p className="text-xs text-negative">{errors.name.message}</p>}
         </div>
 
         <div className="space-y-2">
           <Label>Code</Label>
           <Input {...register("shortCode")} placeholder="ex: FCB" />
-          {errors.shortCode && <p className="text-xs text-red-500">{errors.shortCode.message}</p>}
+          {errors.shortCode && <p className="text-xs text-negative">{errors.shortCode.message}</p>}
         </div>
 
         <div className="space-y-2">

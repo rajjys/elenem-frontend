@@ -161,13 +161,13 @@ export default function LeagueDashboard() {
         }
     }, [currentLeagueId, fetchLeagueDetails, fetchLeagueMetrics, fetchRecentGames, fetchUpcomingGames, fetchLeagueStandings]);
     if(detailsLoading) return <LoadingSpinner />
-    if(error) return <div className='text-red-500 text-center mt-8'>Error: {error}</div>;
+    if(error) return <div className='text-negative text-center mt-8'>Error: {error}</div>;
     return (
         <div className="min-h-screen">
             <Head>
                 <title>{league?.tenant?.tenantCode || "Ligue"} - Tableau de Bord</title>
             </Head>  
-            <section className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 md:gap-0 px-4 py-3 mb-6 bg-white shadow-md rounded-md">
+            <section className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 md:gap-0 px-4 py-3 mb-6 bg-surface shadow-md rounded-md">
               <div className="flex items-center gap-3">
                   {league?.businessProfile?.logoAsset?.url ? (
                   <Image
@@ -183,10 +183,10 @@ export default function LeagueDashboard() {
                   {
                     league &&
                     <div>
-                      <h1 className="text-lg md:text-xl lg:text-2xl font-bold text-gray-800 leading-tight">
+                      <h1 className="text-lg md:text-xl lg:text-2xl font-bold text-ink leading-tight">
                           {league.name}
                       </h1>
-                      <p className="text-sm text-gray-500 flex items-center gap-2">
+                      <p className="text-sm text-ink-muted flex items-center gap-2">
                           <span>{league?.division}</span>
                           -
                           <span className='italic'>{
@@ -303,10 +303,10 @@ export default function LeagueDashboard() {
             <section className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
                 {/* Recent Games */}
                 <div className="h-full lg:col-span-1">
-                    <Card className="h-full flex flex-col justify-between shadow-elevated bg-gray-50">
-                      <CardHeader className="flex flex-row items-center justify-between gap-2 sm:gap-4 px-4 border-b border-slate-200">
-                          <CardTitle className="text-lg font-semibold text-gray-500">Matchs Recents</CardTitle>
-                          <Link href={buildLink('/league/games#results')} className="inline-flex items-center text-sm font-medium text-slate-500 nav-hover">
+                    <Card className="h-full flex flex-col justify-between shadow-elevated bg-surface-sunk">
+                      <CardHeader className="flex flex-row items-center justify-between gap-2 sm:gap-4 px-4 border-b border-line">
+                          <CardTitle className="text-lg font-semibold text-ink-muted">Matchs Recents</CardTitle>
+                          <Link href={buildLink('/league/games#results')} className="inline-flex items-center text-sm font-medium text-ink-muted nav-hover">
                               <Clock1 className="h-4 w-4 mr-1" />
                               <span>Resultats</span>
                           </Link>
@@ -318,11 +318,11 @@ export default function LeagueDashboard() {
                             <MinimalGameCard key={game.id} game={game} />
                           ))
                           :
-                          <p className="text-center text-sm text-slate-500 py-8">Aucun match récent</p>
+                          <p className="text-center text-sm text-ink-muted py-8">Aucun match récent</p>
                         }
                       </CardContent>
-                      <CardFooter className='flex items-center justify-center border-t border-slate-200'>
-                          <Link href={buildLink('/league/games#results')} className="py-1 flex items-center justify-center text-sm font-medium text-slate-500 nav-hover">
+                      <CardFooter className='flex items-center justify-center border-t border-line'>
+                          <Link href={buildLink('/league/games#results')} className="py-1 flex items-center justify-center text-sm font-medium text-ink-muted nav-hover">
                               <Clock className="h-4 w-4 mr-1" />
                               <span>Tout les Resultats</span>
                           </Link>
@@ -331,10 +331,10 @@ export default function LeagueDashboard() {
                 </div>
                 {/* Upcoming Games */}
                 <div className="h-full lg:col-span-1">
-                    <Card className="h-full flex flex-col justify-between shadow-elevated bg-gray-50">
-                      <CardHeader className="flex flex-row items-center justify-between gap-2 sm:gap-4 px-4 border-b border-slate-200">
-                          <CardTitle className="text-lg font-semibold text-gray-500">Prochains Matchs</CardTitle>
-                          <Link href={buildLink('/league/games#schedule')} className="inline-flex items-center text-sm font-medium text-slate-500 nav-hover">
+                    <Card className="h-full flex flex-col justify-between shadow-elevated bg-surface-sunk">
+                      <CardHeader className="flex flex-row items-center justify-between gap-2 sm:gap-4 px-4 border-b border-line">
+                          <CardTitle className="text-lg font-semibold text-ink-muted">Prochains Matchs</CardTitle>
+                          <Link href={buildLink('/league/games#schedule')} className="inline-flex items-center text-sm font-medium text-ink-muted nav-hover">
                               <Clock1 className="h-4 w-4 mr-1" />
                               <span>Calendriers</span>
                           </Link>
@@ -346,11 +346,11 @@ export default function LeagueDashboard() {
                               <MinimalGameCard key={game.id} game={game} />
                             ))
                           :
-                            <p className="text-center text-sm text-slate-500 py-8">Aucun match programmé</p>
+                            <p className="text-center text-sm text-ink-muted py-8">Aucun match programmé</p>
                         }
                       </CardContent>
-                      <CardFooter className='flex items-center justify-center border-t border-slate-200'>
-                          <Link href={buildLink('/league/games#schedule')} className="py-1 flex items-center justify-center text-sm font-medium text-slate-500 nav-hover">
+                      <CardFooter className='flex items-center justify-center border-t border-line'>
+                          <Link href={buildLink('/league/games#schedule')} className="py-1 flex items-center justify-center text-sm font-medium text-ink-muted nav-hover">
                               <Clock className="h-4 w-4 mr-1" />
                               <span>Calendriers Complets</span>
                           </Link>
@@ -358,10 +358,10 @@ export default function LeagueDashboard() {
                     </Card>
                 </div>
                 <div className="h-full lg:col-span-1">
-                    <Card className="h-full flex flex-col justify-between shadow-elevated bg-gray-50">
-                      <CardHeader className="flex flex-row items-center justify-between gap-2 sm:gap-4 px-4 border-b border-slate-200">
-                          <CardTitle className="text-lg font-semibold text-gray-500">Classements</CardTitle>
-                          <Link href={buildLink('/league/standings')} className="inline-flex items-center text-sm font-medium text-slate-500 nav-hover">
+                    <Card className="h-full flex flex-col justify-between shadow-elevated bg-surface-sunk">
+                      <CardHeader className="flex flex-row items-center justify-between gap-2 sm:gap-4 px-4 border-b border-line">
+                          <CardTitle className="text-lg font-semibold text-ink-muted">Classements</CardTitle>
+                          <Link href={buildLink('/league/standings')} className="inline-flex items-center text-sm font-medium text-ink-muted nav-hover">
                               <Clock1 className="h-4 w-4 mr-1" />
                               <span>Liste complete</span>
                           </Link>
@@ -371,11 +371,11 @@ export default function LeagueDashboard() {
                           Standings.length > 0 ?
                           <StandingsTable standings={Standings.slice(0, 8)} />
                           :
-                          <p className="text-center text-sm text-slate-500 py-8">Aucun classement disponible</p>
+                          <p className="text-center text-sm text-ink-muted py-8">Aucun classement disponible</p>
                         }
                       </CardContent>
-                      <CardFooter className='flex items-center justify-center border-t border-slate-200'>
-                          <Link href={buildLink('/league/standings')} className="py-1 flex items-center justify-center text-sm font-medium text-slate-500 nav-hover">
+                      <CardFooter className='flex items-center justify-center border-t border-line'>
+                          <Link href={buildLink('/league/standings')} className="py-1 flex items-center justify-center text-sm font-medium text-ink-muted nav-hover">
                               <Clock className="h-4 w-4 mr-1" />
                               <span>Classements Complets</span>
                           </Link>
@@ -391,33 +391,33 @@ export default function LeagueDashboard() {
                     </CardHeader>
                     <CardContent>
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <div className="p-4 border border-gray-200 rounded-lg hover:bg-gray-200 transition-colors cursor-pointer">
+                        <div className="p-4 border border-line rounded-lg hover:bg-line transition-colors cursor-pointer">
                           <div className="flex items-center gap-3">
-                            <div className="h-10 w-10 rounded-lg bg-green-400 flex items-center justify-center text-white">
+                            <div className="h-10 w-10 rounded-lg bg-positive flex items-center justify-center text-white">
                               <Users className="h-5 w-5" />
                             </div>
                             <div>
                               <div className="font-medium text-sm">Manage Teams</div>
-                              <div className="text-xs text-gray-500">Add, edit teams</div>
+                              <div className="text-xs text-ink-muted">Add, edit teams</div>
                             </div>
                           </div>
                         </div>
                         
-                        <div className="p-4 border border border-gray-200 rounded-lg hover:bg-gray-200 transition-colors cursor-pointer">
+                        <div className="p-4 border border border-line rounded-lg hover:bg-line transition-colors cursor-pointer">
                           <div className="flex items-center gap-3">
-                            <div className="h-10 w-10 rounded-lg bg-orange-400 flex items-center justify-center text-white">
+                            <div className="h-10 w-10 rounded-lg bg-caution flex items-center justify-center text-white">
                               <Calendar className="h-5 w-5" />
                             </div>
                             <div>
                               <div className="font-medium text-sm">Schedule Game</div>
-                              <div className="text-xs text-gray-500">Create new games</div>
+                              <div className="text-xs text-ink-muted">Create new games</div>
                             </div>
                           </div>
                         </div>
                         
-                        <div className="p-4 border border border-gray-200 rounded-lg hover:bg-muted/50 transition-colors cursor-pointer">
+                        <div className="p-4 border border border-line rounded-lg hover:bg-muted/50 transition-colors cursor-pointer">
                           <div className="flex items-center gap-3">
-                            <div className="h-10 w-10 rounded-lg bg-green-400 flex items-center justify-center text-white">
+                            <div className="h-10 w-10 rounded-lg bg-positive flex items-center justify-center text-white">
                               <Trophy className="h-5 w-5" />
                             </div>
                             <div>
@@ -427,9 +427,9 @@ export default function LeagueDashboard() {
                           </div>
                         </div>
                         
-                        <div className="p-4 border border border-gray-200 rounded-lg hover:bg-muted/50 transition-colors cursor-pointer">
+                        <div className="p-4 border border border-line rounded-lg hover:bg-muted/50 transition-colors cursor-pointer">
                           <div className="flex items-center gap-3">
-                            <div className="h-10 w-10 rounded-lg bg-indigo-400 flex items-center justify-center text-white">
+                            <div className="h-10 w-10 rounded-lg bg-accent flex items-center justify-center text-white">
                               <Award className="h-5 w-5" />
                             </div>
                             <div>
@@ -450,12 +450,12 @@ export default function LeagueDashboard() {
 const MinimalGameCard = ({ game }: { game: GameDetails }) => {
   return (
     <Link href={`/game/${game.id}/dashboard`} key={game.id} className="block">
-      <div className="bg-white rounded-lg shadow-sm hover:shadow-md hover:bg-slate-100 transition p-2 my-2 space-y-3">
+      <div className="bg-surface rounded-lg shadow-sm hover:shadow-md hover:bg-surface-sunk transition p-2 my-2 space-y-3">
         {/* Date & Status */}
-        <div className="flex items-center justify-between text-xs text-gray-600 font-semibold">
+        <div className="flex items-center justify-between text-xs text-ink-muted font-semibold">
           <span>{formatDateFr(game.dateTime)}</span>
           {game.status === GameStatus.LIVE && 
-            <span className='text-red-500 bg-red-50 border border-red-200 rounded-full px-3 py-0.5 font-semibold animate-pulse'>
+            <span className='text-negative bg-negative-soft border border-negative rounded-full px-3 py-0.5 font-semibold animate-pulse'>
               Live
             </span>
           }
@@ -472,7 +472,7 @@ const MinimalGameCard = ({ game }: { game: GameDetails }) => {
             <span className="font-semibold text-sm">{game.homeTeam.shortCode}</span>
           </div>
           {/* Score */}
-          <div className="flex items-center gap-2 text-lg font-bold text-gray-800">
+          <div className="flex items-center gap-2 text-lg font-bold text-ink">
             <span>{game.homeScore}</span>
             <span>-</span>
             <span>{game.awayScore}</span>
@@ -512,7 +512,7 @@ const StandingsTable = ({ standings } : { standings: StandingsBasic []}) => {
         <TableBody>
           {standings.map((item) => {
             return (
-                  <TableRow key={item.team.id} className="cursor-pointer hover:bg-gray-100"
+                  <TableRow key={item.team.id} className="cursor-pointer hover:bg-surface-sunk"
                     onClick={() => router.push(buildLink(`/team/dashboard`, { ctxTeamId: item.team.id }))}>
                     <TableCell className="font-medium text-center px-1">{item.rank}</TableCell>
                     <TableCell>

@@ -68,10 +68,10 @@ export default function PublicTeamsPage({ params }: { params: Promise<{ tenantSl
     <div className="min-h-screen max-w-6xl mx-auto">
       <div className="container mx-auto p-4 sm:p-6 space-y-8">
         <header>
-          <h1 className="text-2xl font-bold tracking-tight text-gray-800">
+          <h1 className="text-2xl font-bold tracking-tight text-ink">
             Équipes
           </h1>
-          <p className="mt-2 text-md text-gray-500">
+          <p className="mt-2 text-md text-ink-muted">
             Explorez les équipes affiliées.
           </p>
         </header>
@@ -83,7 +83,7 @@ export default function PublicTeamsPage({ params }: { params: Promise<{ tenantSl
               type="search"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full py-2 pl-10 rounded-full border border-gray-300"
+              className="w-full py-2 pl-10 rounded-full border border-line"
             />
           </div>
           <Select
@@ -122,7 +122,7 @@ export default function PublicTeamsPage({ params }: { params: Promise<{ tenantSl
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {teams.map((team) => (
               <Link href={`/teams/${team.league.slug}/${team.slug}`} key={team.slug}>
-                <Card key={team.slug} className="overflow-hidden hover:shadow-md transition bg-gray-200 hover:bg-gray-50">
+                <Card key={team.slug} className="overflow-hidden hover:shadow-md transition bg-line hover:bg-surface-sunk">
                   <CardContent className="flex items-center justify-between p-3">
                     <div className="flex items-center gap-4">
                       {team.businessProfile?.logoAsset?.url ? (
@@ -134,15 +134,15 @@ export default function PublicTeamsPage({ params }: { params: Promise<{ tenantSl
                           className="h-8 w-8 rounded-full object-cover"
                         />
                       ) : (
-                        <div className="h-8 w-8 rounded-full bg-gray-300" />
+                        <div className="h-8 w-8 rounded-full bg-line" />
                       )}
                       <div>
                         <h3 className="font-semibold">{team.name}</h3>
-                        <p className="text-sm text-gray-500">{team.shortCode}</p>
+                        <p className="text-sm text-ink-muted">{team.shortCode}</p>
                       </div>
                     </div>
                     <div>
-                      <ArrowRight className="h-4 w-4 text-gray-600" />
+                      <ArrowRight className="h-4 w-4 text-ink-muted" />
                     </div>
                   </CardContent>
                 </Card>
@@ -151,7 +151,7 @@ export default function PublicTeamsPage({ params }: { params: Promise<{ tenantSl
             ))}
           </div>
         ) : (
-          <div className="text-center py-16 bg-white rounded-lg border">
+          <div className="text-center py-16 bg-surface rounded-lg border">
             <h3 className="text-xl font-semibold">Aucune équipe trouvée</h3>
             <p className="text-muted-foreground mt-2">
               Essayez de modifier vos filtres ou votre recherche.

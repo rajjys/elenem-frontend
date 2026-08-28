@@ -187,10 +187,10 @@ export function SeasonForm({ onSuccess, onCancel, currentLeagueId, currentTenant
 
 
   return (
-    <div className="p-4 bg-white max-w-2xl mx-auto">
+    <div className="p-4 bg-surface max-w-2xl mx-auto">
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         {loadingData && (isSystemAdmin || isTenantAdmin) && !currentLeagueId && (
-          <p className="text-center text-gray-500">
+          <p className="text-center text-ink-muted">
             Loading available organisations and leagues...
           </p>
         )}
@@ -199,7 +199,7 @@ export function SeasonForm({ onSuccess, onCancel, currentLeagueId, currentTenant
         <div>
           {/* Display fixed Tenant Name if context is present and no selection is needed */}
           {(displayTenantName && (currentTenantId || isTenantAdmin || isLeagueAdmin) && !isSystemAdmin) && (
-             <p className="font-semibold text-lg text-slate-600 py-1 border-b border-slate-300">
+             <p className="font-semibold text-lg text-ink-muted py-1 border-b border-line">
                 {displayTenantName}
              </p>
           )}
@@ -236,7 +236,7 @@ export function SeasonForm({ onSuccess, onCancel, currentLeagueId, currentTenant
               />
               {/* Note: Errors.tenantId will still show up if validation fails, but it's not registered to an input */}
               {errors.tenantId && (
-                <p className="text-red-500 text-sm">{errors.tenantId.message}</p>
+                <p className="text-negative text-sm">{errors.tenantId.message}</p>
               )}
             </div>
           ) : null}
@@ -246,7 +246,7 @@ export function SeasonForm({ onSuccess, onCancel, currentLeagueId, currentTenant
         <div>
           {/* Display fixed League Name if context is present */}
           {(displayLeagueName && currentLeagueId) && (
-              <p className="font-semibold text-base text-slate-600 py-1 border-b border-slate-300">
+              <p className="font-semibold text-base text-ink-muted py-1 border-b border-line">
                   League: {displayLeagueName}
               </p>
           )}
@@ -279,7 +279,7 @@ export function SeasonForm({ onSuccess, onCancel, currentLeagueId, currentTenant
                 )}
               />
               {errors.leagueId && (
-                <p className="text-red-500 text-sm">{errors.leagueId.message}</p>
+                <p className="text-negative text-sm">{errors.leagueId.message}</p>
               )}
             </div>
           ) : null}
@@ -292,7 +292,7 @@ export function SeasonForm({ onSuccess, onCancel, currentLeagueId, currentTenant
           <Label htmlFor="name" hidden>Nom</Label>
           <Input id="name" type="text" placeholder="Nom de la saison" {...register("name")} disabled={isSubmitting} />
           {errors.name && (
-            <p className="text-red-500 text-sm">{errors.name.message}</p>
+            <p className="text-negative text-sm">{errors.name.message}</p>
           )}
         </div>
         
@@ -302,7 +302,7 @@ export function SeasonForm({ onSuccess, onCancel, currentLeagueId, currentTenant
             <Label htmlFor="startDate">Date de debut</Label>
             <Input id="startDate" type="date" {...register("startDate")} disabled={isSubmitting} />
             {errors.startDate && (
-              <p className="text-red-500 text-sm">{errors.startDate.message}</p>
+              <p className="text-negative text-sm">{errors.startDate.message}</p>
             )}
           </div>
 
@@ -311,7 +311,7 @@ export function SeasonForm({ onSuccess, onCancel, currentLeagueId, currentTenant
             <Label htmlFor="endDate">Date de fin</Label>
             <Input id="endDate" type="date" {...register("endDate")} disabled={isSubmitting} />
             {errors.endDate && (
-              <p className="text-red-500 text-sm">{errors.endDate.message}</p>
+              <p className="text-negative text-sm">{errors.endDate.message}</p>
             )}
           </div>
         </div>

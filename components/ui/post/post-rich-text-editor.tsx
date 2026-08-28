@@ -39,7 +39,7 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@
 
 const lexicalTheme: EditorThemeClasses = {
   paragraph: "text-sm leading-6",
-  quote: "border-l-2 pl-4 italic text-gray-600",
+  quote: "border-l-2 pl-4 italic text-ink-muted",
   heading: {
     h1: "text-2xl font-bold",
     h2: "text-xl font-semibold",
@@ -49,7 +49,7 @@ const lexicalTheme: EditorThemeClasses = {
     bold: "font-bold",
     italic: "italic",
     underline: "underline",
-    code: "font-mono text-sm bg-gray-100 px-1 rounded",
+    code: "font-mono text-sm bg-surface-sunk px-1 rounded",
   },
   list: {
     ul: "list-disc ml-6",
@@ -142,7 +142,7 @@ const changeBlock = useCallback(
 
 
   return (
-    <div className="flex flex-wrap items-center gap-2 border-b border-gray-200 py-2 px-3 sticky top-0 bg-white z-20">
+    <div className="flex flex-wrap items-center gap-2 border-b border-line py-2 px-3 sticky top-0 bg-surface z-20">
       <div className="flex gap-1">
         <Button variant={formats.bold ? "secondary" : "ghost"} size="sm" onClick={() => format("bold")}><Bold className="h-3 w-3" /></Button>
         <Button variant={formats.italic ? "secondary" : "ghost"} size="sm" onClick={() => format("italic")}><Italic className="h-3 w-3" /></Button>
@@ -150,12 +150,12 @@ const changeBlock = useCallback(
         <Button variant={formats.code ? "secondary" : "ghost"} size="sm" onClick={() => format("code")}><Code className="h-3 w-3" /></Button>
       </div>
 
-      <div className="h-6 w-px bg-gray-200 mx-2" />
+      <div className="h-6 w-px bg-line mx-2" />
 
       <Button variant="ghost" size="sm" onClick={() => changeBlock("ul")}><List className="h-3 w-3" /></Button>
       <Button variant="ghost" size="sm" onClick={() => changeBlock("ol")}><ListOrdered className="h-3 w-3" /></Button>
 
-      <div className="h-6 w-px bg-gray-200 mx-2" />
+      <div className="h-6 w-px bg-line mx-2" />
 
       <Select value={blockType} onValueChange={(v) => changeBlock(v)}>
         <SelectTrigger className="w-28 h-8 text-xs">
@@ -246,7 +246,7 @@ export default function PostRichTextEditor({
 
   return (
     <LexicalComposer initialConfig={initialConfig}>
-      <div className="border border-slate-200 rounded-md bg-white">
+      <div className="border border-line rounded-md bg-surface">
         <PostEditorToolbar />
         <div className="relative p-4 min-h-[320px]">
           <RichTextPlugin
@@ -254,7 +254,7 @@ export default function PostRichTextEditor({
                 <ContentEditable className="prose prose-sm max-w-full focus:outline-none min-h-[220px]" />
             }
             placeholder={
-                <div className="absolute top-4 left-4 text-gray-400 select-none pointer-events-none">
+                <div className="absolute top-4 left-4 text-ink-subtle select-none pointer-events-none">
                 Contenu de la publication...
                 </div>
             }

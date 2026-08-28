@@ -33,7 +33,7 @@ export default function CreateleaguePage() {
 
   return (
     <div className="container mx-auto max-w-3xl">
-      <h1 className="text-3xl font-bold text-gray-900 mb-6 text-center">Creer une Ligue</h1>
+      <h1 className="text-3xl font-bold text-ink mb-6 text-center">Creer une Ligue</h1>
       <div>
         {/* AccessGate to restrict who can access this creation form */}
         <AccessGate allowedRoles={[Roles.SYSTEM_ADMIN, Roles.TENANT_ADMIN]}>

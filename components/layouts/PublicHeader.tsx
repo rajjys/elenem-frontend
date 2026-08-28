@@ -8,6 +8,7 @@ import { Menu, X } from "lucide-react";
 
 import { useAuthStore } from "@/store/auth.store";
 import useI18n from "@/hooks/useI18n";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import UserDropdown from "./user-dropdown";
 
 export default function PublicHeader() {
@@ -24,7 +25,7 @@ export default function PublicHeader() {
   ];
 
   return (
-    <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/80 backdrop-blur">
+    <header className="sticky top-0 z-50 border-b border-line bg-surface/80 backdrop-blur">
       <div className="mx-auto max-w-7xl px-4">
         <div className="flex h-16 items-center justify-between">
           
@@ -40,7 +41,7 @@ export default function PublicHeader() {
           </Link>
 
           {/* Desktop nav */}
-          <nav className="hidden lg:flex items-center gap-8 text-sm font-medium text-slate-700">
+          <nav className="hidden lg:flex items-center gap-8 text-sm font-medium text-ink">
             {nav.map((item) => (
               <NavLink key={item.href} {...item} />
             ))}
@@ -48,10 +49,11 @@ export default function PublicHeader() {
 
           {/* Right cluster */}
           <div className="flex items-center gap-4">
+            <ThemeToggle className="hidden lg:inline-flex" />
             {/* Language */}
             <button
               onClick={() => setLocale(locale === "fr" ? "en" : "fr")}
-              className="hidden lg:block text-xs text-slate-500 hover:text-slate-700"
+              className="hidden lg:block text-xs text-ink-muted hover:text-ink"
             >
               {locale === "fr" ? "EN" : "FR"}
             </button>
@@ -71,7 +73,7 @@ export default function PublicHeader() {
             {/* Mobile toggle */}
             <button
               onClick={() => setOpen(!open)}
-              className="lg:hidden p-2 text-slate-700"
+              className="lg:hidden p-2 text-ink"
               aria-label="Toggle menu"
             >
               {open ? <X size={20} /> : <Menu size={20} />}
@@ -82,23 +84,23 @@ export default function PublicHeader() {
 
       {/* Mobile menu */}
       {open && (
-        <div className="lg:hidden border-t border-slate-200 bg-white">
+        <div className="lg:hidden border-t border-line bg-surface">
           <div className="px-4 py-6 space-y-4 text-sm font-medium">
             {nav.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
                 onClick={() => setOpen(false)}
-                className="block text-slate-700"
+                className="block text-ink"
               >
                 {item.label}
               </Link>
             ))}
 
-            <div className="pt-4 border-t border-slate-200 flex items-center justify-between">
+            <div className="pt-4 border-t border-line flex items-center justify-between">
               <button
                 onClick={() => setLocale(locale === "fr" ? "en" : "fr")}
-                className="text-xs text-slate-500"
+                className="text-xs text-ink-muted"
               >
                 {locale === "fr" ? "EN" : "FR"}
               </button>

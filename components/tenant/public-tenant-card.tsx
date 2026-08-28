@@ -16,7 +16,7 @@ function PublicTenantCard({ tenant }: { tenant: PublicTenantBasic }) {
               <div className="md:flex">
                 {/* Left: Banner + Logo */}
                 <div className="md:w-1/3 md:flex-shrink-0">
-                    <div className="relative h-48 w-full md:h-full bg-slate-200 dark:bg-slate-700">
+                    <div className="relative h-48 w-full md:h-full bg-line ">
                         {/* Banner Image */}
                         <Image
                             src={
@@ -29,10 +29,10 @@ function PublicTenantCard({ tenant }: { tenant: PublicTenantBasic }) {
                         />
 
                         {/* Dark overlay */}
-                        <div className="absolute inset-0 bg-black/30 dark:bg-black/40 z-10" />
+                        <div className="absolute inset-0 bg-black/30 z-10" />
 
                         {/* Logo */}
-                        <div className="absolute bottom-2 left-2 h-18 w-18 rounded-full bg-gray-300 dark:bg-gray-700 flex items-center justify-center overflow-hidden border-2 border-white dark:border-black shadow-md z-20">
+                        <div className="absolute bottom-2 left-2 h-18 w-18 rounded-full bg-line flex items-center justify-center overflow-hidden border-2 border-white shadow-md z-20">
                             {tenant.businessProfile?.logoAsset?.url ? (
                                 <Image
                                 src={tenant.businessProfile.logoAsset.url}
@@ -41,32 +41,32 @@ function PublicTenantCard({ tenant }: { tenant: PublicTenantBasic }) {
                                 className="object-cover"
                                 />
                             ) : (
-                                <span className="text-xs text-gray-600 dark:text-gray-300">Logo</span>
+                                <span className="text-xs text-ink-muted ">Logo</span>
                             )}
                         </div>
                     </div>
                 </div>
                 {/* Right: Content */}
-                <div className="md:w-2/3 p-4 flex flex-col bg-white dark:bg-gray-900">
-                    <h2 className="text-lg sm:text-xl lg:text-2xl font-bold tracking-tight text-gray-900 dark:text-gray-100 group-hover:text-blue-900 dark:group-hover:text-blue-400 transition-colors duration-300 ease-in-out">
+                <div className="md:w-2/3 p-4 flex flex-col bg-surface ">
+                    <h2 className="text-lg sm:text-xl lg:text-2xl font-bold tracking-tight text-ink group-hover:text-blue-900 transition-colors duration-300 ease-in-out">
                         {tenant.name}
                     </h2>
-                    <p className="text-xs md:text-sm font-mono text-gray-600 dark:text-gray-400 mb-2">
+                    <p className="text-xs md:text-sm font-mono text-ink-muted mb-2">
                         {tenant.tenantCode} • {tenant.sportType} • {countryNameToCode[tenant.country]}
                     </p>
                     {/* Website */}
-                    <div className="mt-1 inline-flex items-center text-xs md:text-sm text-gray-600 dark:text-gray-400">
+                    <div className="mt-1 inline-flex items-center text-xs md:text-sm text-ink-muted ">
                         { tenant.businessProfile?.website || tenantUrl }
                         <ExternalLink className="ml-1 w-3.5 h-3.5" />
                     </div>
                     {/* Footer info */}
-                    <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700 flex items-center space-x-6 text-xs sm:text-sm text-gray-700 dark:text-gray-300">
+                    <div className="mt-4 pt-4 border-t border-line flex items-center space-x-6 text-xs sm:text-sm text-ink ">
                         <div className="flex items-center gap-2">
-                        <Shield className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                        <Shield className="h-5 w-5 text-accent-text " />
                         <span>{tenant._count?.leagues ?? 0} Leagues</span>
                         </div>
                         <div className="flex items-center gap-2">
-                        <Users className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                        <Users className="h-5 w-5 text-accent-text " />
                         <span>{tenant._count?.teams ?? 0} Teams</span>
                         </div>
                     </div>

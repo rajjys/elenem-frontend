@@ -247,15 +247,15 @@ export function GamesFilters({ filters, onFilterChange, onPageSizeChange, fixedT
       {/* Filter Button and Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogTrigger asChild>
-          <Button variant="outline" className="whitespace-nowrap rounded-md shadow-sm hover:bg-primary-700 font-semibold py-2 px-4 transition duration-300 ease-in-out transform hover:scale-105">
+          <Button variant="outline" className="whitespace-nowrap rounded-md shadow-sm hover:bg-accent font-semibold py-2 px-4 transition duration-300 ease-in-out transform hover:scale-105">
             <FilterIcon className="mr-2 h-4 w-4" />
             More Filters
           </Button>
         </DialogTrigger>
-        <DialogContent className="sm:max-w-[700px] rounded-lg shadow-xl p-6 bg-white">
+        <DialogContent className="sm:max-w-[700px] rounded-lg shadow-xl p-6 bg-surface">
           <DialogHeader className="mb-4">
-            <DialogTitle className="text-2xl font-bold text-gray-800">Advanced Game Filters</DialogTitle>
-            <DialogDescription className="text-gray-600">
+            <DialogTitle className="text-2xl font-bold text-ink">Advanced Game Filters</DialogTitle>
+            <DialogDescription className="text-ink-muted">
               Apply additional filters to refine your game list.
             </DialogDescription>
           </DialogHeader>
@@ -265,15 +265,15 @@ export function GamesFilters({ filters, onFilterChange, onPageSizeChange, fixedT
             {/* Tenant Selection (System Admin only) */}
             {isSystemAdmin && (
               <div>
-                <Label htmlFor="tenantId" className="block text-sm font-medium text-gray-700 mb-1">Tenant</Label>
+                <Label htmlFor="tenantId" className="block text-sm font-medium text-ink mb-1">Tenant</Label>
                 <Select
                   value={selectedTenantId}
                   onValueChange={(value) => setSelectedTenantId(value === 'clear_selection' ? '' : value)}
                 >
-                  <SelectTrigger className="w-full border-gray-300 rounded-md shadow-sm focus:border-primary-500 focus:ring-primary-500">
+                  <SelectTrigger className="w-full border-line rounded-md shadow-sm focus:border-accent focus:ring-accent">
                     <SelectValue placeholder="Select Tenant" />
                   </SelectTrigger>
-                  <SelectContent className='bg-white rounded-md shadow-lg z-50'>
+                  <SelectContent className='bg-surface rounded-md shadow-lg z-50'>
                     <SelectItem value="clear_selection">Clear Selection</SelectItem>
                     {availableTenants?.map(tenant => (
                       <SelectItem key={tenant.id} value={tenant.id}>{tenant.name}</SelectItem>
@@ -286,86 +286,86 @@ export function GamesFilters({ filters, onFilterChange, onPageSizeChange, fixedT
             {/* League Selection (System Admin, Tenant Admin) */}
             {(isSystemAdmin || isTenantAdmin) && !fixedLeagueId && (
               <div>
-                <Label htmlFor="leagueId" className="block text-sm font-medium text-gray-700 mb-1">League</Label>
+                <Label htmlFor="leagueId" className="block text-sm font-medium text-ink mb-1">League</Label>
                 <Select
                   value={selectedLeagueId}
                   onValueChange={(value) => setSelectedLeagueId(value === 'clear_selection' ? '' : value)}
                   disabled={!selectedTenantId && !fixedTenantId}
                 >
-                  <SelectTrigger className="w-full border-gray-300 rounded-md shadow-sm focus:border-primary-500 focus:ring-primary-500">
+                  <SelectTrigger className="w-full border-line rounded-md shadow-sm focus:border-accent focus:ring-accent">
                     <SelectValue placeholder="Select League" />
                   </SelectTrigger>
-                  <SelectContent className='bg-white rounded-md shadow-lg z-50'>
+                  <SelectContent className='bg-surface rounded-md shadow-lg z-50'>
                     <SelectItem value="clear_selection">Clear Selection</SelectItem>
                     {availableLeagues?.map(league => (
                       <SelectItem key={league.id} value={league.id}>{league.name}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
-                {(!selectedTenantId && isSystemAdmin) && <p className="text-gray-500 text-xs mt-1">Select a tenant to load leagues.</p>}
-                {(selectedTenantId || fixedTenantId) && availableLeagues?.length === 0 && <p className="text-gray-500 text-xs mt-1">No leagues found for this tenant.</p>}
+                {(!selectedTenantId && isSystemAdmin) && <p className="text-ink-muted text-xs mt-1">Select a tenant to load leagues.</p>}
+                {(selectedTenantId || fixedTenantId) && availableLeagues?.length === 0 && <p className="text-ink-muted text-xs mt-1">No leagues found for this tenant.</p>}
               </div>
             )}
 
             {/* Season Selection (System Admin, Tenant Admin, League Admin) */}
             {(isSystemAdmin || isTenantAdmin || isLeagueAdmin) && !fixedSeasonId && (
               <div>
-                <Label htmlFor="seasonId" className="block text-sm font-medium text-gray-700 mb-1">Season</Label>
+                <Label htmlFor="seasonId" className="block text-sm font-medium text-ink mb-1">Season</Label>
                 <Select
                   value={selectedSeasonId}
                   onValueChange={(value) => setSelectedSeasonId(value === 'clear_selection' ? '' : value)}
                   disabled={!selectedLeagueId && !fixedLeagueId}
                 >
-                  <SelectTrigger className="w-full border-gray-300 rounded-md shadow-sm focus:border-primary-500 focus:ring-primary-500">
+                  <SelectTrigger className="w-full border-line rounded-md shadow-sm focus:border-accent focus:ring-accent">
                     <SelectValue placeholder="Select Season" />
                   </SelectTrigger>
-                  <SelectContent className='bg-white rounded-md shadow-lg z-50'>
+                  <SelectContent className='bg-surface rounded-md shadow-lg z-50'>
                     <SelectItem value="clear_selection">Clear Selection</SelectItem>
                     {availableSeasons?.map(season => (
                       <SelectItem key={season.id} value={season.id}>{season.name}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
-                {(!selectedLeagueId && (isSystemAdmin || isTenantAdmin || isLeagueAdmin)) && <p className="text-gray-500 text-xs mt-1">Select a league to load seasons.</p>}
-                {(selectedLeagueId || fixedLeagueId) && availableSeasons?.length === 0 && <p className="text-gray-500 text-xs mt-1">No seasons found for this league.</p>}
+                {(!selectedLeagueId && (isSystemAdmin || isTenantAdmin || isLeagueAdmin)) && <p className="text-ink-muted text-xs mt-1">Select a league to load seasons.</p>}
+                {(selectedLeagueId || fixedLeagueId) && availableSeasons?.length === 0 && <p className="text-ink-muted text-xs mt-1">No seasons found for this league.</p>}
               </div>
             )}
 
             {/* Team Selection (System Admin, Tenant Admin, League Admin) */}
             {(isSystemAdmin || isTenantAdmin || isLeagueAdmin) && !fixedTeamId && (
               <div>
-                <Label htmlFor="teamId" className="block text-sm font-medium text-gray-700 mb-1">Team</Label>
+                <Label htmlFor="teamId" className="block text-sm font-medium text-ink mb-1">Team</Label>
                 <Select
                   value={selectedTeamId}
                   onValueChange={(value) => setSelectedTeamId(value === 'clear_selection' ? '' : value)}
                   disabled={!selectedLeagueId && !fixedLeagueId}
                 >
-                  <SelectTrigger className="w-full border-gray-300 rounded-md shadow-sm focus:border-primary-500 focus:ring-primary-500">
+                  <SelectTrigger className="w-full border-line rounded-md shadow-sm focus:border-accent focus:ring-accent">
                     <SelectValue placeholder="Select Team" />
                   </SelectTrigger>
-                  <SelectContent className='bg-white rounded-md shadow-lg z-50'>
+                  <SelectContent className='bg-surface rounded-md shadow-lg z-50'>
                     <SelectItem value="clear_selection">Clear Selection</SelectItem>
                     {availableTeams?.map(team => (
                       <SelectItem key={team.id} value={team.id}>{team.name}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
-                {(!selectedLeagueId && (isSystemAdmin || isTenantAdmin || isLeagueAdmin)) && <p className="text-gray-500 text-xs mt-1">Select a league to load teams.</p>}
-                {(selectedLeagueId || fixedLeagueId) && availableTeams?.length === 0 && <p className="text-gray-500 text-xs mt-1">No teams found for this league.</p>}
+                {(!selectedLeagueId && (isSystemAdmin || isTenantAdmin || isLeagueAdmin)) && <p className="text-ink-muted text-xs mt-1">Select a league to load teams.</p>}
+                {(selectedLeagueId || fixedLeagueId) && availableTeams?.length === 0 && <p className="text-ink-muted text-xs mt-1">No teams found for this league.</p>}
               </div>
             )}
 
             {/* Status Select */}
             <div>
-              <Label htmlFor="gameStatus" className="block text-sm font-medium text-gray-700 mb-1">Game Status</Label>
+              <Label htmlFor="gameStatus" className="block text-sm font-medium text-ink mb-1">Game Status</Label>
               <Select
                 value={selectedStatus || ''}
                 onValueChange={(value: GameStatus) => setSelectedStatus(!value ? undefined : value)}
               >
-                <SelectTrigger className="w-full border-gray-300 rounded-md shadow-sm focus:border-primary-500 focus:ring-primary-500">
+                <SelectTrigger className="w-full border-line rounded-md shadow-sm focus:border-accent focus:ring-accent">
                   <SelectValue placeholder="Select Status" />
                 </SelectTrigger>
-                <SelectContent className='bg-white rounded-md shadow-lg z-50'>
+                <SelectContent className='bg-surface rounded-md shadow-lg z-50'>
                   <SelectItem value="clear_selection">Clear Selection</SelectItem>
                   {statusOptions.map(option => (
                     <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
@@ -376,13 +376,13 @@ export function GamesFilters({ filters, onFilterChange, onPageSizeChange, fixedT
 
             {/* Date Input */}
             <div>
-              <Label htmlFor="gameDate" className="block text-sm font-medium text-gray-700 mb-1">Date</Label>
+              <Label htmlFor="gameDate" className="block text-sm font-medium text-ink mb-1">Date</Label>
               <Input
                 id="gameDate"
                 type="date"
                 value={selectedDate}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSelectedDate(e.target.value)}
-                className="w-full border-gray-300 rounded-md shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                className="w-full border-line rounded-md shadow-sm focus:border-accent focus:ring-accent"
               />
             </div>
 
@@ -393,12 +393,12 @@ export function GamesFilters({ filters, onFilterChange, onPageSizeChange, fixedT
                 checked={isActive || false}
                 onCheckedChange={setIsActive}
               />
-              <Label htmlFor="gameIsActive" className="text-sm font-medium text-gray-700">Active Games</Label>
+              <Label htmlFor="gameIsActive" className="text-sm font-medium text-ink">Active Games</Label>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => setIsActive(undefined)}
-                className="ml-2 text-gray-500 hover:bg-gray-100 rounded-md px-2 py-1"
+                className="ml-2 text-ink-muted hover:bg-surface-sunk rounded-md px-2 py-1"
                 disabled={isActive === undefined}
               >
                 Clear
@@ -407,7 +407,7 @@ export function GamesFilters({ filters, onFilterChange, onPageSizeChange, fixedT
 
             {/* Page Size Control */}
             <div className="flex items-center space-x-2 mt-4">
-              <Label htmlFor="pageSize" className="text-sm font-medium text-gray-700">Games per page</Label>
+              <Label htmlFor="pageSize" className="text-sm font-medium text-ink">Games per page</Label>
               <Input
                 id="pageSize"
                 type="number"
@@ -424,14 +424,14 @@ export function GamesFilters({ filters, onFilterChange, onPageSizeChange, fixedT
             <Button
               variant="danger"
               onClick={handleClearAllFilters}
-              // className="bg-red-500 hover:bg-red-600 text-white rounded-md shadow-sm transition duration-300 ease-in-out"
+              // className="bg-negative hover:bg-negative text-white rounded-md shadow-sm transition duration-300 ease-in-out"
             >
               Clear All Filters
             </Button>
             <Button
               type="button"
               onClick={() => setIsDialogOpen(false)}
-              // className="bg-primary-600 hover:bg-primary-700 text-white rounded-md shadow-sm transition duration-300 ease-in-out"
+              // className="bg-accent hover:bg-accent text-white rounded-md shadow-sm transition duration-300 ease-in-out"
             >
               Close
             </Button>

@@ -44,7 +44,7 @@ const StandingsTable: React.FC<StandingsTableProps> = ({ standings, rowsToShow =
     return (
     <div className="overflow-x-auto no-scrollbar">
       <Table>
-        <TableHeader className="border-blue-200">
+        <TableHeader className="border-accent-line">
           <TableRow>
             <TableHead className="text-center"></TableHead>
             <TableHead className="min-w-[100px]">Equipes</TableHead>
@@ -58,14 +58,14 @@ const StandingsTable: React.FC<StandingsTableProps> = ({ standings, rowsToShow =
         <TableBody>
           {trimmedStandings.map((item) => {
             return (
-                  <TableRow key={item.team.id} className="cursor-pointer hover:bg-gray-100">
+                  <TableRow key={item.team.id} className="cursor-pointer hover:bg-surface-sunk">
                     <TableCell className="font-medium text-center px-0">{item.rank}</TableCell>
                     <TableCell className="px-0">
                       <Link href={`/teams/${item.team.league.slug}/${item.team.slug}`} className="flex items-center gap-3 w-full">
                         <Avatar src={item.team.businessProfile?.logoAsset?.url} name={item.team.name} size={25} />
                         <span className="hidden md:inline font-bold">
                             {item.team.name}
-                            <span className="text-slate-400 font-normal text-xs"> ({item.team.shortCode})</span>
+                            <span className="text-ink-subtle font-normal text-xs"> ({item.team.shortCode})</span>
                         </span>
                         <span className="font-bold md:hidden">{item.team.shortCode}</span>
                       </Link>

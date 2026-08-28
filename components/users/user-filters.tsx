@@ -160,15 +160,15 @@ export function UserFilters({ filters, onFilterChange, onPageSizeChange }: UserF
       {/* Filter Button and Dialog - to the right of the search input */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogTrigger asChild>
-          <Button variant="outline" className="rounded-md shadow-sm bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 transition duration-300 ease-in-out transform hover:scale-105">
+          <Button variant="outline" className="rounded-md shadow-sm bg-accent hover:bg-accent text-white font-semibold py-2 px-4 transition duration-300 ease-in-out transform hover:scale-105">
             <FilterIcon />
             More Filters
           </Button>
         </DialogTrigger>
-        <DialogContent className="sm:max-w-[700px] rounded-lg shadow-xl p-6 bg-white">
+        <DialogContent className="sm:max-w-[700px] rounded-lg shadow-xl p-6 bg-surface">
           <DialogHeader className="mb-4">
-            <DialogTitle className="text-2xl font-bold text-gray-800">Advanced Filters</DialogTitle>
-            <DialogDescription className="text-gray-600">
+            <DialogTitle className="text-2xl font-bold text-ink">Advanced Filters</DialogTitle>
+            <DialogDescription className="text-ink-muted">
               Apply additional filters to refine your user list.
             </DialogDescription>
           </DialogHeader>
@@ -176,7 +176,7 @@ export function UserFilters({ filters, onFilterChange, onPageSizeChange }: UserF
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 py-4">
             {/* Roles Multi-Select */}
             <div>
-              <Label htmlFor="roles" className="block text-sm font-medium text-gray-700 mb-1">Roles</Label>
+              <Label htmlFor="roles" className="block text-sm font-medium text-ink mb-1">Roles</Label>
               <MultiSelect
                 options={roleOptions}
                 selected={selectedRoles}
@@ -188,15 +188,15 @@ export function UserFilters({ filters, onFilterChange, onPageSizeChange }: UserF
 
             {/* Gender Select */}
             <div>
-              <Label htmlFor="gender" className="block text-sm font-medium text-gray-700 mb-1">Gender</Label>
+              <Label htmlFor="gender" className="block text-sm font-medium text-ink mb-1">Gender</Label>
               <Select
                 value={selectedGender}
                 onValueChange={(value: Gender) => setSelectedGender(!value ? undefined : value)}
               >
-                <SelectTrigger className="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                <SelectTrigger className="w-full border-line rounded-md shadow-sm focus:border-accent focus:ring-accent">
                   <SelectValue placeholder="Select Gender" />
                 </SelectTrigger>
-                <SelectContent className='bg-white rounded-md shadow-lg z-50'>
+                <SelectContent className='bg-surface rounded-md shadow-lg z-50'>
                   {/* Option to clear gender filter */}
                   <SelectItem value="clear_selection">Clear Selection</SelectItem>
                   {genderOptions.map(option => (
@@ -208,15 +208,15 @@ export function UserFilters({ filters, onFilterChange, onPageSizeChange }: UserF
 
             {/* Language Select */}
             <div>
-              <Label htmlFor="language" className="block text-sm font-medium text-gray-700 mb-1">Preferred Language</Label>
+              <Label htmlFor="language" className="block text-sm font-medium text-ink mb-1">Preferred Language</Label>
               <Select
                 value={selectedLanguage}
                 onValueChange={(value: SupportedLanguages) => setSelectedLanguage(!value ? undefined : value)}
               >
-                <SelectTrigger className="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                <SelectTrigger className="w-full border-line rounded-md shadow-sm focus:border-accent focus:ring-accent">
                   <SelectValue placeholder="Select Language" />
                 </SelectTrigger>
-                <SelectContent className='bg-white rounded-md shadow-lg z-50'>
+                <SelectContent className='bg-surface rounded-md shadow-lg z-50'>
                   {/* Option to clear language filter */}
                   <SelectItem value="clear_selection">Clear Selection</SelectItem>
                   {languageOptions.map(option => (
@@ -232,14 +232,14 @@ export function UserFilters({ filters, onFilterChange, onPageSizeChange }: UserF
                 id="isActive"
                 checked={isActive || false}
                 onCheckedChange={setIsActive}
-                className="data-[state=checked]:bg-blue-500 data-[state=unchecked]:bg-gray-200"
+                className="data-[state=checked]:bg-accent data-[state=unchecked]:bg-line"
               />
-              <Label htmlFor="isActive" className="text-sm font-medium text-gray-700">Active Users</Label>
+              <Label htmlFor="isActive" className="text-sm font-medium text-ink">Active Users</Label>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => setIsActive(undefined)}
-                className="ml-2 text-gray-500 hover:bg-gray-100 rounded-md px-2 py-1"
+                className="ml-2 text-ink-muted hover:bg-surface-sunk rounded-md px-2 py-1"
                 disabled={isActive === undefined}
               >
                 Clear
@@ -252,14 +252,14 @@ export function UserFilters({ filters, onFilterChange, onPageSizeChange }: UserF
                 id="isEmailVerified"
                 checked={isEmailVerified || false}
                 onCheckedChange={setIsVerified}
-                className="data-[state=checked]:bg-blue-500 data-[state=unchecked]:bg-gray-200"
+                className="data-[state=checked]:bg-accent data-[state=unchecked]:bg-line"
               />
-              <Label htmlFor="isEmailVerified" className="text-sm font-medium text-gray-700">Verified Users</Label>
+              <Label htmlFor="isEmailVerified" className="text-sm font-medium text-ink">Verified Users</Label>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => setIsVerified(undefined)}
-                className="ml-2 text-gray-500 hover:bg-gray-100 rounded-md px-2 py-1"
+                className="ml-2 text-ink-muted hover:bg-surface-sunk rounded-md px-2 py-1"
                 disabled={isEmailVerified === undefined}
               >
                 Clear
@@ -269,7 +269,7 @@ export function UserFilters({ filters, onFilterChange, onPageSizeChange }: UserF
 
           {/* Page Size Control - inside the dialog */}
           <div className="flex items-center space-x-2 mt-4">
-            <Label htmlFor="pageSize" className="text-sm font-medium text-gray-700">Users per page</Label>
+            <Label htmlFor="pageSize" className="text-sm font-medium text-ink">Users per page</Label>
             <Input
               id="pageSize"
               type="number"
@@ -277,7 +277,7 @@ export function UserFilters({ filters, onFilterChange, onPageSizeChange }: UserF
               max="50"
               value={pageSizeInput}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPageSizeInput(e.target.value)}
-              className="w-20 border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              className="w-20 border-line rounded-md shadow-sm focus:border-accent focus:ring-accent"
             />
           </div>
 
@@ -285,14 +285,14 @@ export function UserFilters({ filters, onFilterChange, onPageSizeChange }: UserF
             <Button
               variant="outline"
               onClick={handleClearAllFilters}
-              className="bg-red-500 hover:bg-red-600 text-white rounded-md shadow-sm transition duration-300 ease-in-out"
+              className="bg-negative hover:bg-negative text-white rounded-md shadow-sm transition duration-300 ease-in-out"
             >
               Clear All Filters
             </Button>
             <Button
               type="button"
               onClick={() => setIsDialogOpen(false)}
-              className="bg-blue-500 hover:bg-blue-600 text-white rounded-md shadow-sm transition duration-300 ease-in-out"
+              className="bg-accent hover:bg-accent text-white rounded-md shadow-sm transition duration-300 ease-in-out"
             >
               Close
             </Button>

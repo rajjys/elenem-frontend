@@ -117,13 +117,13 @@ export default function PlansPage() {
     return RedirectPath
   }
   return (
-    <div className="min-h-screen bg-white text-zinc-900 dark:bg-slate-900 dark:text-slate-100">
+    <div className="min-h-screen bg-surface text-ink ">
       {/* Hero */}
       <section className="mx-auto max-w-5xl px-4 pt-12 md:pt-20 text-center">
         <h1 className="text-3xl md:text-5xl font-semibold tracking-tight leading-tight">
           Tarifs simples et transparents
         </h1>
-        <p className="mt-4 text-zinc-600 dark:text-slate-400 max-w-2xl mx-auto">
+        <p className="mt-4 text-ink-muted max-w-2xl mx-auto">
           Commencez gratuitement, puis évoluez vers les plans Pro, Élite ou Fédération selon vos besoins. Conçu pour les ligues de toutes tailles.
         </p>
       </section>    
@@ -134,27 +134,27 @@ export default function PlansPage() {
           {plans.map((plan, i) => (
             <Card
               key={i}
-              className={`rounded-3xl flex flex-col bg-white dark:bg-slate-800 ${
-                plan.highlight ? "border-2 border-indigo-500 dark:border-indigo-400" : "border border-slate-200 dark:border-slate-700"
+              className={`rounded-3xl flex flex-col bg-surface ${
+                plan.highlight ? "border-2 border-accent " : "border border-line "
               }`}
             >
               <CardHeader>
                 <CardTitle className="text-lg font-semibold">{plan.name}</CardTitle>
                 <div className="text-2xl font-bold mt-2">{plan.price}</div>
-                <p className="text-sm text-zinc-500 dark:text-slate-400 mt-1">{plan.tagline}</p>
+                <p className="text-sm text-ink-muted mt-1">{plan.tagline}</p>
               </CardHeader>
               <CardContent className="flex-1 flex flex-col justify-between pb-4">
                 <ul className="space-y-2 mb-6 text-sm">
                   {plan.features.map((f, j) => (
                     <li key={j} className="flex gap-2 items-start">
-                      <Check className="w-4 h-4 text-indigo-500 dark:text-indigo-400 shrink-0 mt-0.5" />
+                      <Check className="w-4 h-4 text-accent-text shrink-0 mt-0.5" />
                       <span>{f}</span>
                     </li>
                   ))}
                 </ul>
                 {plan.disabled ? (
                   <span
-                    className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-full text-gray-400 bg-gray-100 dark:text-slate-500 dark:bg-slate-700 cursor-not-allowed"
+                    className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-full text-ink-subtle bg-surface-sunk cursor-not-allowed"
                     aria-disabled="true"
                     tabIndex={-1}
                   >
@@ -163,7 +163,7 @@ export default function PlansPage() {
                 ) : (
                   <Link
                     href={handleRedirectByPlan(plan.slug)}
-                    className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-full text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-300 ease-in-out"
+                    className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-full text-white bg-accent hover:bg-accent focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent transition duration-300 ease-in-out"
                   >
                     {plan.cta}
                   </Link>
@@ -179,9 +179,9 @@ export default function PlansPage() {
         <h2 className="text-2xl font-semibold text-center mb-8">Questions fréquentes</h2>
         <div className="space-y-6">
           {faqs.map((f, i) => (
-            <div key={i} className="border-b border-gray-200 dark:border-slate-700 pb-4">
+            <div key={i} className="border-b border-line pb-4">
               <h3 className="font-medium">{f.q}</h3>
-              <p className="text-sm text-zinc-600 dark:text-slate-400 mt-1">{f.a}</p>
+              <p className="text-sm text-ink-muted mt-1">{f.a}</p>
             </div>
           ))}
         </div>

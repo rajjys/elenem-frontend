@@ -77,15 +77,15 @@ function VerifyEmailInner() {
 
   return (
     <div className="flex min-h-[70vh] items-center justify-center px-4 py-10">
-      <div className="w-full max-w-md rounded-2xl border border-gray-100 bg-white p-8 shadow-xl">
+      <div className="w-full max-w-md rounded-2xl border border-line bg-surface p-8 shadow-xl">
         <div className="mb-6 flex flex-col items-center text-center">
-          <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-indigo-50 text-indigo-600">
+          <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-accent-soft text-accent-text">
             <MailCheck size={22} />
           </div>
-          <h1 className="text-xl font-semibold text-gray-900">Vérifiez votre email</h1>
-          <p className="mt-1 text-sm text-gray-500">
+          <h1 className="text-xl font-semibold text-ink">Vérifiez votre email</h1>
+          <p className="mt-1 text-sm text-ink-muted">
             Un code à 6 chiffres a été envoyé à{' '}
-            <span className="font-medium text-gray-700">{email || 'votre adresse'}</span>. La
+            <span className="font-medium text-ink">{email || 'votre adresse'}</span>. La
             réception peut prendre quelques instants.
           </p>
         </div>
@@ -111,22 +111,22 @@ function VerifyEmailInner() {
             type="button"
             disabled={cooldown > 0 || resend.isPending}
             onClick={doResend}
-            className="text-indigo-600 hover:text-indigo-500 disabled:cursor-not-allowed disabled:text-gray-400"
+            className="text-accent-text hover:text-accent-text disabled:cursor-not-allowed disabled:text-ink-subtle"
           >
             {cooldown > 0 ? `Renvoyer le code (${cooldown}s)` : 'Renvoyer le code'}
           </button>
         </div>
 
-        <div className="mt-6 border-t border-gray-100 pt-4 text-center text-sm">
+        <div className="mt-6 border-t border-line pt-4 text-center text-sm">
           {user ? (
             <Link
               href="/account/dashboard"
-              className="inline-flex items-center gap-1 text-gray-500 hover:text-gray-700"
+              className="inline-flex items-center gap-1 text-ink-muted hover:text-ink"
             >
               <ArrowLeft size={14} /> Retour au tableau de bord
             </Link>
           ) : (
-            <Link href="/login" className="text-indigo-600 hover:text-indigo-500">
+            <Link href="/login" className="text-accent-text hover:text-accent-text">
               Retour à la connexion
             </Link>
           )}

@@ -129,12 +129,12 @@ const onSubmit = async (data: ProfileFormValues) => {
     return (
   <form
     onSubmit={handleSubmit(onSubmit)}
-    className="space-y-6 p-6 pb-0 shadow-md bg-white rounded-lg"
+    className="space-y-6 p-6 pb-0 shadow-md bg-surface rounded-lg"
   >
     {/* --- Error Summary Display (Optional for large forms) --- */}
     {errors && Object.keys(errors).length > 0 && isDirty && (
       <div
-        className="p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg"
+        className="p-4 mb-4 text-sm text-negative bg-negative-soft rounded-lg"
         role="alert"
       >
         <p className="font-semibold">
@@ -324,7 +324,7 @@ const onSubmit = async (data: ProfileFormValues) => {
 
     {/* --- STICKY FOOTER FOR SUBMISSION --- */}
     <div
-      className="sticky bottom-0 z-10 p-4 -mx-6 mt-6 bg-white border-t border-slate-200 shadow-lg rounded-b-lg flex justify-end"
+      className="sticky bottom-0 z-10 p-4 -mx-6 mt-6 bg-surface border-t border-line shadow-lg rounded-b-lg flex justify-end"
       style={{ width: "calc(100% + 48px)" }}
     >
       <div className="flex items-center gap-3">

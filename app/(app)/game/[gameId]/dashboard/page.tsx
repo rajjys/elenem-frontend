@@ -35,26 +35,26 @@ interface TeamScoreProps {
 const TeamScore = ({ label, score, onIncrement, onDecrement, isLive, canEdit }: TeamScoreProps) => {
   return (
     <div className="flex flex-col items-center rounded-2xl shadow-inner w-20 sm:w-24">
-      <h2 className="text-xs sm:text-sm font-semibold text-gray-700 uppercase tracking-wide mb-2 dark:text-gray-300 text-center">
+      <h2 className="text-xs sm:text-sm font-semibold text-ink uppercase tracking-wide mb-2 text-center">
         {label}
       </h2>
       {canEdit && isLive && (
         <Button
           onClick={onIncrement}
           variant="outline"
-          className="rounded-full border-2 border-gray-300 hover:bg-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600 mb-2">
-            <ChevronUp className='w-4 h-4 text-green-600 dark:text-green-300 font-bold' />
+          className="rounded-full border-2 border-line hover:bg-line mb-2">
+            <ChevronUp className='w-4 h-4 text-positive font-bold' />
         </Button>
       )}
-      <span className="text-3xl sm:text-4xl font-extrabold dark:text-white">
+      <span className="text-3xl sm:text-4xl font-extrabold ">
         {score}
       </span>
       {canEdit && isLive && (
         <Button
           onClick={onDecrement}
           variant="outline"
-          className="rounded-full border-2 border-gray-300 hover:bg-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600 mb-2">
-            <ChevronDown className="w-4 h-4 text-red-600 dark:text-red-400 font-bold" />
+          className="rounded-full border-2 border-line hover:bg-line mb-2">
+            <ChevronDown className="w-4 h-4 text-negative font-bold" />
         </Button>
       )}
     </div>
@@ -171,7 +171,7 @@ export default function GameManagementDashboard() {
 
   if (loading || !game) {
     return (
-      <div className="flex justify-center items-center h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="flex justify-center items-center h-screen bg-surface-sunk ">
         <LoadingSpinner message="Chargement du match" />
       </div>
     );
@@ -181,7 +181,7 @@ export default function GameManagementDashboard() {
   const canEdit = !isTeamAdmin;
 
   return (
-    <div className="flex flex-col min-h-screen px-2 py-4 sm:p-6 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">
+    <div className="flex flex-col min-h-screen px-2 py-4 sm:p-6 bg-surface-sunk text-ink transition-colors duration-300">
       {/* Header: Back + Status + CTA */}
       <div className="flex items-center justify-between mb-4">
         <Button
@@ -192,7 +192,7 @@ export default function GameManagementDashboard() {
         </Button>
         <div className='flex flex-col justify-center items-center'>
           {getStatusBadge(game.status)}
-          <span className='text-xs md:text-sm lg:text-base py-1 text-gray-500 dark:text-gray-300'>{formatDateFr(game.dateTime)}</span>
+          <span className='text-xs md:text-sm lg:text-base py-1 text-ink-muted '>{formatDateFr(game.dateTime)}</span>
         </div>
         <div>
           {game.status === GameStatus.SCHEDULED && canEdit && (
@@ -206,7 +206,7 @@ export default function GameManagementDashboard() {
           {game.status === GameStatus.LIVE && canEdit && (
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <Button variant='danger' className="bg-red-500 hover:bg-red-600 text-white rounded-xl">
+                <Button variant='danger' className="bg-negative hover:bg-negative text-white rounded-xl">
                   <Flag className="w-4 h-4 mr-2" /> Clôturer le match
                 </Button>
               </AlertDialogTrigger>
@@ -235,11 +235,11 @@ export default function GameManagementDashboard() {
       </div>
 
       {/* Team logos + scores */}
-      <div className="flex sm:flex-row items-center justify-around bg-gray-100 dark:bg-gray-800 rounded-3xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+      <div className="flex sm:flex-row items-center justify-around bg-surface-sunk rounded-3xl shadow-lg p-6 border border-line ">
         
         {/* Home team logo */}
         <div className="flex flex-col items-center">
-          <div className="w-10 h-10 md:w-16 md:h-16 lg:w-20 lg:h-20 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700">
+          <div className="w-10 h-10 md:w-16 md:h-16 lg:w-20 lg:h-20 rounded-full overflow-hidden bg-line ">
             <Image
               src={game.homeTeam?.businessProfile?.logoAsset?.url || 'https://placehold.co/80x80/E2E8F0/1A202C?text=Home'}
               alt={game.homeTeam.name || "Équipe Domicile"}
@@ -276,7 +276,7 @@ export default function GameManagementDashboard() {
 
         {/* Away team logo */}
         <div className="flex flex-col items-center">
-          <div className="w-10 h-10 md:w-16 md:h-16 lg:w-20 lg:h-20 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700">
+          <div className="w-10 h-10 md:w-16 md:h-16 lg:w-20 lg:h-20 rounded-full overflow-hidden bg-line ">
             <Image
               src={game.awayTeam?.businessProfile?.logoAsset?.url || 'https://placehold.co/80x80/E2E8F0/1A202C?text=Away'}
               alt={game.awayTeam.name || "Équipe Extérieure"}

@@ -206,10 +206,10 @@ export default function TenantDashboard() {
 
     // Dynamically generate stat cards based on tenant data
     const statCards = [
-        { title: "Ligues", value: counts.leagues, description: "Ligues Actives de l'organisation", trend: {isPositive: true, value: 3.6, timespan: "season"}, icon: Trophy, bgColorClass: "bg-blue-400", textColorClass: "text-white", href: buildLink("/tenant/leagues") },
-        { title: "Equipes", value: counts.teams, description: "Equipes actives de l'organisation", trend: {isPositive: false, value: 2.6, timespan: "season"}, icon: Building, bgColorClass: "bg-green-400", textColorClass: "text-white", href: buildLink("/tenant/teams") },
-        { title: "Athletes", value: counts.players, description: "Athletes actifs dans l'organisation", trend: {isPositive: true, value: 0, timespan: "season"}, icon: Users, bgColorClass: "bg-orange-400", textColorClass: "text-white", href: buildLink("/tenant/players") },
-        { title: "Ventes (Aujourdh'hui)", value: 0, description: "Billets Vendus Aujourd'hui", trend: {isPositive: true, value: 0, timespan: "season"}, icon: Ticket, bgColorClass: "bg-red-400", textColorClass: "text-white", href: buildLink("/tenant/tickets") }, // Keeping mock for now as per request
+        { title: "Ligues", value: counts.leagues, description: "Ligues Actives de l'organisation", trend: {isPositive: true, value: 3.6, timespan: "season"}, icon: Trophy, bgColorClass: "bg-accent", textColorClass: "text-white", href: buildLink("/tenant/leagues") },
+        { title: "Equipes", value: counts.teams, description: "Equipes actives de l'organisation", trend: {isPositive: false, value: 2.6, timespan: "season"}, icon: Building, bgColorClass: "bg-positive", textColorClass: "text-white", href: buildLink("/tenant/teams") },
+        { title: "Athletes", value: counts.players, description: "Athletes actifs dans l'organisation", trend: {isPositive: true, value: 0, timespan: "season"}, icon: Users, bgColorClass: "bg-caution", textColorClass: "text-white", href: buildLink("/tenant/players") },
+        { title: "Ventes (Aujourdh'hui)", value: 0, description: "Billets Vendus Aujourd'hui", trend: {isPositive: true, value: 0, timespan: "season"}, icon: Ticket, bgColorClass: "bg-negative", textColorClass: "text-white", href: buildLink("/tenant/tickets") }, // Keeping mock for now as per request
     ]
 
     return (
@@ -218,7 +218,7 @@ export default function TenantDashboard() {
                 <title>{tenant?.tenantCode || "Tenant"} - Tableau de Bord</title>
             </Head>
             {/* Header Section */}
-            <section className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 md:gap-0 px-4 py-3 mb-4 bg-white shadow-md rounded-md">
+            <section className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 md:gap-0 px-4 py-3 mb-4 bg-surface shadow-md rounded-md">
                 <div className="flex items-center gap-3">
                     {tenant?.businessProfile.logoAsset?.url ? (
                     <Image
@@ -232,11 +232,11 @@ export default function TenantDashboard() {
                     <Avatar name={tenant?.name || 'Tenant'} size={40} className="rounded-full" />
                     )}
                     <div>
-                    <h1 className="text-lg md:text-xl lg:text-2xl font-bold text-gray-800 leading-tight">
+                    <h1 className="text-lg md:text-xl lg:text-2xl font-bold text-ink leading-tight">
                         {tenant?.name}
                     </h1>
                     {tenant?.tenantCode && (
-                        <p className="text-sm text-gray-500 flex items-center gap-1">
+                        <p className="text-sm text-ink-muted flex items-center gap-1">
                             <span>{capitalizeFirst(tenant.tenantCode)}</span>
                             -
                             <CountryFlag countryCode={countryNameToCode[tenant.country ?? ''] || tenant.country || ''} svg style={{ width: '2em', height: '1em' }} />
@@ -259,7 +259,7 @@ export default function TenantDashboard() {
             </section>
                 {/* Key Metrics Section */}
             <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-4">
-                {loading ? <LoadingSpinner /> : error ? <p className='text-red-500'>{error}</p> :
+                {loading ? <LoadingSpinner /> : error ? <p className='text-negative'>{error}</p> :
                 statCards.map((card, index) => (
                     <StatsCard key={index} {...card} />
                 ))}    
@@ -267,10 +267,10 @@ export default function TenantDashboard() {
             {/* Leagues and Games Overview */}
             <section className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-4">
                 <div className="h-full lg:col-span-2">
-                    <Card className="h-full flex flex-col justify-between shadow-elevated bg-gray-50">
-                        <CardHeader className="flex flex-row items-center justify-between gap-2 sm:gap-4 px-4 border-b border-slate-200">
-                            <CardTitle className="text-lg font-semibold text-gray-500">{tenant?.leagues?.length} Ligues</CardTitle>
-                            <Link href={buildLink('/tenant/leagues')} className="inline-flex items-center text-sm font-medium text-slate-500 nav-hover">
+                    <Card className="h-full flex flex-col justify-between shadow-elevated bg-surface-sunk">
+                        <CardHeader className="flex flex-row items-center justify-between gap-2 sm:gap-4 px-4 border-b border-line">
+                            <CardTitle className="text-lg font-semibold text-ink-muted">{tenant?.leagues?.length} Ligues</CardTitle>
+                            <Link href={buildLink('/tenant/leagues')} className="inline-flex items-center text-sm font-medium text-ink-muted nav-hover">
                                 <Trophy className="h-4 w-4 mr-1" />
                                 <span>Toutes les Ligues</span>
                             </Link>
@@ -280,7 +280,7 @@ export default function TenantDashboard() {
                                 leagues.length == 0 ?
                                 <p className='my-8 flex flex-col items-center justify-center gap-2'>
                                     <span>Aucune Ligue Trouvee</span>
-                                    <Link href={buildLink("/league/create")} className='inline-flex items-center font-medium text-slate-500 nav-hover'>
+                                    <Link href={buildLink("/league/create")} className='inline-flex items-center font-medium text-ink-muted nav-hover'>
                                         <Plus className="h-4 w-4 mr-1" />
                                         Creer une nouvelle Ligue
                                     </Link>
@@ -291,9 +291,9 @@ export default function TenantDashboard() {
                                 ))
                             }
                         </CardContent>
-                        <CardFooter className='flex items-center justify-center border-t border-slate-200'>
-                            <Link href={buildLink('/tenant/leagues')} className="inline-flex items-center text-sm font-medium text-slate-500 nav-hover">
-                                <Trophy className="h-4 w-4 mr-1 text-emerald-600" />
+                        <CardFooter className='flex items-center justify-center border-t border-line'>
+                            <Link href={buildLink('/tenant/leagues')} className="inline-flex items-center text-sm font-medium text-ink-muted nav-hover">
+                                <Trophy className="h-4 w-4 mr-1 text-positive" />
                                 <span>Toutes les Ligues</span>
                             </Link>
                         </CardFooter>
@@ -302,10 +302,10 @@ export default function TenantDashboard() {
                 {/* Games */}
                 <div className='h-full'>
                     <Card className="h-full flex flex-col justify-between shadow-elevated">
-                        <CardHeader className="flex flex-row items-center justify-between gap-2 sm:gap-4 px-4 py-2 border-b border-slate-200">
-                            <CardTitle className="text-xl font-semibold text-gray-800">Matchs</CardTitle>
-                            <Link href={buildLink('/tenant/games')} className="inline-flex items-center text-sm font-medium text-emerald-700 hover:text-emerald-800 transition-colors">
-                                <Clock1 className="h-4 w-4 mr-1 text-emerald-600" />
+                        <CardHeader className="flex flex-row items-center justify-between gap-2 sm:gap-4 px-4 py-2 border-b border-line">
+                            <CardTitle className="text-xl font-semibold text-ink">Matchs</CardTitle>
+                            <Link href={buildLink('/tenant/games')} className="inline-flex items-center text-sm font-medium text-positive hover:text-positive transition-colors">
+                                <Clock1 className="h-4 w-4 mr-1 text-positive" />
                                 <span>Tout les Matchs</span>
                             </Link>
                         </CardHeader>
@@ -326,13 +326,13 @@ export default function TenantDashboard() {
                                         gamesByDate.length > 0 ? (
                                             gamesByDate.map( game => (
                                                 <Link key={game.id} href={buildLink(`/game/${game.id}/dashboard`)} >
-                                                    <div className="flex items-center justify-between gap-4 px-3 py-2 my-1 border border-slate-200 rounded-md bg-white hover:bg-slate-100 transition-colors shadow-sm">
+                                                    <div className="flex items-center justify-between gap-4 px-3 py-2 my-1 border border-line rounded-md bg-surface hover:bg-surface-sunk transition-colors shadow-sm">
                                                         {/* Game Status Badge */}
                                                         <div className="shrink-0 ">
                                                             {getStatusBadge(game.status)}
                                                         </div>
                                                         {/* Teams & Scores */}
-                                                        <div className="flex items-center justify-between gap-2 flex-1 text-sm font-medium text-slate-700">
+                                                        <div className="flex items-center justify-between gap-2 flex-1 text-sm font-medium text-ink">
                                                             {/* Home Team */}
                                                             <div className='flex items-center justify-start gap-2'>
                                                                 {game.homeTeam.businessProfile.logoAsset?.url ? (
@@ -341,7 +341,7 @@ export default function TenantDashboard() {
                                                                     alt={`${game.homeTeam.shortCode} Logo`}
                                                                     width={24}
                                                                     height={24}
-                                                                    className="rounded-full border border-slate-300 "
+                                                                    className="rounded-full border border-line "
                                                                 />
                                                                 ) : (
                                                                 <div className="h-6 w-6 rounded-full bg-gradient-to-tr from-gray-400 to-blue-700" />
@@ -351,7 +351,7 @@ export default function TenantDashboard() {
                                                             
                                                             {/* Score */}
                                                             {game.homeScore !== null && game.awayScore !== null && (
-                                                            <span className="px-2 font-bold text-slate-900">
+                                                            <span className="px-2 font-bold text-ink">
                                                                 {game.homeScore} - {game.awayScore}
                                                             </span>
                                                             )}
@@ -365,7 +365,7 @@ export default function TenantDashboard() {
                                                                     alt={`${game.awayTeam.shortCode} Logo`}
                                                                     width={24}
                                                                     height={24}
-                                                                    className="rounded-full border border-slate-300"
+                                                                    className="rounded-full border border-line"
                                                                 />
                                                                 ) : (
                                                                 <div className="h-6 w-6 rounded-full bg-gradient-to-tr from-gray-400 to-blue-700" />
@@ -383,9 +383,9 @@ export default function TenantDashboard() {
                                 }
                             </div>       
                         </CardContent>
-                        <CardFooter className='flex items-center justify-center border-t border-slate-200'>
-                            <Link href={buildLink('/tenant/games')} className="py-1 flex items-center justify-center text-sm font-medium text-emerald-600 hover:text-emerald-800 transition-colors">
-                                <Clock className="h-4 w-4 mr-1 text-emerald-600" />
+                        <CardFooter className='flex items-center justify-center border-t border-line'>
+                            <Link href={buildLink('/tenant/games')} className="py-1 flex items-center justify-center text-sm font-medium text-positive hover:text-positive transition-colors">
+                                <Clock className="h-4 w-4 mr-1 text-positive" />
                                 <span>Resultats & Calendrier</span>
                             </Link>
                         </CardFooter>
@@ -400,23 +400,23 @@ export default function TenantDashboard() {
                     </CardHeader>
                     <CardContent className='pb-4 grid grid-cols-2 md:grid-cols-4 gap-4'>
                             <Link href="/season/create"
-                                className="h-20 w-full flex flex-col items-center justify-center gap-2 rounded-md border border-slate-200 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-medium transition-colors">
+                                className="h-20 w-full flex flex-col items-center justify-center gap-2 rounded-md border border-line bg-surface-sunk hover:bg-line text-ink text-sm font-medium transition-colors">
                                 <Trophy className="h-6 w-6" />
                                 <span>Créer Une Nouvelle Saison</span>
                             </Link>
                             <Link href="/tenant/admin/add"
-                                className="h-20 w-full flex flex-col items-center justify-center gap-2 rounded-md border border-slate-200 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-medium transition-colors">
+                                className="h-20 w-full flex flex-col items-center justify-center gap-2 rounded-md border border-line bg-surface-sunk hover:bg-line text-ink text-sm font-medium transition-colors">
                                 <UserPlus className="h-6 w-6" />
                                 <span>Ajouter un Admin</span>
                             </Link>
                             <Link href="/post/create"
-                                className="h-20 w-full flex flex-col items-center justify-center gap-2 rounded-md border border-slate-200 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-medium transition-colors">
+                                className="h-20 w-full flex flex-col items-center justify-center gap-2 rounded-md border border-line bg-surface-sunk hover:bg-line text-ink text-sm font-medium transition-colors">
                                 <Newspaper className="h-6 w-6" />
                                 <span>Créer une publication</span>
                             </Link>
                             <Link
                                 href="/tenant/analytics"
-                                className="h-20 w-full flex flex-col items-center justify-center gap-2 rounded-md border border-slate-200 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-medium transition-colors">
+                                className="h-20 w-full flex flex-col items-center justify-center gap-2 rounded-md border border-line bg-surface-sunk hover:bg-line text-ink text-sm font-medium transition-colors">
                                 <TrendingUp className="h-6 w-6" />
                                 <span>Analytics</span>
                             </Link>

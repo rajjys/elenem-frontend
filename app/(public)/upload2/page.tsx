@@ -62,7 +62,7 @@ export default function UploadTestPage() {
   }
 
   return (
-   <div className="max-w-xl mx-auto mt-10 p-6 font-sans bg-white shadow-md rounded-lg">
+   <div className="max-w-xl mx-auto mt-10 p-6 font-sans bg-surface shadow-md rounded-lg">
         <h1 className="text-2xl font-semibold text-center mb-6">Upload Tester (Proxy & Direct)</h1>
 
         <div className="grid gap-4">
@@ -72,7 +72,7 @@ export default function UploadTestPage() {
                 value={folder}
                 onChange={e => setFolder(e.target.value)}
                 placeholder="avatars"
-                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="px-3 py-2 border border-line rounded-md focus:outline-none focus:ring-2 focus:ring-accent"
             />
             </label>
 
@@ -81,7 +81,7 @@ export default function UploadTestPage() {
             <select
                 value={strategy}
                 onChange={e => setStrategy(e.target.value as 'direct' | 'proxy')}
-                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="px-3 py-2 border border-line rounded-md focus:outline-none focus:ring-2 focus:ring-accent"
             >
                 <option value="direct">Direct to S3 (presigned URL)</option>
                 <option value="proxy">Proxy via NestJS</option>
@@ -92,19 +92,19 @@ export default function UploadTestPage() {
             type="file"
             ref={fileRef}
             accept="image/*,application/pdf"
-            className="file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:bg-blue-600 file:text-white hover:file:bg-blue-700"
+            className="file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:bg-accent file:text-white hover:file:bg-accent"
             />
 
             <button
             onClick={onUpload}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+            className="px-4 py-2 bg-accent text-white rounded-md hover:bg-accent transition"
             >
             Upload
             </button>
 
-            <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+            <div className="h-2 bg-line rounded-full overflow-hidden">
             <div
-                className="h-full bg-blue-500 transition-all"
+                className="h-full bg-accent transition-all"
                 style={{ width: `${progress}%` }}
             />
             </div>
@@ -113,17 +113,17 @@ export default function UploadTestPage() {
             <div className="mt-2">
                 <div className="font-medium">Result:</div>
                 {resultUrl.startsWith('http') ? (
-                <a href={resultUrl} target="_blank" rel="noreferrer" className="text-blue-600 underline">
+                <a href={resultUrl} target="_blank" rel="noreferrer" className="text-accent-text underline">
                     {resultUrl}
                 </a>
                 ) : (
-                <code className="bg-gray-100 px-2 py-1 rounded-md text-sm">{resultUrl}</code>
+                <code className="bg-surface-sunk px-2 py-1 rounded-md text-sm">{resultUrl}</code>
                 )}
             </div>
             )}
         </div>
 
-        <p className="mt-6 text-sm text-gray-500 text-center">
+        <p className="mt-6 text-sm text-ink-muted text-center">
             Tip: “Direct” is best for scale. Keep objects private and serve via CloudFront or presigned GET.
         </p>
     </div>

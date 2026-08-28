@@ -106,18 +106,18 @@ export function BusinessProfileForm({
     <div>
       {/* Banner */}
       <div className="relative mb-12">
-        <div className="relative w-full h-48 bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center">
+        <div className="relative w-full h-48 bg-surface-sunk rounded-lg overflow-hidden flex items-center justify-center">
           {bannerPreview ? (
             <Image src={bannerPreview} alt="Aperçu de la bannière" width={736} height={480} className="w-full h-full object-cover" />
           ) : (
-            <div className="text-gray-400">Aucune bannière — téléchargez-en une</div>
+            <div className="text-ink-subtle">Aucune bannière — téléchargez-en une</div>
           )}
 
           <div className="absolute top-3 right-3 flex items-center space-x-2">
             <button
               type="button"
               onClick={() => bannerInputRef.current?.click()}
-              className="bg-white p-2 rounded-full shadow hover:bg-gray-50 cursor-pointer"
+              className="bg-surface p-2 rounded-full shadow hover:bg-surface-sunk cursor-pointer"
               aria-label="Télécharger bannière"
             >
               <Camera className="w-5 h-5" />
@@ -130,7 +130,7 @@ export function BusinessProfileForm({
                   setValue("businessProfile.bannerAssetId", null);
                   setBannerPreview(null);
                 }}
-                className="bg-white p-2 rounded-full shadow hover:bg-gray-50"
+                className="bg-surface p-2 rounded-full shadow hover:bg-surface-sunk"
                 aria-label="Supprimer bannière"
               >
                 <Trash className="w-4 h-4" />
@@ -147,18 +147,18 @@ export function BusinessProfileForm({
 
         {/* Logo */}
         <div className="absolute left-2 -bottom-10">
-          <div className="relative w-28 h-28 rounded-full border-4 border-white shadow-md overflow-hidden bg-gray-100">
+          <div className="relative w-28 h-28 rounded-full border-4 border-white shadow-md overflow-hidden bg-surface-sunk">
             {logoPreview ? (
               <Image src={logoPreview} alt="Aperçu du logo" width={80} height={80} className="w-full h-full object-cover" />
             ) : (
-              <div className="w-full h-full flex items-center justify-center text-gray-400">Logo</div>
+              <div className="w-full h-full flex items-center justify-center text-ink-subtle">Logo</div>
             )}
 
             <div className="absolute bottom-1 right-1 flex space-x-2 z-50">
               <button
                 type="button"
                 onClick={() => logoInputRef.current?.click()}
-                className="bg-white p-2 rounded-full shadow hover:bg-gray-50 cursor-pointer"
+                className="bg-surface p-2 rounded-full shadow hover:bg-surface-sunk cursor-pointer"
                 aria-label="Télécharger logo"
               >
                 <Camera className="w-5 h-5" />
@@ -171,7 +171,7 @@ export function BusinessProfileForm({
                     setValue("businessProfile.logoAssetId", null);
                     setLogoPreview(null);
                   }}
-                  className="bg-white p-2 rounded-full shadow hover:bg-gray-50"
+                  className="bg-surface p-2 rounded-full shadow hover:bg-surface-sunk"
                   aria-label="Supprimer logo"
                 >
                   <Trash className="w-4 h-4" />
@@ -220,7 +220,7 @@ export function BusinessProfileForm({
             country={country || ""}
             value={regionValue ?? ""}
             onChange={(value) => setValue("businessProfile.region", value)}
-            className="w-full h-10 px-3 py-2 text-sm border rounded-md border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500"
+            className="w-full h-10 px-3 py-2 text-sm border rounded-md border-line focus:outline-none focus:ring-2 focus:ring-accent"
           />
         </div>
 
@@ -258,7 +258,7 @@ export function BusinessProfileForm({
                 ))}
               </SelectContent>
             </Select>
-            {errors.ownerId && <p className="text-xs text-red-500">{String(errors.ownerId?.message ?? "")}</p>}
+            {errors.ownerId && <p className="text-xs text-negative">{String(errors.ownerId?.message ?? "")}</p>}
           </div>
         )}
       </div>

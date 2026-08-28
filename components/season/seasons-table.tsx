@@ -44,7 +44,7 @@ export function SeasonsTable({ seasons, onSort, sortBy, sortOrder, onDelete, cur
   };
 
   if (seasons.length === 0) {
-    return <p className="text-center text-gray-500 mt-8">No seasons found matching your criteria.</p>;
+    return <p className="text-center text-ink-muted mt-8">No seasons found matching your criteria.</p>;
   }
 
   // Function to build the dashboard link dynamically
@@ -84,19 +84,19 @@ export function SeasonsTable({ seasons, onSort, sortBy, sortOrder, onDelete, cur
   return (
     <div className="rounded-lg shadow-md overflow-hidden">
       <Table>
-        <TableHeader className="bg-gray-50">
+        <TableHeader className="bg-surface-sunk">
           <TableRow>
-            <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <TableHead className="px-6 py-3 text-left text-xs font-medium text-ink-muted uppercase tracking-wider">
               Status
             </TableHead>
-            <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <TableHead className="px-6 py-3 text-left text-xs font-medium text-ink-muted uppercase tracking-wider">
               <Button variant="ghost" onClick={() => onSort('name')}>
                 Name {getSortIndicator('name')}
                 <ArrowUpDown className="ml-2 h-4 w-4" />
               </Button>
             </TableHead>
             {(isSystemAdmin || isTenantAdmin) && ( // Show Tenant column for SA/TA
-              <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <TableHead className="px-6 py-3 text-left text-xs font-medium text-ink-muted uppercase tracking-wider">
                 <Button variant="ghost" onClick={() => onSort('tenantName')}>
                   Tenant {getSortIndicator('tenantName')}
                   <ArrowUpDown className="ml-2 h-4 w-4" />
@@ -104,59 +104,59 @@ export function SeasonsTable({ seasons, onSort, sortBy, sortOrder, onDelete, cur
               </TableHead>
             )}
             {(isSystemAdmin || isTenantAdmin || isLeagueAdmin) && ( // Show League column for SA/TA/LA
-              <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <TableHead className="px-6 py-3 text-left text-xs font-medium text-ink-muted uppercase tracking-wider">
                 <Button variant="ghost" onClick={() => onSort('leagueName')}>
                   League {getSortIndicator('leagueName')}
                   <ArrowUpDown className="ml-2 h-4 w-4" />
                 </Button>
               </TableHead>
             )}
-            <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <TableHead className="px-6 py-3 text-left text-xs font-medium text-ink-muted uppercase tracking-wider">
               <Button variant="ghost" onClick={() => onSort('startDate')}>
                 Start Date {getSortIndicator('startDate')}
                 <ArrowUpDown className="ml-2 h-4 w-4" />
               </Button>
             </TableHead>
-            <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <TableHead className="px-6 py-3 text-left text-xs font-medium text-ink-muted uppercase tracking-wider">
               <Button variant="ghost" onClick={() => onSort('endDate')}>
                 End Date {getSortIndicator('endDate')}
                 <ArrowUpDown className="ml-2 h-4 w-4" />
               </Button>
             </TableHead>
-            <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <TableHead className="px-6 py-3 text-left text-xs font-medium text-ink-muted uppercase tracking-wider">
               Season Status
             </TableHead>
-            <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <TableHead className="px-6 py-3 text-left text-xs font-medium text-ink-muted uppercase tracking-wider">
               Actions
             </TableHead>
           </TableRow>
         </TableHeader>
-        <TableBody className="bg-white divide-y divide-gray-200">
+        <TableBody className="bg-surface divide-y divide-line">
           {seasons.map((season) => (
             <TableRow key={season.id}>
               <TableCell className="px-6 py-4 whitespace-nowrap">
                 <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                  season.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                  season.isActive ? 'bg-positive-soft text-positive' : 'bg-negative-soft text-negative'
                 }`}>
                   {season.isActive ? 'Active' : 'Inactive'}
                 </span>
               </TableCell>
               <TableCell className="px-6 py-4 whitespace-nowrap">
-                <div className="text-sm font-medium text-gray-900">
+                <div className="text-sm font-medium text-ink">
                   <Link
                     href={buildSeasonDashboardLink(season)}
-                    className="text-primary-600 hover:text-primary-800"
+                    className="text-accent-text hover:text-accent-text"
                   >
                     {season.name}
                   </Link>
                 </div>
-                <div className="text-sm text-gray-500">{season.slug}</div>
+                <div className="text-sm text-ink-muted">{season.slug}</div>
               </TableCell>
               {(isSystemAdmin || isTenantAdmin) && (
                 <TableCell className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">
+                  <div className="text-sm text-ink">
                     {season.tenant ? (
-                      <Link href={buildLink(`/admin/tenants/${season.tenant.id}`)} className="text-primary-600 hover:text-primary-800">
+                      <Link href={buildLink(`/admin/tenants/${season.tenant.id}`)} className="text-accent-text hover:text-accent-text">
                         {season.tenant.name}
                       </Link>
                     ) : 'N/A'}
@@ -165,9 +165,9 @@ export function SeasonsTable({ seasons, onSort, sortBy, sortOrder, onDelete, cur
               )}
               {(isSystemAdmin || isTenantAdmin || isLeagueAdmin) && (
                 <TableCell className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">
+                  <div className="text-sm text-ink">
                     {season.league ? (
-                      <Link href={buildLink(`/admin/leagues/${season.league.id}`)} className="text-primary-600 hover:text-primary-800">
+                      <Link href={buildLink(`/admin/leagues/${season.league.id}`)} className="text-accent-text hover:text-accent-text">
                         {season.league.name} ({season.league.slug})
                       </Link>
                     ) : 'N/A'}
@@ -175,16 +175,16 @@ export function SeasonsTable({ seasons, onSort, sortBy, sortOrder, onDelete, cur
                 </TableCell>
               )}
               <TableCell className="px-6 py-4 whitespace-nowrap">
-                <div className="text-sm text-gray-900">{formatDate(season.startDate)}</div>
+                <div className="text-sm text-ink">{formatDate(season.startDate)}</div>
               </TableCell>
               <TableCell className="px-6 py-4 whitespace-nowrap">
-                <div className="text-sm text-gray-900">{formatDate(season.endDate)}</div>
+                <div className="text-sm text-ink">{formatDate(season.endDate)}</div>
               </TableCell>
               <TableCell className="px-6 py-4 whitespace-nowrap">
                 <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                  season.status === SeasonStatus.ACTIVE ? 'bg-blue-100 text-blue-800' :
-                  season.status === SeasonStatus.COMPLETED ? 'bg-gray-100 text-gray-800' :
-                  'bg-yellow-100 text-yellow-800'
+                  season.status === SeasonStatus.ACTIVE ? 'bg-accent-soft text-accent-text' :
+                  season.status === SeasonStatus.COMPLETED ? 'bg-surface-sunk text-ink' :
+                  'bg-caution-soft text-caution'
                 }`}>
                   {season.status.replace(/_/g, ' ')}
                 </span>
@@ -204,7 +204,7 @@ export function SeasonsTable({ seasons, onSort, sortBy, sortOrder, onDelete, cur
                       </Link>
                     </DropdownMenuItem>
                     {(isSystemAdmin || isTenantAdmin || isLeagueAdmin) && ( // Only higher admins can delete
-                      <DropdownMenuItem onClick={() => onDelete(season.id)} className="flex items-center text-red-600 cursor-pointer">
+                      <DropdownMenuItem onClick={() => onDelete(season.id)} className="flex items-center text-negative cursor-pointer">
                         <Trash className="mr-2 h-4 w-4" /> Delete Season
                       </DropdownMenuItem>
                     )}

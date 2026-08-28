@@ -14,8 +14,8 @@ export function ErrorState({
 }) {
   return (
     <div className="flex flex-col items-center justify-center gap-4 py-24 text-center">
-      <p className="text-lg font-semibold text-gray-800">{title}</p>
-      <p className="max-w-md text-sm text-gray-500">
+      <p className="text-lg font-semibold text-ink">{title}</p>
+      <p className="max-w-md text-sm text-ink-muted">
         {error?.message || "Quelque chose s'est mal passé. Veuillez réessayer."}
       </p>
       {reset && (

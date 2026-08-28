@@ -1,69 +1,105 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-// Mock Dialog components (simplified for basic functionality)
-import React from "react";
+'use client';
 
-export const Dialog = ({ open, onOpenChange, children }: any) => {
-  return (
-    <>
-      {React.Children.map(children, child =>
-        child.type === DialogTrigger ? React.cloneElement(child, { onClick: () => onOpenChange(!open) }) : null
+// Real Radix dialog, replacing the hand-rolled mock.
+//
+// The previous implementation was an `any`-typed div: no focus trap, no Escape handling, no
+// `aria-modal`, no scroll lock, and it rendered its overlay inline rather than in a portal.
+// `@radix-ui/react-dialog` was already a dependency and unused. The API is kept identical so
+// existing call sites (the roster and bulk-entry dialogs) did not need changing.
+import * as React from 'react';
+import * as DialogPrimitive from '@radix-ui/react-dialog';
+import { X } from 'lucide-react';
+import { cn } from '@/utils/cn';
+
+export const Dialog = DialogPrimitive.Root;
+export const DialogTrigger = DialogPrimitive.Trigger;
+export const DialogPortal = DialogPrimitive.Portal;
+export const DialogClose = DialogPrimitive.Close;
+
+export const DialogOverlay = React.forwardRef<
+  React.ElementRef<typeof DialogPrimitive.Overlay>,
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Overlay>
+>(({ className, ...props }, ref) => (
+  <DialogPrimitive.Overlay
+    ref={ref}
+    className={cn(
+      'fixed inset-0 z-50 bg-ink/40 backdrop-blur-[2px]',
+      'data-[state=open]:animate-in data-[state=closed]:animate-out',
+      className,
+    )}
+    {...props}
+  />
+));
+DialogOverlay.displayName = 'DialogOverlay';
+
+export const DialogContent = React.forwardRef<
+  React.ElementRef<typeof DialogPrimitive.Content>,
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> & { hideClose?: boolean }
+>(({ className, children, hideClose, ...props }, ref) => (
+  <DialogPortal>
+    <DialogOverlay />
+    <DialogPrimitive.Content
+      ref={ref}
+      className={cn(
+        'fixed left-1/2 top-1/2 z-50 w-[calc(100vw-2rem)] max-w-lg -translate-x-1/2 -translate-y-1/2',
+        'max-h-[calc(100vh-4rem)] overflow-y-auto',
+        'rounded-lg border border-line bg-elevated p-6 shadow-e2',
+        'focus:outline-none',
+        className,
       )}
-      {open && (
-        <div className="fixed inset-0 z-40 bg-black/80 flex items-center justify-center">
-          {/* Dialog Overlay */}
-          <div className="fixed inset-0" onClick={() => onOpenChange(false)}></div>
-          {/* Dialog Content Wrapper */}
-          <div className="relative z-50">
-            {React.Children.map(children, child =>
-              child.type === DialogContent ? React.cloneElement(child, { onOpenChange }) : null
-            )}
-          </div>
-        </div>
-      )}
-    </>
-  );
-};
-
-export const DialogTrigger = ({ asChild, children, onClick }: any) => {
-  if (asChild) {
-    return React.cloneElement(children, { onClick });
-  }
-  return <button onClick={onClick}>{children}</button>;
-};
-
-export const DialogContent = ({ children, onOpenChange, className }: any) => (
-  <div className={`bg-white p-6 rounded-lg shadow-xl relative ${className}`}>
-    {children}
-    {/* Close button inside dialog content */}
-    <button
-      className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
-      onClick={() => onOpenChange(false)}
+      {...props}
     >
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
-    </button>
-  </div>
-);
+      {children}
+      {!hideClose && (
+        <DialogPrimitive.Close
+          className={cn(
+            'absolute right-4 top-4 rounded-sm p-1 text-ink-subtle transition-colors',
+            'hover:bg-surface-sunk hover:text-ink',
+            'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent',
+          )}
+        >
+          <X className="h-4 w-4" />
+          <span className="sr-only">Fermer</span>
+        </DialogPrimitive.Close>
+      )}
+    </DialogPrimitive.Content>
+  </DialogPortal>
+));
+DialogContent.displayName = 'DialogContent';
 
-export const DialogHeader = ({ children, className }: any) => (
-  <div className={`flex flex-col space-y-1.5 text-center sm:text-left ${className}`}>
-    {children}
-  </div>
-);
+export function DialogHeader({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
+  return <div className={cn('mb-4 flex flex-col gap-1 pr-8', className)} {...props} />;
+}
 
-export const DialogTitle = ({ children, className }: any) => (
-  <h2 className={`text-lg font-semibold leading-none tracking-tight ${className}`}>
-    {children}
-  </h2>
-);
+export const DialogTitle = React.forwardRef<
+  React.ElementRef<typeof DialogPrimitive.Title>,
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Title>
+>(({ className, ...props }, ref) => (
+  <DialogPrimitive.Title
+    ref={ref}
+    className={cn('text-lg font-semibold leading-tight text-ink', className)}
+    {...props}
+  />
+));
+DialogTitle.displayName = 'DialogTitle';
 
-export const DialogDescription = ({ children, className }: any) => (
-  <p className={`text-sm text-muted-foreground ${className}`}>
-    {children}
-  </p>
-);
+export const DialogDescription = React.forwardRef<
+  React.ElementRef<typeof DialogPrimitive.Description>,
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Description>
+>(({ className, ...props }, ref) => (
+  <DialogPrimitive.Description
+    ref={ref}
+    className={cn('text-sm text-ink-muted', className)}
+    {...props}
+  />
+));
+DialogDescription.displayName = 'DialogDescription';
 
-export const DialogFooter = ({ children, className }: any) => (
-  <div className={`flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 ${className}`}>
-    {children}
-  </div>
-);
+export function DialogFooter({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
+  return (
+    <div
+      className={cn('mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end', className)}
+      {...props}
+    />
+  );
+}

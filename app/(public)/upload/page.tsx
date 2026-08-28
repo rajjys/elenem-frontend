@@ -96,10 +96,10 @@ export default function FileUploadTester() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 p-4">
-      <div className="w-full max-w-2xl bg-white p-8 rounded-xl shadow-lg border">
-        <h1 className="text-3xl font-bold text-center mb-6 text-gray-800">Media Upload Tester</h1>
-        <p className="text-center text-sm text-gray-500 mb-8">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-surface-sunk p-4">
+      <div className="w-full max-w-2xl bg-surface p-8 rounded-xl shadow-lg border">
+        <h1 className="text-3xl font-bold text-center mb-6 text-ink">Media Upload Tester</h1>
+        <p className="text-center text-sm text-ink-muted mb-8">
           Select an image or video to test your NestJS upload endpoints.
         </p>
 
@@ -107,7 +107,7 @@ export default function FileUploadTester() {
           <Input 
             type="file" 
             onChange={handleFileChange} 
-            className="file:text-blue-500 file:bg-blue-50 file:border-0 file:rounded-md file:py-2 file:px-4"
+            className="file:text-accent-text file:bg-accent-soft file:border-0 file:rounded-md file:py-2 file:px-4"
           />
 
           <Button 
@@ -125,23 +125,23 @@ export default function FileUploadTester() {
           )}
 
           {uploadStatus === 'success' && uploadedUrl && (
-            <div className="mt-4 p-4 rounded-md bg-green-50 border border-green-200 text-green-800">
+            <div className="mt-4 p-4 rounded-md bg-positive-soft border border-positive text-positive">
               <p className="font-semibold">Upload successful!</p>
               <p className="text-sm break-all">
-                URL: <a href={uploadedUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">{uploadedUrl}</a>
+                URL: <a href={uploadedUrl} target="_blank" rel="noopener noreferrer" className="text-accent-text hover:underline">{uploadedUrl}</a>
               </p>
             </div>
           )}
 
           {uploadStatus === 'error' && errorMessage && (
-            <div className="mt-4 p-4 rounded-md bg-red-50 border border-red-200 text-red-800">
+            <div className="mt-4 p-4 rounded-md bg-negative-soft border border-negative text-negative">
               <p className="font-semibold">Upload failed.</p>
               <p className="text-sm">{errorMessage}</p>
             </div>
           )}
 
           {selectedFile && uploadStatus === 'idle' && (
-            <div className="mt-4 p-4 rounded-md bg-blue-50 border border-blue-200 text-blue-800">
+            <div className="mt-4 p-4 rounded-md bg-accent-soft border border-accent-line text-accent-text">
               <p className="font-semibold">File selected:</p>
               <p className="text-sm">{selectedFile.name} ({(selectedFile.size / 1024 / 1024).toFixed(2)} MB)</p>
             </div>

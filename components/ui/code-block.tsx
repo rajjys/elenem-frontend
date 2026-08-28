@@ -12,23 +12,23 @@ export const CodeBlock: React.FC<CodeBlockProps> = ({ method, url, params, respo
   return (
     <div className="rounded-xl p-4 text-sm font-mono overflow-x-auto">
       <div className="mb-2">
-        <span className="inline-block px-2 py-1 rounded bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300 font-semibold">
+        <span className="inline-block px-2 py-1 rounded bg-accent-soft text-accent-text font-semibold">
           {method.toUpperCase()}
         </span>
-        <span className="ml-2 text-slate-700 dark:text-slate-300">{url}</span>
+        <span className="ml-2 text-ink ">{url}</span>
       </div>
 
       {params && (
-        <div className="mb-2 text-slate-500 dark:text-slate-400">
+        <div className="mb-2 text-ink-muted ">
           <span className="font-semibold">Params:</span> {params}
         </div>
       )}
 
       <div className="mb-2">
-        <span className="font-semibold text-green-600 dark:text-green-400">{responseCode} OK</span>
+        <span className="font-semibold text-positive ">{responseCode} OK</span>
       </div>
 
-      <pre className="bg-slate-100 dark:bg-slate-800 rounded-md p-2 text-xs leading-relaxed text-slate-700 dark:text-slate-300 whitespace-pre-wrap break-words">
+      <pre className="bg-surface-sunk rounded-md p-2 text-xs leading-relaxed text-ink whitespace-pre-wrap break-words">
         {JSON.stringify(responseJson, null, 2)}
       </pre>
     </div>

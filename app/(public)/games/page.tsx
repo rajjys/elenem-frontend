@@ -91,17 +91,17 @@ export default function PublicGamesPage() {
     }, [availableDates, todayISO]);
 
   return (
-    <div className="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-200">
+    <div className="bg-surface-sunk text-ink ">
       <div className="container mx-auto min-h-screen max-w-2xl p-4 sm:p-6 space-y-8">
         <header>
           <h1 className="text-2xl md:text-3xl font-bold tracking-tight ">Matchs et Résultats: Toutes les Organisations</h1>
           <p className="my-2 text-sm md:text-md">Parcourez les Matchs publics dans toutes les ligues.</p>
         </header>
         { !loadingDates &&
-          <Card className="overflow-hidden shadow-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
+          <Card className="overflow-hidden shadow-sm bg-surface border border-line ">
             <CardHeader>
               {availableDates.length > 0 && (
-                <CardTitle className="text-base px-2 text-slate-800 dark:text-slate-100">
+                <CardTitle className="text-base px-2 text-ink ">
                   Sélectionner une date
                 </CardTitle>
               )}
@@ -123,14 +123,14 @@ export default function PublicGamesPage() {
         loadingGames ? (
             <div className="space-y-8">
                  {Array.from({ length: 2 }).map((_, i) => (
-                     <Card key={i} className="overflow-hidden bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
+                     <Card key={i} className="overflow-hidden bg-surface border border-line ">
                         <CardHeader>
-                          <Skeleton className="h-7 w-1/3 bg-slate-200 dark:bg-slate-700" />
+                          <Skeleton className="h-7 w-1/3 bg-line " />
                         </CardHeader>
                         <CardContent className="grid gap-4 md:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-                          <Skeleton className="h-48 w-full rounded-lg bg-slate-200 dark:bg-slate-700" />
-                          <Skeleton className="h-48 w-full rounded-lg bg-slate-200 dark:bg-slate-700" />
-                          <Skeleton className="h-48 w-full rounded-lg bg-slate-200 dark:bg-slate-700" />
+                          <Skeleton className="h-48 w-full rounded-lg bg-line " />
+                          <Skeleton className="h-48 w-full rounded-lg bg-line " />
+                          <Skeleton className="h-48 w-full rounded-lg bg-line " />
                         </CardContent>
                       </Card>
                  ))}
@@ -138,10 +138,10 @@ export default function PublicGamesPage() {
         ) : gamesByTenant.length > 0 ? (
           <div className="space-y-8">
             {gamesByTenant.map(({ tenantId, tenantName, tenantSlug, logoUrl, games }) => (
-              <Card key={tenantId} className="overflow-hidden shadow-sm pb-2 bg-slate-200 dark:bg-slate-800">
+              <Card key={tenantId} className="overflow-hidden shadow-sm pb-2 bg-line ">
                 <CardHeader>
                   <CardTitle>
-                    <Link href={buildTenantUrl(tenantSlug)} target="_blank" rel="noopener noreferrer" className="flex items-center justify-start space-x-2 text-slate-800 dark:text-slate-200">
+                    <Link href={buildTenantUrl(tenantSlug)} target="_blank" rel="noopener noreferrer" className="flex items-center justify-start space-x-2 text-ink ">
                       <Avatar src={logoUrl} name={tenantName} size={35} />
                       <span>{tenantName}</span>
                     </Link>
@@ -158,12 +158,12 @@ export default function PublicGamesPage() {
             ))}
           </div>
         ) : (
-            <div className="text-center py-16 bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-700">
-              <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-100">
+            <div className="text-center py-16 bg-surface rounded-lg border border-line ">
+              <h3 className="text-xl font-semibold text-ink ">
                 Pas des Matchs Disponible
               </h3>
               {availableDates.length > 0 && (
-                <p className="mt-2 text-slate-500 dark:text-slate-400">
+                <p className="mt-2 text-ink-muted ">
                   Pas de matchs Disponible à la date sélectionnée.
                 </p>
               )}

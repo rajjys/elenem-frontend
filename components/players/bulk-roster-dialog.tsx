@@ -166,7 +166,7 @@ export function BulkRosterDialog({
         </DialogHeader>
 
         <div className="space-y-4">
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-ink-muted">
             Collez la feuille d&apos;équipe, un joueur par ligne. Le numéro de maillot et le poste
             sont facultatifs. Aucune adresse e-mail n&apos;est requise.
           </p>
@@ -188,36 +188,36 @@ export function BulkRosterDialog({
               rows={10}
               spellCheck={false}
               placeholder={'7  Mumbere Katembo  Pivot\n12 Jean Bisimwa  Meneur\nEric Kambale'}
-              className="w-full rounded-md border border-gray-300 p-3 font-mono text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+              className="w-full rounded-md border border-line p-3 font-mono text-sm focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
             />
           </div>
 
           {rows.length > 0 && (
-            <div className="rounded-md border border-gray-200 bg-gray-50 p-3 text-sm">
-              <p className="mb-2 font-medium text-gray-900">
+            <div className="rounded-md border border-line bg-surface-sunk p-3 text-sm">
+              <p className="mb-2 font-medium text-ink">
                 {valid.length} joueur{valid.length === 1 ? '' : 's'} prêt
                 {valid.length === 1 ? '' : 's'} à enregistrer
                 {invalid.length > 0 && ` · ${invalid.length} ligne(s) à corriger`}
               </p>
               <ul className="max-h-40 space-y-1 overflow-y-auto">
                 {rows.slice(0, 20).map((r, i) => (
-                  <li key={i} className={r.problem ? 'text-red-600' : 'text-gray-700'}>
-                    <span className="inline-block w-8 font-mono tabular-nums text-gray-400">
+                  <li key={i} className={r.problem ? 'text-negative' : 'text-ink'}>
+                    <span className="inline-block w-8 font-mono tabular-nums text-ink-subtle">
                       {r.jerseyNumber ?? '—'}
                     </span>
                     {r.problem ? `${r.raw} — ${r.problem}` : `${r.firstName} ${r.lastName}`}
-                    {r.position && <span className="ml-2 text-gray-400">{r.position}</span>}
+                    {r.position && <span className="ml-2 text-ink-subtle">{r.position}</span>}
                   </li>
                 ))}
                 {rows.length > 20 && (
-                  <li className="text-gray-400">… et {rows.length - 20} autres</li>
+                  <li className="text-ink-subtle">… et {rows.length - 20} autres</li>
                 )}
               </ul>
             </div>
           )}
 
           {busy && (
-            <div className="flex items-center gap-3 text-sm text-gray-600">
+            <div className="flex items-center gap-3 text-sm text-ink-muted">
               <LoadingSpinner />
               <span>
                 Enregistrement… {progress.done}/{progress.total}

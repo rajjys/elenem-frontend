@@ -65,14 +65,14 @@ export const PublicTenantFooter = () => {
         { href: "/teams", label: "Équipes", icon: Users },
     ];
     return (
-        <footer className="mb-14 md:mb-0 bg-gradient-to-br from-gray-100 to-gray-200 text-gray-800 border-t border-gray-300">
+        <footer className="mb-14 md:mb-0 bg-gradient-to-br from-gray-100 to-gray-200 text-ink border-t border-line">
             <div className="max-w-7xl mx-auto px-4 py-8">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
                     <div className="lg:col-span-2">
                         <div className="flex flex-col space-y-4">
                             <div className="flex items-center space-x-4">
                                 {businessProfile?.logoAsset?.url ? (
-                                    <div className="relative w-16 h-16 bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                                    <div className="relative w-16 h-16 bg-surface rounded-lg shadow-sm border border-line overflow-hidden">
                                         <Image
                                             src={businessProfile.logoAsset.url}
                                             alt={`${businessProfile.legalName || tenant.name} Logo`}
@@ -86,12 +86,12 @@ export const PublicTenantFooter = () => {
                                     </div>
                                 )}
                                 <div>
-                                    <h3 className="font-bold text-2xl text-gray-900 bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+                                    <h3 className="font-bold text-2xl text-ink bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
                                         {tenant.name}
                                     </h3>
                                 </div>
                             </div>
-                            <p className="text-sm text-gray-600 leading-relaxed">
+                            <p className="text-sm text-ink-muted leading-relaxed">
                                 {businessProfile?.description ||
                                     "Organisation sportive engagée dans la promotion du sport, du fair-play et du développement personnel à travers la pratique sportive."
                                 }
@@ -99,11 +99,11 @@ export const PublicTenantFooter = () => {
                             <div className="flex space-x-6 md:pt-2">
                                 {stats.map((stat, index) => (
                                     <div key={index} className="text-center">
-                                        <div className="flex items-center space-x-1 text-gray-700">
+                                        <div className="flex items-center space-x-1 text-ink">
                                             <stat.icon className="w-4 h-4" />
                                             <span className="font-bold text-lg">{stat.value}</span>
                                         </div>
-                                        <div className="text-xs text-gray-500">{stat.label}</div>
+                                        <div className="text-xs text-ink-muted">{stat.label}</div>
                                     </div>
                                 ))}
                             </div>
@@ -111,8 +111,8 @@ export const PublicTenantFooter = () => {
                     </div>
 
                     <div>
-                        <h4 className="font-semibold text-gray-900 mb-4 flex items-center text-lg">
-                            {/* <TrendingUp className="w-5 h-5 mr-2 text-orange-500" /> */}
+                        <h4 className="font-semibold text-ink mb-4 flex items-center text-lg">
+                            {/* <TrendingUp className="w-5 h-5 mr-2 text-caution" /> */}
                             Navigation
                         </h4>
                         <ul className="space-y-2">
@@ -120,9 +120,9 @@ export const PublicTenantFooter = () => {
                                 <li key={item.href}>
                                     <Link
                                         href={item.href}
-                                        className="flex items-center text-sm text-gray-700 hover:text-orange-500 transition-all duration-200 group"
+                                        className="flex items-center text-sm text-ink hover:text-caution transition-all duration-200 group"
                                     >
-                                        <item.icon className="w-4 h-4 mr-3 text-gray-500 group-hover:text-orange-500 transition-colors" />
+                                        <item.icon className="w-4 h-4 mr-3 text-ink-muted group-hover:text-caution transition-colors" />
                                         {item.label}
                                         <ExternalLink className="w-3 h-3 ml-2 opacity-0 group-hover:opacity-100 transition-opacity" />
                                     </Link>
@@ -132,17 +132,17 @@ export const PublicTenantFooter = () => {
                     </div>
 
                     <div>
-                        <h4 className="font-semibold text-gray-900 mb-3 flex items-center text-lg">
-                            {/* <Mail className="w-5 h-5 mr-2 text-orange-500" /> */}
+                        <h4 className="font-semibold text-ink mb-3 flex items-center text-lg">
+                            {/* <Mail className="w-5 h-5 mr-2 text-caution" /> */}
                             Contact
                         </h4>
                         <div className="space-y-2 text-sm">
                             {businessProfile?.contactEmail && (
                                 <div className="flex items-center group">
-                                    <Mail className="w-4 h-4 mr-3 text-gray-500 flex-shrink-0" />
+                                    <Mail className="w-4 h-4 mr-3 text-ink-muted flex-shrink-0" />
                                     <a
                                         href={`mailto:${businessProfile.contactEmail}`}
-                                        className="text-gray-700 hover:text-orange-500 transition-colors truncate"
+                                        className="text-ink hover:text-caution transition-colors truncate"
                                     >
                                         {businessProfile.contactEmail}
                                     </a>
@@ -150,10 +150,10 @@ export const PublicTenantFooter = () => {
                             )}
                             {businessProfile?.phone && (
                                 <div className="flex items-center group">
-                                    <Phone className="w-4 h-4 mr-3 text-gray-500 flex-shrink-0" />
+                                    <Phone className="w-4 h-4 mr-3 text-ink-muted flex-shrink-0" />
                                     <a
                                         href={`tel:${businessProfile.phone}`}
-                                        className="text-gray-700 hover:text-orange-500 transition-colors"
+                                        className="text-ink hover:text-caution transition-colors"
                                     >
                                         {businessProfile.phone}
                                     </a>
@@ -161,8 +161,8 @@ export const PublicTenantFooter = () => {
                             )}
                             {(businessProfile?.city || businessProfile?.state || businessProfile?.region) && (
                                 <div className="flex items-start group">
-                                    <MapPin className="w-4 h-4 mr-3 text-gray-500 mt-0.5 flex-shrink-0" />
-                                    <span className="text-gray-700">
+                                    <MapPin className="w-4 h-4 mr-3 text-ink-muted mt-0.5 flex-shrink-0" />
+                                    <span className="text-ink">
                                         {[businessProfile?.city, businessProfile?.state, businessProfile?.region]
                                             .filter(Boolean)
                                             .join(", ")}
@@ -174,30 +174,30 @@ export const PublicTenantFooter = () => {
                     </div>
 
                     <div>
-                        <h4 className="font-semibold text-gray-900 mb-3 flex items-center text-lg">
-                            {/* <Code className="w-5 h-5 mr-2 text-orange-500" /> */}
+                        <h4 className="font-semibold text-ink mb-3 flex items-center text-lg">
+                            {/* <Code className="w-5 h-5 mr-2 text-caution" /> */}
                             Information
                         </h4>
                         <div className="space-y-2 text-sm">
-                            <div className="flex items-center text-gray-700">
-                                <CalendarIcon className="w-4 h-4 mr-3 text-gray-500 flex-shrink-0" />
+                            <div className="flex items-center text-ink">
+                                <CalendarIcon className="w-4 h-4 mr-3 text-ink-muted flex-shrink-0" />
                                 <span>Créé en {creationYear}</span>
                             </div>
-                            <div className="flex items-center text-gray-700">
-                                <Code className="w-4 h-4 mr-3 text-gray-500 flex-shrink-0" />
+                            <div className="flex items-center text-ink">
+                                <Code className="w-4 h-4 mr-3 text-ink-muted flex-shrink-0" />
                                 <span>
-                                    Code: <code className="bg-gray-200 px-2 py-1 rounded text-xs font-mono border">{tenant.tenantCode}</code>
+                                    Code: <code className="bg-line px-2 py-1 rounded text-xs font-mono border">{tenant.tenantCode}</code>
                                 </span>
                             </div>
                             {tenant.visibility && (
-                                <div className="flex items-center text-gray-700">
-                                    <Eye className="w-4 h-4 mr-3 text-gray-500 flex-shrink-0" />
+                                <div className="flex items-center text-ink">
+                                    <Eye className="w-4 h-4 mr-3 text-ink-muted flex-shrink-0" />
                                     <span className="capitalize">{tenant.visibility.toLowerCase()}</span>
                                 </div>
                             )}
-                            <div className="flex items-center text-gray-700">
-                                <Globe className="w-4 h-4 mr-3 text-gray-500 flex-shrink-0" />
-                                <span className="hover:text-orange-500 transition-colors truncate cursor-pointer">
+                            <div className="flex items-center text-ink">
+                                <Globe className="w-4 h-4 mr-3 text-ink-muted flex-shrink-0" />
+                                <span className="hover:text-caution transition-colors truncate cursor-pointer">
                                     {businessProfile.website ? `${businessProfile.website}` : `${tenant.slug}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`}
                                 </span>
                             </div>
@@ -206,11 +206,11 @@ export const PublicTenantFooter = () => {
                 </div>
 
                 {(hasLeagues || hasTeams) && (
-                    <div className="mt-4 pt-4 border-t border-gray-300">
+                    <div className="mt-4 pt-4 border-t border-line">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                             {hasLeagues && (
                                 <div>
-                                    <h5 className="font-semibold text-gray-900 mb-3 flex items-center">
+                                    <h5 className="font-semibold text-ink mb-3 flex items-center">
                                         <Trophy className="w-4 h-4 mr-2" />
                                         Ligues Actives ({leagues.length})
                                     </h5>
@@ -218,13 +218,13 @@ export const PublicTenantFooter = () => {
                                         {leagues.slice(0, 6).map((league) => (
                                             <span
                                                 key={league.id}
-                                                className="px-3 py-1 bg-white border border-gray-200 rounded-full text-xs text-gray-700 shadow-sm hover:shadow-md transition-shadow"
+                                                className="px-3 py-1 bg-surface border border-line rounded-full text-xs text-ink shadow-sm hover:shadow-md transition-shadow"
                                             >
                                                 {league.name}
                                             </span>
                                         ))}
                                         {leagues.length > 6 && (
-                                            <span className="px-3 py-1 bg-gray-100 border border-gray-200 rounded-full text-xs text-gray-500">
+                                            <span className="px-3 py-1 bg-surface-sunk border border-line rounded-full text-xs text-ink-muted">
                                                 +{leagues.length - 6} autres
                                             </span>
                                         )}
@@ -233,7 +233,7 @@ export const PublicTenantFooter = () => {
                             )}
                             {hasTeams && (
                                 <div>
-                                    <h5 className="font-semibold text-gray-900 mb-3 flex items-center">
+                                    <h5 className="font-semibold text-ink mb-3 flex items-center">
                                         <Users className="w-4 h-4 mr-2" />
                                         Équipes ({teams.length})
                                     </h5>
@@ -241,13 +241,13 @@ export const PublicTenantFooter = () => {
                                         {teams.slice(0, 6).map((team) => (
                                             <span
                                                 key={team.id}
-                                                className="px-3 py-1 bg-white border border-gray-200 rounded-full text-xs text-gray-700 shadow-sm hover:shadow-md transition-shadow"
+                                                className="px-3 py-1 bg-surface border border-line rounded-full text-xs text-ink shadow-sm hover:shadow-md transition-shadow"
                                             >
                                                 {team.shortCode || team.name}
                                             </span>
                                         ))}
                                         {teams.length > 6 && (
-                                            <span className="px-3 py-1 bg-gray-100 border border-gray-200 rounded-full text-xs text-gray-500">
+                                            <span className="px-3 py-1 bg-surface-sunk border border-line rounded-full text-xs text-ink-muted">
                                                 +{teams.length - 6} autres
                                             </span>
                                         )}
@@ -259,16 +259,16 @@ export const PublicTenantFooter = () => {
                 )}
             </div>
 
-            <div className="border-t border-gray-300 bg-gray-50/50">
+            <div className="border-t border-line bg-surface-sunk/50">
                 <div className="max-w-7xl mx-auto px-4 py-4">
-                    <div className="flex flex-col md:flex-row items-center justify-between text-xs text-gray-500 space-y-2 md:space-y-0">
+                    <div className="flex flex-col md:flex-row items-center justify-between text-xs text-ink-muted space-y-2 md:space-y-0">
                         <div>
                             © {creationYear === currentYear ? currentYear : `${creationYear} - ${currentYear}`} {tenant.name}.
                             Tous droits réservés.
                         </div>
                         <div className="flex items-center space-x-4">
                             <span className="flex items-center">
-                                <span className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></span>
+                                <span className="w-2 h-2 bg-positive rounded-full mr-2 animate-pulse"></span>
                                 Statut: Actif
                             </span>
                             <span>•</span>

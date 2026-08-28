@@ -6,7 +6,7 @@ import PublicHeader from '@/components/layouts/PublicHeader';
 
 export default function PublicLayout({ children }: { children: ReactNode }) {
   return (
-          <div className="flex min-h-screen flex-col bg-gray-50 text-gray-800">
+          <div className="flex min-h-screen flex-col bg-surface-sunk text-ink">
             <PublicHeader />
               <main className="flex-grow">{children}</main>
             { <PublicFooter /> }

@@ -134,7 +134,7 @@ export default function TenantGeneralSettings({ tenant, onSuccess  }: TenantGene
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 p-6 shadow-md bg-white rounded-lg">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 p-6 shadow-md bg-surface rounded-lg">
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
@@ -153,7 +153,7 @@ export default function TenantGeneralSettings({ tenant, onSuccess  }: TenantGene
               />
             )}
           />
-          {errors.name && <p className="text-red-500 text-xs">{errors.name.message}</p>}
+          {errors.name && <p className="text-negative text-xs">{errors.name.message}</p>}
         </div>
 
         {/* Tenant Code */}
@@ -178,11 +178,11 @@ export default function TenantGeneralSettings({ tenant, onSuccess  }: TenantGene
               />
             )}
           />
-          <Label className="text-slate-400">https://<span className="text-green-700">{tenantCode?.toLowerCase()}</span>.elenem.site</Label>
-          {errors.tenantCode && <p className="text-red-500 text-xs">{errors.tenantCode.message}</p>}
+          <Label className="text-ink-subtle">https://<span className="text-positive">{tenantCode?.toLowerCase()}</span>.elenem.site</Label>
+          {errors.tenantCode && <p className="text-negative text-xs">{errors.tenantCode.message}</p>}
         </div>
 
-        <div className="border-b border-slate-200 col-span-1 md:col-span-2"/>
+        <div className="border-b border-line col-span-1 md:col-span-2"/>
 
         {/* Sport Type */}
         <div className="space-y-2">
@@ -214,7 +214,7 @@ export default function TenantGeneralSettings({ tenant, onSuccess  }: TenantGene
               </Select>
             )}
           />
-          {errors.sportType && <p className="text-red-500 text-xs">{errors.sportType.message}</p>}
+          {errors.sportType && <p className="text-negative text-xs">{errors.sportType.message}</p>}
         </div>
 
         {/* Country */}
@@ -229,11 +229,11 @@ export default function TenantGeneralSettings({ tenant, onSuccess  }: TenantGene
                 value={country} // Use watched value
                 aria-placeholder="Pays"
                 onChange={(val) => field.onChange(val)} // Update field value on change
-                className="w-full h-10 px-3 py-2 text-sm border rounded-md border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full h-10 px-3 py-2 text-sm border rounded-md border-line focus:outline-none focus:ring-2 focus:ring-accent"
               />
             )}
           />
-          {errors.country && <p className="text-red-500 text-xs">{errors.country.message}</p>}
+          {errors.country && <p className="text-negative text-xs">{errors.country.message}</p>}
         </div>
 
         {/* isActive (Status) - Refactored to Select for consistency, but kept Switch logic for reference */}
@@ -247,7 +247,7 @@ export default function TenantGeneralSettings({ tenant, onSuccess  }: TenantGene
               <div className="flex items-center gap-3">
                 {/* Use the Switch component */}
                 <Switch id="isActive" checked={!!field.value} onCheckedChange={(val) => field.onChange(val)} />
-                <span className="text-sm text-gray-600">{field.value ? "Actif" : "Inactif"}</span>
+                <span className="text-sm text-ink-muted">{field.value ? "Actif" : "Inactif"}</span>
               </div>
             )}
           />
@@ -278,7 +278,7 @@ export default function TenantGeneralSettings({ tenant, onSuccess  }: TenantGene
               </Select>
             )}
           />
-          {errors.visibility && <p className="text-red-500 text-xs">{errors.visibility.message}</p>}
+          {errors.visibility && <p className="text-negative text-xs">{errors.visibility.message}</p>}
         </div>
 
         {/* Tenant Type - Added for completeness and consistency with creation form */}
@@ -305,7 +305,7 @@ export default function TenantGeneralSettings({ tenant, onSuccess  }: TenantGene
               </Select>
             )}
           />
-          {errors.tenantType && <p className="text-red-500 text-xs">{errors.tenantType.message}</p>}
+          {errors.tenantType && <p className="text-negative text-xs">{errors.tenantType.message}</p>}
         </div>
       </div>
 

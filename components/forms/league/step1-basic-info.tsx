@@ -70,7 +70,7 @@ export default function Step1BasicInfo({ form }: Step1Props) {
       <div className="grid w-full items-center gap-1.5">
         <Label htmlFor="name">League Name</Label>
         <Input id="name" {...register("name")} />
-        {errors.name && <p className="text-red-500 text-xs">{errors.name.message}</p>}
+        {errors.name && <p className="text-negative text-xs">{errors.name.message}</p>}
       </div>
 
       {isSystemAdmin && (
@@ -91,7 +91,7 @@ export default function Step1BasicInfo({ form }: Step1Props) {
               ))}
             </SelectContent>
           </Select>
-          {errors.tenantId && <p className="text-red-500 text-xs">{errors.tenantId.message}</p>}
+          {errors.tenantId && <p className="text-negative text-xs">{errors.tenantId.message}</p>}
         </div>
       )}
 
@@ -112,13 +112,13 @@ export default function Step1BasicInfo({ form }: Step1Props) {
             ))}
           </SelectContent>
         </Select>
-        {errors.parentLeagueId && <p className="text-red-500 text-xs">{errors.parentLeagueId.message}</p>}
+        {errors.parentLeagueId && <p className="text-negative text-xs">{errors.parentLeagueId.message}</p>}
       </div>
 
       <div className="grid w-full items-center gap-1.5">
         <Label htmlFor="division">Division</Label>
         <Input id="division" {...register("division")} defaultValue="D1" />
-        {errors.division && <p className="text-red-500 text-xs">{errors.division.message}</p>}
+        {errors.division && <p className="text-negative text-xs">{errors.division.message}</p>}
       </div>
 
       <div className="grid w-full items-center gap-1.5">
@@ -138,7 +138,7 @@ export default function Step1BasicInfo({ form }: Step1Props) {
             ))}
           </SelectContent>
         </Select>
-        {errors.gender && <p className="text-red-500 text-xs">{errors.gender.message}</p>}
+        {errors.gender && <p className="text-negative text-xs">{errors.gender.message}</p>}
       </div>
     </div>
   );

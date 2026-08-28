@@ -19,10 +19,10 @@ function PublicTenantsFilters({ onFilterChange }: { onFilterChange: (filters: {s
     }, [debouncedSearch, sportType, country, onFilterChange]);
 
     return (
-        <div className="p-2 md:p-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl shadow-sm grid grid-cols-1 md:grid-cols-4 gap-2 gap-y-4 items-end">
+        <div className="p-2 md:p-4 bg-surface border border-line rounded-xl shadow-sm grid grid-cols-1 md:grid-cols-4 gap-2 gap-y-4 items-end">
             {/* 🔍 Search Input */}
             <div className="md:col-span-2 flex flex-col">
-                <Label htmlFor="search" className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-1" >
+                <Label htmlFor="search" className="text-sm font-medium text-ink mb-1" >
                     Rechercher une ligue
                 </Label>
                 <Input
@@ -31,7 +31,7 @@ function PublicTenantsFilters({ onFilterChange }: { onFilterChange: (filters: {s
                     placeholder="Nom ou code..."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    className="w-full pl-10 py-2 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
+                    className="w-full pl-10 py-2 border border-line bg-surface text-ink rounded-md focus:outline-none focus:ring-2 focus:ring-accent transition-all duration-200"
                 />
             </div>
 
@@ -39,7 +39,7 @@ function PublicTenantsFilters({ onFilterChange }: { onFilterChange: (filters: {s
             <div className="flex flex-col">
                 <Label
                 htmlFor="sportType"
-                className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-1"
+                className="text-sm font-medium text-ink mb-1"
                 >
                 Sport
                 </Label>
@@ -49,13 +49,13 @@ function PublicTenantsFilters({ onFilterChange }: { onFilterChange: (filters: {s
                 >
                 <SelectTrigger
                     id="sportType"
-                    className="w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded-md focus:ring-2 focus:ring-blue-500">
+                    className="w-full border border-line bg-surface text-ink rounded-md focus:ring-2 focus:ring-accent">
                     <SelectValue placeholder="Sélectionner un sport" />
                 </SelectTrigger>
                 <SelectContent>
-                    <SelectItem value="null" className="bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100">Tous les sports</SelectItem>
+                    <SelectItem value="null" className="bg-surface text-ink ">Tous les sports</SelectItem>
                     {Object.values(SportType).map((type) => (
-                    <SelectItem key={type} value={type} className="bg-white dark:bg-slate-800 hover:bg-blue-900 text-slate-900 dark:text-slate-100">
+                    <SelectItem key={type} value={type} className="bg-surface hover:bg-blue-900 text-ink ">
                         {type.replace("_", " ")}
                     </SelectItem>
                     ))}
@@ -67,14 +67,14 @@ function PublicTenantsFilters({ onFilterChange }: { onFilterChange: (filters: {s
             <div className="flex flex-col">
                 <Label
                 htmlFor="country"
-                className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-1"
+                className="text-sm font-medium text-ink mb-1"
                 >
                 Pays
                 </Label>
                 <CountryDropdown
                 value={country}
                 onChange={setCountry}
-                className="w-full px-3 py-2 border border-blue-500 rounded-md bg-white dark:bg-slate-800 text-sm text-blue-700 dark:text-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-200"
+                className="w-full px-3 py-2 border border-accent rounded-md bg-surface text-sm text-accent-text focus:outline-none focus:ring-2 focus:ring-accent transition-all duration-200"
                 />
             </div>
         </div>

@@ -37,15 +37,15 @@ export function InlineEditField<T extends FieldValues>({
     return (
       <div
   key={name}
-  className="py-3 px-2 border-b border-slate-200 hover:bg-gray-50 transition-colors "
+  className="py-3 px-2 border-b border-line hover:bg-surface-sunk transition-colors "
 >
   {/* Label */}
-  <span className="text-sm font-medium text-gray-500">{label}</span>
+  <span className="text-sm font-medium text-ink-muted">{label}</span>
 
   {/* Value + Edit Button */}
   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4 w-full">
     <span
-      className="text-gray-900 truncate max-w-full sm:max-w-sm"
+      className="text-ink truncate max-w-full sm:max-w-sm"
       title={currentValue}
     >
       {currentValue}
@@ -69,7 +69,7 @@ export function InlineEditField<T extends FieldValues>({
       }}
       className="flex items-center gap-1"
     >
-      <Pencil className="w-4 h-4 text-gray-600" />
+      <Pencil className="w-4 h-4 text-ink-muted" />
       <span className="hidden md:inline text-xs">Modifier</span>
     </Button>
   </div>
@@ -79,7 +79,7 @@ export function InlineEditField<T extends FieldValues>({
   }
 
   return (
-    <div key={name} className="px-4 py-3 border-l-4 border-blue-500 bg-blue-50 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 rounded-md">
+    <div key={name} className="px-4 py-3 border-l-4 border-accent bg-accent-soft flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 rounded-md">
       {/* Input Section */}
       <div className="flex-1 min-w-[200px]">
         <Input
@@ -88,7 +88,7 @@ export function InlineEditField<T extends FieldValues>({
           placeholder={placeholder}
           {...register(name)}
         />
-        {error && <p className="text-xs text-red-600 mt-1">{error}</p>}
+        {error && <p className="text-xs text-negative mt-1">{error}</p>}
       </div>
       {/* Action Buttons */}
       <div className="flex flex-col sm:flex-row justify-end gap-2 pt-2 sm:pt-0">
@@ -105,7 +105,7 @@ export function InlineEditField<T extends FieldValues>({
             setActiveEditField(null);
           }}
           className="flex items-center gap-1">
-          <Check className="w-5 h-5 text-green-600" />
+          <Check className="w-5 h-5 text-positive" />
           <span className="hidden sm:inline text-sm">Valider</span>
         </Button>
         <Button

@@ -103,15 +103,15 @@ export default function AdminGamesPage() {
   }
 
   if (error) {
-    return <p className="text-red-500 text-center mt-8">Error: {error}</p>;
+    return <p className="text-negative text-center mt-8">Error: {error}</p>;
   }
 
   return (
     <div className="container mx-auto p-6">
       <div className="flex flex-col space-y-4 mb-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-gray-900">Games</h1>
-          <p className="text-muted-foreground text-gray-600">View and manage all games across tenants, leagues, and seasons.</p>
+          <h1 className="text-3xl font-bold tracking-tight text-ink">Games</h1>
+          <p className="text-muted-foreground text-ink-muted">View and manage all games across tenants, leagues, and seasons.</p>
         </div>
         <div className="flex justify-between items-center">
           <GamesFilters
@@ -127,7 +127,7 @@ export default function AdminGamesPage() {
       </div>
 
       {games.length === 0 ? (
-        <p className="text-center text-gray-500 mt-8">No games found matching your criteria.</p>
+        <p className="text-center text-ink-muted mt-8">No games found matching your criteria.</p>
       ) : (
         <div className="mt-4 gap-4"> 
         <span hidden>{totalItems} Games</span>

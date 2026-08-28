@@ -39,21 +39,21 @@ export const StatsCard: React.FC<StatCardProps> = ({
   const cardContent = (
     <div
       className={clsx(
-        "bg-white p-6 rounded-lg shadow-md transition-transform hover:scale-[1.02]",
+        "bg-surface p-6 rounded-lg shadow-md transition-transform hover:scale-[1.02]",
         layout === "horizontal" && "flex items-center justify-between gap-4"
       )}
     >
       <div className="flex flex-col">
-        <p className="text-sm font-medium text-gray-500">{title}</p>
+        <p className="text-sm font-medium text-ink-muted">{title}</p>
         <p className="text-2xl font-bold mt-1">{value}</p>
-        {description && <p className="text-xs text-gray-500 mt-1">{description}</p>}
+        {description && <p className="text-xs text-ink-muted mt-1">{description}</p>}
         {trend && (
-          <div className="flex items-center mt-2 text-xs text-gray-500">
+          <div className="flex items-center mt-2 text-xs text-ink-muted">
             <span
               className={clsx("font-bold", {
-                "text-green-600": trendDirection === "up",
-                "text-red-500": trendDirection === "down",
-                "text-gray-400": trendDirection === "neutral",
+                "text-positive": trendDirection === "up",
+                "text-negative": trendDirection === "down",
+                "text-ink-subtle": trendDirection === "neutral",
               })}
             >
               {trendDirection === "up" && "+"}
@@ -69,18 +69,18 @@ export const StatsCard: React.FC<StatCardProps> = ({
         className={clsx(
           "p-2 rounded-md",
           {
-            "bg-green-100": variant === "success",
-            "bg-red-100": variant === "danger",
-            "bg-gray-100": variant === "neutral",
+            "bg-positive-soft": variant === "success",
+            "bg-negative-soft": variant === "danger",
+            "bg-surface-sunk": variant === "neutral",
           },
           iconPosition === "left" && layout === "horizontal" && "order-first"
         )}
       >
         <Icon
           className={clsx("w-5 h-5", {
-            "text-green-600": variant === "success",
-            "text-red-500": variant === "danger",
-            "text-gray-500": variant === "neutral",
+            "text-positive": variant === "success",
+            "text-negative": variant === "danger",
+            "text-ink-muted": variant === "neutral",
           })}
         />
       </div>
@@ -90,7 +90,7 @@ export const StatsCard: React.FC<StatCardProps> = ({
   const skeletonContent = (
     <div
       className={clsx(
-        "bg-white p-6 rounded-lg shadow-md transition-transform hover:scale-[1.02]",
+        "bg-surface p-6 rounded-lg shadow-md transition-transform hover:scale-[1.02]",
         layout === "horizontal" && "flex items-center justify-between gap-4"
       )}
     >
@@ -103,7 +103,7 @@ export const StatsCard: React.FC<StatCardProps> = ({
       <div
         className={clsx(
           "p-2 rounded-md",
-          "bg-gray-100",
+          "bg-surface-sunk",
           iconPosition === "left" && layout === "horizontal" && "order-first"
         )}
       >

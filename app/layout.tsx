@@ -7,6 +7,7 @@ import React, { ReactNode } from 'react';
 import { Inter } from 'next/font/google'; // Example font
 import { Toaster } from "sonner";
 import { QueryProvider } from "@/components/providers/query-provider";
+import { ThemeProvider, themeInitScript } from "@/components/providers/theme-provider";
 import Script from 'next/script';
 
 const inter = Inter({ subsets: ['latin'] , variable: '--font-inter'});
@@ -21,16 +22,19 @@ export const metadata = {
 }
 export default function PublicLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" className={`${inter.variable}`} suppressHydrationWarning>
+    <html lang="fr" className={`${inter.variable}`} suppressHydrationWarning>
+      <head>
+        {/* Applies the viewer's saved theme before first paint. Without this the page renders
+            light, then flips once the client reads localStorage — the flash of wrong theme. */}
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+      </head>
       <body>
-        <QueryProvider>
-          {children}
-        </QueryProvider>
-        <Toaster
-            position="top-center" 
-            richColors // ✅ success = green, error = red, etc.
-            closeButton // ✅ shows an X button on every toast
-        />
+        <ThemeProvider>
+          <QueryProvider>
+            {children}
+          </QueryProvider>
+        </ThemeProvider>
+        <Toaster position="top-center" richColors closeButton theme="system" />
         <Analytics/>
         <SpeedInsights/>
         {/* Global AdSense Script */}

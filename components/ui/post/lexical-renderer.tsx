@@ -47,8 +47,8 @@ const editorConfig: InitialConfigType = {
       listitem: "mb-1",
     },
     quote:
-      "border-l-4 border-indigo-500 pl-6 py-2 italic text-xl text-gray-600 dark:text-gray-400 my-6",
-    link: "text-indigo-600 dark:text-indigo-400 underline hover:text-indigo-800",
+      "border-l-4 border-accent pl-6 py-2 italic text-xl text-ink-muted my-6",
+    link: "text-accent-text underline hover:text-accent-text",
   },
   onError: (error) => console.error("Lexical Render Error:", error),
 };
@@ -84,7 +84,7 @@ const InitialContentPlugin = ({ richContent }: { richContent: any }) => {
 export const LexicalRenderer = ({ richContent }: { richContent: any }) => {
   if (!richContent) {
     return (
-      <p className="text-center text-gray-500 italic">
+      <p className="text-center text-ink-muted italic">
         No content available for this post.
       </p>
     );
@@ -98,7 +98,7 @@ export const LexicalRenderer = ({ richContent }: { richContent: any }) => {
           <ContentEditable className="relative p-0 min-h-[200px] outline-none" />
         }
         placeholder={
-          <div className="absolute top-0 left-0 text-gray-400">
+          <div className="absolute top-0 left-0 text-ink-subtle">
             Loading content...
           </div>
         }

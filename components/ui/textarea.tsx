@@ -10,7 +10,7 @@ export const TextArea = React.forwardRef<HTMLTextAreaElement, TextAreaProps>(
     return (
       <div className="mb-4">
         {label && (
-          <label htmlFor={name} className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor={name} className="block text-sm font-medium text-ink mb-1">
             {label}
           </label>
         )}
@@ -20,11 +20,11 @@ export const TextArea = React.forwardRef<HTMLTextAreaElement, TextAreaProps>(
           ref={ref}
           rows={3}
           className={`mt-1 block w-full px-3 py-2 border ${
-            error ? 'border-red-500' : 'border-gray-300'
-          } rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm`}
+            error ? 'border-negative' : 'border-line'
+          } rounded-md shadow-sm focus:outline-none focus:ring-accent focus:border-accent sm:text-sm`}
           {...props}
         />
-        {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
+        {error && <p className="mt-1 text-xs text-negative">{error}</p>}
       </div>
     );
   }

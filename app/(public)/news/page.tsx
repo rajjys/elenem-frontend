@@ -98,10 +98,10 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-4 font-inter">
+    <div className="min-h-screen bg-surface-sunk p-4 font-inter">
       {/** Stories Section */}
-      <div className="max-w-2xl mx-auto border-b border-gray-300 mb-4 pb-4">
-        <h2 className="text-2xl font-bold mb-4 text-gray-800">Stories</h2>
+      <div className="max-w-2xl mx-auto border-b border-line mb-4 pb-4">
+        <h2 className="text-2xl font-bold mb-4 text-ink">Stories</h2>
         <div className="flex gap-4 overflow-x-auto pb-4 custom-scrollbar">
           {statusesToDisplay.map((status) => (
             <StatusCard
@@ -124,7 +124,7 @@ export default function HomePage() {
 
       {/** Blog Posts Section */}
       <div className="max-w-2xl mx-auto">
-        <h2 className="text-2xl font-bold text-gray-900">A La Une</h2>
+        <h2 className="text-2xl font-bold text-ink">A La Une</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           {displayedBlogPosts.map((post) => (
             <BlogPostCard key={post.id} post={post} />
@@ -136,15 +136,15 @@ export default function HomePage() {
           <button
             onClick={handlePreviousPage}
             disabled={currentPage === 1}
-            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors duration-200"
+            className="px-6 py-3 bg-accent text-white rounded-lg hover:bg-accent disabled:bg-ink-subtle disabled:cursor-not-allowed transition-colors duration-200"
           >
             Previous
           </button>
-          <span className="text-lg font-medium text-gray-700">Page {currentPage}</span>
+          <span className="text-lg font-medium text-ink">Page {currentPage}</span>
           <button
             onClick={handleNextPage}
             disabled={currentPage * postsPerPage >= mockBlogPosts.length}
-            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors duration-200"
+            className="px-6 py-3 bg-accent text-white rounded-lg hover:bg-accent disabled:bg-ink-subtle disabled:cursor-not-allowed transition-colors duration-200"
           >
             Next
           </button>

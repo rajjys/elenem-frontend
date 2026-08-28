@@ -53,7 +53,7 @@ export default function LeagueStandingsPage() {
       {loading ? (
         <StandingsTableSkeleton />
       ) : error ? (
-        <p className="text-center text-red-500">{error}</p>
+        <p className="text-center text-negative">{error}</p>
       ) : standings.length > 0 ? (
         <StandingsTable standings={standings} managingTeamId={userAuth?.managingTeamId} />
       ) : (

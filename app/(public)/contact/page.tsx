@@ -35,8 +35,8 @@ function ContactContent() {
   const Icon = config.icon
 
   return (
-    <div className="bg-white min-h-screen selection:bg-primary/10">
-      <div className="h-1 bg-slate-50 w-full" />
+    <div className="bg-surface min-h-screen selection:bg-primary/10">
+      <div className="h-1 bg-surface-sunk w-full" />
 
       <section className="py-12 lg:py-20">
         <Container>
@@ -50,38 +50,38 @@ function ContactContent() {
                   <p className="text-[9px] uppercase tracking-[0.2em] font-black">Inquiry: {intent}</p>
                 </div>
                 
-                <h1 className="text-3xl lg:text-4xl font-black text-slate-900 tracking-tight mb-4 leading-tight">
+                <h1 className="text-3xl lg:text-4xl font-black text-ink tracking-tight mb-4 leading-tight">
                   {config.title}
                 </h1>
-                <p className="text-base text-slate-500 leading-relaxed max-w-lg">
+                <p className="text-base text-ink-muted leading-relaxed max-w-lg">
                   {config.subtitle}
                 </p>
               </div>
 
-              <form className="grid sm:grid-cols-2 gap-4 p-6 bg-slate-50 rounded-[2rem] border border-slate-100 shadow-sm">
+              <form className="grid sm:grid-cols-2 gap-4 p-6 bg-surface-sunk rounded-[2rem] border border-line shadow-sm">
                 <div className="sm:col-span-1">
-                   <label className="text-[9px] font-black uppercase tracking-widest text-slate-400 ml-1 mb-1.5 block">Full Name</label>
-                   <input placeholder="Your name" className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm font-medium text-slate-900 placeholder:text-slate-300" />
+                   <label className="text-[9px] font-black uppercase tracking-widest text-ink-subtle ml-1 mb-1.5 block">Full Name</label>
+                   <input placeholder="Your name" className="w-full px-4 py-3 rounded-xl border border-line bg-surface focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm font-medium text-ink placeholder:text-ink-subtle" />
                 </div>
 
                 <div className="sm:col-span-1">
-                   <label className="text-[9px] font-black uppercase tracking-widest text-slate-400 ml-1 mb-1.5 block">Organization</label>
-                   <input placeholder="League name" className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm font-medium text-slate-900 placeholder:text-slate-300" />
+                   <label className="text-[9px] font-black uppercase tracking-widest text-ink-subtle ml-1 mb-1.5 block">Organization</label>
+                   <input placeholder="League name" className="w-full px-4 py-3 rounded-xl border border-line bg-surface focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm font-medium text-ink placeholder:text-ink-subtle" />
                 </div>
 
                 <div className="sm:col-span-1">
-                   <label className="text-[9px] font-black uppercase tracking-widest text-slate-400 ml-1 mb-1.5 block">WhatsApp</label>
-                   <input placeholder="+243 ..." className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm font-medium text-slate-900 placeholder:text-slate-300" />
+                   <label className="text-[9px] font-black uppercase tracking-widest text-ink-subtle ml-1 mb-1.5 block">WhatsApp</label>
+                   <input placeholder="+243 ..." className="w-full px-4 py-3 rounded-xl border border-line bg-surface focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm font-medium text-ink placeholder:text-ink-subtle" />
                 </div>
 
                 <div className="sm:col-span-1">
-                   <label className="text-[9px] font-black uppercase tracking-widest text-slate-400 ml-1 mb-1.5 block">Email</label>
-                   <input placeholder="Optional" className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm font-medium text-slate-900 placeholder:text-slate-300" />
+                   <label className="text-[9px] font-black uppercase tracking-widest text-ink-subtle ml-1 mb-1.5 block">Email</label>
+                   <input placeholder="Optional" className="w-full px-4 py-3 rounded-xl border border-line bg-surface focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm font-medium text-ink placeholder:text-ink-subtle" />
                 </div>
 
                 <div className="sm:col-span-1">
-                   <label className="text-[9px] font-black uppercase tracking-widest text-slate-400 ml-1 mb-1.5 block">Sport</label>
-                   <select className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm font-medium text-slate-900 appearance-none">
+                   <label className="text-[9px] font-black uppercase tracking-widest text-ink-subtle ml-1 mb-1.5 block">Sport</label>
+                   <select className="w-full px-4 py-3 rounded-xl border border-line bg-surface focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm font-medium text-ink appearance-none">
                     <option>Select Sport</option>
                     <option>Football</option>
                     <option>Basketball</option>
@@ -89,8 +89,8 @@ function ContactContent() {
                 </div>
 
                 <div className="sm:col-span-1">
-                   <label className="text-[9px] font-black uppercase tracking-widest text-slate-400 ml-1 mb-1.5 block">Team Count</label>
-                   <select className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm font-medium text-slate-900 appearance-none">
+                   <label className="text-[9px] font-black uppercase tracking-widest text-ink-subtle ml-1 mb-1.5 block">Team Count</label>
+                   <select className="w-full px-4 py-3 rounded-xl border border-line bg-surface focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm font-medium text-ink appearance-none">
                     <option>Quantity</option>
                     <option>1–8</option>
                     <option>9–16</option>
@@ -100,8 +100,8 @@ function ContactContent() {
                 </div>
 
                 <div className="sm:col-span-2">
-                   <label className="text-[9px] font-black uppercase tracking-widest text-slate-400 ml-1 mb-1.5 block">Competition Type</label>
-                   <select className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm font-medium text-slate-900 appearance-none">
+                   <label className="text-[9px] font-black uppercase tracking-widest text-ink-subtle ml-1 mb-1.5 block">Competition Type</label>
+                   <select className="w-full px-4 py-3 rounded-xl border border-line bg-surface focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm font-medium text-ink appearance-none">
                     <option>League structure</option>
                     <option>Single competition</option>
                     <option>Multiple divisions</option>
@@ -110,10 +110,10 @@ function ContactContent() {
                 </div>
 
                 <div className="sm:col-span-2">
-                   <label className="text-[9px] font-black uppercase tracking-widest text-slate-400 ml-1 mb-1.5 block">Context</label>
+                   <label className="text-[9px] font-black uppercase tracking-widest text-ink-subtle ml-1 mb-1.5 block">Context</label>
                    <textarea
                     placeholder="Tell us more about your league (optional)"
-                    className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm font-medium text-slate-900 placeholder:text-slate-300 h-24 resize-none"
+                    className="w-full px-4 py-3 rounded-xl border border-line bg-surface focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm font-medium text-ink placeholder:text-ink-subtle h-24 resize-none"
                   />
                 </div>
 
@@ -145,30 +145,30 @@ function ContactContent() {
                      { step: 'Activation', text: 'Complete system configuration and onboarding for your team.' }
                    ].map((item, i) => (
                      <div key={i} className="relative flex gap-4 group">
-                        <div className="w-[18px] h-[18px] rounded-full bg-slate-800 border-2 border-slate-900 z-10 flex items-center justify-center transition-colors group-hover:bg-primary" />
+                        <div className="w-[18px] h-[18px] rounded-full bg-slate-800 border-2 border-line z-10 flex items-center justify-center transition-colors group-hover:bg-primary" />
                         <div>
                            <p className="text-[9px] font-black uppercase tracking-widest text-primary mb-0.5">{item.step}</p>
-                           <p className="text-slate-400 font-medium text-xs leading-relaxed">{item.text}</p>
+                           <p className="text-ink-subtle font-medium text-xs leading-relaxed">{item.text}</p>
                         </div>
                      </div>
                    ))}
                 </div>
 
-                <div className="mt-8 pt-6 border-t border-slate-800">
+                <div className="mt-8 pt-6 border-t border-line">
                   <div className="flex items-center gap-2 mb-3">
-                    <CheckCircle2 className="text-green-500" size={14} />
-                    <p className="text-xs font-bold text-slate-200 tracking-tight">24h Response Commitment</p>
+                    <CheckCircle2 className="text-positive" size={14} />
+                    <p className="text-xs font-bold text-ink-inverted tracking-tight">24h Response Commitment</p>
                   </div>
-                  <p className="text-[11px] text-slate-500 leading-relaxed italic">
+                  <p className="text-[11px] text-ink-muted leading-relaxed italic">
                     WhatsApp preferred for instant coordination and technical support.
                   </p>
                 </div>
               </div>
 
               {/* Minimal Trust Badge */}
-              <div className="mt-6 flex items-center gap-3 px-6 py-4 rounded-2xl border border-slate-100 bg-slate-50/30">
-                 <ShieldCheck className="text-slate-200" size={20} />
-                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-tight">
+              <div className="mt-6 flex items-center gap-3 px-6 py-4 rounded-2xl border border-line bg-surface-sunk/30">
+                 <ShieldCheck className="text-ink-inverted" size={20} />
+                 <p className="text-[10px] font-bold text-ink-subtle uppercase tracking-widest leading-tight">
                     Enterprise Security <br/> & Data Privacy
                  </p>
               </div>

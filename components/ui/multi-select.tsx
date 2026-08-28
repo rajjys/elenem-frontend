@@ -89,7 +89,7 @@ export function MultiSelect({
           <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent ref={contentRef} className="w-[--radix-popover-trigger-width] p-0 bg-white" align="start">
+      <PopoverContent ref={contentRef} className="w-[--radix-popover-trigger-width] p-0 bg-surface" align="start">
         <Command>
           <CommandInput placeholder="Search options..." value={searchValue} onValueChange={setSearchValue} />
           <CommandList>

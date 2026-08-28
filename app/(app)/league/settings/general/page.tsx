@@ -270,18 +270,18 @@ export default function GeneralLeagueSettingsPage() {
   }
 
   if (error) {
-    return <div className="p-6 text-red-500 font-semibold">Error: {error}</div>;
+    return <div className="p-6 text-negative font-semibold">Error: {error}</div>;
   }
   
   if (!league) {
-    return <div className="p-6 text-red-500 font-semibold">Error: League not found or access denied.</div>;
+    return <div className="p-6 text-negative font-semibold">Error: League not found or access denied.</div>;
   }
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
       <h1 className="text-3xl font-bold mb-6">Parametres Generales: {league?.name}</h1>
       
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 p-6 shadow-md bg-white rounded-lg">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 p-6 shadow-md bg-surface rounded-lg">
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
@@ -299,7 +299,7 @@ export default function GeneralLeagueSettingsPage() {
                 />
               )}
             />
-            {errors.name && <p className="text-red-500 text-xs">{errors.name.message}</p>}
+            {errors.name && <p className="text-negative text-xs">{errors.name.message}</p>}
           </div>
 
           {/* Division */}
@@ -316,10 +316,10 @@ export default function GeneralLeagueSettingsPage() {
                 />
               )}
             />
-            {errors.division && <p className="text-red-500 text-xs">{errors.division.message}</p>}
+            {errors.division && <p className="text-negative text-xs">{errors.division.message}</p>}
           </div>
 
-          <div className="border-b border-slate-200 col-span-1 md:col-span-2"/>
+          <div className="border-b border-line col-span-1 md:col-span-2"/>
 
           {/* Gender */}
           <div className="space-y-2">
@@ -345,7 +345,7 @@ export default function GeneralLeagueSettingsPage() {
                 </Select>
               )}
             />
-            {errors.gender && <p className="text-red-500 text-xs">{errors.gender.message}</p>}
+            {errors.gender && <p className="text-negative text-xs">{errors.gender.message}</p>}
           </div>
           
           {/* Visibility select */}
@@ -372,7 +372,7 @@ export default function GeneralLeagueSettingsPage() {
                 </Select>
               )}
             />
-            {errors.visibility && <p className="text-red-500 text-xs">{errors.visibility.message}</p>}
+            {errors.visibility && <p className="text-negative text-xs">{errors.visibility.message}</p>}
           </div>
 
           {/* isActive (Status) Switch */}
@@ -384,7 +384,7 @@ export default function GeneralLeagueSettingsPage() {
               render={({ field }) => (
                 <div className="flex items-center gap-3">
                   <Switch id="isActive" checked={!!field.value} onCheckedChange={(val) => field.onChange(val)} />
-                  <span className="text-sm text-gray-600">{field.value ? "Actif" : "Inactif"}</span>
+                  <span className="text-sm text-ink-muted">{field.value ? "Actif" : "Inactif"}</span>
                 </div>
               )}
             />
@@ -415,14 +415,14 @@ export default function GeneralLeagueSettingsPage() {
                 </Select>
               )}
             />
-            {errors.currentSeasonId && <p className="text-red-500 text-xs">{errors.currentSeasonId.message}</p>}
+            {errors.currentSeasonId && <p className="text-negative text-xs">{errors.currentSeasonId.message}</p>}
           </div>
           
           {/* Parent League ID: Ignored as requested, but you might want to display it as read-only */}
           {league.parentLeagueId && (
             <div className="space-y-2">
               <Label>Ligue Parent</Label>
-              <Input disabled value={league.parentLeague?.name || league.parentLeagueId} className="bg-slate-50"/>
+              <Input disabled value={league.parentLeague?.name || league.parentLeagueId} className="bg-surface-sunk"/>
             </div>
           )}
 

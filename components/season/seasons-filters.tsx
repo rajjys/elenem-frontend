@@ -204,15 +204,15 @@ export function SeasonsFilters({ filters, onFilterChange, onPageSizeChange, fixe
       {/* Filter Button and Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogTrigger asChild>
-          <Button variant="outline" className="rounded-md shadow-sm bg-primary-600 hover:bg-primary-700 text-white font-semibold py-2 px-4 transition duration-300 ease-in-out transform hover:scale-105">
+          <Button variant="outline" className="rounded-md shadow-sm bg-accent hover:bg-accent text-white font-semibold py-2 px-4 transition duration-300 ease-in-out transform hover:scale-105">
             <FilterIcon className="mr-2 h-4 w-4" />
             More Filters
           </Button>
         </DialogTrigger>
-        <DialogContent className="sm:max-w-[700px] rounded-lg shadow-xl p-6 bg-white">
+        <DialogContent className="sm:max-w-[700px] rounded-lg shadow-xl p-6 bg-surface">
           <DialogHeader className="mb-4">
-            <DialogTitle className="text-2xl font-bold text-gray-800">Advanced Season Filters</DialogTitle>
-            <DialogDescription className="text-gray-600">
+            <DialogTitle className="text-2xl font-bold text-ink">Advanced Season Filters</DialogTitle>
+            <DialogDescription className="text-ink-muted">
               Apply additional filters to refine your season list.
             </DialogDescription>
           </DialogHeader>
@@ -222,15 +222,15 @@ export function SeasonsFilters({ filters, onFilterChange, onPageSizeChange, fixe
             {/* Tenant Selection (System Admin only) */}
             {isSystemAdmin && !fixedTenantId && (
               <div>
-                <Label htmlFor="tenantId" className="block text-sm font-medium text-gray-700 mb-1">Tenant</Label>
+                <Label htmlFor="tenantId" className="block text-sm font-medium text-ink mb-1">Tenant</Label>
                 <Select
                   value={selectedTenantId}
                   onValueChange={(value) => setSelectedTenantId(value === 'clear_selection' ? '' : value)}
                 >
-                  <SelectTrigger className="w-full border-gray-300 rounded-md shadow-sm focus:border-primary-500 focus:ring-primary-500">
+                  <SelectTrigger className="w-full border-line rounded-md shadow-sm focus:border-accent focus:ring-accent">
                     <SelectValue placeholder="Select Tenant" />
                   </SelectTrigger>
-                  <SelectContent className='bg-white rounded-md shadow-lg z-50'>
+                  <SelectContent className='bg-surface rounded-md shadow-lg z-50'>
                     <SelectItem value="clear_selection">Clear Selection</SelectItem>
                     {availableTenants.map(tenant => (
                       <SelectItem key={tenant.id} value={tenant.id}>{tenant.name}</SelectItem>
@@ -243,24 +243,24 @@ export function SeasonsFilters({ filters, onFilterChange, onPageSizeChange, fixe
             {/* League Selection (System Admin, Tenant Admin) */}
             {(isSystemAdmin || isTenantAdmin) && !fixedLeagueId && (
               <div>
-                <Label htmlFor="leagueId" className="block text-sm font-medium text-gray-700 mb-1">League</Label>
+                <Label htmlFor="leagueId" className="block text-sm font-medium text-ink mb-1">League</Label>
                 <Select
                   value={selectedLeagueId}
                   onValueChange={(value) => setSelectedLeagueId(value === 'clear_selection' ? '' : value)}
                   disabled={!selectedTenantId && !fixedTenantId}
                 >
-                  <SelectTrigger className="w-full border-gray-300 rounded-md shadow-sm focus:border-primary-500 focus:ring-primary-500">
+                  <SelectTrigger className="w-full border-line rounded-md shadow-sm focus:border-accent focus:ring-accent">
                     <SelectValue placeholder="Select League" />
                   </SelectTrigger>
-                  <SelectContent className='bg-white rounded-md shadow-lg z-50'>
+                  <SelectContent className='bg-surface rounded-md shadow-lg z-50'>
                     <SelectItem value="clear_selection">Clear Selection</SelectItem>
                     {availableLeagues.map(league => (
                       <SelectItem key={league.id} value={league.id}>{league.name}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
-                {(!selectedTenantId && isSystemAdmin) && <p className="text-gray-500 text-xs mt-1">Select a tenant to load leagues.</p>}
-                {(selectedTenantId || fixedTenantId) && availableLeagues.length === 0 && <p className="text-gray-500 text-xs mt-1">No leagues found for this tenant.</p>}
+                {(!selectedTenantId && isSystemAdmin) && <p className="text-ink-muted text-xs mt-1">Select a tenant to load leagues.</p>}
+                {(selectedTenantId || fixedTenantId) && availableLeagues.length === 0 && <p className="text-ink-muted text-xs mt-1">No leagues found for this tenant.</p>}
               </div>
             )}
 
@@ -271,12 +271,12 @@ export function SeasonsFilters({ filters, onFilterChange, onPageSizeChange, fixe
                 checked={isActive || false}
                 onCheckedChange={setIsActive}
               />
-              <Label htmlFor="seasonStatusActive" className="text-sm font-medium text-gray-700">Active Seasons</Label>
+              <Label htmlFor="seasonStatusActive" className="text-sm font-medium text-ink">Active Seasons</Label>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => setIsActive(undefined)}
-                className="ml-2 text-gray-500 hover:bg-gray-100 rounded-md px-2 py-1"
+                className="ml-2 text-ink-muted hover:bg-surface-sunk rounded-md px-2 py-1"
                 disabled={isActive === undefined}
               >
                 Clear
@@ -285,15 +285,15 @@ export function SeasonsFilters({ filters, onFilterChange, onPageSizeChange, fixe
 
             {/* Season Status Select */}
             <div>
-              <Label htmlFor="seasonStatus" className="block text-sm font-medium text-gray-700 mb-1">Season Status</Label>
+              <Label htmlFor="seasonStatus" className="block text-sm font-medium text-ink mb-1">Season Status</Label>
               <Select
                 value={selectedStatus || ''}
                 onValueChange={(value: SeasonStatus) => setSelectedStatus(!value ? undefined : value)}
               >
-                <SelectTrigger className="w-full border-gray-300 rounded-md shadow-sm focus:border-primary-500 focus:ring-primary-500">
+                <SelectTrigger className="w-full border-line rounded-md shadow-sm focus:border-accent focus:ring-accent">
                   <SelectValue placeholder="Select Status" />
                 </SelectTrigger>
-                <SelectContent className='bg-white rounded-md shadow-lg z-50'>
+                <SelectContent className='bg-surface rounded-md shadow-lg z-50'>
                   <SelectItem value="clear_selection">Clear Selection</SelectItem>
                   {statusOptions.map(option => (
                     <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
@@ -304,51 +304,51 @@ export function SeasonsFilters({ filters, onFilterChange, onPageSizeChange, fixe
 
             {/* Start Date Range */}
             <div>
-              <Label htmlFor="startDateAfter" className="block text-sm font-medium text-gray-700 mb-1">Start Date After</Label>
+              <Label htmlFor="startDateAfter" className="block text-sm font-medium text-ink mb-1">Start Date After</Label>
               <Input
                 id="startDateAfter"
                 type="date"
                 value={startDateAfter}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setStartDateAfter(e.target.value)}
-                className="w-full border-gray-300 rounded-md shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                className="w-full border-line rounded-md shadow-sm focus:border-accent focus:ring-accent"
               />
             </div>
             <div>
-              <Label htmlFor="startDateBefore" className="block text-sm font-medium text-gray-700 mb-1">Start Date Before</Label>
+              <Label htmlFor="startDateBefore" className="block text-sm font-medium text-ink mb-1">Start Date Before</Label>
               <Input
                 id="startDateBefore"
                 type="date"
                 value={startDateBefore}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setStartDateBefore(e.target.value)}
-                className="w-full border-gray-300 rounded-md shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                className="w-full border-line rounded-md shadow-sm focus:border-accent focus:ring-accent"
               />
             </div>
 
             {/* End Date Range */}
             <div>
-              <Label htmlFor="endDateAfter" className="block text-sm font-medium text-gray-700 mb-1">End Date After</Label>
+              <Label htmlFor="endDateAfter" className="block text-sm font-medium text-ink mb-1">End Date After</Label>
               <Input
                 id="endDateAfter"
                 type="date"
                 value={endDateAfter}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEndDateAfter(e.target.value)}
-                className="w-full border-gray-300 rounded-md shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                className="w-full border-line rounded-md shadow-sm focus:border-accent focus:ring-accent"
               />
             </div>
             <div>
-              <Label htmlFor="endDateBefore" className="block text-sm font-medium text-gray-700 mb-1">End Date Before</Label>
+              <Label htmlFor="endDateBefore" className="block text-sm font-medium text-ink mb-1">End Date Before</Label>
               <Input
                 id="endDateBefore"
                 type="date"
                 value={endDateBefore}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEndDateBefore(e.target.value)}
-                className="w-full border-gray-300 rounded-md shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                className="w-full border-line rounded-md shadow-sm focus:border-accent focus:ring-accent"
               />
             </div>
 
             {/* Page Size Control */}
             <div className="flex items-center space-x-2 mt-4">
-              <Label htmlFor="pageSize" className="text-sm font-medium text-gray-700">Seasons per page</Label>
+              <Label htmlFor="pageSize" className="text-sm font-medium text-ink">Seasons per page</Label>
               <Input
                 id="pageSize"
                 type="number"
@@ -365,14 +365,14 @@ export function SeasonsFilters({ filters, onFilterChange, onPageSizeChange, fixe
             <Button
               variant="outline"
               onClick={handleClearAllFilters}
-              className="bg-red-500 hover:bg-red-600 text-white rounded-md shadow-sm transition duration-300 ease-in-out"
+              className="bg-negative hover:bg-negative text-white rounded-md shadow-sm transition duration-300 ease-in-out"
             >
               Clear All Filters
             </Button>
             <Button
               type="button"
               onClick={() => setIsDialogOpen(false)}
-              className="bg-primary-600 hover:bg-primary-700 text-white rounded-md shadow-sm transition duration-300 ease-in-out"
+              className="bg-accent hover:bg-accent text-white rounded-md shadow-sm transition duration-300 ease-in-out"
             >
               Close
             </Button>

@@ -48,7 +48,7 @@ export function UsersListView({ basePath, createHref }: { basePath: string; crea
 
   return (
     <div className="container mx-auto p-6">
-      {isError && <p className="pb-2 text-red-400">Erreur lors du chargement des utilisateurs.</p>}
+      {isError && <p className="pb-2 text-negative">Erreur lors du chargement des utilisateurs.</p>}
       <div className="mb-4 flex items-center justify-between gap-3">
         <UserFilters filters={filters} onFilterChange={handleFilterChange} onPageSizeChange={handlePageSizeChange} />
         {createHref && (

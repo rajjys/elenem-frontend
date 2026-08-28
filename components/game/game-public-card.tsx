@@ -25,23 +25,23 @@ const GamePublicCard: React.FC<GamePublicCardProps> = ({ game }) => {
           alt={`${name} Logo`}
           width={28}
           height={28}
-          className="rounded-full border border-slate-300 dark:border-slate-600"/>
+          className="rounded-full border border-line "/>
           :
           <div className="h-6 w-6 rounded-full bg-gradient-to-tr from-gray-400 to-blue-700" />
         }
       <span
         className={`text-sm font-medium ${
           highlight
-            ? 'text-slate-900 dark:text-slate-100 font-semibold'
-            : 'text-slate-600 dark:text-slate-400'
+            ? 'text-ink font-semibold'
+            : 'text-ink-muted '
         }`}>{name}</span>
     </div>
     {score !== null && (
       <span
         className={`text-sm font-bold ${
           highlight
-            ? 'text-slate-900 dark:text-slate-100'
-            : 'text-slate-500 dark:text-slate-400'
+            ? 'text-ink '
+            : 'text-ink-muted '
         }`}
       >
         {highlight && (
@@ -64,20 +64,20 @@ const GamePublicCard: React.FC<GamePublicCardProps> = ({ game }) => {
   const awayWin = game.status === GameStatus.COMPLETED && awayScore !== null && awayScore > (homeScore ?? 0);
 
   return (
-    <Card className="rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md transition bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors duration-300 ease-in-out">
-      <CardHeader className="flex flex-col items-start gap-1 px-4 py-1 border-b border-slate-200 dark:border-slate-700 space-y-1">
-        <div className="flex items-center justify-between py-1 w-full text-xs text-slate-500 dark:text-slate-400">
+    <Card className="rounded-xl border border-line shadow-sm hover:shadow-md transition bg-surface hover:bg-surface-sunk transition-colors duration-300 ease-in-out">
+      <CardHeader className="flex flex-col items-start gap-1 px-4 py-1 border-b border-line space-y-1">
+        <div className="flex items-center justify-between py-1 w-full text-xs text-ink-muted ">
           <span>{game.round || game.league.name}</span>
-          <span className="hidden md:inline text-xs text-slate-700 dark:text-slate-200 font-medium">
+          <span className="hidden md:inline text-xs text-ink font-medium">
             {gameDate}
           </span>
           {getStatusBadge(game.status)}
         </div>
-        {/* <div className="md:hidden text-sm text-slate-700 dark:text-slate-200 font-medium flex justify-start gap-4">
+        {/* <div className="md:hidden text-sm text-ink font-medium flex justify-start gap-4">
           <span>{gameDate}</span>
           {game.homeVenue?.name && <span>•</span>}
           {game.homeVenue?.name && (
-            <div className="text-xs text-slate-500 dark:text-slate-400 mt-2">
+            <div className="text-xs text-ink-muted mt-2">
               {game.homeVenue.name}
             </div>
           )}

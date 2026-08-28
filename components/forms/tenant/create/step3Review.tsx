@@ -31,7 +31,7 @@ export function Step3Review({
     <>
       <CardContent className="space-y-6">
         {/* Banner + Logo */}
-        <div className="relative w-full h-48 bg-gray-100 rounded-lg flex items-center justify-center mb-12">
+        <div className="relative w-full h-48 bg-surface-sunk rounded-lg flex items-center justify-center mb-12">
           {bannerPreview ? (
             <Image
               src={bannerPreview}
@@ -41,12 +41,12 @@ export function Step3Review({
               className="w-full h-full object-cover"
             />
           ) : (
-            <div className="text-gray-400">No banner uploaded</div>
+            <div className="text-ink-subtle">No banner uploaded</div>
           )}
 
           {/* Logo */}
           <div className="absolute left-4 -bottom-10">
-            <div className="relative w-28 h-28 rounded-full border-4 border-white shadow-md overflow-hidden bg-gray-100">
+            <div className="relative w-28 h-28 rounded-full border-4 border-white shadow-md overflow-hidden bg-surface-sunk">
               {logoPreview ? (
                 <Image
                   src={logoPreview}
@@ -56,7 +56,7 @@ export function Step3Review({
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <div className="w-full h-full flex items-center justify-center text-gray-400">
+                <div className="w-full h-full flex items-center justify-center text-ink-subtle">
                   Logo
                 </div>
               )}
@@ -65,35 +65,35 @@ export function Step3Review({
         </div>
 
         {/* Tenant Details */}
-        <div className="bg-gray-100 p-4 rounded-lg">
-          <div className="flex items-center justify-center gap-3 mb-2 border-b border-slate-300">
-            <Icon className="w-6 h-6 text-green-800 font-bold" />
+        <div className="bg-surface-sunk p-4 rounded-lg">
+          <div className="flex items-center justify-center gap-3 mb-2 border-b border-line">
+            <Icon className="w-6 h-6 text-positive font-bold" />
             <h3 className="text-lg md:text-xl font-semibold my-2">{formData.name}</h3>
             <span><CountryFlag countryCode={countryNameToCode[formData.country]} svg style={{ width: '2em', height: '1em' }} /></span>
           </div>
           <p className="py-0.5">
-            <span className="text-slate-800 pr-1">code:</span>
-            <span className="text-slate-800 font-semibold">{formData.tenantCode}</span> 
+            <span className="text-ink pr-1">code:</span>
+            <span className="text-ink font-semibold">{formData.tenantCode}</span> 
           </p>
           <p>
-            <span className="text-slate-800 pr-1">site:</span>
-            <span className="text-slate-800 font-semibold">https://<span className="font-bold">{formData.tenantCode.toLowerCase()}</span>.elenem.site</span> 
+            <span className="text-ink pr-1">site:</span>
+            <span className="text-ink font-semibold">https://<span className="font-bold">{formData.tenantCode.toLowerCase()}</span>.elenem.site</span> 
           </p>
           <p className="py-0.5">
-            <span className="text-slate-800 pr-1">sport:</span>
-            <span className="text-slate-800 font-semibold ">{capitalizeFirst(formData.sportType)}</span>
+            <span className="text-ink pr-1">sport:</span>
+            <span className="text-ink font-semibold ">{capitalizeFirst(formData.sportType)}</span>
           </p>
           <p className="py-0.5">
-            <span className="text-slate-800 pr-1">type:</span>
-            <span className="text-slate-800 font-semibold ">{capitalizeFirst(formData.tenantType)}</span>
+            <span className="text-ink pr-1">type:</span>
+            <span className="text-ink font-semibold ">{capitalizeFirst(formData.tenantType)}</span>
           </p>
           <p className="py-0.5">
-            <span className="text-slate-800 pr-1">pays:</span>
-            <span className="text-slate-800 font-semibold ">{capitalizeFirst(formData.country)}</span>
+            <span className="text-ink pr-1">pays:</span>
+            <span className="text-ink font-semibold ">{capitalizeFirst(formData.country)}</span>
           </p>
           <p className="py-0.5">
-            <span className="text-slate-800 pr-1">Visibilite:</span>
-            <span className="text-slate-800 font-semibold ">Publique</span>
+            <span className="text-ink pr-1">Visibilite:</span>
+            <span className="text-ink font-semibold ">Publique</span>
           </p>
           {currentUserRoles.includes(Roles.SYSTEM_ADMIN) && (
             <p>
@@ -103,8 +103,8 @@ export function Step3Review({
         </div>
 
         {/* Business Profile */}
-        <div className="bg-gray-100 p-4 rounded-lg">
-          <div className="flex items-center justify-center gap-3 mb-2 border-b border-slate-300">
+        <div className="bg-surface-sunk p-4 rounded-lg">
+          <div className="flex items-center justify-center gap-3 mb-2 border-b border-line">
             <h3 className="text-lg md:text-xl font-semibold my-2">Profil business</h3>
           </div>
           <p>

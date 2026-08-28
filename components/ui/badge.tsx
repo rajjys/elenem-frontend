@@ -1,5 +1,16 @@
-// components/ui/badge.tsx
 import React from 'react';
+import { cn } from '@/utils/cn';
+
+/**
+ * Status badge, built on the semantic tokens.
+ *
+ * The rule from the design direction: a colour appears only when it means something. So the
+ * variants map onto three meanings — positive (it happened, it went well), negative (it failed or
+ * was cancelled) and caution (it needs attention) — plus a neutral for everything else. The
+ * previous version reached for eight different palettes (yellow, orange, slate, and a
+ * `text-ink-subtle` that isn't even a real Tailwind shade) and referenced
+ * `bg-primary`/`text-primary-foreground` tokens that were never defined.
+ */
 export type BadgeVariant =
   | 'default'
   | 'secondary'
@@ -14,69 +25,52 @@ export type BadgeVariant =
   | 'completed'
   | 'canceled'
   | 'archived';
-// Define the possible variants for the badge
+
 interface BadgeProps {
   children: React.ReactNode;
   variant?: BadgeVariant;
   className?: string;
 }
 
+const NEUTRAL = 'bg-surface-sunk text-ink-muted border border-line';
+const POSITIVE = 'bg-positive-soft text-positive border border-positive/25';
+const NEGATIVE = 'bg-negative-soft text-negative border border-negative/25';
+const CAUTION = 'bg-caution-soft text-caution border border-caution/25';
+const ACCENT = 'bg-accent-soft text-accent-text border border-accent-line';
+
+const variants: Record<BadgeVariant, string> = {
+  default: ACCENT,
+  secondary: NEUTRAL,
+  outline: NEUTRAL,
+  unknown: NEUTRAL,
+
+  // In progress or upcoming — the organiser may still need to act.
+  planning: CAUTION,
+  paused: CAUTION,
+  scheduled: ACCENT,
+
+  // Settled, and settled well.
+  success: POSITIVE,
+  active: POSITIVE,
+
+  // Settled, and it didn't happen.
+  destructive: NEGATIVE,
+  canceled: NEGATIVE,
+
+  // Done and filed away — deliberately quiet.
+  completed: NEUTRAL,
+  archived: NEUTRAL,
+};
+
 export function Badge({ children, variant = 'default', className }: BadgeProps) {
-  // Base styling for all badges
-  let baseClasses = 'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2';
-
-  // Apply variant-specific styles
-  switch (variant) {
-    case 'default':
-      baseClasses += ' bg-primary text-primary-foreground hover:bg-primary/80'; // Example: blue/indigo
-      break;
-    case 'secondary':
-      baseClasses += ' bg-secondary text-secondary-foreground hover:bg-secondary/80'; // Example: light gray
-      break;
-    case 'success':
-      baseClasses += ' bg-green-600 text-white'; // For active states
-      break;
-    case 'destructive':
-      baseClasses += ' bg-red-600 text-white hover:bg-red-700'; // For inactive/error states
-      break;
-    case 'outline':
-      baseClasses += ' text-green-600 border border-green-600 bg-emerald-50 hover:bg-accent'; // Outline style
-      break;
-    case 'unknown':
-      baseClasses += ' text-gray-450 border border-gray-450 bg-gray-100'; // Outline style
-      break;
-    case 'planning':
-      baseClasses += ' bg-yellow-100 text-yellow-800 border border-yellow-300';
-      break;
-    case 'scheduled':
-      baseClasses += ' bg-blue-100 text-blue-800 border border-blue-300';
-      break;
-    case 'active':
-      baseClasses += ' bg-green-600 text-white';
-      break;
-    case 'paused':
-      baseClasses += ' bg-orange-100 text-orange-800 border border-orange-300';
-      break;
-    case 'completed':
-      baseClasses += ' bg-gray-100 text-gray-800 border border-gray-300';
-      break;
-    case 'canceled':
-      baseClasses += ' bg-red-600 text-white';
-      break;
-    case 'archived':
-      baseClasses += ' bg-slate-200 text-slate-600';
-      break;
-
-    default:
-      baseClasses += ' bg-gray-500 text-white'; // Fallback
-      break;
-  }
-
-  // Combine base and any additional classes provided by the user
-  const finalClasses = `${baseClasses} ${className || ''}`;
-
   return (
-    <span className={finalClasses}>
+    <span
+      className={cn(
+        'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium',
+        variants[variant],
+        className,
+      )}
+    >
       {children}
     </span>
   );

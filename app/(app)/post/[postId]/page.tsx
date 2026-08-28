@@ -78,7 +78,7 @@ export default function PostEditPage() {
   // Loading state (modeled after GameManagementDashboard)
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="flex justify-center items-center h-screen bg-surface-sunk ">
         <LoadingSpinner message="Loading post..." />
       </div>
     );
@@ -87,7 +87,7 @@ export default function PostEditPage() {
   // Error state
   if (error || !postData) {
     return (
-      <div className="max-w-4xl mx-auto my-8 p-6 text-center text-red-600 border border-red-300 rounded-lg">
+      <div className="max-w-4xl mx-auto my-8 p-6 text-center text-negative border border-negative rounded-lg">
         <h2 className="text-xl font-bold mb-2">Error Loading Post</h2>
         <p>{error || "The post data could not be found."}</p>
         <Button onClick={handleCancel} className="mt-4">Go Back</Button>
@@ -101,7 +101,7 @@ export default function PostEditPage() {
       <Card>
         <CardHeader>
           <CardTitle>Edit Post: {postData.title}</CardTitle>
-          <p className="text-sm text-gray-500">Post ID: {postId}</p>
+          <p className="text-sm text-ink-muted">Post ID: {postId}</p>
         </CardHeader>
         <CardContent>
           <PostForm

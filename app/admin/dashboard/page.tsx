@@ -39,10 +39,10 @@ const SystemAdminDashboard = () => {
   const { buildLink } = useContextualLink();
 
   const systemMetrics = [
-    { title: "Total Users", value: "12,847", description: "Active Individual Users", trend: {isPositive: true, value: 3.6, timespan: "season"}, icon: Users, bgColorClass: "bg-blue-400", textColorClass: "text-white", href: buildLink("/admin/users") },
-    { title: "Active Tenants", value: "324", description: "Tenants with active subscriptions", trend: {isPositive: true, value: 3.6, timespan: "season"}, icon: Building2, bgColorClass: "bg-green-400", textColorClass: "text-white", href: buildLink("/admin/tenants") },
-    { title: "Monthly Revenue", value: "$89,230", description: "Income From Subscriptions",trend: {isPositive: true, value: 3.6, timespan: "season"}, icon: DollarSign, bgColorClass: "bg-orange-400", textColorClass: "text-white", href: buildLink("/admin/financials/revenue")  },
-    { title: "System Uptime", value: "99.97%", description: "Average Time Alive", trend: {isPositive: true, value: 4.8, timespan: "season"}, icon: Activity, color: "text-purple-600", bgColorClass: "bg-red-400", textColorClass: "text-white", href: buildLink("/admin/system/status")  },
+    { title: "Total Users", value: "12,847", description: "Active Individual Users", trend: {isPositive: true, value: 3.6, timespan: "season"}, icon: Users, bgColorClass: "bg-accent", textColorClass: "text-white", href: buildLink("/admin/users") },
+    { title: "Active Tenants", value: "324", description: "Tenants with active subscriptions", trend: {isPositive: true, value: 3.6, timespan: "season"}, icon: Building2, bgColorClass: "bg-positive", textColorClass: "text-white", href: buildLink("/admin/tenants") },
+    { title: "Monthly Revenue", value: "$89,230", description: "Income From Subscriptions",trend: {isPositive: true, value: 3.6, timespan: "season"}, icon: DollarSign, bgColorClass: "bg-caution", textColorClass: "text-white", href: buildLink("/admin/financials/revenue")  },
+    { title: "System Uptime", value: "99.97%", description: "Average Time Alive", trend: {isPositive: true, value: 4.8, timespan: "season"}, icon: Activity, color: "text-purple-600", bgColorClass: "bg-negative", textColorClass: "text-white", href: buildLink("/admin/system/status")  },
   ];
 
   const userManagement = [
@@ -83,25 +83,25 @@ const SystemAdminDashboard = () => {
 
   const getStatusBadge = (status: string) => {
     const variants: Record<string, { variant: "default" | "secondary" | "destructive" | "outline", color: string }> = {
-      "Active": { variant: "default", color: "bg-green-100 text-green-800" },
-      "Pending": { variant: "secondary", color: "bg-yellow-100 text-yellow-800" },
-      "Suspended": { variant: "destructive", color: "bg-red-100 text-red-800" },
-      "Healthy": { variant: "default", color: "bg-green-100 text-green-800" },
-      "Warning": { variant: "secondary", color: "bg-yellow-100 text-yellow-800" },
-      "Critical": { variant: "destructive", color: "bg-red-100 text-red-800" }
+      "Active": { variant: "default", color: "bg-positive-soft text-positive" },
+      "Pending": { variant: "secondary", color: "bg-caution-soft text-caution" },
+      "Suspended": { variant: "destructive", color: "bg-negative-soft text-negative" },
+      "Healthy": { variant: "default", color: "bg-positive-soft text-positive" },
+      "Warning": { variant: "secondary", color: "bg-caution-soft text-caution" },
+      "Critical": { variant: "destructive", color: "bg-negative-soft text-negative" }
     };
     
-    return variants[status] || { variant: "outline" as const, color: "bg-gray-100 text-gray-800" };
+    return variants[status] || { variant: "outline" as const, color: "bg-surface-sunk text-ink" };
   };
 
   const getPriorityBadge = (priority: string) => {
     const variants: Record<string, string> = {
-      "High": "bg-red-100 text-red-800",
-      "Medium": "bg-yellow-100 text-yellow-800",
-      "Low": "bg-green-100 text-green-800"
+      "High": "bg-negative-soft text-negative",
+      "Medium": "bg-caution-soft text-caution",
+      "Low": "bg-positive-soft text-positive"
     };
     
-    return variants[priority] || "bg-gray-100 text-gray-800";
+    return variants[priority] || "bg-surface-sunk text-ink";
   };
 
   return (
@@ -110,10 +110,10 @@ const SystemAdminDashboard = () => {
         <div className="flex justify-between items-center">
           <div>
             <h1 className="text-2xl font-bold text-foreground flex items-center gap-3">
-              <Crown className="h-8 w-8 text-blue-400" />
+              <Crown className="h-8 w-8 text-accent-text" />
               System Administration
             </h1>
-            <p className="text-gray-500 mt-1">Complete platform oversight and management</p>
+            <p className="text-ink-muted mt-1">Complete platform oversight and management</p>
           </div>
           <div className="flex gap-3">
             <Button variant="outline" size="sm">
@@ -136,7 +136,7 @@ const SystemAdminDashboard = () => {
 
         {/* Main Content Tabs */}
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6 bg-gray-200">
+          <TabsList className="grid w-full grid-cols-6 bg-line">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="users">User Management</TabsTrigger>
             <TabsTrigger value="system">System Health</TabsTrigger>
@@ -152,7 +152,7 @@ const SystemAdminDashboard = () => {
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <AlertTriangle className="h-5 w-5 text-orange-500" />
+                    <AlertTriangle className="h-5 w-5 text-caution" />
                     System Alerts
                   </CardTitle>
                   <CardDescription>Recent system notifications and alerts</CardDescription>
@@ -162,9 +162,9 @@ const SystemAdminDashboard = () => {
                     {systemAlerts.map((alert, index) => (
                       <div key={index} className="flex items-start gap-3 p-3 rounded-lg border">
                         <alert.icon className={`h-4 w-4 mt-0.5 ${
-                          alert.type === 'critical' ? 'text-red-500' :
-                          alert.type === 'warning' ? 'text-yellow-500' :
-                          alert.type === 'error' ? 'text-red-500' : 'text-green-500'
+                          alert.type === 'critical' ? 'text-negative' :
+                          alert.type === 'warning' ? 'text-caution' :
+                          alert.type === 'error' ? 'text-negative' : 'text-positive'
                         }`} />
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium text-foreground">{alert.message}</p>
@@ -180,7 +180,7 @@ const SystemAdminDashboard = () => {
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <BarChart3 className="h-5 w-5 text-blue-500" />
+                    <BarChart3 className="h-5 w-5 text-accent-text" />
                     Platform Statistics
                   </CardTitle>
                   <CardDescription>Key performance indicators</CardDescription>
@@ -235,9 +235,9 @@ const SystemAdminDashboard = () => {
                   ].map((activity, index) => (
                     <div key={index} className="flex items-center gap-3 p-3 rounded-lg border">
                       <div className={`w-2 h-2 rounded-full ${
-                        activity.type === 'success' ? 'bg-green-500' :
-                        activity.type === 'warning' ? 'bg-yellow-500' :
-                        activity.type === 'error' ? 'bg-red-500' : 'bg-blue-500'
+                        activity.type === 'success' ? 'bg-positive' :
+                        activity.type === 'warning' ? 'bg-caution' :
+                        activity.type === 'error' ? 'bg-negative' : 'bg-accent'
                       }`} />
                       <div className="flex-1">
                         <p className="text-sm font-medium text-foreground">{activity.action}</p>
@@ -255,7 +255,7 @@ const SystemAdminDashboard = () => {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Users className="h-5 w-5 text-blue-500" />
+                  <Users className="h-5 w-5 text-accent-text" />
                   User Management
                 </CardTitle>
                 <CardDescription>Manage platform users and their permissions</CardDescription>
@@ -341,7 +341,7 @@ const SystemAdminDashboard = () => {
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <Server className="h-5 w-5 text-green-500" />
+                    <Server className="h-5 w-5 text-positive" />
                     Service Status
                   </CardTitle>
                   <CardDescription>Real-time status of all system services</CardDescription>
@@ -352,8 +352,8 @@ const SystemAdminDashboard = () => {
                       <div key={index} className="flex items-center justify-between p-3 rounded-lg border">
                         <div className="flex items-center gap-3">
                           <div className={`w-3 h-3 rounded-full ${
-                            service.status === 'Healthy' ? 'bg-green-500' :
-                            service.status === 'Warning' ? 'bg-yellow-500' : 'bg-red-500'
+                            service.status === 'Healthy' ? 'bg-positive' :
+                            service.status === 'Warning' ? 'bg-caution' : 'bg-negative'
                           }`} />
                           <div>
                             <p className="font-medium text-foreground">{service.service}</p>
@@ -373,7 +373,7 @@ const SystemAdminDashboard = () => {
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <Monitor className="h-5 w-5 text-blue-500" />
+                    <Monitor className="h-5 w-5 text-accent-text" />
                     System Resources
                   </CardTitle>
                   <CardDescription>Current system resource utilization</CardDescription>
@@ -434,7 +434,7 @@ const SystemAdminDashboard = () => {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <DollarSign className="h-5 w-5 text-green-500" />
+                  <DollarSign className="h-5 w-5 text-positive" />
                   Revenue Analytics
                 </CardTitle>
                 <CardDescription>Financial performance across all tenants</CardDescription>
@@ -443,11 +443,11 @@ const SystemAdminDashboard = () => {
                 <div className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                     <div className="p-4 rounded-lg border text-center">
-                      <p className="text-2xl font-bold text-green-600">$89,230</p>
+                      <p className="text-2xl font-bold text-positive">$89,230</p>
                       <p className="text-sm text-muted-foreground">Monthly Revenue</p>
                     </div>
                     <div className="p-4 rounded-lg border text-center">
-                      <p className="text-2xl font-bold text-blue-600">$1,048,760</p>
+                      <p className="text-2xl font-bold text-accent-text">$1,048,760</p>
                       <p className="text-sm text-muted-foreground">Annual Revenue</p>
                     </div>
                     <div className="p-4 rounded-lg border text-center">
@@ -473,16 +473,16 @@ const SystemAdminDashboard = () => {
                             <td className="p-4 text-foreground">{tenant.revenue}</td>
                             <td className="p-4">
                               <span className={`text-sm ${
-                                tenant.growth.startsWith('+') ? 'text-green-600' : 'text-red-600'
+                                tenant.growth.startsWith('+') ? 'text-positive' : 'text-negative'
                               }`}>
                                 {tenant.growth}
                               </span>
                             </td>
                             <td className="p-4">
                               <Badge className={
-                                tenant.status === 'Growing' ? 'bg-green-100 text-green-800' :
-                                tenant.status === 'Stable' ? 'bg-blue-100 text-blue-800' :
-                                'bg-red-100 text-red-800'
+                                tenant.status === 'Growing' ? 'bg-positive-soft text-positive' :
+                                tenant.status === 'Stable' ? 'bg-accent-soft text-accent-text' :
+                                'bg-negative-soft text-negative'
                               }>
                                 {tenant.status}
                               </Badge>
@@ -502,7 +502,7 @@ const SystemAdminDashboard = () => {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Mail className="h-5 w-5 text-orange-500" />
+                  <Mail className="h-5 w-5 text-caution" />
                   Support Tickets
                 </CardTitle>
                 <CardDescription>Manage customer support requests</CardDescription>
@@ -563,7 +563,7 @@ const SystemAdminDashboard = () => {
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <Settings className="h-5 w-5 text-gray-500" />
+                    <Settings className="h-5 w-5 text-ink-muted" />
                     System Configuration
                   </CardTitle>
                   <CardDescription>Core system settings and parameters</CardDescription>
@@ -608,7 +608,7 @@ const SystemAdminDashboard = () => {
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <Shield className="h-5 w-5 text-red-500" />
+                    <Shield className="h-5 w-5 text-negative" />
                     Security Settings
                   </CardTitle>
                   <CardDescription>Platform security and access controls</CardDescription>

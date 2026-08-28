@@ -148,7 +148,7 @@ export default function Step3Rules({ form } : Step3Props ) {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-40">
-        <p className="text-gray-500">Loading sport rules...</p>
+        <p className="text-ink-muted">Loading sport rules...</p>
       </div>
     );
   }
@@ -157,11 +157,11 @@ export default function Step3Rules({ form } : Step3Props ) {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h3 className="text-lg font-semibold">Point System</h3>
-        <span className="text-sm text-gray-500">Sport: {sportRulesTemplate?.sportType || 'N/A'}</span>
+        <span className="text-sm text-ink-muted">Sport: {sportRulesTemplate?.sportType || 'N/A'}</span>
       </div>
 
       <div className="space-y-4">
-        {pointRuleFields.length === 0 && <p className="text-sm text-gray-500">No point rules found. Select one to add below.</p>}
+        {pointRuleFields.length === 0 && <p className="text-sm text-ink-muted">No point rules found. Select one to add below.</p>}
         {pointRuleFields.map((field, index) => (
           <div key={field.id} className="flex items-center space-x-2">
             <Label className="w-1/4">{field.outcome}</Label>
@@ -199,7 +199,7 @@ export default function Step3Rules({ form } : Step3Props ) {
 
       <div className="space-y-2">
         <h4 className="text-md font-medium">Tiebreakers</h4>
-        {tiebreakerFields.length === 0 && <p className="text-sm text-gray-500">No tiebreakers selected. You can add one below.</p>}
+        {tiebreakerFields.length === 0 && <p className="text-sm text-ink-muted">No tiebreakers selected. You can add one below.</p>}
         
         <DragDropContext onDragEnd={onDragEnd}>
           <Droppable droppableId="tiebreakers">
@@ -211,21 +211,21 @@ export default function Step3Rules({ form } : Step3Props ) {
                       <div
                         ref={provided.innerRef}
                         {...provided.draggableProps}
-                        className="flex items-center space-x-2 bg-gray-50 p-2 rounded-md border"
+                        className="flex items-center space-x-2 bg-surface-sunk p-2 rounded-md border"
                       >
-                        <div {...provided.dragHandleProps} className="cursor-grab text-gray-400 hover:text-gray-600">
+                        <div {...provided.dragHandleProps} className="cursor-grab text-ink-subtle hover:text-ink-muted">
                           <GripVertical />
                         </div>
                         <Input
                           type="number"
                           readOnly
                           {...register(`tieBreakerConfig.${index}.order`, { valueAsNumber: true })}
-                          className="w-16 bg-gray-100 text-gray-700"
+                          className="w-16 bg-surface-sunk text-ink"
                         />
                         <Input
                           readOnly
                           value={field.description}
-                          className="flex-grow bg-gray-100 text-gray-700"
+                          className="flex-grow bg-surface-sunk text-ink"
                         />
                         <Button
                           type="button"
@@ -263,7 +263,7 @@ export default function Step3Rules({ form } : Step3Props ) {
       
       {/* Display form-wide errors */}
       {Object.keys(errors).length > 0 && (
-        <div className="mt-6 p-4 rounded-md bg-red-50 border border-red-200 text-red-700">
+        <div className="mt-6 p-4 rounded-md bg-negative-soft border border-negative text-negative">
           <p className="font-semibold">Please correct the following errors:</p>
           <ul className="list-disc list-inside mt-2">
             {Object.keys(errors).map(key => {

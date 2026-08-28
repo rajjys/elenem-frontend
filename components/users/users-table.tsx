@@ -36,53 +36,53 @@ export function UsersTable({ users, onSort, sortBy, sortOrder, onDelete, onManag
   };
 
   if (users.length === 0) {
-    return <p className="text-center text-gray-500 mt-8">No users found matching your criteria.</p>;
+    return <p className="text-center text-ink-muted mt-8">No users found matching your criteria.</p>;
   }
 
   return (
     <div className="rounded-lg shadow-md overflow-hidden">
       <Table>
-        <TableHeader className="bg-gray-50">
+        <TableHeader className="bg-surface-sunk">
           <TableRow>
-            <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <TableHead className="px-6 py-3 text-left text-xs font-medium text-ink-muted uppercase tracking-wider">
               <Button variant="ghost" onClick={() => onSort('firstName')}>
                 First Name {getSortIndicator('firstName')}
                 <ArrowUpDown className="ml-2 h-4 w-4" />
               </Button>
             </TableHead>
-            <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <TableHead className="px-6 py-3 text-left text-xs font-medium text-ink-muted uppercase tracking-wider">
               <Button variant="ghost" onClick={() => onSort('lastName')}>
                 Last Name {getSortIndicator('lastName')}
                 <ArrowUpDown className="ml-2 h-4 w-4" />
               </Button>
             </TableHead>
-            <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <TableHead className="px-6 py-3 text-left text-xs font-medium text-ink-muted uppercase tracking-wider">
               <Button variant="ghost" onClick={() => onSort('email')}>
                 Email {getSortIndicator('email')}
                 <ArrowUpDown className="ml-2 h-4 w-4" />
               </Button>
             </TableHead>
-            <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <TableHead className="px-6 py-3 text-left text-xs font-medium text-ink-muted uppercase tracking-wider">
               <Button variant="ghost" onClick={() => onSort('username')}>
                 Username {getSortIndicator('username')}
                 <ArrowUpDown className="ml-2 h-4 w-4" />
               </Button>
             </TableHead>
-            <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <TableHead className="px-6 py-3 text-left text-xs font-medium text-ink-muted uppercase tracking-wider">
               Roles
             </TableHead>
-            <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <TableHead className="px-6 py-3 text-left text-xs font-medium text-ink-muted uppercase tracking-wider">
               Organisation
             </TableHead>
-            <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <TableHead className="px-6 py-3 text-left text-xs font-medium text-ink-muted uppercase tracking-wider">
               Status
             </TableHead>
-            <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <TableHead className="px-6 py-3 text-left text-xs font-medium text-ink-muted uppercase tracking-wider">
               Actions
             </TableHead>
           </TableRow>
         </TableHeader>
-        <TableBody className="bg-white divide-y divide-gray-200">
+        <TableBody className="bg-surface divide-y divide-line">
           {users.map((user) => (
             <TableRow key={user.id}>
               <TableCell className="px-6 py-4 whitespace-nowrap">
@@ -97,30 +97,30 @@ export function UsersTable({ users, onSort, sortBy, sortOrder, onDelete, onManag
                     </div>
                   )}
                   <div className="ml-4">
-                    <div className="text-sm font-medium text-gray-900">
+                    <div className="text-sm font-medium text-ink">
                       {user.firstName} {user.lastName}
                     </div>
                   </div>
                 </div>
               </TableCell>
-              <TableCell className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              <TableCell className="px-6 py-4 whitespace-nowrap text-sm text-ink-muted">
                 {user.lastName}
               </TableCell>
-              <TableCell className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              <TableCell className="px-6 py-4 whitespace-nowrap text-sm text-ink-muted">
                 {user.email}
               </TableCell>
-              <TableCell className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              <TableCell className="px-6 py-4 whitespace-nowrap text-sm text-ink-muted">
                 {user.username}
               </TableCell>
-              <TableCell className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              <TableCell className="px-6 py-4 whitespace-nowrap text-sm text-ink-muted">
                 {user.roles.map(role => role.replace(/_/g, ' ')).join(', ')}
               </TableCell>
-              <TableCell className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              <TableCell className="px-6 py-4 whitespace-nowrap text-sm text-ink-muted">
                 {user?.tenant?.tenantCode}
               </TableCell>
               <TableCell className="px-6 py-4 whitespace-nowrap">
                 <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                  user.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                  user.isActive ? 'bg-positive-soft text-positive' : 'bg-negative-soft text-negative'
                 }`}>
                   {user.isActive ? 'Active' : 'Inactive'}
                 </span>
@@ -143,7 +143,7 @@ export function UsersTable({ users, onSort, sortBy, sortOrder, onDelete, onManag
                       <Pencil className="mr-2 h-4 w-4" /> Manage Roles
                     </DropdownMenuItem>
                     {/* Add more actions like view full profile */}
-                    <DropdownMenuItem onClick={() => onDelete(user.id)} className="flex items-center text-red-600 cursor-pointer">
+                    <DropdownMenuItem onClick={() => onDelete(user.id)} className="flex items-center text-negative cursor-pointer">
                       <Trash className="mr-2 h-4 w-4" /> Delete User
                     </DropdownMenuItem>
                   </DropdownMenuContent>

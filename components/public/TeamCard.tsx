@@ -20,7 +20,7 @@ export function TeamCard({ team, leagueId }: TeamCardProps) {
 
   return (
     <Link href={teamLink} className="block group">
-      <div className="bg-white shadow-lg rounded-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
+      <div className="bg-surface shadow-lg rounded-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
         {team.businessProfile.bannerAsset?.url && !bannerError ? (
           <Image
             src={team.businessProfile.bannerAsset?.url}
@@ -32,7 +32,7 @@ export function TeamCard({ team, leagueId }: TeamCardProps) {
             unoptimized
           />
         ) : (
-          <div className="w-full h-32 bg-gray-200 flex items-center justify-center text-gray-500">
+          <div className="w-full h-32 bg-line flex items-center justify-center text-ink-muted">
             No Banner
           </div>
         )}
@@ -44,29 +44,29 @@ export function TeamCard({ team, leagueId }: TeamCardProps) {
                 alt={`${team.name} logo`}
                 width={48}
                 height={48}
-                className="h-12 w-12 rounded-full object-cover border-2 border-gray-200"
+                className="h-12 w-12 rounded-full object-cover border-2 border-line"
                 onError={() => setLogoError(true)}
                 unoptimized
               />
             ) : (
-              <div className="h-12 w-12 rounded-full bg-gray-300 flex items-center justify-center text-gray-600 text-lg font-semibold">
+              <div className="h-12 w-12 rounded-full bg-line flex items-center justify-center text-ink-muted text-lg font-semibold">
                 {team.name.substring(0, 2).toUpperCase()}
               </div>
             )}
             <h3
-              className="text-lg font-semibold text-gray-800 group-hover:text-indigo-600 truncate"
+              className="text-lg font-semibold text-ink group-hover:text-accent-text truncate"
               title={team.name}
             >
               {team.name}
             </h3>
           </div>
           {team.businessProfile.description && (
-            <p className="text-sm text-gray-600 line-clamp-2 mb-2">
+            <p className="text-sm text-ink-muted line-clamp-2 mb-2">
               {team.businessProfile.description}
             </p>
           )}
           {team.homeVenue && (
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-ink-muted">
               <span className="font-medium">Venue:</span> {team.homeVenue.name}
             </p>
           )}

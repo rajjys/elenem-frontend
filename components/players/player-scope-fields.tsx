@@ -77,7 +77,7 @@ export function LeaguePicker({
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+        className="mt-1 w-full rounded-md border border-line px-3 py-2 text-sm focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
       >
         <option value="">Choisir une ligue…</option>
         {leagues.map((l) => (
@@ -116,7 +116,7 @@ export function TeamPicker({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         disabled={!leagueId}
-        className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 disabled:bg-gray-50 disabled:text-gray-400"
+        className="mt-1 w-full rounded-md border border-line px-3 py-2 text-sm focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent disabled:bg-surface-sunk disabled:text-ink-subtle"
       >
         <option value="">{leagueId ? 'Sans équipe' : 'Choisir d’abord une ligue'}</option>
         {teams.map((t) => (
@@ -158,12 +158,12 @@ export function Field({
         placeholder={placeholder}
         className={`mt-1 w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-1 ${
           invalid
-            ? 'border-red-400 focus:border-red-500 focus:ring-red-500'
-            : 'border-gray-300 focus:border-primary-500 focus:ring-primary-500'
+            ? 'border-negative focus:border-negative focus:ring-negative'
+            : 'border-line focus:border-accent focus:ring-accent'
         }`}
       />
-      {hint && !invalid && <p className="mt-1 text-xs text-gray-500">{hint}</p>}
-      {invalid && <p className="mt-1 text-xs text-red-600">Ce champ est requis.</p>}
+      {hint && !invalid && <p className="mt-1 text-xs text-ink-muted">{hint}</p>}
+      {invalid && <p className="mt-1 text-xs text-negative">Ce champ est requis.</p>}
     </div>
   );
 }

@@ -55,14 +55,14 @@ export default function GeneralSearchDialog() {
   return (
     <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
       <DialogTrigger asChild>
-        <Button variant='outline' className="flex-1 py-2 px-4 rounded-xl text-left bg-white dark:bg-slate-900/80 border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800">
+        <Button variant='outline' className="flex-1 py-2 px-4 rounded-xl text-left bg-surface border-line hover:bg-surface-sunk ">
           <div className="flex items-center gap-2">
-            <Search className="h-4 w-4 text-slate-400 dark:text-slate-500" />
-            <span className="text-sm text-slate-500 dark:text-slate-400">Rechercher une ligue, Équipe ou Ville...</span>
+            <Search className="h-4 w-4 text-ink-subtle " />
+            <span className="text-sm text-ink-muted ">Rechercher une ligue, Équipe ou Ville...</span>
           </div>
         </Button>
       </DialogTrigger>
-      <DialogContent className="w-full max-w-[90vw] sm:max-w-lg md:max-w-xl rounded-2xl p-6 bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 shadow-lg mx-auto overflow-hidden">
+      <DialogContent className="w-full max-w-[90vw] sm:max-w-lg md:max-w-xl rounded-2xl p-6 bg-surface border-line shadow-lg mx-auto overflow-hidden">
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold">Rechercher une ligue</DialogTitle>
         </DialogHeader>
@@ -74,7 +74,7 @@ export default function GeneralSearchDialog() {
               type="search"
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Rechercher ligue, équipe, ville…"
-              className="pl-9 py-1 w-full rounded-md bg-white dark:bg-slate-900/80 border-slate-300 dark:border-slate-700 focus:ring-blue-500 focus:border-blue-500"
+              className="pl-9 py-1 w-full rounded-md bg-surface border-line focus:ring-accent focus:border-accent"
             />
           </div>
         </div>
@@ -98,9 +98,9 @@ export default function GeneralSearchDialog() {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <Card className="w-full max-w-full rounded-xl bg-white dark:bg-slate-900 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all mb-2">
+                <Card className="w-full max-w-full rounded-xl bg-surface shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all mb-2">
                   <CardContent className="p-4 flex items-center gap-3 w-full overflow-hidden">
-                    <div className="w-10 h-10 rounded-xl bg-slate-200 dark:bg-slate-700 flex items-center justify-center overflow-hidden shrink-0">
+                    <div className="w-10 h-10 rounded-xl bg-line flex items-center justify-center overflow-hidden shrink-0">
                       {tenant.businessProfile.logoAsset?.url ? (
                         <Image
                           src={tenant.businessProfile.logoAsset?.url}
@@ -110,12 +110,12 @@ export default function GeneralSearchDialog() {
                           className="w-full h-full object-cover"
                         />
                       ) : (
-                        <Building2 className="w-6 h-6 text-slate-500" />
+                        <Building2 className="w-6 h-6 text-ink-muted" />
                       )}
                     </div>
                     <div className="min-w-0 flex-1 overflow-hidden">
                       <div className="font-medium leading-tight truncate">{tenant.name}</div>
-                      <div className="text-xs text-slate-500 truncate">
+                      <div className="text-xs text-ink-muted truncate">
                         {tenant.businessProfile.website || `https://${tenant.tenantCode.toLowerCase()}.elenem.site`}
                       </div>
                     </div>
@@ -124,11 +124,11 @@ export default function GeneralSearchDialog() {
               </Link>
             ))
           ) : debouncedQuery ? (
-            <p className="text-center text-slate-500 dark:text-slate-400 mt-8">
+            <p className="text-center text-ink-muted mt-8">
               Aucun résultat trouvé pour votre recherche.
             </p>
           ) : (
-            <p className="text-center text-slate-500 dark:text-slate-400 mt-8">
+            <p className="text-center text-ink-muted mt-8">
               Commencez à taper pour rechercher une ligue.
             </p>
           )}

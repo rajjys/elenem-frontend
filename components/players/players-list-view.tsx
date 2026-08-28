@@ -69,8 +69,8 @@ export function PlayersListView({
     <div className="p-6">
       <header className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-900">{title}</h1>
-          <p className="text-sm text-gray-500">
+          <h1 className="text-2xl font-semibold text-ink">{title}</h1>
+          <p className="text-sm text-ink-muted">
             {total} {total === 1 ? 'joueur enregistré' : 'joueurs enregistrés'}
           </p>
         </div>
@@ -90,7 +90,7 @@ export function PlayersListView({
 
       <div className="mb-4 max-w-sm">
         <div className="relative">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-subtle" />
           <Input
             value={search}
             onChange={(e) => {
@@ -110,9 +110,9 @@ export function PlayersListView({
       ) : players.length === 0 ? (
         <EmptyRoster canManage={canManage} searching={!!debouncedSearch} onAdd={() => setBulkOpen(true)} />
       ) : (
-        <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white">
+        <div className="overflow-x-auto rounded-lg border border-line bg-surface">
           <table className="w-full min-w-[720px] text-sm">
-            <thead className="border-b border-gray-200 bg-gray-50 text-left text-xs uppercase tracking-wide text-gray-500">
+            <thead className="border-b border-line bg-surface-sunk text-left text-xs uppercase tracking-wide text-ink-muted">
               <tr>
                 <th className="w-16 px-4 py-3">N°</th>
                 <th className="px-4 py-3">Joueur</th>
@@ -122,24 +122,24 @@ export function PlayersListView({
                 {canManage && <th className="w-24 px-4 py-3 text-right">Actions</th>}
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-line">
               {players.map((p) => (
-                <tr key={p.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-3 font-mono tabular-nums text-gray-500">
+                <tr key={p.id} className="hover:bg-surface-sunk">
+                  <td className="px-4 py-3 font-mono tabular-nums text-ink-muted">
                     {p.jerseyNumber ?? '—'}
                   </td>
-                  <td className="px-4 py-3 font-medium text-gray-900">
+                  <td className="px-4 py-3 font-medium text-ink">
                     {p.firstName} {p.lastName}
                   </td>
-                  <td className="px-4 py-3 text-gray-600">{p.position ?? '—'}</td>
-                  <td className="px-4 py-3 text-gray-600">{p.currentTeam?.name ?? '—'}</td>
+                  <td className="px-4 py-3 text-ink-muted">{p.position ?? '—'}</td>
+                  <td className="px-4 py-3 text-ink-muted">{p.currentTeam?.name ?? '—'}</td>
                   <td className="px-4 py-3">
                     {p.email ? (
-                      <span className="text-gray-600">{p.email}</span>
+                      <span className="text-ink-muted">{p.email}</span>
                     ) : (
                       // Deliberately not framed as missing data: most players have no email and
                       // never will. A roster entry without an account is the normal case.
-                      <span className="text-xs text-gray-400">Fiche d&apos;effectif</span>
+                      <span className="text-xs text-ink-subtle">Fiche d&apos;effectif</span>
                     )}
                   </td>
                   {canManage && (
@@ -147,14 +147,14 @@ export function PlayersListView({
                       <div className="flex justify-end gap-1">
                         <button
                           onClick={() => setEditing(p)}
-                          className="rounded p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-700"
+                          className="rounded p-1.5 text-ink-subtle hover:bg-surface-sunk hover:text-ink"
                           aria-label={`Modifier ${p.firstName} ${p.lastName}`}
                         >
                           <Pencil className="h-4 w-4" />
                         </button>
                         <button
                           onClick={() => setToDelete(p)}
-                          className="rounded p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-600"
+                          className="rounded p-1.5 text-ink-subtle hover:bg-negative-soft hover:text-negative"
                           aria-label={`Retirer ${p.firstName} ${p.lastName}`}
                         >
                           <Trash2 className="h-4 w-4" />
@@ -228,16 +228,16 @@ function EmptyRoster({
 }) {
   if (searching) {
     return (
-      <div className="rounded-lg border border-dashed border-gray-300 bg-white py-16 text-center">
-        <p className="text-gray-500">Aucun joueur ne correspond à cette recherche.</p>
+      <div className="rounded-lg border border-dashed border-line bg-surface py-16 text-center">
+        <p className="text-ink-muted">Aucun joueur ne correspond à cette recherche.</p>
       </div>
     );
   }
   return (
-    <div className="rounded-lg border border-dashed border-gray-300 bg-white py-16 text-center">
-      <Users className="mx-auto mb-3 h-8 w-8 text-gray-300" />
-      <p className="font-medium text-gray-900">Aucun joueur pour le moment</p>
-      <p className="mx-auto mt-1 max-w-sm text-sm text-gray-500">
+    <div className="rounded-lg border border-dashed border-line bg-surface py-16 text-center">
+      <Users className="mx-auto mb-3 h-8 w-8 text-ink-subtle" />
+      <p className="font-medium text-ink">Aucun joueur pour le moment</p>
+      <p className="mx-auto mt-1 max-w-sm text-sm text-ink-muted">
         Collez la feuille d&apos;équipe pour enregistrer tout l&apos;effectif d&apos;un coup. Aucune
         adresse e-mail n&apos;est nécessaire.
       </p>

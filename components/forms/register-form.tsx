@@ -376,9 +376,9 @@ export function RegisterForm() {
             </Button>
           </div>
           {/* Already have an account? Sign In */}
-        <div className="mt-4 py-8 border-t border-indigo-200">
-          <p className="text-sm text-gray-600">Vous avez deja un compte? 
-            <Link href="/login" className="text-indigo-600 hover:text-indigo-500 transition-all duration-300 ease-in-out font-medium pl-2">Connectez-vous</Link>
+        <div className="mt-4 py-8 border-t border-accent-line">
+          <p className="text-sm text-ink-muted">Vous avez deja un compte? 
+            <Link href="/login" className="text-accent-text hover:text-accent-text transition-all duration-300 ease-in-out font-medium pl-2">Connectez-vous</Link>
           </p>
         </div>
         </form>

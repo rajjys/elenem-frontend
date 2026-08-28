@@ -21,9 +21,9 @@ export const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputPro
     return (
       <div>
         {label && (
-          <label htmlFor={name} className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor={name} className="block text-sm font-medium text-ink mb-1">
             {label}
-            {required && <span className="text-red-500 ml-1">*</span>}
+            {required && <span className="text-negative ml-1">*</span>}
           </label>
         )}
         <div className="relative">
@@ -34,8 +34,8 @@ export const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputPro
             type={show ? 'text' : 'password'}
             required={required}
             className={cn(
-              'block w-full px-3 py-2 pr-10 border rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm',
-              error ? 'border-red-500' : 'border-gray-300',
+              'block w-full px-3 py-2 pr-10 border rounded-md shadow-sm focus:outline-none focus:ring-accent focus:border-accent sm:text-sm',
+              error ? 'border-negative' : 'border-line',
               className,
             )}
             {...props}
@@ -45,13 +45,13 @@ export const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputPro
             tabIndex={-1}
             onClick={() => setShow((s) => !s)}
             aria-label={show ? 'Hide password' : 'Show password'}
-            className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-400 hover:text-gray-600"
+            className="absolute inset-y-0 right-0 flex items-center px-3 text-ink-subtle hover:text-ink-muted"
           >
             {show ? <EyeOff size={18} /> : <Eye size={18} />}
           </button>
         </div>
-        {hint && <p className="text-gray-500 text-xs mt-1">{hint}</p>}
-        {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
+        {hint && <p className="text-ink-muted text-xs mt-1">{hint}</p>}
+        {error && <p className="text-negative text-xs mt-1">{error}</p>}
       </div>
     );
   },

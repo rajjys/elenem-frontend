@@ -105,37 +105,40 @@ export default function AppLayout({
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
   const closeMobileMenu = () => setIsMobileMenuOpen(false);
 
-  // Determine the theme class to apply to the main container
-  const themeClass = `${themeColor}-theme`; // e.g., "emerald-theme"
-
+  // The per-role accent (`admin`=indigo, `league`=purple …) is gone: the app has one identity,
+  // and it now comes from the token layer, which also resolves light and dark. These variables
+  // stay only to feed the legacy `.nav-hover` / `.soft-theme-gradient` rules in globals.css —
+  // they read tokens now rather than a palette shade, so nav hover follows the theme.
   return (
-    <div className={`flex flex-col h-screen bg-gray-100 ${themeClass}`}
-         style={{
-         ["--hover-bg" as string]: `var(--color-${themeColor}-50)`,
-         ["--hover-text" as string]: `var(--color-${themeColor}-600)`,
-         ["--color-theme" as string]: `var(--color-${themeColor}-600)`,
-         ["--color-theme-light-from" as string]: `color-mix(in srgb, var(--color-${themeColor}-100) 25%, white)`,
-         ["--color-theme-light-to" as string]: `color-mix(in srgb, var(--color-${themeColor}-50) 50%, white)`,
-         ["--color-theme-hover-from" as string]: `color-mix(in srgb, var(--color-${themeColor}-100) 40%, white)`,
-         ["--color-theme-hover-to" as string]: `color-mix(in srgb, var(--color-${themeColor}-200) 60%, white)`,
-         ["--color-theme-hover-text" as string]: `var(--color-${themeColor}-700)`,
-       }}>
+    <div
+      className="flex h-screen flex-col bg-canvas"
+      style={{
+        ['--hover-bg' as string]: 'var(--t-accent-soft)',
+        ['--hover-text' as string]: 'var(--t-accent-text)',
+        ['--color-theme' as string]: 'var(--t-accent-text)',
+        ['--color-theme-light-from' as string]: 'var(--t-surface)',
+        ['--color-theme-light-to' as string]: 'var(--t-surface-sunk)',
+        ['--color-theme-hover-from' as string]: 'var(--t-accent-soft)',
+        ['--color-theme-hover-to' as string]: 'var(--t-accent-soft)',
+        ['--color-theme-hover-text' as string]: 'var(--t-accent)',
+      }}
+    >
       {/* Navbar is always visible */}
       <AppLayoutHeader onMobileMenuToggle={toggleMobileMenu} handleLogout={handleLogout}/>
       <div className='flex flex-1 overflow-hidden'> {/* This flex container holds sidebar and main content */}
         {/* Sidebar (desktop) */}
         {shouldShowSidebar 
           && (
-              <aside className={`bg-white shadow-lg transition-all duration-300 ease-in-out hidden md:flex flex-col sticky top-16 h-[calc(100vh-4rem)]
+              <aside className={`bg-surface shadow-lg transition-all duration-300 ease-in-out hidden md:flex flex-col sticky top-16 h-[calc(100vh-4rem)]
                                 ${isSidebarOpen ? "w-64" : "w-20"}`}>
                 {shouldShowDashboardLink && (
-                  <div className={`flex items-center p-2 border-b border-gray-200 ${isSidebarOpen ? "justify-start" : "justify-center"}`}>
+                  <div className={`flex items-center p-2 border-b border-line ${isSidebarOpen ? "justify-start" : "justify-center"}`}>
                     {/* Logo and Title in Desktop Sidebar (Only shows when open) */}
                       <Link href={buildLink(dashboard.link)} className="flex items-center" onClick={closeFlyout}>
                         <div className={`p-2`}>
-                          <ChevronLeft className="h-5 w-5 text-slate-400 font-bold" />
+                          <ChevronLeft className="h-5 w-5 text-ink-subtle font-bold" />
                         </div>
-                        {isSidebarOpen && (<span className="text-sm text-slate-500 nav-hover">{dashboard.label}</span>)}
+                        {isSidebarOpen && (<span className="text-sm text-ink-muted nav-hover">{dashboard.label}</span>)}
                       </Link>
                     {/* The space will be empty when collapsed, but the button is gone */}
                   </div>
@@ -153,7 +156,7 @@ export default function AppLayout({
                       buildLink={buildLink}
                     />
                   ))}
-                  <div className="mt-auto pt-4 border-t border-gray-200">
+                  <div className="mt-auto pt-4 border-t border-line">
 
                     <NavLink
                       item={{ label: "My Profile", basePath: "/account/profile", icon: User }}
@@ -176,7 +179,7 @@ export default function AppLayout({
                       isSidebarOpen={isSidebarOpen}
                       onClick={closeFlyout}
                       themeColor={themeColor} />
-                    <button onClick={handleLogout} className={`flex items-center text-sm p-2 rounded-md transition-colors w-full ${isSidebarOpen ? "justify-start pl-3" : "justify-center"} text-primary-700 hover:bg-primary-100`}>
+                    <button onClick={handleLogout} className={`flex items-center text-sm p-2 rounded-md transition-colors w-full ${isSidebarOpen ? "justify-start pl-3" : "justify-center"} text-accent-text hover:bg-accent-soft`}>
                       <FiLogOut className={`w-5 h-5 ${isSidebarOpen ? "mr-3" : ""}`} />
                       {isSidebarOpen && 'Logout'}
                     </button>
@@ -188,17 +191,17 @@ export default function AppLayout({
         {/* Mobile Sidebar (Overlay) */}
         {shouldShowSidebar && (
           <div className={`fixed inset-0 z-40 flex md:hidden ${isMobileMenuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"} transition-opacity duration-300 ease-in-out`}>
-            <div className="fixed inset-0 bg-black/50" onClick={closeMobileMenu}></div>
-            <aside className={`relative flex flex-col w-64 max-w-xs h-full bg-white shadow-xl py-4 z-50 transform transition-transform duration-300 ease-in-out ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+            <div className="fixed inset-0 bg-ink/50" onClick={closeMobileMenu}></div>
+            <aside className={`relative flex flex-col w-64 max-w-xs h-full bg-surface shadow-xl py-4 z-50 transform transition-transform duration-300 ease-in-out ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
               {/* Mobile Sidebar Header with Close Button and Logo/Title */}
-              <div className="flex items-center justify-between px-4 pb-2 border-b">
+              <div className="flex items-center justify-between px-4 pb-2 border-b border-line">
                 <Link href={buildLink(dashboard.link)} className="flex items-center " onClick={closeFlyout}>
                   <div className={`p-2`}>
-                    <ArrowLeft className="h-4 w-4 text-slate-400" />
+                    <ArrowLeft className="h-4 w-4 text-ink-subtle" />
                   </div>
-                  <span className="text-xs font-bold text-slate-500">{dashboard.label}</span>
+                  <span className="text-xs font-bold text-ink-muted">{dashboard.label}</span>
                 </Link>
-                <button onClick={closeMobileMenu} className="p-2 rounded-md text-gray-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-500">
+                <button onClick={closeMobileMenu} className="p-2 rounded-md text-ink-muted hover:bg-surface-sunk focus:outline-none focus:ring-2 focus:ring-inset focus:ring-accent">
                   <FiX className="w-6 h-6" />
                 </button>
               </div>
@@ -216,7 +219,7 @@ export default function AppLayout({
                     buildLink={buildLink}
                   />
                 ))}
-                <div className="mt-auto pt-4 border-t border-gray-200">
+                <div className="mt-auto pt-4 border-t border-line">
                   <NavLink
                     item={{ label: "Settings", basePath: "/account/settings", icon: FiUser }}
                     buildLink={buildLink} currentPath={currentPath}
@@ -237,7 +240,7 @@ export default function AppLayout({
                     onClick={closeMobileMenu}
                     themeColor={themeColor}
                   />
-                  <button onClick={handleLogout} className="flex items-center text-sm p-2 rounded-md transition-colors w-full justify-start pl-3 text-primary-700 hover:bg-primary-100">
+                  <button onClick={handleLogout} className="flex items-center text-sm p-2 rounded-md transition-colors w-full justify-start pl-3 text-accent-text hover:bg-accent-soft">
                     <FiLogOut className="w-5 h-5 mr-3" />
                     Logout
                   </button>
@@ -252,7 +255,7 @@ export default function AppLayout({
             onClick={toggleSidebar}
             className={`
               hidden md:flex items-center justify-center w-6 h-6 z-30
-              font-bold text-slate-400 hover:text-slate-700 transition-all duration-300 ease-in-out
+              font-bold text-ink-subtle hover:text-ink transition-all duration-300 ease-in-out
               bg-transparent cursor-pointer absolute
             `}
             style={{
@@ -275,7 +278,7 @@ export default function AppLayout({
         {/* Main Content Area */}
         <div className="flex-1 flex flex-col overflow-hidden">
           {/* Main content area no longer has its own header, as AppLayoutNavbar handles it */}
-          <main className="flex-1 p-6 overflow-y-auto bg-gray-50">
+          <main className="flex-1 p-6 overflow-y-auto bg-surface-sunk">
             {children}
           </main>
         </div>

@@ -146,7 +146,7 @@ export default function TenantPostsPage() {
   );
 
   if (error) {
-    return <p className="text-red-500 text-center mt-8">Error: {error}</p>;
+    return <p className="text-negative text-center mt-8">Error: {error}</p>;
   }
 
   return (
@@ -172,10 +172,10 @@ export default function TenantPostsPage() {
           <LoadingSpinner />
         </div>
       ) : posts.length === 0 ? (
-        <p className="text-center text-slate-500 py-8">Aucune Publication trouvée</p>
+        <p className="text-center text-ink-muted py-8">Aucune Publication trouvée</p>
       ) : (
         <div>
-          <p className="py-2 text-base md:text-lg font-semibold text-slate-500">
+          <p className="py-2 text-base md:text-lg font-semibold text-ink-muted">
             {totalItems} Publications
           </p>
           <PostsTable

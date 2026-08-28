@@ -291,7 +291,7 @@ export function UserForm({
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       {!isEditMode && (
-        <h2 className="text-2xl font-bold text-gray-800 mb-6">Create New User</h2>
+        <h2 className="text-2xl font-bold text-ink mb-6">Create New User</h2>
       )}
 
       <Tabs defaultValue="identity">
@@ -322,13 +322,13 @@ export function UserForm({
             </SelectContent>
           </Select>
           {errors.tenantId && (
-            <p className="text-red-500 text-xs mt-1">{errors.tenantId.message}</p>
+            <p className="text-negative text-xs mt-1">{errors.tenantId.message}</p>
           )}
         </div>
       )}
 
       {(isTenantAdmin || isLeagueAdmin) && currentUsersTenantId && (
-        <div className="bg-blue-50 border border-blue-200 text-blue-800 p-3 rounded-md text-sm">
+        <div className="bg-accent-soft border border-accent-line text-accent-text p-3 rounded-md text-sm">
           <p>This user will be associated with tenant:</p>
           <p className="font-semibold">
             {displayTenantName || currentUsersTenantId}
@@ -341,7 +341,7 @@ export function UserForm({
         <Label htmlFor="username">Username</Label>
         <Input id="username" {...register("username")} disabled={overallLoading} />
         {errors.username && (
-          <p className="text-red-500 text-xs mt-1">{errors.username.message}</p>
+          <p className="text-negative text-xs mt-1">{errors.username.message}</p>
         )}
       </div>
 
@@ -349,7 +349,7 @@ export function UserForm({
         <Label htmlFor="email">Email</Label>
         <Input id="email" type="email" {...register("email")} disabled={overallLoading} />
         {errors.email && (
-          <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>
+          <p className="text-negative text-xs mt-1">{errors.email.message}</p>
         )}
       </div>
 
@@ -362,7 +362,7 @@ export function UserForm({
               value={selectedRole}
               onChange={(e) => setSelectedRole(e.target.value as Roles)}
               disabled={overallLoading}
-              className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+              className="block w-full px-3 py-2 border border-line rounded-md shadow-sm focus:outline-none focus:ring-accent focus:border-accent sm:text-sm"
             >
               {assignableRoles.map((r) => (
                 <option key={r} value={r}>{r}</option>
@@ -376,20 +376,20 @@ export function UserForm({
               <button
                 type="button"
                 onClick={() => setCreationMethod('invite')}
-                className={`rounded-md border px-3 py-2 text-sm transition-colors ${creationMethod === 'invite' ? 'border-indigo-500 bg-indigo-50 text-indigo-700' : 'border-gray-300 text-gray-600 hover:bg-gray-50'}`}
+                className={`rounded-md border px-3 py-2 text-sm transition-colors ${creationMethod === 'invite' ? 'border-accent bg-accent-soft text-accent-text' : 'border-line text-ink-muted hover:bg-surface-sunk'}`}
               >
                 Envoyer une invitation
               </button>
               <button
                 type="button"
                 onClick={() => setCreationMethod('password')}
-                className={`rounded-md border px-3 py-2 text-sm transition-colors ${creationMethod === 'password' ? 'border-indigo-500 bg-indigo-50 text-indigo-700' : 'border-gray-300 text-gray-600 hover:bg-gray-50'}`}
+                className={`rounded-md border px-3 py-2 text-sm transition-colors ${creationMethod === 'password' ? 'border-accent bg-accent-soft text-accent-text' : 'border-line text-ink-muted hover:bg-surface-sunk'}`}
               >
                 Définir un mot de passe
               </button>
             </div>
             {creationMethod === 'invite' && (
-              <p className="mt-1 text-xs text-gray-500">
+              <p className="mt-1 text-xs text-ink-muted">
                 L&apos;utilisateur recevra un email pour activer son compte et définir son mot de passe.
               </p>
             )}
@@ -411,14 +411,14 @@ export function UserForm({
           <Label htmlFor="firstName">First Name</Label>
           <Input id="firstName" {...register("firstName")} disabled={overallLoading} />
           {errors.firstName && (
-            <p className="text-red-500 text-xs mt-1">{errors.firstName.message}</p>
+            <p className="text-negative text-xs mt-1">{errors.firstName.message}</p>
           )}
         </div>
         <div>
           <Label htmlFor="lastName">Last Name</Label>
           <Input id="lastName" {...register("lastName")} disabled={overallLoading} />
           {errors.lastName && (
-            <p className="text-red-500 text-xs mt-1">{errors.lastName.message}</p>
+            <p className="text-negative text-xs mt-1">{errors.lastName.message}</p>
           )}
         </div>
       </div>
@@ -427,7 +427,7 @@ export function UserForm({
         <Label htmlFor="profileImageUrl">Profile Image URL</Label>
         <Input id="profileImageUrl" type="url" {...register("profileImageUrl")} disabled={overallLoading} />
         {errors.profileImageUrl && (
-          <p className="text-red-500 text-xs mt-1">{errors.profileImageUrl.message}</p>
+          <p className="text-negative text-xs mt-1">{errors.profileImageUrl.message}</p>
         )}
       </div>
 
@@ -435,7 +435,7 @@ export function UserForm({
         <Label htmlFor="phone">Phone</Label>
         <Input id="phone" type="tel" {...register("phone")} disabled={overallLoading} />
         {errors.phone && (
-          <p className="text-red-500 text-xs mt-1">{errors.phone.message}</p>
+          <p className="text-negative text-xs mt-1">{errors.phone.message}</p>
         )}
       </div>
 
@@ -443,7 +443,7 @@ export function UserForm({
         <Label htmlFor="dateOfBirth">Date of Birth</Label>
         <Input id="dateOfBirth" type="date" {...register("dateOfBirth")} disabled={overallLoading} />
         {errors.dateOfBirth && (
-          <p className="text-red-500 text-xs mt-1">{errors.dateOfBirth.message}</p>
+          <p className="text-negative text-xs mt-1">{errors.dateOfBirth.message}</p>
         )}
       </div>
 
@@ -451,7 +451,7 @@ export function UserForm({
         <Label htmlFor="nationality">Nationality</Label>
         <Input id="nationality" {...register("nationality")} disabled={overallLoading} />
         {errors.nationality && (
-          <p className="text-red-500 text-xs mt-1">{errors.nationality.message}</p>
+          <p className="text-negative text-xs mt-1">{errors.nationality.message}</p>
         )}
       </div>
 
@@ -474,7 +474,7 @@ export function UserForm({
           </SelectContent>
         </Select>
         {errors.gender && (
-          <p className="text-red-500 text-xs mt-1">{errors.gender.message}</p>
+          <p className="text-negative text-xs mt-1">{errors.gender.message}</p>
         )}
       </div>
 
@@ -490,7 +490,7 @@ export function UserForm({
           rows={3}
         />
         {errors.bio && (
-          <p className="text-red-500 text-xs mt-1">{errors.bio.message}</p>
+          <p className="text-negative text-xs mt-1">{errors.bio.message}</p>
         )}
       </div>
 
@@ -498,7 +498,7 @@ export function UserForm({
         <Label htmlFor="avatarUrl">Avatar URL</Label>
         <Input id="avatarUrl" type="url" {...register("avatarUrl")} disabled={overallLoading} />
         {errors.avatarUrl && (
-          <p className="text-red-500 text-xs mt-1">{errors.avatarUrl.message}</p>
+          <p className="text-negative text-xs mt-1">{errors.avatarUrl.message}</p>
         )}
       </div>
 
@@ -521,7 +521,7 @@ export function UserForm({
           </SelectContent>
         </Select>
         {errors.preferredLanguage && (
-          <p className="text-red-500 text-xs mt-1">{errors.preferredLanguage.message}</p>
+          <p className="text-negative text-xs mt-1">{errors.preferredLanguage.message}</p>
         )}
       </div>
 
@@ -529,7 +529,7 @@ export function UserForm({
         <Label htmlFor="timezone">Timezone</Label>
         <Input id="timezone" {...register("timezone")} disabled={overallLoading} />
         {errors.timezone && (
-          <p className="text-red-500 text-xs mt-1">{errors.timezone.message}</p>
+          <p className="text-negative text-xs mt-1">{errors.timezone.message}</p>
         )}
       </div>
 

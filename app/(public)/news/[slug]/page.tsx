@@ -26,12 +26,12 @@ export default function NewsPostPage({ params }: any) {
     .slice(0, 3); // Get up to 3 similar posts
 
   return (
-    <div className="min-h-screen bg-gray-100 p-4 font-inter">
-      <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-4xl mx-auto">
+    <div className="min-h-screen bg-surface-sunk p-4 font-inter">
+      <div className="bg-surface p-8 rounded-xl shadow-lg w-full max-w-4xl mx-auto">
         {/* Blog Post Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">{post.title}</h1>
-          <p className="text-gray-600 text-sm mb-2">
+          <h1 className="text-4xl font-bold text-ink mb-4">{post.title}</h1>
+          <p className="text-ink-muted text-sm mb-2">
             By {post.author} on {new Date(post.date).toLocaleDateString('fr-FR')}
           </p>
           <div className="relative w-full h-96 rounded-lg overflow-hidden mb-6">
@@ -46,7 +46,7 @@ export default function NewsPostPage({ params }: any) {
         </div>
 
         {/* Blog Post Content */}
-        <div className="prose prose-lg max-w-none text-gray-800 leading-relaxed mb-12">
+        <div className="prose prose-lg max-w-none text-ink leading-relaxed mb-12">
           <p>{post.content}</p>
           {/* Add more paragraphs or rich content here */}
           <p>
@@ -56,12 +56,12 @@ export default function NewsPostPage({ params }: any) {
 
         {/* Similar Posts Section */}
         {similarPosts.length > 0 && (
-          <div className="mt-12 border-t pt-8 border-gray-200">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">Articles Similaires</h2>
+          <div className="mt-12 border-t pt-8 border-line">
+            <h2 className="text-2xl font-bold text-ink mb-6 text-center">Articles Similaires</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {similarPosts.map((similarPost) => (
                 <Link href={`/news/${similarPost.slug}`} key={similarPost.id} className="block">
-                  <div className="bg-gray-50 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden">
+                  <div className="bg-surface-sunk rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden">
                     <div className="relative w-full h-32">
                       <Image
                         src={similarPost.imageUrl}
@@ -71,10 +71,10 @@ export default function NewsPostPage({ params }: any) {
                       />
                     </div>
                     <div className="p-4">
-                      <h3 className="text-lg font-semibold text-gray-800 mb-1 line-clamp-2">
+                      <h3 className="text-lg font-semibold text-ink mb-1 line-clamp-2">
                         {similarPost.title}
                       </h3>
-                      <p className="text-gray-600 text-xs">
+                      <p className="text-ink-muted text-xs">
                         By {similarPost.author}
                       </p>
                     </div>
@@ -87,7 +87,7 @@ export default function NewsPostPage({ params }: any) {
 
         {/* Back to all news link */}
         <div className="mt-10 text-center">
-          <Link href="/news" className="text-blue-600 hover:underline text-lg font-medium">
+          <Link href="/news" className="text-accent-text hover:underline text-lg font-medium">
             &larr; Back to All News
           </Link>
         </div>

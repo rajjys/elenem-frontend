@@ -48,7 +48,7 @@ export default function FeaturesPage() {
               <Settings2 className="w-4 h-4" />
               <p className="text-[10px] uppercase tracking-[0.2em] font-bold">Solution & Features</p>
             </div>
-            <h1 className="text-5xl sm:text-7xl font-extrabold tracking-tight text-slate-900 leading-[1.1]">
+            <h1 className="text-5xl sm:text-7xl font-extrabold tracking-tight text-ink leading-[1.1]">
               The engine behind <br />
               <span className="text-primary">successful seasons.</span>
             </h1>
@@ -59,11 +59,11 @@ export default function FeaturesPage() {
             </p>
             
             <div className="mt-10 flex flex-col sm:flex-row justify-center items-center gap-4">
-               <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-full border border-slate-200 shadow-sm text-sm font-bold text-slate-700">
+               <div className="flex items-center gap-2 px-4 py-2 bg-surface rounded-full border border-line shadow-sm text-sm font-bold text-ink">
                   <ShieldCheck className="w-4 h-4 text-primary" />
                   Official Authority
                </div>
-               <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-full border border-slate-200 shadow-sm text-sm font-bold text-slate-700">
+               <div className="flex items-center gap-2 px-4 py-2 bg-surface rounded-full border border-line shadow-sm text-sm font-bold text-ink">
                   <Activity className="w-4 h-4 text-primary" />
                   Real-time Automation
                </div>
@@ -110,7 +110,7 @@ export default function FeaturesPage() {
         </Container>
       </section>
       {/* SECTION 1: LEAGUE CONFIGURATION */}
-      <section className="py-16 bg-white"> {/* Tighter vertical padding */}
+      <section className="py-16 bg-surface"> {/* Tighter vertical padding */}
         <Container>
           <div className="grid lg:grid-cols-2 gap-12 items-start"> {/* Reduced gap, aligned to start */}
             
@@ -123,11 +123,11 @@ export default function FeaturesPage() {
                 </p>
               </div>
               
-              <h2 className="text-4xl font-black text-slate-900 tracking-tight mb-6">
+              <h2 className="text-4xl font-black text-ink tracking-tight mb-6">
                 Built around how leagues <br /> actually operate
               </h2>
               
-              <p className="text-lg text-slate-600 mb-8 leading-relaxed">
+              <p className="text-lg text-ink-muted mb-8 leading-relaxed">
                 Every league has its own format, rules, and structure. Elenem is 
                 configured to match your competition before the season starts, 
                 so the system enforces the rules consistently from kickoff to 
@@ -143,8 +143,8 @@ export default function FeaturesPage() {
                 ].map((item, i) => (
                   <li key={i} className="flex items-start gap-3">
                     <div className="mt-1.5 h-1.5 w-1.5 rounded-full bg-primary shrink-0" />
-                    <p className="text-sm text-slate-700">
-                      <span className="font-bold text-slate-900">{item.label}:</span> {item.desc}
+                    <p className="text-sm text-ink">
+                      <span className="font-bold text-ink">{item.label}:</span> {item.desc}
                     </p>
                   </li>
                 ))}
@@ -153,36 +153,36 @@ export default function FeaturesPage() {
 
             {/* VISUAL: The "Operational Window" Skeleton */}
             <div className="">
-              <div className="bg-slate-50 rounded-3xl p-3 border border-slate-100 shadow-inner"> {/* Tightened outer container */}
-                <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden">
+              <div className="bg-surface-sunk rounded-3xl p-3 border border-line shadow-inner"> {/* Tightened outer container */}
+                <div className="bg-surface rounded-xl shadow-lg border border-line overflow-hidden">
                   
                   {/* macOS Style Window Header: Establishing "Real Software" Feel */}
-                  <div className="px-4 py-3 border-b border-slate-100 flex items-center gap-2 bg-slate-50/50">
+                  <div className="px-4 py-3 border-b border-line flex items-center gap-2 bg-surface-sunk/50">
                     <div className="flex gap-1.5">
-                      <div className="w-2.5 h-2.5 rounded-full bg-slate-200/70" /> {/* Close */}
-                      <div className="w-2.5 h-2.5 rounded-full bg-slate-200/70" /> {/* Minimize */}
-                      <div className="w-2.5 h-2.5 rounded-full bg-slate-200/70" /> {/* Expand */}
+                      <div className="w-2.5 h-2.5 rounded-full bg-line/70" /> {/* Close */}
+                      <div className="w-2.5 h-2.5 rounded-full bg-line/70" /> {/* Minimize */}
+                      <div className="w-2.5 h-2.5 rounded-full bg-line/70" /> {/* Expand */}
                     </div>
                     <div className="flex-1 text-center pr-10"> {/* Offset for balance */}
-                      <div className="h-2 w-28 bg-slate-200 rounded-full mx-auto" /> {/* Window Title Placeholder */}
+                      <div className="h-2 w-28 bg-line rounded-full mx-auto" /> {/* Window Title Placeholder */}
                     </div>
                   </div>
 
                   {/* Content: Tightened vertical flow (divide-y ensures clean logic breaks) */}
-                  <div className="divide-y divide-slate-100">
+                  <div className="divide-y divide-line">
 
                     {/* Step 1: Points Logic */}
                     <div className="p-3 space-y-4">
-                      <div className="h-2 w-24 bg-slate-300 rounded-full mb-3" />
+                      <div className="h-2 w-24 bg-line rounded-full mb-3" />
                       <div className="grid grid-cols-3 gap-3"> {/* Use grid for strict 3-col layout */}
                         {[
                           { val: '3', sub: 'Win' },
                           { val: '1', sub: 'Draw' },
                           { val: '0', sub: 'Loss' }
                         ].map((item, i) => (
-                          <div key={i} className="p-3 rounded-lg bg-slate-50 border border-slate-100 text-center">
-                            <div className="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">{item.sub}</div>
-                            <div className="text-sm font-black text-slate-900 italic">{item.val}</div>
+                          <div key={i} className="p-3 rounded-lg bg-surface-sunk border border-line text-center">
+                            <div className="text-[10px] text-ink-subtle font-bold uppercase tracking-tighter">{item.sub}</div>
+                            <div className="text-sm font-black text-ink italic">{item.val}</div>
                           </div>
                         ))}
                       </div>
@@ -190,7 +190,7 @@ export default function FeaturesPage() {
 
                     {/* Step 2: Tie-Breaker Hierarchy */}
                     <div className="p-5 space-y-4 pt-4"> {/* Slight pt-4 to give breathing room after divide-y */}
-                      <div className="h-2 w-32 bg-slate-300 rounded-full mb-4" />
+                      <div className="h-2 w-32 bg-line rounded-full mb-4" />
                       <div className="space-y-3">
                         {[
                           { label: 'Goal Difference', active: true },
@@ -199,39 +199,39 @@ export default function FeaturesPage() {
                         ].map((rule, i) => (
                           <div key={i} className="flex items-center justify-between text-[11px] font-bold">
                             <div className="flex items-center gap-3">
-                              <div className="text-slate-300 font-mono flex gap-1"><Menu className='w-4 h-4'/> 0{i+1}</div>
-                              <span className={rule.active ? 'text-slate-900' : 'text-slate-400'}>{rule.label}</span>
+                              <div className="text-ink-subtle font-mono flex gap-1"><Menu className='w-4 h-4'/> 0{i+1}</div>
+                              <span className={rule.active ? 'text-ink' : 'text-ink-subtle'}>{rule.label}</span>
                             </div>
-                            <div className={`w-3 h-3 rounded-full border-2 ${rule.active ? 'bg-primary border-primary shadow-inner' : 'border-slate-200 bg-white'}`} />
+                            <div className={`w-3 h-3 rounded-full border-2 ${rule.active ? 'bg-primary border-primary shadow-inner' : 'border-line bg-surface'}`} />
                           </div>
                         ))}
                       </div>
                     </div>
 
                     {/* Step 3: Team Registry (Using Lucide Users icon) */}
-                    <div className="p-4 flex items-center justify-between gap-4 bg-slate-50/50">
+                    <div className="p-4 flex items-center justify-between gap-4 bg-surface-sunk/50">
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/20">
                           <Users className="w-4 h-4 text-primary" />
                         </div>
                         <div className="space-y-1">
-                          <div className="h-2 w-16 bg-slate-300 rounded-full" />
+                          <div className="h-2 w-16 bg-line rounded-full" />
                           <div className='flex justify-between'>
-                            <div className="h-1.5 w-6 bg-slate-200 rounded-full" />
-                            <div className="h-1.5 w-5 bg-slate-200 rounded-full" />
+                            <div className="h-1.5 w-6 bg-line rounded-full" />
+                            <div className="h-1.5 w-5 bg-line rounded-full" />
                           </div>
                         </div>
                       </div>
                       <div className="flex -space-x-2.5">
                         {[1, 2, 3, 4].map(i => (
-                          <div key={i} className="w-8 h-8 rounded-full border-2 border-white bg-slate-200/70" />
+                          <div key={i} className="w-8 h-8 rounded-full border-2 border-white bg-line/70" />
                         ))}
-                        <div className="w-8 h-8 rounded-full border-2 border-white bg-slate-200 flex items-center justify-center text-[10px] font-black text-slate-600">+12</div>
+                        <div className="w-8 h-8 rounded-full border-2 border-white bg-line flex items-center justify-center text-[10px] font-black text-ink-muted">+12</div>
                       </div>
                     </div>
 
                     {/* Step 4: Athlete Registry (Using Lucide User icon) */}
-                    <div className="p-4 flex items-center justify-between gap-4 bg-slate-50/50">
+                    <div className="p-4 flex items-center justify-between gap-4 bg-surface-sunk/50">
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-lg bg-slate-900 flex items-center justify-center">
                           <ShieldUser className="w-5.5 h-5.5 text-primary-light" />
@@ -243,9 +243,9 @@ export default function FeaturesPage() {
                       </div>
                       <div className="flex -space-x-3.5">
                         {[1, 2, 3, 4, 5, 6].map(i => (
-                          <div key={i} className="w-8 h-8 rounded-full border-2 border-white bg-slate-200/70" />
+                          <div key={i} className="w-8 h-8 rounded-full border-2 border-white bg-line/70" />
                         ))}
-                        <div className="w-8 h-8 rounded-full border-2 border-slate-50 bg-primary/20 flex items-center justify-center text-[10px] font-black text-primary">+80</div>
+                        <div className="w-8 h-8 rounded-full border-2 border-line bg-primary/20 flex items-center justify-center text-[10px] font-black text-primary">+80</div>
                       </div>
                     </div>
 
@@ -258,7 +258,7 @@ export default function FeaturesPage() {
         </Container>
       </section>
       {/* SECTION 2: FIXTURES & MATCH MANAGEMENT */}
-      <section className="py-12 bg-slate-50 border-y border-slate-200">
+      <section className="py-12 bg-surface-sunk border-y border-line">
         <Container>
           <div className="grid lg:grid-cols-2 gap-10 items-start">
             
@@ -271,11 +271,11 @@ export default function FeaturesPage() {
                 </p>
               </div>
               
-              <h2 className="text-4xl font-black text-slate-900 tracking-tight mb-5 leading-[1.15]">
+              <h2 className="text-4xl font-black text-ink tracking-tight mb-5 leading-[1.15]">
                 Scheduling with flexibility <br /> and precision
               </h2>
               
-              <p className="text-lg text-slate-600 mb-8 leading-relaxed">
+              <p className="text-lg text-ink-muted mb-8 leading-relaxed">
                 Elenem centralizes your entire season into one <strong>"source of truth."</strong> 
                 Reschedule games, enter results, or track live stats in seconds — 
                 every club, official, and fan stays synced automatically.
@@ -290,8 +290,8 @@ export default function FeaturesPage() {
                 ].map((item, i) => (
                   <li key={i} className="flex items-start gap-3">
                     <div className="mt-1.5 h-1 w-1 rounded-full bg-primary shrink-0" />
-                    <p className="text-sm text-slate-700">
-                      <span className="font-bold text-slate-900">{item.label}:</span> {item.desc}
+                    <p className="text-sm text-ink">
+                      <span className="font-bold text-ink">{item.label}:</span> {item.desc}
                     </p>
                   </li>
                 ))}
@@ -300,18 +300,18 @@ export default function FeaturesPage() {
 
             {/* VISUAL SECOND ON MOBILE */}
             <div className="relative order-2 lg:order-1">
-              <div className="bg-slate-200/50 rounded-3xl p-4 border border-slate-200 shadow-inner">
-                <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden">
+              <div className="bg-line/50 rounded-3xl p-4 border border-line shadow-inner">
+                <div className="bg-surface rounded-xl shadow-lg border border-line overflow-hidden">
                   
                   {/* macOS Style Window Header */}
-                  <div className="px-4 py-2.5 border-b border-slate-100 flex items-center gap-2 bg-slate-50/80">
+                  <div className="px-4 py-2.5 border-b border-line flex items-center gap-2 bg-surface-sunk/80">
                     <div className="flex gap-1.5">
-                      <div className="w-2.5 h-2.5 rounded-full bg-slate-300" />
-                      <div className="w-2.5 h-2.5 rounded-full bg-slate-300" />
-                      <div className="w-2.5 h-2.5 rounded-full bg-slate-300" />
+                      <div className="w-2.5 h-2.5 rounded-full bg-line" />
+                      <div className="w-2.5 h-2.5 rounded-full bg-line" />
+                      <div className="w-2.5 h-2.5 rounded-full bg-line" />
                     </div>
                     <div className="flex-1 text-center pr-10">
-                      <div className="h-1.5 w-20 bg-slate-200 rounded-full mx-auto" />
+                      <div className="h-1.5 w-20 bg-line rounded-full mx-auto" />
                     </div>
                   </div>
 
@@ -329,21 +329,21 @@ export default function FeaturesPage() {
                       {/* Skeleton weekday row */}
                       <div className="grid grid-cols-7 gap-1 mb-1">
                         {Array.from({ length: 7 }).map((_, i) => (
-                          <div key={i} className="h-1 w-8 bg-slate-200 rounded mx-auto" />
+                          <div key={i} className="h-1 w-8 bg-line rounded mx-auto" />
                         ))}
                       </div>
 
                       {/* Calendar Grid */}
-                      <div className="grid grid-cols-7 gap-1 pb-2 border-b border-slate-50">
+                      <div className="grid grid-cols-7 gap-1 pb-2 border-b border-line">
                         {Array.from({ length: 28 }).map((_, i) => {
                           const gameDays = [2,4,7,10,12,15,18,21,24,26]; // 10 gamedays
                           return (
                             <div 
                               key={i} 
-                              className="max-w-18 rounded-sm border border-slate-200 bg-slate-50 flex flex-col items-center justify-start py-1.5"
+                              className="max-w-18 rounded-sm border border-line bg-surface-sunk flex flex-col items-center justify-start py-1.5"
                             >
                               {/* Date number */}
-                              <span className="text-[10px] text-slate-400 leading-none">{i+1}</span>
+                              <span className="text-[10px] text-ink-subtle leading-none">{i+1}</span>
                               
                               {/* Game badge below date */}
                               {gameDays.includes(i) && (
@@ -360,24 +360,24 @@ export default function FeaturesPage() {
                     {/* Part B: Compact Match Feed */}
                     <div className="space-y-2">
                       <div className="flex items-center justify-between px-1">
-                        <div className="h-1.5 w-16 bg-slate-200 rounded-full" />
+                        <div className="h-1.5 w-16 bg-line rounded-full" />
                       </div>
 
                       {/* Live Match Card with softer contrast */}
-                      <div className="p-2.5 rounded-lg border border-slate-200 bg-slate-50 shadow-sm">
+                      <div className="p-2.5 rounded-lg border border-line bg-surface-sunk shadow-sm">
                         <div className="flex justify-between items-center mb-1">
-                          <div className="h-1 w-10 bg-slate-200 rounded-full" />
-                          <div className="px-1.5 py-0.5 rounded bg-green-400/20 text-green-900/60 text-[8px] font-bold tracking-widest italic">82'</div>
+                          <div className="h-1 w-10 bg-line rounded-full" />
+                          <div className="px-1.5 py-0.5 rounded bg-positive/20 text-positive/60 text-[8px] font-bold tracking-widest italic">82'</div>
                         </div>
                         <div className="flex items-center justify-between gap-2">
                           <div className="flex-1 flex items-center gap-2">
-                            <div className="w-5 h-5 rounded-full bg-slate-100 shrink-0" />
-                            <div className="h-1.5 w-full bg-slate-300 rounded-full max-w-[40px]" />
+                            <div className="w-5 h-5 rounded-full bg-surface-sunk shrink-0" />
+                            <div className="h-1.5 w-full bg-line rounded-full max-w-[40px]" />
                           </div>
-                          <div className="text-sm font-bold italic tabular-nums tracking-tighter text-slate-500">3 - 2</div>
+                          <div className="text-sm font-bold italic tabular-nums tracking-tighter text-ink-muted">3 - 2</div>
                           <div className="flex-1 flex items-center justify-end gap-2">
-                            <div className="h-1.5 w-full bg-slate-300 rounded-full max-w-[40px]" />
-                            <div className="w-5 h-5 rounded-full bg-slate-100 shrink-0" />
+                            <div className="h-1.5 w-full bg-line rounded-full max-w-[40px]" />
+                            <div className="w-5 h-5 rounded-full bg-surface-sunk shrink-0" />
                           </div>
                         </div>
                       </div>
@@ -390,7 +390,7 @@ export default function FeaturesPage() {
         </Container>
       </section>
       {/* SECTION 3: AUTOMATIC STANDINGS & ANALYTICS */}
-      <section className="py-12 bg-white">
+      <section className="py-12 bg-surface">
         <Container>
           <div className="grid lg:grid-cols-2 gap-10 items-start">
             
@@ -403,11 +403,11 @@ export default function FeaturesPage() {
                 </p>
               </div>
               
-              <h2 className="text-4xl font-black text-slate-900 tracking-tight mb-5 leading-[1.15]">
+              <h2 className="text-4xl font-black text-ink tracking-tight mb-5 leading-[1.15]">
                 Standings calculated <br /> automatically — every time
               </h2>
               
-              <p className="text-lg text-slate-600 mb-8 leading-relaxed">
+              <p className="text-lg text-ink-muted mb-8 leading-relaxed">
                 Elenem’s logic engine instantly recalculates your entire league’s 
                 hierarchy the moment a score is saved. From tie-breakers to player 
                 leaderboards, your data remains authoritative, transparent, and undisputed.
@@ -422,8 +422,8 @@ export default function FeaturesPage() {
                 ].map((item, i) => (
                   <li key={i} className="flex items-start gap-3">
                     <div className="mt-1.5 h-1 w-1 rounded-full bg-primary shrink-0" />
-                    <p className="text-sm text-slate-700">
-                      <span className="font-bold text-slate-900">{item.label}:</span> {item.desc}
+                    <p className="text-sm text-ink">
+                      <span className="font-bold text-ink">{item.label}:</span> {item.desc}
                     </p>
                   </li>
                 ))}
@@ -432,28 +432,28 @@ export default function FeaturesPage() {
 
             {/* VISUAL: The Professional Standings Table */}
             <div className="">
-              <div className="bg-slate-100/50 rounded-3xl p-4 border border-slate-200 shadow-inner">
-                <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden">
+              <div className="bg-surface-sunk/50 rounded-3xl p-4 border border-line shadow-inner">
+                <div className="bg-surface rounded-xl shadow-lg border border-line overflow-hidden">
                   
                   {/* macOS Style Window Header: Consistent with Step 1 & 2 */}
-                  <div className="px-4 py-2.5 border-b border-slate-100 flex items-center gap-2 bg-slate-50/80">
+                  <div className="px-4 py-2.5 border-b border-line flex items-center gap-2 bg-surface-sunk/80">
                     <div className="flex gap-1.5">
-                      <div className="w-2.5 h-2.5 rounded-full bg-slate-300" />
-                      <div className="w-2.5 h-2.5 rounded-full bg-slate-300" />
-                      <div className="w-2.5 h-2.5 rounded-full bg-slate-300" />
+                      <div className="w-2.5 h-2.5 rounded-full bg-line" />
+                      <div className="w-2.5 h-2.5 rounded-full bg-line" />
+                      <div className="w-2.5 h-2.5 rounded-full bg-line" />
                     </div>
                     <div className="flex-1 text-center pr-10">
-                      <div className="h-1.5 w-24 bg-slate-200 rounded-full mx-auto" />
+                      <div className="h-1.5 w-24 bg-line rounded-full mx-auto" />
                     </div>
                   </div>
 
                   {/* Table Header: Mimicking La Liga / Google Search density */}
-                  <div className="grid grid-cols-12 gap-2 px-4 py-3 bg-slate-50 border-b border-slate-100">
-                    <div className="col-span-1 text-[9px] font-black text-slate-400 uppercase">#</div>
-                    <div className="col-span-5 text-[9px] font-black text-slate-400 uppercase">Team</div>
-                    <div className="col-span-2 text-[9px] font-black text-slate-400 uppercase text-center">PL</div>
-                    <div className="col-span-2 text-[9px] font-black text-slate-400 uppercase text-center">GD</div>
-                    <div className="col-span-2 text-[9px] font-black text-slate-400 uppercase text-center">PTS</div>
+                  <div className="grid grid-cols-12 gap-2 px-4 py-3 bg-surface-sunk border-b border-line">
+                    <div className="col-span-1 text-[9px] font-black text-ink-subtle uppercase">#</div>
+                    <div className="col-span-5 text-[9px] font-black text-ink-subtle uppercase">Team</div>
+                    <div className="col-span-2 text-[9px] font-black text-ink-subtle uppercase text-center">PL</div>
+                    <div className="col-span-2 text-[9px] font-black text-ink-subtle uppercase text-center">GD</div>
+                    <div className="col-span-2 text-[9px] font-black text-ink-subtle uppercase text-center">PTS</div>
                   </div>
 
                   {/* Table Rows: Max 7 rows, abstract but meaningful */}
@@ -467,35 +467,35 @@ export default function FeaturesPage() {
                       { rank: 6, trend: 'up', pts: 28, gd: '-1' },
                       { rank: 7, trend: 'stay', pts: 25, gd: '-4' }
                     ].map((row, i) => (
-                      <div key={i} className="grid grid-cols-12 gap-2 px-4 py-2.5 items-center hover:bg-slate-50/50 transition-colors">
+                      <div key={i} className="grid grid-cols-12 gap-2 px-4 py-2.5 items-center hover:bg-surface-sunk/50 transition-colors">
                         {/* Rank & Trend */}
                         <div className="col-span-1 flex items-center gap-1.5">
-                          <span className="text-[10px] font-black text-slate-400">{row.rank}</span>
+                          <span className="text-[10px] font-black text-ink-subtle">{row.rank}</span>
                           <div className={`w-1 h-1 rounded-full ${
                             row.trend === 'up' ? 'bg-green-200' : 
-                            row.trend === 'down' ? 'bg-red-200' : 'bg-slate-200'
+                            row.trend === 'down' ? 'bg-red-200' : 'bg-line'
                           }`} />
                         </div>
                         
                         {/* Team: Round Logo + Name Skeleton */}
                         <div className="col-span-5 flex items-center gap-2.5">
-                          <div className="w-5 h-5 rounded-full bg-slate-100 border border-slate-200 shrink-0" />
-                          <div className="h-1.5 w-full bg-slate-100 rounded-full max-w-[60px]" />
+                          <div className="w-5 h-5 rounded-full bg-surface-sunk border border-line shrink-0" />
+                          <div className="h-1.5 w-full bg-surface-sunk rounded-full max-w-[60px]" />
                         </div>
 
                         {/* Stats: Played, Goal Diff, Points */}
-                        <div className="col-span-2 text-center text-[10px] font-medium text-slate-400 tabular-nums">18</div>
-                        <div className="col-span-2 text-center text-[10px] font-medium text-slate-400 tabular-nums">{row.gd}</div>
-                        <div className="col-span-2 text-center text-[10px] font-black text-slate-400 tabular-nums">{row.pts}</div>
+                        <div className="col-span-2 text-center text-[10px] font-medium text-ink-subtle tabular-nums">18</div>
+                        <div className="col-span-2 text-center text-[10px] font-medium text-ink-subtle tabular-nums">{row.gd}</div>
+                        <div className="col-span-2 text-center text-[10px] font-black text-ink-subtle tabular-nums">{row.pts}</div>
                       </div>
                     ))}
                   </div>
 
                   {/* Subtle Footer: Logic Enforcement Badge */}
-                  <div className="p-3 bg-slate-50 border-t border-slate-100 flex justify-center">
-                    <div className="px-3 py-1 rounded-full border border-slate-200 bg-white shadow-sm flex items-center gap-2">
+                  <div className="p-3 bg-surface-sunk border-t border-line flex justify-center">
+                    <div className="px-3 py-1 rounded-full border border-line bg-surface shadow-sm flex items-center gap-2">
                         <div className="w-1.5 h-1.5 rounded-full bg-green-200" />
-                        <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">Updated 3 mins ago</span>
+                        <span className="text-[8px] font-bold text-ink-subtle uppercase tracking-widest">Updated 3 mins ago</span>
                     </div>
                   </div>
 
@@ -516,14 +516,14 @@ export default function FeaturesPage() {
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-primary/10 rounded-full blur-[100px]" />
               
               {/* Smartphone Mockup with Browser UI */}
-              <div className="relative w-full max-w-[260px] aspect-[9/19] bg-slate-800 rounded-[2.5rem] p-2.5 shadow-2xl border border-slate-700">
-                <div className="bg-white h-full w-full rounded-[2rem] overflow-hidden flex flex-col">
+              <div className="relative w-full max-w-[260px] aspect-[9/19] bg-slate-800 rounded-[2.5rem] p-2.5 shadow-2xl border border-line">
+                <div className="bg-surface h-full w-full rounded-[2rem] overflow-hidden flex flex-col">
                   
                   {/* Mobile Browser URL Bar */}
-                  <div className="px-4 pt-4 pb-2 bg-slate-50 border-b border-slate-100">
-                    <div className="bg-white border border-slate-200 rounded-full py-1 px-3 flex items-center gap-2">
-                        <div className="w-2 h-2 rounded-full bg-green-500" />
-                        <div className="h-1.5 w-24 bg-slate-100 rounded-full" /> {/* URL: yourleague.com */}
+                  <div className="px-4 pt-4 pb-2 bg-surface-sunk border-b border-line">
+                    <div className="bg-surface border border-line rounded-full py-1 px-3 flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-positive" />
+                        <div className="h-1.5 w-24 bg-surface-sunk rounded-full" /> {/* URL: yourleague.com */}
                     </div>
                   </div>
 
@@ -533,27 +533,27 @@ export default function FeaturesPage() {
                     <div className="flex justify-between items-center px-1">
                       <div className="w-6 h-6 rounded bg-slate-900 flex items-center justify-center text-[8px] font-bold text-white italic">L</div>
                       <div className="flex gap-2">
-                          <div className="w-4 h-4 rounded-full bg-slate-100" />
-                          <div className="w-4 h-4 rounded-full bg-slate-100" />
+                          <div className="w-4 h-4 rounded-full bg-surface-sunk" />
+                          <div className="w-4 h-4 rounded-full bg-surface-sunk" />
                       </div>
                     </div>
 
                     {/* Featured "Next Match" Card */}
                     <div className="space-y-2">
-                      <div className="h-1.5 w-16 bg-slate-200 rounded-full ml-1" />
+                      <div className="h-1.5 w-16 bg-line rounded-full ml-1" />
                       <div className="p-4 rounded-xl bg-slate-900 text-white shadow-lg space-y-4">
                         <div className="flex justify-between items-center">
                           <div className="flex flex-col items-center gap-1.5">
-                            <div className="w-8 h-8 rounded-full bg-white/10" />
-                            <div className="h-1 w-8 bg-white/20 rounded-full" />
+                            <div className="w-8 h-8 rounded-full bg-surface/10" />
+                            <div className="h-1 w-8 bg-surface/20 rounded-full" />
                           </div>
                           <div className="text-sm font-black italic tracking-tighter text-primary">VS</div>
                           <div className="flex flex-col items-center gap-1.5">
-                            <div className="w-8 h-8 rounded-full bg-white/10" />
-                            <div className="h-1 w-8 bg-white/20 rounded-full" />
+                            <div className="w-8 h-8 rounded-full bg-surface/10" />
+                            <div className="h-1 w-8 bg-surface/20 rounded-full" />
                           </div>
                         </div>
-                        <div className="h-1 w-full bg-white/5 rounded-full relative overflow-hidden">
+                        <div className="h-1 w-full bg-surface/5 rounded-full relative overflow-hidden">
                           <div className="absolute inset-y-0 left-0 w-1/3 bg-primary" />
                         </div>
                       </div>
@@ -561,34 +561,34 @@ export default function FeaturesPage() {
 
                     {/* Match Day Schedule List (Multiple Games) */}
                     <div className="space-y-3">
-                      <div className="h-1.5 w-24 bg-slate-200 rounded-full ml-1" />
+                      <div className="h-1.5 w-24 bg-line rounded-full ml-1" />
                       {[1, 2].map((i) => (
-                        <div key={i} className="p-3 rounded-lg border border-slate-100 flex items-center justify-between">
+                        <div key={i} className="p-3 rounded-lg border border-line flex items-center justify-between">
                           <div className="flex items-center gap-2">
-                            <div className="w-4 h-4 rounded bg-slate-50 border border-slate-100" />
-                            <div className="h-1 w-10 bg-slate-200 rounded-full" />
+                            <div className="w-4 h-4 rounded bg-surface-sunk border border-line" />
+                            <div className="h-1 w-10 bg-line rounded-full" />
                           </div>
                           <div className="h-1.5 w-6 bg-slate-900 rounded-full" />
                           <div className="flex items-center gap-2">
-                            <div className="h-1 w-10 bg-slate-200 rounded-full" />
-                            <div className="w-4 h-4 rounded bg-slate-50 border border-slate-100" />
+                            <div className="h-1 w-10 bg-line rounded-full" />
+                            <div className="w-4 h-4 rounded bg-surface-sunk border border-line" />
                           </div>
                         </div>
                       ))}
                     </div>
 
                     {/* Mini Table Snippet */}
-                    <div className="p-3 bg-slate-50 rounded-lg border border-slate-100">
-                      <div className="h-1 w-full bg-slate-200 rounded-full mb-2" />
-                      <div className="h-1 w-2/3 bg-slate-200 rounded-full" />
+                    <div className="p-3 bg-surface-sunk rounded-lg border border-line">
+                      <div className="h-1 w-full bg-line rounded-full mb-2" />
+                      <div className="h-1 w-2/3 bg-line rounded-full" />
                     </div>
                   </div>
 
                   {/* Simple Mobile Nav */}
-                  <div className="h-12 border-t border-slate-100 flex justify-around items-center px-6">
+                  <div className="h-12 border-t border-line flex justify-around items-center px-6">
                     <div className="w-1 h-1 rounded-full bg-primary" />
-                    <div className="w-1 h-1 rounded-full bg-slate-200" />
-                    <div className="w-1 h-1 rounded-full bg-slate-200" />
+                    <div className="w-1 h-1 rounded-full bg-line" />
+                    <div className="w-1 h-1 rounded-full bg-line" />
                   </div>
                 </div>
               </div>
@@ -612,7 +612,7 @@ export default function FeaturesPage() {
                 One official place <br /> for fans and clubs
               </h2>
               
-              <p className="text-lg text-slate-400 mb-8 leading-relaxed">
+              <p className="text-lg text-ink-subtle mb-8 leading-relaxed">
                 Elenem provides a dedicated public portal where fixtures, standings, 
                 and results are always live. Information is published once 
                 and remains accessible to everyone on any device.
@@ -627,7 +627,7 @@ export default function FeaturesPage() {
                 ].map((item, i) => (
                   <li key={i} className="flex items-start gap-3">
                     <div className="mt-1.5 h-1 w-1 rounded-full bg-primary shrink-0" />
-                    <p className="text-sm text-slate-300">
+                    <p className="text-sm text-ink-subtle">
                       <span className="font-bold text-white">{item.label}:</span> {item.desc}
                     </p>
                   </li>
@@ -639,7 +639,7 @@ export default function FeaturesPage() {
         </Container>
       </section>
       {/* SECTION 5: IDENTITY & OWNERSHIP */}
-      <section className="py-16 bg-white overflow-hidden">
+      <section className="py-16 bg-surface overflow-hidden">
         <Container>
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             
@@ -652,11 +652,11 @@ export default function FeaturesPage() {
                 </p>
               </div>
               
-              <h2 className="text-4xl font-black text-slate-900 tracking-tight mb-6 leading-[1.15]">
+              <h2 className="text-4xl font-black text-ink tracking-tight mb-6 leading-[1.15]">
                 Your League. Your Brand. <br /> Your Design.
               </h2>
               
-              <p className="text-lg text-slate-600 mb-8 leading-relaxed text-balance">
+              <p className="text-lg text-ink-muted mb-8 leading-relaxed text-balance">
                 We provide the engine, but you keep the keys. Launch a clean 
                 digital home that lives on your own domain and reflects your 
                 unique identity — a premium experience that feels custom-built.
@@ -669,9 +669,9 @@ export default function FeaturesPage() {
                   { label: 'Theming', desc: 'Custom logos, colors, and fonts to match your brand.' },
                   { label: 'Ownership', desc: 'Full control over your data and public presence.' }
                 ].map((item, i) => (
-                  <li key={i} className="flex items-start gap-3 text-sm text-slate-700">
+                  <li key={i} className="flex items-start gap-3 text-sm text-ink">
                     <div className="mt-1.5 h-1 w-1 rounded-full bg-primary shrink-0" />
-                    <p><span className="font-bold text-slate-900">{item.label}:</span> {item.desc}</p>
+                    <p><span className="font-bold text-ink">{item.label}:</span> {item.desc}</p>
                   </li>
                 ))}
               </ul>
@@ -682,32 +682,32 @@ export default function FeaturesPage() {
               <div className="flex flex-col gap-6 scale-90 sm:scale-100 origin-center">
                 
                 {/* WINDOW 1: The "Elite League" (Dark/Neon) */}
-                <div className="w-full max-w-[360px] bg-slate-900 rounded-xl shadow-2xl border border-slate-800 overflow-hidden self-start">
+                <div className="w-full max-w-[360px] bg-slate-900 rounded-xl shadow-2xl border border-line overflow-hidden self-start">
                   {/* Header */}
-                  <div className="px-3 py-2 border-b border-slate-800 bg-slate-950 flex gap-2 items-center">
+                  <div className="px-3 py-2 border-b border-line bg-slate-950 flex gap-2 items-center">
                       <div className="flex gap-1">
                         <div className="w-1.5 h-1.5 rounded-full bg-slate-800" />
                         <div className="w-1.5 h-1.5 rounded-full bg-slate-800" />
                       </div>
-                      <div className="flex-1 bg-white/5 border border-white/10 rounded-full py-0.5 px-3 flex items-center gap-2">
-                        <Lock size={8} className="text-green-500/70" />
-                        <span className="text-[9px] text-slate-400">https://<strong>elite-league.app</strong></span>
+                      <div className="flex-1 bg-surface/5 border border-white/10 rounded-full py-0.5 px-3 flex items-center gap-2">
+                        <Lock size={8} className="text-positive/70" />
+                        <span className="text-[9px] text-ink-subtle">https://<strong>elite-league.app</strong></span>
                       </div>
                   </div>
                   
                   {/* Navbar: Tightened and Realistic */}
-                  <div className="px-4 py-1 flex justify-between items-center border-b border-slate-800/50 bg-slate-900">
+                  <div className="px-4 py-1 flex justify-between items-center border-b border-line/50 bg-slate-900">
                       <div className="flex items-center gap-2">
                         <Trophy className="w-4 h-4 text-primary-light opacity-40" />
-                        <div className="h-1.5 w-12 bg-white/60 rounded-full" />
+                        <div className="h-1.5 w-12 bg-surface/60 rounded-full" />
                       </div>
                       <div className="flex items-center gap-4">
                         <div className="flex gap-2">
-                            <div className="w-5 h-1 bg-white/60 rounded-full" />
-                            <div className="w-5 h-1 bg-white/20 rounded-full" />
-                            <div className="w-5 h-1 bg-white/20 rounded-full" />
+                            <div className="w-5 h-1 bg-surface/60 rounded-full" />
+                            <div className="w-5 h-1 bg-surface/20 rounded-full" />
+                            <div className="w-5 h-1 bg-surface/20 rounded-full" />
                         </div>
-                        <div className="w-5 h-5 rounded-full bg-white/5 border border-white/40 flex items-center justify-center">
+                        <div className="w-5 h-5 rounded-full bg-surface/5 border border-white/40 flex items-center justify-center">
                             <User size={10} className="text-white/40" />
                         </div>
                       </div>
@@ -715,26 +715,26 @@ export default function FeaturesPage() {
                   
                   {/* Content Area */}
                   <div className="p-4 space-y-3">
-                      <div className="h-12 w-full bg-slate-950 rounded-lg border border-slate-800/50" />
+                      <div className="h-12 w-full bg-slate-950 rounded-lg border border-line/50" />
                   </div>
                 </div>
 
                 {/* WINDOW 2: The "Community Cup" (Light/Classic) */}
-                <div className="w-full max-w-[360px] bg-white rounded-xl shadow-2xl border border-slate-200 overflow-hidden self-end -mt-12 relative z-10">
+                <div className="w-full max-w-[360px] bg-surface rounded-xl shadow-2xl border border-line overflow-hidden self-end -mt-12 relative z-10">
                   {/* Header */}
-                  <div className="px-3 py-2 border-b border-slate-100 bg-slate-50/50 flex gap-2 items-center">
+                  <div className="px-3 py-2 border-b border-line bg-surface-sunk/50 flex gap-2 items-center">
                       <div className="flex gap-1">
-                        <div className="w-1.5 h-1.5 rounded-full bg-slate-200" />
-                        <div className="w-1.5 h-1.5 rounded-full bg-slate-200" />
+                        <div className="w-1.5 h-1.5 rounded-full bg-line" />
+                        <div className="w-1.5 h-1.5 rounded-full bg-line" />
                       </div>
-                      <div className="flex-1 bg-white border border-slate-200 rounded-full py-0.5 px-3 flex items-center gap-2">
-                        <Lock size={8} className="text-green-500" />
-                        <span className="text-[9px] font-medium text-slate-500">https://<strong className='text-slate-800'>community-cup.com</strong></span>
+                      <div className="flex-1 bg-surface border border-line rounded-full py-0.5 px-3 flex items-center gap-2">
+                        <Lock size={8} className="text-positive" />
+                        <span className="text-[9px] font-medium text-ink-muted">https://<strong className='text-ink'>community-cup.com</strong></span>
                       </div>
                   </div>
 
                   {/* Navbar: Tightened and Realistic */}
-                  <div className="px-4 py-1 flex justify-between items-center border-b border-slate-50 bg-white">
+                  <div className="px-4 py-1 flex justify-between items-center border-b border-line bg-surface">
                       <div className="flex items-center gap-2">
                         <div className="w-5 h-5 rounded-md bg-primary/5 flex items-center justify-center border border-primary/10">
                             <Shield className="w-3.5 h-3.5 text-primary opacity-40" />
@@ -744,18 +744,18 @@ export default function FeaturesPage() {
                       <div className="flex items-center gap-4">
                         <div className="flex gap-3">
                             <div className="w-6 h-1 bg-slate-900/60 rounded-full" />
-                            <div className="w-6 h-1 bg-slate-300 rounded-full" />
-                            <div className="w-6 h-1 bg-slate-300 rounded-full" />
+                            <div className="w-6 h-1 bg-line rounded-full" />
+                            <div className="w-6 h-1 bg-line rounded-full" />
                         </div>
-                        <div className="w-5 h-5 rounded-full bg-slate-50 border border-slate-400 flex items-center justify-center">
-                            <User size={10} className="text-slate-400" />
+                        <div className="w-5 h-5 rounded-full bg-surface-sunk border border-line-strong flex items-center justify-center">
+                            <User size={10} className="text-ink-subtle" />
                         </div>
                       </div>
                   </div>
 
                   {/* Content Area */}
                   <div className="p-4 space-y-3">
-                      <div className="h-12 w-full bg-slate-50 rounded-lg border border-slate-100" />
+                      <div className="h-12 w-full bg-surface-sunk rounded-lg border border-line" />
                   </div>
                 </div>
 
@@ -766,33 +766,33 @@ export default function FeaturesPage() {
         </Container>
       </section>
       {/* SECTION 6: ADMINISTRATION & CONTROL */}
-      <section className="py-16 bg-slate-50 border-y border-slate-200">
+      <section className="py-16 bg-surface-sunk border-y border-line">
         <Container>
           <div className="grid lg:grid-cols-2 gap-12 items-start">
             
             {/* VISUAL: The Production Dashboard Cockpit */}
             <div className="relative order-2 lg:order-1">
-              <div className="bg-slate-200/50 rounded-[2.5rem] p-4 border border-slate-200 shadow-inner">
-                <div className="bg-white rounded-xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col min-h-[380px]">
+              <div className="bg-line/50 rounded-[2.5rem] p-4 border border-line shadow-inner">
+                <div className="bg-surface rounded-xl shadow-2xl border border-line overflow-hidden flex flex-col min-h-[380px]">
                   
                   {/* macOS Window Header (Consistent Style) */}
-                  <div className="px-4 py-2.5 border-b border-slate-100 flex items-center gap-2 bg-slate-50/80">
+                  <div className="px-4 py-2.5 border-b border-line flex items-center gap-2 bg-surface-sunk/80">
                     <div className="flex gap-1.5">
-                      <div className="w-2.5 h-2.5 rounded-full bg-slate-300" />
-                      <div className="w-2.5 h-2.5 rounded-full bg-slate-300" />
-                      <div className="w-2.5 h-2.5 rounded-full bg-slate-300" />
+                      <div className="w-2.5 h-2.5 rounded-full bg-line" />
+                      <div className="w-2.5 h-2.5 rounded-full bg-line" />
+                      <div className="w-2.5 h-2.5 rounded-full bg-line" />
                     </div>
                     <div className="flex-1 text-center pr-10">
-                      <div className="h-1.5 w-24 bg-slate-200 rounded-full mx-auto" />
+                      <div className="h-1.5 w-24 bg-line rounded-full mx-auto" />
                     </div>
                   </div>
                   <div className="flex flex-1">
                     {/* Sidebar: The Navigation Rail */}
-                    <div className="w-16 border-r border-slate-100 bg-slate-50/30 flex flex-col items-center py-6 gap-6">
-                      <div className="w-8 h-8 rounded-lg bg-slate-400 flex items-center justify-center text-white text-[10px] font-black">E</div>
+                    <div className="w-16 border-r border-line bg-surface-sunk/30 flex flex-col items-center py-6 gap-6">
+                      <div className="w-8 h-8 rounded-lg bg-ink-subtle flex items-center justify-center text-white text-[10px] font-black">E</div>
                       <div className="flex flex-col gap-4">
                         {[LayoutDashboard, Calendar, Users2, ShieldAlert, Settings].map((Icon, i) => (
-                          <Icon key={i} size={18} className={i === 0 ? "text-slate-600" : "text-slate-300"} />
+                          <Icon key={i} size={18} className={i === 0 ? "text-ink-muted" : "text-ink-subtle"} />
                         ))}
                       </div>
                     </div>
@@ -807,9 +807,9 @@ export default function FeaturesPage() {
                           { label: 'Players', val: '34' },
                           { label: 'Open Issues', val: '01' }
                         ].map((stat, i) => (
-                          <div key={i} className="p-3 rounded-lg border border-slate-200 bg-white">
-                            <div className="h-1 w-5 md:w-10 bg-slate-300 rounded-full mb-2" />
-                            <div className="text-sm font-black text-slate-400 italic tracking-tighter">{stat.val}</div>
+                          <div key={i} className="p-3 rounded-lg border border-line bg-surface">
+                            <div className="h-1 w-5 md:w-10 bg-line rounded-full mb-2" />
+                            <div className="text-sm font-black text-ink-subtle italic tracking-tighter">{stat.val}</div>
                           </div>
                         ))}
                       </div>
@@ -817,25 +817,25 @@ export default function FeaturesPage() {
                       {/* Task Feed: Actionable Items */}
                       <div className="space-y-3">
                         <div className="flex items-center justify-between px-1">
-                          <div className="h-2 w-24 bg-slate-400 rounded-full" />
-                          <div className="h-1.5 w-12 bg-slate-300 rounded-full" />
+                          <div className="h-2 w-24 bg-ink-subtle rounded-full" />
+                          <div className="h-1.5 w-12 bg-line rounded-full" />
                         </div>
 
                         {[
                           { task: 'Match Approval', type: 'Result', color: 'bg-blue-200' },
                           { task: 'Venue Conflict', type: 'Alert', color: 'bg-red-200' },
-                          { task: 'Referee Assign', type: 'Schedule', color: 'bg-slate-200' },
-                          { task: 'Stadium Validation', type: 'Schedule', color: 'bg-slate-200' },
+                          { task: 'Referee Assign', type: 'Schedule', color: 'bg-line' },
+                          { task: 'Stadium Validation', type: 'Schedule', color: 'bg-line' },
                         ].map((item, i) => (
-                          <div key={i} className="flex items-center justify-between p-2 rounded-xl border border-slate-100 hover:border-primary/20 transition-colors bg-white">
+                          <div key={i} className="flex items-center justify-between p-2 rounded-xl border border-line hover:border-primary/20 transition-colors bg-surface">
                             <div className="flex items-center gap-3">
                                 <div className={`w-1.5 h-1.5 rounded-full ${item.color}`} />
                                 <div className="space-y-1">
-                                  <div className="h-2 w-28 bg-slate-300 rounded-full" />
-                                  <div className="h-1 w-16 bg-slate-300 rounded-full" />
+                                  <div className="h-2 w-28 bg-line rounded-full" />
+                                  <div className="h-1 w-16 bg-line rounded-full" />
                                 </div>
                             </div>
-                            <div className="px-2 py-1 rounded bg-slate-50 border border-slate-100 text-[8px] font-bold text-slate-400 uppercase tracking-widest">Action</div>
+                            <div className="px-2 py-1 rounded bg-surface-sunk border border-line text-[8px] font-bold text-ink-subtle uppercase tracking-widest">Action</div>
                           </div>
                         ))}
                       </div>
@@ -854,11 +854,11 @@ export default function FeaturesPage() {
                 </p>
               </div>
               
-              <h2 className="text-4xl font-black text-slate-900 tracking-tight mb-6 leading-[1.15]">
+              <h2 className="text-4xl font-black text-ink tracking-tight mb-6 leading-[1.15]">
                 A command center for <br /> every operational detail.
               </h2>
               
-              <p className="text-lg text-slate-600 mb-8 leading-relaxed">
+              <p className="text-lg text-ink-muted mb-8 leading-relaxed">
                 Running a league is complex; managing it shouldn’t be. Our administrative 
                 dashboard brings every team, venue, and score into a unified workstation 
                 designed for speed and total oversight.
@@ -871,9 +871,9 @@ export default function FeaturesPage() {
                   { label: 'Bulk Operations', desc: 'Update entire seasons or divisions in few clicks.' },
                   { label: 'Reporting', desc: 'Export full season data and performance audits.' }
                 ].map((item, i) => (
-                  <li key={i} className="flex items-start gap-3 text-sm text-slate-700">
+                  <li key={i} className="flex items-start gap-3 text-sm text-ink">
                     <div className="mt-1.5 h-1 w-1 rounded-full bg-primary shrink-0" />
-                    <p><span className="font-bold text-slate-900">{item.label}:</span> {item.desc}</p>
+                    <p><span className="font-bold text-ink">{item.label}:</span> {item.desc}</p>
                   </li>
                 ))}
               </ul>
@@ -883,7 +883,7 @@ export default function FeaturesPage() {
         </Container>
       </section>
       {/* SECTION 7: DATA RELIABILITY & SAFETY */}
-      <section className="py-16 bg-white border-b border-slate-200">
+      <section className="py-16 bg-surface border-b border-line">
         <Container>
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             
@@ -896,11 +896,11 @@ export default function FeaturesPage() {
                 </p>
               </div>
               
-              <h2 className="text-4xl font-black text-slate-900 tracking-tight mb-6 leading-[1.15] text-balance">
+              <h2 className="text-4xl font-black text-ink tracking-tight mb-6 leading-[1.15] text-balance">
                 Data you can trust, <br /> season after season.
               </h2>
               
-              <p className="text-lg text-slate-600 mb-8 leading-relaxed">
+              <p className="text-lg text-ink-muted mb-8 leading-relaxed">
                 League history is too valuable to risk on personal spreadsheets. 
                 Our foundational architecture treats your standings as an immutable 
                 system of record—ensuring every score is validated, encrypted, and backed up.
@@ -913,9 +913,9 @@ export default function FeaturesPage() {
                   { label: 'Automatic Backups', desc: 'Real-time database snapshots prevent data loss.' },
                   { label: 'Encrypted Access', desc: 'Industrial-grade security for internal league administration.' }
                 ].map((item, i) => (
-                  <li key={i} className="flex items-start gap-3 text-sm text-slate-700">
+                  <li key={i} className="flex items-start gap-3 text-sm text-ink">
                     <div className="mt-1.5 h-1 w-1 rounded-full bg-primary shrink-0" />
-                    <p><span className="font-bold text-slate-900">{item.label}:</span> {item.desc}</p>
+                    <p><span className="font-bold text-ink">{item.label}:</span> {item.desc}</p>
                   </li>
                 ))}
               </ul>
@@ -923,43 +923,43 @@ export default function FeaturesPage() {
 
             {/* VISUAL: The Immutable Audit Vault (Git-like Log) */}
             <div className="relative">
-              <div className="bg-slate-100/50 rounded-[2.5rem] p-4 border border-slate-100 shadow-inner">
-                <div className="bg-white rounded-xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col min-h-[360px]">
+              <div className="bg-surface-sunk/50 rounded-[2.5rem] p-4 border border-line shadow-inner">
+                <div className="bg-surface rounded-xl shadow-2xl border border-line overflow-hidden flex flex-col min-h-[360px]">
                   
                   {/* macOS Window Header (Consistent Style) */}
-                  <div className="px-4 py-2.5 border-b border-slate-100 flex items-center gap-2 bg-slate-50/80">
+                  <div className="px-4 py-2.5 border-b border-line flex items-center gap-2 bg-surface-sunk/80">
                     <div className="flex gap-1.5">
-                      <div className="w-2.5 h-2.5 rounded-full bg-slate-300" />
-                      <div className="w-2.5 h-2.5 rounded-full bg-slate-300" />
-                      <div className="w-2.5 h-2.5 rounded-full bg-slate-300" />
+                      <div className="w-2.5 h-2.5 rounded-full bg-line" />
+                      <div className="w-2.5 h-2.5 rounded-full bg-line" />
+                      <div className="w-2.5 h-2.5 rounded-full bg-line" />
                     </div>
                     <div className="flex-1 text-center pr-10">
-                      <div className="h-1.5 w-32 bg-slate-200 rounded-full mx-auto" />
+                      <div className="h-1.5 w-32 bg-line rounded-full mx-auto" />
                     </div>
                   </div>
 
                   {/* Audit Feed: High Density, Low Contrast */}
-                  <div className="flex-1 p-5 space-y-4 font-mono text-[9px] text-slate-400">
-                    <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-                        <div className="h-2 w-28 bg-slate-400 rounded-full" />
-                        <div className="px-2 py-0.5 rounded bg-green-400/20 text-green-900/60 font-bold uppercase tracking-widest text-[8px]">Synced ✓</div>
+                  <div className="flex-1 p-5 space-y-4 font-mono text-[9px] text-ink-subtle">
+                    <div className="flex items-center justify-between pb-3 border-b border-line">
+                        <div className="h-2 w-28 bg-ink-subtle rounded-full" />
+                        <div className="px-2 py-0.5 rounded bg-positive/20 text-positive/60 font-bold uppercase tracking-widest text-[8px]">Synced ✓</div>
                     </div>
 
                     {/* Log Entries: Abstracted Git/Audit feel */}
                     {[
                       { hash: 'e5a1b3', event: 'STANDINGS_RECALCULATED', icon: RefreshCcw, color: 'text-primary' },
-                      { hash: '8c9d2f', event: 'MATCH_RESULT_VERIFIED (TIGvLIO)', icon: CheckCircle2, color: 'text-green-500' },
-                      { hash: 'SYSTEM', event: 'AUTOMATIC_BACKUP_COMPLETED', icon: CloudDownload, color: 'text-slate-400' },
+                      { hash: '8c9d2f', event: 'MATCH_RESULT_VERIFIED (TIGvLIO)', icon: CheckCircle2, color: 'text-positive' },
+                      { hash: 'SYSTEM', event: 'AUTOMATIC_BACKUP_COMPLETED', icon: CloudDownload, color: 'text-ink-subtle' },
                       { hash: '4f1a0b', event: 'IDENTITY_THEME_UPDATED', icon: Palette, color: 'text-primary' },
-                      { hash: '7d6e5a', event: 'ADMIN_ROLE_ASSIGNED (REF_04)', icon: UserPlus, color: 'text-slate-400' },
-                      { hash: 'b9c2d1', event: 'LEAGUE_RULES_LOCKED (24/25)', icon: Lock, color: 'text-slate-900' }
+                      { hash: '7d6e5a', event: 'ADMIN_ROLE_ASSIGNED (REF_04)', icon: UserPlus, color: 'text-ink-subtle' },
+                      { hash: 'b9c2d1', event: 'LEAGUE_RULES_LOCKED (24/25)', icon: Lock, color: 'text-ink' }
                     ].map((log, i) => (
                         <div key={i} className={`flex items-start gap-3 py-1 ${i > 0 ? 'opacity-70' : ''}`}>
-                          <span className="text-slate-300 w-10 shrink-0 tabular-nums">[{log.hash}]</span>
-                          <div className="w-4 h-4 rounded-md border border-slate-100 bg-slate-50 flex items-center justify-center shrink-0 mt-0.5">
+                          <span className="text-ink-subtle w-10 shrink-0 tabular-nums">[{log.hash}]</span>
+                          <div className="w-4 h-4 rounded-md border border-line bg-surface-sunk flex items-center justify-center shrink-0 mt-0.5">
                               <log.icon size={12} className={log.color} />
                           </div>
-                          <span className={`${i === 0 ? 'text-slate-600 font-medium' : 'text-slate-600'}`}>
+                          <span className={`${i === 0 ? 'text-ink-muted font-medium' : 'text-ink-muted'}`}>
                               {log.event}
                           </span>
                         </div>
@@ -967,7 +967,7 @@ export default function FeaturesPage() {
                   </div>
 
                   {/* System Status Footer */}
-                  <div className="p-3 bg-slate-50 border-t border-slate-100 flex justify-center text-[8px] font-bold text-slate-400 uppercase tracking-widest">
+                  <div className="p-3 bg-surface-sunk border-t border-line flex justify-center text-[8px] font-bold text-ink-subtle uppercase tracking-widest">
                     Uptime: 99.98% | Next Backup: 04:00 GMT
                   </div>
                 </div>
@@ -989,23 +989,23 @@ export default function FeaturesPage() {
         <div className="absolute top-1/2 left-0 w-full h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
 
         {/* 1. START SMALL: The "Basic" View */}
-        <div className="absolute left-0 bottom-12 w-40 h-52 bg-slate-800 rounded-2xl border border-slate-700 p-4 shadow-xl transform -rotate-6 hover:rotate-0 transition-transform duration-500 z-10">
+        <div className="absolute left-0 bottom-12 w-40 h-52 bg-slate-800 rounded-2xl border border-line p-4 shadow-xl transform -rotate-6 hover:rotate-0 transition-transform duration-500 z-10">
            <div className="flex flex-col h-full">
               <div className="w-8 h-8 rounded bg-slate-700 mb-3 flex items-center justify-center">
-                 <Users size={14} className="text-slate-400" />
+                 <Users size={14} className="text-ink-subtle" />
               </div>
-              <div className="h-2 w-16 bg-white/20 rounded-full mb-1" />
-              <div className="h-1.5 w-10 bg-white/5 rounded-full mb-6" />
+              <div className="h-2 w-16 bg-surface/20 rounded-full mb-1" />
+              <div className="h-1.5 w-10 bg-surface/5 rounded-full mb-6" />
               
               <div className="mt-auto p-2 rounded bg-primary/10 border border-primary/20">
                  <div className="h-1 w-full bg-primary/40 rounded-full" />
               </div>
-              <p className="mt-2 text-[8px] font-bold text-center text-slate-500 uppercase tracking-widest">Single League</p>
+              <p className="mt-2 text-[8px] font-bold text-center text-ink-muted uppercase tracking-widest">Single League</p>
            </div>
         </div>
 
         {/* 2. GROW: The "Pro" View */}
-        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-64 bg-slate-800 rounded-2xl border-2 border-slate-600 p-5 shadow-2xl z-20">
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-64 bg-slate-800 rounded-2xl border-2 border-line p-5 shadow-2xl z-20">
            <div className="flex flex-col h-full">
               <div className="flex justify-between items-start mb-4">
                  <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center">
@@ -1014,21 +1014,21 @@ export default function FeaturesPage() {
                  <div className="px-2 py-0.5 rounded bg-primary text-[7px] font-bold">PRO</div>
               </div>
               <div className="space-y-2 mb-6">
-                 <div className="h-2 w-24 bg-white/20 rounded-full" />
-                 <div className="h-2 w-20 bg-white/10 rounded-full" />
-                 <div className="h-2 w-28 bg-white/10 rounded-full" />
+                 <div className="h-2 w-24 bg-surface/20 rounded-full" />
+                 <div className="h-2 w-20 bg-surface/10 rounded-full" />
+                 <div className="h-2 w-28 bg-surface/10 rounded-full" />
               </div>
               
               <div className="mt-auto grid grid-cols-2 gap-2">
-                 <div className="h-8 rounded bg-white/5 border border-white/5" />
-                 <div className="h-8 rounded bg-white/5 border border-white/5" />
+                 <div className="h-8 rounded bg-surface/5 border border-white/5" />
+                 <div className="h-8 rounded bg-surface/5 border border-white/5" />
               </div>
               <p className="mt-3 text-[9px] font-black text-center text-white italic tracking-tight">Multi-Division</p>
            </div>
         </div>
 
         {/* 3. EXPAND: The "Federation" View */}
-        <div className="absolute right-0 top-12 w-56 h-72 bg-white rounded-2xl border border-white p-6 shadow-[0_20px_50px_rgba(0,0,0,0.5)] transform rotate-6 hover:rotate-0 transition-all duration-500 z-30 group">
+        <div className="absolute right-0 top-12 w-56 h-72 bg-surface rounded-2xl border border-white p-6 shadow-[0_20px_50px_rgba(0,0,0,0.5)] transform rotate-6 hover:rotate-0 transition-all duration-500 z-30 group">
            <div className="flex flex-col h-full">
               <div className="flex items-center gap-3 mb-5">
                  <div className="w-10 h-10 rounded-full bg-slate-900 flex items-center justify-center">
@@ -1036,7 +1036,7 @@ export default function FeaturesPage() {
                  </div>
                  <div className="space-y-1">
                     <div className="h-2 w-20 bg-slate-900 rounded-full" />
-                    <div className="h-1.5 w-12 bg-slate-200 rounded-full" />
+                    <div className="h-1.5 w-12 bg-line rounded-full" />
                  </div>
               </div>
               
@@ -1044,13 +1044,13 @@ export default function FeaturesPage() {
                  {[1,2,3,4].map(i => (
                     <div key={i} className="flex items-center gap-2">
                        <div className="w-2 h-2 rounded-full bg-primary" />
-                       <div className="h-1.5 flex-1 bg-slate-100 rounded-full" />
+                       <div className="h-1.5 flex-1 bg-surface-sunk rounded-full" />
                     </div>
                  ))}
               </div>
 
-              <div className="mt-auto pt-4 border-t border-slate-100 flex justify-center">
-                 <span className="text-[10px] font-black text-slate-900 uppercase tracking-[0.2em]">National Scale</span>
+              <div className="mt-auto pt-4 border-t border-line flex justify-center">
+                 <span className="text-[10px] font-black text-ink uppercase tracking-[0.2em]">National Scale</span>
               </div>
            </div>
         </div>
@@ -1070,7 +1070,7 @@ export default function FeaturesPage() {
           Built for today, <br /> ready for tomorrow.
         </h2>
         
-        <p className="text-lg text-slate-400 mb-8 leading-relaxed">
+        <p className="text-lg text-ink-subtle mb-8 leading-relaxed">
           Whether you’re launching your first tournament or managing a 
           national federation, Elenem adapts to your scope. Start with 
           the essentials and unlock advanced professional tools as your 
@@ -1084,7 +1084,7 @@ export default function FeaturesPage() {
             { label: 'Federation', desc: 'Regional control for massive multi-league networks.' },
             { label: 'Seamless Migration', desc: 'Upgrade your plan anytime without losing a single goal or stat.' }
           ].map((item, i) => (
-            <li key={i} className="flex items-start gap-3 text-sm text-slate-300">
+            <li key={i} className="flex items-start gap-3 text-sm text-ink-subtle">
               <div className="mt-1.5 h-1 w-1 rounded-full bg-primary shrink-0" />
               <p><span className="font-bold text-white">{item.label}:</span> {item.desc}</p>
             </li>
@@ -1111,7 +1111,7 @@ export default function FeaturesPage() {
               </svg>
             </div>
             <div className="relative z-10 max-w-2xl mx-auto">
-              <h2 className="text-3xl sm:text-5xl font-bold tracking-tight text-slate-900 leading-[1.1]">
+              <h2 className="text-3xl sm:text-5xl font-bold tracking-tight text-ink leading-[1.1]">
                 Ready for your next season?
               </h2>
               <p className="mt-6 text-lg leading-8 text-muted">
@@ -1122,13 +1122,13 @@ export default function FeaturesPage() {
                 <Link href="/contact?intent=demo" className="w-auto inline-flex items-center justify-center rounded-full bg-primary px-6 py-2 text-white font-bold transition-transform hover:scale-105 active:scale-95 shadow-lg shadow-primary/20">
                   Request a demo
                 </Link>
-                <Link href="/pricing" className="w-auto inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-6 py-2 font-semibold text-slate-600 hover:bg-slate-50 transition-colors">
+                <Link href="/pricing" className="w-auto inline-flex items-center justify-center rounded-full border border-line bg-surface px-6 py-2 font-semibold text-ink-muted hover:bg-surface-sunk transition-colors">
                   View pricing
                 </Link>
               </div>
             </div>
             {/* Subtle "Trusted By" label to lower the barrier */}
-            <p className="mt-12 text-xs font-medium uppercase tracking-[0.2em] text-slate-900">
+            <p className="mt-12 text-xs font-medium uppercase tracking-[0.2em] text-ink">
               Configuration and onboarding included
             </p>
           </div>

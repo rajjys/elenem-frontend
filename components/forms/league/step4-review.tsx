@@ -21,7 +21,7 @@ export default function Step4Review({
   return (
     <CardContent className="space-y-6">
       {/* Banner + Logo */}
-      <div className="relative w-full h-48 bg-gray-100 rounded-lg flex items-center justify-center mb-12">
+      <div className="relative w-full h-48 bg-surface-sunk rounded-lg flex items-center justify-center mb-12">
         {bannerPreview ? (
           <Image
             src={bannerPreview}
@@ -31,12 +31,12 @@ export default function Step4Review({
             className="w-full h-full object-cover"
           />
         ) : (
-          <div className="text-gray-400">No banner uploaded</div>
+          <div className="text-ink-subtle">No banner uploaded</div>
         )}
 
         {/* Logo */}
         <div className="absolute left-4 -bottom-10">
-          <div className="relative w-28 h-28 rounded-full border-4 border-white shadow-md overflow-hidden bg-gray-100">
+          <div className="relative w-28 h-28 rounded-full border-4 border-white shadow-md overflow-hidden bg-surface-sunk">
             {logoPreview ? (
               <Image
                 src={logoPreview}
@@ -46,7 +46,7 @@ export default function Step4Review({
                 className="w-full h-full object-cover"
               />
             ) : (
-              <div className="w-full h-full flex items-center justify-center text-gray-400">
+              <div className="w-full h-full flex items-center justify-center text-ink-subtle">
                 Logo
               </div>
             )}
@@ -55,7 +55,7 @@ export default function Step4Review({
       </div>
 
       {/* Key League Details */}
-      <div className="bg-gray-100 p-4 rounded-lg">
+      <div className="bg-surface-sunk p-4 rounded-lg">
         <h3 className="text-lg font-semibold mb-2">League Details</h3>
         <p>
           <strong>Name:</strong> {formData.name}
@@ -72,7 +72,7 @@ export default function Step4Review({
       </div>
 
       {/* Point System */}
-      <div className="bg-gray-100 p-4 rounded-lg">
+      <div className="bg-surface-sunk p-4 rounded-lg">
         <h3 className="text-lg font-semibold mb-2">Point System & Tiebreakers</h3>
         <p className="font-medium">Point Rules</p>
         <ul className="list-disc list-inside space-y-1">
@@ -83,7 +83,7 @@ export default function Step4Review({
               </li>
             ))
           ) : (
-            <p className="text-sm text-gray-500">No point rules defined</p>
+            <p className="text-sm text-ink-muted">No point rules defined</p>
           )}
         </ul>
 
@@ -96,13 +96,13 @@ export default function Step4Review({
               </li>
             ))
           ) : (
-            <p className="text-sm text-gray-500">No tiebreakers defined</p>
+            <p className="text-sm text-ink-muted">No tiebreakers defined</p>
           )}
         </ul>
       </div>
 
       {/* Everything Else */}
-      <div className="bg-gray-100 p-4 rounded-lg">
+      <div className="bg-surface-sunk p-4 rounded-lg">
         <h3 className="text-lg font-semibold mb-2">Additional Information</h3>
         <p>
           <strong>Visibility:</strong> {formData.visibility}

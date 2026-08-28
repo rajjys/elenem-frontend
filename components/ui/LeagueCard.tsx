@@ -29,7 +29,7 @@ export const LeagueCard: React.FC<LeagueCardProps> = ({ league, tenant, onDelete
     const logoUrl = league.businessProfile?.logoAsset?.url;
 
   return (
-    <div className="p-2 border border-gray-200 rounded-lg hover:bg-gray-200/30 transition-colors my-2">
+    <div className="p-2 border border-line rounded-lg hover:bg-line/30 transition-colors my-2">
       <div className="flex sm:items-center flex-wrap justify-between gap-2 sm:gap-4 mb-2">
         {/* Identity */}
         <Link href={buildLink('/league/dashboard', { ctxLeagueId: league.id })} key={league.id}>
@@ -43,7 +43,7 @@ export const LeagueCard: React.FC<LeagueCardProps> = ({ league, tenant, onDelete
               <h3 className="font-semibold text-sm sm:text-base text-foreground truncate">
                 {league.name}
               </h3>
-              <div className="flex items-center gap-2 text-xs text-gray-500">
+              <div className="flex items-center gap-2 text-xs text-ink-muted">
                 <span>{capitalize(tenant?.sportType || '')}</span>
                 <span>•</span>
                 <span>{league.currentSeason && league.currentSeason.status !== "UNKNOWN" ? league.currentSeason.name : "Non definie"}</span>
@@ -57,7 +57,7 @@ export const LeagueCard: React.FC<LeagueCardProps> = ({ league, tenant, onDelete
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <span className='p-1.5 bg-slate-100 hover:bg-slate-200 transition-colors duration-200 rounded-full shadow-sm cursor-pointer'>
+                <span className='p-1.5 bg-surface-sunk hover:bg-line transition-colors duration-200 rounded-full shadow-sm cursor-pointer'>
                   <MoreVertical className="h-4 w-4" />
                 </span>
               </DropdownMenuTrigger>
@@ -80,7 +80,7 @@ export const LeagueCard: React.FC<LeagueCardProps> = ({ league, tenant, onDelete
                     Configurer
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem className='bg-red-50 text-red-500'>
+                <DropdownMenuItem className='bg-negative-soft text-negative'>
                   <Trash className="mr-2 h-4 w-4" />
                   <button onClick={() => onDeleteLeague(league.id)}>Supprimer</button>
                 </DropdownMenuItem>
@@ -100,7 +100,7 @@ export const LeagueCard: React.FC<LeagueCardProps> = ({ league, tenant, onDelete
             <Crown className="h-3 w-3" />
             <span>{league.managingUsers?.length || 0} Managers</span>
           </div>
-          <div className="flex items-center gap-1 text-green-600 font-semibold">
+          <div className="flex items-center gap-1 text-positive font-semibold">
             <TrendingUp className="h-3 w-3" />
             <span>$0</span>
           </div>

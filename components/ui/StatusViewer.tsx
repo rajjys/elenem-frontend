@@ -81,7 +81,7 @@ const StatusViewer = ({ user, media, onClose }: StatusViewerProps) => {
             className="flex-1 h-1 bg-gray-700 rounded-full overflow-hidden"
           >
             <div
-              className={`h-full bg-white transition-all duration-500 ease-linear ${ index < currentMediaIndex ? 'w-full' : index === currentMediaIndex ? 'w-0 animate-progress' : 'w-0'}`}
+              className={`h-full bg-surface transition-all duration-500 ease-linear ${ index < currentMediaIndex ? 'w-full' : index === currentMediaIndex ? 'w-0 animate-progress' : 'w-0'}`}
               style={
                 index === currentMediaIndex
                   ? { animationDuration: '5s' }

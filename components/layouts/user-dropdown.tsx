@@ -61,7 +61,7 @@ export const UserDropdown = ({ }) => {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setDropdownOpen(!dropdownOpen)}
-        className="flex items-center gap-2 px-2 py-1 rounded-full border border-slate-200 bg-slate-50 nav-hover transition-all duration-150"
+        className="flex items-center gap-2 px-2 py-1 rounded-full border border-line bg-surface-sunk nav-hover transition-all duration-150"
       >
         {userAuth.profileImageUrl ? (
           <Image
@@ -72,7 +72,7 @@ export const UserDropdown = ({ }) => {
             className="rounded-full object-cover"
           />
         ) : (
-          <FiUser className="w-6 h-6 p-1 rounded-full border border-slate-200 dark:border-slate-800" />
+          <FiUser className="w-6 h-6 p-1 rounded-full border border-line " />
         )}
         <span className="hidden sm:inline text-sm font-medium">
           {userAuth.username || userAuth.email}
@@ -81,7 +81,7 @@ export const UserDropdown = ({ }) => {
       </button>
 
       {dropdownOpen && (
-        <div className="absolute right-0 mt-2 w-52 rounded-md shadow-md bg-white dark:bg-slate-950 dark:text-gray-200 ring-1 ring-black/5 dark:ring-slate-700 z-40 animate-fadeIn">
+        <div className="absolute right-0 mt-2 w-52 rounded-md shadow-md bg-surface ring-1 ring-black/5 z-40 animate-fadeIn">
           <div>
             {/* Common Dashboard Link */}
             {
@@ -116,7 +116,7 @@ export const UserDropdown = ({ }) => {
             <Button
               variant='danger'
               onClick={() => { handleLogout(); closeDropdown(); }}
-              className="w-full flex items-center justify-start gap-2 dark:bg-red-950/20">
+              className="w-full flex items-center justify-start gap-2 ">
               <LogOut className="w-4 h-4" /> Déconnexion
             </Button>
           </div>

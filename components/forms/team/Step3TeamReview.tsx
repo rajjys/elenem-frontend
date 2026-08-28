@@ -31,7 +31,7 @@ export default function Step3_TeamReview({ form, logoPreview, bannerPreview, own
   return (
     <CardContent className="space-y-6">
       {/* Banner + Logo */}
-      <div className="relative w-full h-48 bg-gray-100 rounded-lg flex items-center justify-center mb-12">
+      <div className="relative w-full h-48 bg-surface-sunk rounded-lg flex items-center justify-center mb-12">
         {bannerPreview || formData.businessProfile?.bannerAsset?.url ? (
           <Image
             src={bannerPreview ?? (formData.businessProfile?.bannerAsset?.url as string)}
@@ -41,12 +41,12 @@ export default function Step3_TeamReview({ form, logoPreview, bannerPreview, own
             className="w-full h-full object-cover"
           />
         ) : (
-          <div className="text-gray-400">No banner uploaded</div>
+          <div className="text-ink-subtle">No banner uploaded</div>
         )}
 
         {/* Logo */}
         <div className="absolute left-4 -bottom-10">
-          <div className="relative w-28 h-28 rounded-full border-4 border-white shadow-md overflow-hidden bg-gray-100">
+          <div className="relative w-28 h-28 rounded-full border-4 border-white shadow-md overflow-hidden bg-surface-sunk">
             {logoPreview || formData.businessProfile?.logoAsset?.url ? (
               <Image
                 src={logoPreview ?? (formData.businessProfile?.logoAsset?.url as string)}
@@ -56,14 +56,14 @@ export default function Step3_TeamReview({ form, logoPreview, bannerPreview, own
                 className="w-full h-full object-cover"
               />
             ) : (
-              <div className="w-full h-full flex items-center justify-center text-gray-400">Logo</div>
+              <div className="w-full h-full flex items-center justify-center text-ink-subtle">Logo</div>
             )}
           </div>
         </div>
       </div>
 
       {/* Key Team Details */}
-      <div className="bg-gray-100 p-4 rounded-lg">
+      <div className="bg-surface-sunk p-4 rounded-lg">
         <h3 className="text-lg font-semibold mb-2">Team Details</h3>
         <p><strong>Name:</strong> {formData.name}</p>
         <p><strong>League:</strong> {leagueName}</p>
@@ -72,7 +72,7 @@ export default function Step3_TeamReview({ form, logoPreview, bannerPreview, own
       </div>
 
       {/* Business Profile */}
-      <div className="bg-gray-100 p-4 rounded-lg">
+      <div className="bg-surface-sunk p-4 rounded-lg">
         <h3 className="text-lg font-semibold mb-2">Business Profile</h3>
         <p><strong>Description:</strong> {formData.businessProfile?.description || "N/A"}</p>
         <p><strong>Owner:</strong> {ownerName}</p>

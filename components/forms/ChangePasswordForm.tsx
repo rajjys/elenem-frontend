@@ -51,8 +51,8 @@ export function ChangePasswordForm() {
 
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-      {apiError && <p className="text-red-500 bg-red-100 p-3 rounded text-sm">{apiError}</p>}
-      {successMessage && <p className="text-green-600 bg-green-100 p-3 rounded text-sm">{successMessage}</p>}
+      {apiError && <p className="text-negative bg-negative-soft p-3 rounded text-sm">{apiError}</p>}
+      {successMessage && <p className="text-positive bg-positive-soft p-3 rounded text-sm">{successMessage}</p>}
       <PasswordInput
         label="Current Password"
         {...form.register("oldPassword")}

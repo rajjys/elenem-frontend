@@ -19,13 +19,13 @@ function DateCarousel({ dates, selectedDate, onDateSelect }: { dates: string[], 
                     className={`flex-shrink-0 w-14 h-20 rounded-lg flex flex-col items-center justify-center transition-all duration-200
                         ${
                         isSelected
-                            ? "bg-slate-900 dark:bg-slate-600 text-white shadow-md scale-105"
-                            : "bg-card dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700"
+                            ? "bg-slate-900 text-white shadow-md scale-105"
+                            : "bg-card hover:bg-line "
                         }`}
                     >
                     <span
                         className={`text-xs font-semibold ${
-                        isSelected ? "text-slate-100" : "text-slate-500 dark:text-slate-400"
+                        isSelected ? "text-ink-inverted" : "text-ink-muted "
                         }`}
                     >
                         {format(dateObj, "EEE", { locale: fr })
@@ -35,14 +35,14 @@ function DateCarousel({ dates, selectedDate, onDateSelect }: { dates: string[], 
                     </span>
                     <span
                         className={`text-2xl font-bold ${
-                        isSelected ? "text-yellow-200" : "text-slate-900 dark:text-slate-200"
+                        isSelected ? "text-yellow-200" : "text-ink "
                         }`}
                     >
                         {format(dateObj, "dd", { locale: fr })}
                     </span>
                     <span
                         className={`text-xs font-semibold ${
-                        isSelected ? "text-slate-100" : "text-slate-500 dark:text-slate-400"
+                        isSelected ? "text-ink-inverted" : "text-ink-muted "
                         }`}
                     >
                         {format(dateObj, "MMM", { locale: fr })

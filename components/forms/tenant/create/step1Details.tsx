@@ -20,16 +20,16 @@ export function Step1TenantDetails({ form }: Step1Props) {
       <div className="space-y-2">
         <Label htmlFor="name">Nom de l&apos;organisation</Label>
         <Input id="name" {...register("name")} restrict="alphanumeric" alphaFirst={true} allowSpace={true} transform="capitalize" maxCharacters={50} placeholder="ex: Ligue de la Paix"/>
-        {errors.name && <p className="text-red-500 text-xs">{errors.name.message}</p>}
+        {errors.name && <p className="text-negative text-xs">{errors.name.message}</p>}
       </div>
       {/* Tenant Code */}
       <div className="space-y-2">
         <Label htmlFor="tenantCode">Code d&apos;Orgnisation</Label>
         <Input id="tenantCode" {...register("tenantCode")} restrict="alphanumeric" alphaFirst={true}  transform="uppercase" maxCharacters={12} placeholder="ex: LIGUE2" />
-        <Label className="text-slate-400">https://<span className="text-green-700">{watch("tenantCode").toLowerCase()}</span>.elenem.site</Label>
-        {errors.tenantCode && <p className="text-red-500 text-xs">{errors.tenantCode.message}</p>}
+        <Label className="text-ink-subtle">https://<span className="text-positive">{watch("tenantCode").toLowerCase()}</span>.elenem.site</Label>
+        {errors.tenantCode && <p className="text-negative text-xs">{errors.tenantCode.message}</p>}
       </div>
-      <div className="border-b border-slate-200 col-span-1 md:col-span-2"/>
+      <div className="border-b border-line col-span-1 md:col-span-2"/>
       {/* Sport Type */}
       <div className="space-y-2">
         <Label htmlFor="sportType">Sport</Label>
@@ -52,7 +52,7 @@ export function Step1TenantDetails({ form }: Step1Props) {
                     })}
           </SelectContent>
         </Select>
-        {errors.sportType && <p className="text-red-500 text-xs">{errors.sportType.message}</p>}
+        {errors.sportType && <p className="text-negative text-xs">{errors.sportType.message}</p>}
       </div>
       {/* Country */}
       <div className="space-y-2">
@@ -61,9 +61,9 @@ export function Step1TenantDetails({ form }: Step1Props) {
           value={country}
           aria-placeholder="Pays"
           onChange={(val) => setValue("country", val)}
-          className="w-full h-10 px-3 py-2 text-sm border rounded-md border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full h-10 px-3 py-2 text-sm border rounded-md border-line focus:outline-none focus:ring-2 focus:ring-accent"
         />
-        {errors.country && <p className="text-red-500 text-xs">{errors.country.message}</p>}
+        {errors.country && <p className="text-negative text-xs">{errors.country.message}</p>}
       </div>
        {/* isActive (Status) 👈 NEW CONTROL */}
       <div className="space-y-2">
@@ -80,7 +80,7 @@ export function Step1TenantDetails({ form }: Step1Props) {
             <SelectItem value="false">Inactif</SelectItem>
           </SelectContent>
         </Select>
-        {errors.isActive && <p className="text-red-500 text-xs">{errors.isActive.message}</p>}
+        {errors.isActive && <p className="text-negative text-xs">{errors.isActive.message}</p>}
       </div>
       {/* visibility 👈 NEW CONTROL */}
       <div className="space-y-2">
@@ -100,7 +100,7 @@ export function Step1TenantDetails({ form }: Step1Props) {
             ))}
           </SelectContent>
         </Select>
-        {errors.visibility && <p className="text-red-500 text-xs">{errors.visibility.message}</p>}
+        {errors.visibility && <p className="text-negative text-xs">{errors.visibility.message}</p>}
       </div>
       {/* Tenant Type */}
       <div className="space-y-2">
@@ -120,7 +120,7 @@ export function Step1TenantDetails({ form }: Step1Props) {
             ))}
           </SelectContent>
         </Select>
-        {errors.tenantType && <p className="text-red-500 text-xs">{errors.tenantType.message}</p>}
+        {errors.tenantType && <p className="text-negative text-xs">{errors.tenantType.message}</p>}
       </div>
     </div>
   );

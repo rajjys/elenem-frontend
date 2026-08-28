@@ -9,7 +9,7 @@ type BlogPostCardProps = {
 const BlogPostCard = ({ post }: BlogPostCardProps) => {
   return (
     <Link href={`/news/${post.slug}`} className="block">
-      <div className="bg-white rounded-sm shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 my-2 md:my-4">
+      <div className="bg-surface rounded-sm shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 my-2 md:my-4">
         <div className="relative w-full h-42">
           <Image
             src={post.imageUrl}
@@ -20,13 +20,13 @@ const BlogPostCard = ({ post }: BlogPostCardProps) => {
           />
         </div>
         <div className="p-4">
-          <h3 className="text-xl font-semibold text-gray-800 mb-2 truncate">
+          <h3 className="text-xl font-semibold text-ink mb-2 truncate">
             {post.title}
           </h3>
-          <p className="text-gray-600 text-sm mb-3 line-clamp-2">
+          <p className="text-ink-muted text-sm mb-3 line-clamp-2">
             {post.content}
           </p>
-          <div className="flex justify-between items-center text-gray-500 text-xs">
+          <div className="flex justify-between items-center text-ink-muted text-xs">
             <span>By {post.author}</span>
             <span>{new Date(post.date).toLocaleDateString('fr-FR')}</span>
           </div>

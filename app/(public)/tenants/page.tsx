@@ -41,7 +41,7 @@ export default function PublicTenantsPage() {
     };
 
     return (
-        <div className="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-200 min-h-screen">
+        <div className="bg-surface-sunk text-ink min-h-screen">
             <div className="container max-w-3xl mx-auto p-4 sm:p-6 space-y-8">
                 <header>
                 <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
@@ -62,11 +62,11 @@ export default function PublicTenantsPage() {
                 ) : tenants.length > 0 ? (
                     tenants.map((tenant) => <PublicTenantCard key={tenant.id} tenant={tenant} />)
                 ) : (
-                    <div className="text-center py-16 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-                    <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+                    <div className="text-center py-16 bg-surface rounded-lg border border-line ">
+                    <h3 className="text-xl font-semibold text-ink ">
                         Aucune Organisation Trouvée
                     </h3>
-                    <p className="mt-2 text-gray-600 dark:text-gray-400">
+                    <p className="mt-2 text-ink-muted ">
                         Essayez de modifier vos filtres.
                     </p>
                     </div>
@@ -75,7 +75,7 @@ export default function PublicTenantsPage() {
 
                 {loading && page > 1 && (
                 <div className="text-center">
-                    <p className="text-gray-600 dark:text-gray-400">Chargement...</p>
+                    <p className="text-ink-muted ">Chargement...</p>
                 </div>
                 )}
 

@@ -35,7 +35,7 @@ export const Avatar: React.FC<AvatarProps> = ({
         alt={name}
         height={size}
         width={size}
-        className={`object-cover rounded-full border border-gray-200 ${className}`}
+        className={`object-cover rounded-full border border-line ${className}`}
         onError={() => setImgError(true)}
       />
     );
@@ -43,7 +43,7 @@ export const Avatar: React.FC<AvatarProps> = ({
 
   return (
     <div
-      className={`flex items-center justify-center rounded-full border border-gray-200 pt-1 px-2 bg-emerald-100 text-emerald-700 font-bold select-none ${className}`}
+      className={`flex items-center justify-center rounded-full border border-line pt-1 px-2 bg-positive-soft text-positive font-bold select-none ${className}`}
       style={{ width: size, height: size, fontSize: size * 0.35 }}
       aria-label={name}
     >

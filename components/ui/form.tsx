@@ -99,7 +99,7 @@ const FormLabel = React.forwardRef<
       ref={ref}
       className={cn(
         "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
-        formError && "text-red-500", // Example of styling based on error state
+        formError && "text-negative", // Example of styling based on error state
         className
       )}
       htmlFor={formItemId}
@@ -162,7 +162,7 @@ const FormMessage = React.forwardRef<
     <p
       ref={ref}
       id={formMessageId}
-      className={cn("text-sm font-medium text-red-500", className)}
+      className={cn("text-sm font-medium text-negative", className)}
       {...props}
     >
       {body}
