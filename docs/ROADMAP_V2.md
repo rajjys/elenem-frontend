@@ -196,3 +196,82 @@ included, and the published table matches their bulletin exactly.
    game? Needed before designing `Stage`.
 5. **Do the women's and men's championships share anything** — venues, matchdays, a combined
    publication? It affects whether they are two leagues or two stages of one competition.
+
+
+---
+
+## 6. Answers from LIPROBAKIN (2026-08-28) — and what they change
+
+These came from the user after §5 was written. Several of them change the plan, not just fill it in.
+
+### A1 — They DO track player stats, and only shooting
+
+Points, and the breakdown: 3-pointers, 2-pointers, free throws. Taken from the paper scoresheet
+the officials fill in during the game. Extensible later to assists, rebounds, steals, minutes —
+**not needed now**.
+
+*Changes:* Phase 3 item 12 shrinks and sharpens. `PlayerGameStat` needs
+`threePointers / twoPointers / freeThrows` and derives points; there is no need for a general stat
+engine. The entry UI mirrors the scoresheet, because that is literally what the operator has in
+front of them.
+
+### A2 — The standings document costs them two manual steps, not one
+
+The officials committee calculates the table **by hand**, sends it to a **designer**, who rebuilds
+it in Photoshop or an AI tool for social media.
+
+*Changes:* the export (§1.4) is worth more than I argued. It removes the hand calculation *and*
+the design round-trip. It is not a convenience feature — it is the thing that makes the switch
+obvious. **Promote it out of Phase 3 into Phase 2** as soon as standings are trustworthy, so they
+can feel the benefit before the rest lands.
+
+### A3 — One person enters everything: the community manager
+
+From the stands, or at home when results are sent to him. He receives **either a photo of the
+scoresheet or the plain final score**.
+
+*Changes:* the score screen has two modes, and the fast one is the default —
+**final score in a few taps**, with an optional box score for when he has the sheet. Optimise for
+one person entering many games in a sitting, not for one person entering one game carefully. Being
+usable one-handed from the stands is a real requirement; live play-by-play remains the wrong
+product (§1.2).
+
+### A4 — The playoff format changes every season. This is the headline.
+
+Sometimes 8 teams, sometimes 6 (two groups of three, top four advance, then knockout), sometimes 4
+for the women. The final might be best-of-five, or a single game. A third-place game sometimes, and
+usually not. It depends on how much of the calendar is left.
+
+*Changes:* **this is the strongest possible argument for the generic `Stage` model, and it raises
+the bar.** We cannot hardcode LIPROBAKIN's playoff because LIPROBAKIN does not have one — they
+have a different one each year. So Phase 3 must deliver a *composer*: the organiser assembles
+stages (`LEAGUE`, `GROUPS`, `KNOCKOUT`), sets how many advance from each, and sets series length
+per round (best-of-1, 3, 5). That is a real feature with a real UI, not a migration with a bracket
+view bolted on. Budget accordingly — Phase 3 is the long one and this is why.
+
+### A5 — Men, women and sometimes D2 share one calendar
+
+Same venues, same matchdays, the same referees and organisers, and **one combined publication**.
+The calendar is designed for both championships together.
+
+*Changes:* two things that were league-scoped have to become tenant-scoped.
+- **Venue and matchday conflict checking spans leagues.** The fixture generator currently reasons
+  inside one season; two leagues can currently be scheduled into the same hall at the same hour and
+  nothing objects.
+- **The calendar view and the published calendar are multi-league by default.** A "matchday" is a
+  tenant-level concept here, not a league-level one.
+
+This is the single biggest structural surprise in this list and it touches Phase 2 (venues,
+fixture generation) as well as Phase 3.
+
+### Also agreed in the same exchange
+
+- **Login accepts username *or* email with a password.** No organisation code. Username must
+  become unique platform-wide; email already is.
+- **Blog posts** belong to the tenant public site, and the foundation already exists.
+- **The public side is not deferred wholesale** — see §1.3; the tenant site ships with launch.
+
+### Still outstanding
+
+The scoresheet photo referenced in A1 did not come through. Worth having before designing the box
+score entry screen, so the field order matches the paper.
