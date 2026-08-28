@@ -1,8 +1,8 @@
 'use client';
 import { PlayersListView } from '@/components/players';
-import { useCurrentUser } from '@/hooks';
+import { useScopeContext } from '@/hooks/useScopeContext';
 
 export default function TeamRosterPage() {
-  const user = useCurrentUser();
-  return <PlayersListView title="Effectif" teamId={user?.managingTeamId ?? undefined} />;
+  const { teamId } = useScopeContext();
+  return <PlayersListView title="Effectif" teamId={teamId} />;
 }

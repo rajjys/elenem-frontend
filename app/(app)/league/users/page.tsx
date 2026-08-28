@@ -1,6 +1,8 @@
 'use client';
 import { UsersListView } from '@/components/users/users-list-view';
+import { useScopeContext } from '@/hooks/useScopeContext';
 
 export default function Page() {
-  return <UsersListView basePath="/league/users" />;
+  const { leagueId } = useScopeContext();
+  return <UsersListView basePath="/league/users" scope={{ managingLeagueId: leagueId }} />;
 }

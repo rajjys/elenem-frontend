@@ -6,6 +6,7 @@ import { Menu } from 'lucide-react';
 import { useAuthStore } from '@/store/auth.store';
 import { Skeleton } from '@/components/ui/';
 import { NavbarProfile } from './navbar-profile';
+import { ContextBreadcrumb } from './context-breadcrumb';
 
 interface AppLayoutNavbarProps {
   onMobileMenuToggle: () => void;
@@ -38,8 +39,8 @@ export function AppLayoutHeader({ onMobileMenuToggle }: AppLayoutNavbarProps) {
   }, [userAuth, fetchUser]);
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-line bg-surface px-3 sm:px-6">
-      <div className="flex items-center gap-2">
+    <header className="sticky top-0 z-20 flex h-16 shrink-0 items-center justify-between gap-4 border-b border-line bg-surface px-3 sm:px-6">
+      <div className="flex min-w-0 items-center gap-2">
         <button
           type="button"
           onClick={onMobileMenuToggle}
@@ -48,9 +49,10 @@ export function AppLayoutHeader({ onMobileMenuToggle }: AppLayoutNavbarProps) {
         >
           <Menu className="h-5 w-5" />
         </button>
+        <ContextBreadcrumb />
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="flex shrink-0 items-center gap-2">
         {/* Search, notifications and help belong here as they arrive. */}
         {loadingUser ? (
           <Skeleton className="h-9 w-9 rounded-full" />

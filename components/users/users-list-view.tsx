@@ -16,7 +16,20 @@ import type { UserFilterParams } from '@/schemas/user-schemas';
 // different basePath (detail route) and optional create link.
 type SortableColumn = 'firstName' | 'lastName' | 'username' | 'email' | 'createdAt' | 'updatedAt' | 'lastLoginAt';
 
-export function UsersListView({ basePath, createHref }: { basePath: string; createHref?: string }) {
+export function UsersListView({
+  basePath,
+  createHref,
+  scope,
+}: {
+  basePath: string;
+  createHref?: string;
+  /**
+   * Pinned by the host page from the current context. Without it every surface showed the same
+   * list: a team admin's /team/users returned every user in the organisation, because the only
+   * scoping was the backend's role check and nothing narrowed by what you had opened.
+   */
+  scope?: { tenantId?: string; managingLeagueId?: string; managingTeamId?: string };
+}) {
   const router = useRouter();
   const [filters, setFilters] = useState<UserFilterParams>({
     page: 1,
@@ -24,7 +37,9 @@ export function UsersListView({ basePath, createHref }: { basePath: string; crea
     sortBy: 'createdAt',
     sortOrder: 'desc',
   });
-  const { data, isLoading, isError } = useUsers(filters);
+  // Scope is not user-editable: someone looking at a team's users should not be able to filter
+  // their way out of that team.
+  const { data, isLoading, isError } = useUsers({ ...filters, ...scope });
   const del = useDeleteUser();
 
   const users = data?.data ?? [];

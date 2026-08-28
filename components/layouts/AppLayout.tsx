@@ -164,12 +164,14 @@ export default function AppLayout({ children, navItems }: AppLayoutProps) {
             it is the permanent frame, and it owns the brand. */}
         {shouldShowSidebar
           && (
-              <aside className={`hidden h-screen shrink-0 flex-col border-r border-line bg-surface transition-[width] duration-200 ease-in-out md:flex
+              <aside className={`sticky top-0 hidden h-screen shrink-0 flex-col overflow-hidden border-r border-line bg-surface transition-[width] duration-200 ease-in-out md:flex
                                 ${isSidebarOpen ? "w-64" : "w-20"}`}>
+                {/* The brand is deliberately not contextual: it is the way home to your own
+                    dashboard, not a link deeper into whatever you have drilled into. */}
                 <SidebarBrand
                   isOpen={isSidebarOpen}
                   onToggle={toggleSidebar}
-                  href={buildLink(dashboard.link)}
+                  href={dashboard.link}
                 />
                 <nav className="flex flex-1 flex-col overflow-y-auto p-2">
                   {navItems.map((group, gi) => (
