@@ -47,7 +47,7 @@ export default function LeagueStandingsPage() {
     <div className="container mx-auto p-4 sm:p-6 space-y-6">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">League Standings</h1>
-        <p className="text-muted-foreground">View standings for different seasons within your league.</p>
+        <p className="text-ink-muted">View standings for different seasons within your league.</p>
       </div>
       <StandingsFilters onFiltersChange={setFilters} />
       {loading ? (
@@ -57,7 +57,7 @@ export default function LeagueStandingsPage() {
       ) : standings.length > 0 ? (
         <StandingsTable standings={standings} managingTeamId={userAuth?.managingTeamId} />
       ) : (
-        <p className="text-center text-muted-foreground pt-8">Select a season to view standings.</p>
+        <p className="text-center text-ink-muted pt-8">Select a season to view standings.</p>
       )}
     </div>
   );

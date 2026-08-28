@@ -2,14 +2,15 @@
 import React, { useState, ReactNode, RefObject } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import {FiShield,FiUser, FiLogOut, FiX } from 'react-icons/fi'; // Keep these imports as your NavLink/CollapsibleNavLink likely use them
+import { FiLogOut, FiX } from 'react-icons/fi';
 import { useAuthStore } from '@/store/auth.store'; // Assuming this path is correct
 // Import your existing components. Replace these with your actual paths.
-import { CollapsibleNavLink, FlyoutMenu, NavLink } from '.'; // Adjust this import path if needed
+import { NavLink } from '.';
+import { accountNavItems } from './nav-items';
 import { useContextualLink, useDashboardLinkEligibillity, useSidebarEligibility } from '@/hooks';
 import { Roles } from '@/schemas'; // Assuming Role enum is here
 import { AppLayoutHeader } from './AppLayoutHeader'; // Import the updated Navbar
-import { ArrowLeft,  ChevronLeft, ChevronRight, Settings, Shield, User } from 'lucide-react';
+import { ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-react';
 
 // Type for a React Icon component
 type IconType = React.ComponentType<React.SVGProps<SVGSVGElement>>;
@@ -22,24 +23,15 @@ interface NavLinkItem {
   onClick?: () => void; // Optional click handler for mobile menu links
 }
 
-// Type for a collapsible navigation category with sub-items
-interface NavCategory {
-  label: string;
-  icon: IconType;
-  subItems: NavLinkItem[];
-}
-
 interface AppLayoutProps {
   children: ReactNode;
-  navItems: NavCategory[]; // Array of navigation categories for the sidebar
-  themeColor?: string; // e.g., 'indigo', 'blue', 'emerald' - used for dynamic styling
+  /** Flat list. Collapsible groups were removed once each surface fitted in 3–9 links. */
+  navItems: NavLinkItem[];
+  /** Retained so existing call sites keep compiling; the product has one accent now. */
+  themeColor?: string;
 }
 
-export default function AppLayout({
-  children,
-  navItems,
-  themeColor = 'indigo', // Default theme color
-}: AppLayoutProps) {
+export default function AppLayout({ children, navItems }: AppLayoutProps) {
   const currentPath = usePathname();
   const { user: userAuth, logout } = useAuthStore();
   const router = useRouter();
@@ -143,45 +135,36 @@ export default function AppLayout({
                     {/* The space will be empty when collapsed, but the button is gone */}
                   </div>
                 )}
-                <nav className="flex-grow p-2 space-y-1 overflow-y-auto">
-                  {navItems.map(category => (
-                    <CollapsibleNavLink
-                      key={category.label}
-                      category={category}
+                <nav className="flex flex-1 flex-col gap-1 overflow-y-auto p-2">
+                  {navItems.map((item) => (
+                    <NavLink
+                      key={item.basePath}
+                      item={item}
                       currentPath={currentPath}
                       isSidebarOpen={isSidebarOpen}
-                      onFlyoutToggle={handleFlyoutToggle}
-                      activeFlyoutLabel={activeFlyoutLabel}
-                      themeColor={themeColor}
                       buildLink={buildLink}
                     />
                   ))}
-                  <div className="mt-auto pt-4 border-t border-line">
 
-                    <NavLink
-                      item={{ label: "My Profile", basePath: "/account/profile", icon: User }}
-                      buildLink={buildLink}
-                      currentPath={currentPath}
-                      isSidebarOpen={isSidebarOpen}
-                      onClick={closeFlyout}
-                      themeColor={themeColor} />
-                    <NavLink
-                      item={{ label: "Security", basePath: "/account/security", icon: Shield }}
-                      buildLink={buildLink}
-                      currentPath={currentPath}
-                      isSidebarOpen={isSidebarOpen}
-                      onClick={closeFlyout}
-                      themeColor={themeColor} />
+                  {/* Account and session live at the bottom, separated by a rule: they are about
+                      you, not about the competition you are running. */}
+                  <div className="mt-auto flex flex-col gap-1 border-t border-line pt-3">
+                    {accountNavItems.map((item) => (
                       <NavLink
-                      item={{ label: "Settings", basePath: "/account/settings", icon: Settings }}
-                      buildLink={buildLink}
-                      currentPath={currentPath}
-                      isSidebarOpen={isSidebarOpen}
-                      onClick={closeFlyout}
-                      themeColor={themeColor} />
-                    <button onClick={handleLogout} className={`flex items-center text-sm p-2 rounded-md transition-colors w-full ${isSidebarOpen ? "justify-start pl-3" : "justify-center"} text-accent-text hover:bg-accent-soft`}>
-                      <FiLogOut className={`w-5 h-5 ${isSidebarOpen ? "mr-3" : ""}`} />
-                      {isSidebarOpen && 'Logout'}
+                        key={item.basePath}
+                        item={item}
+                        currentPath={currentPath}
+                        isSidebarOpen={isSidebarOpen}
+                        buildLink={buildLink}
+                      />
+                    ))}
+                    <button
+                      onClick={handleLogout}
+                      title={isSidebarOpen ? undefined : 'Se déconnecter'}
+                      className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm text-ink-muted transition-colors hover:bg-negative-soft hover:text-negative ${isSidebarOpen ? '' : 'justify-center'}`}
+                    >
+                      <FiLogOut className="h-[18px] w-[18px] shrink-0" />
+                      {isSidebarOpen && 'Se déconnecter'}
                     </button>
                   </div>
                 </nav>
@@ -205,44 +188,34 @@ export default function AppLayout({
                   <FiX className="w-6 h-6" />
                 </button>
               </div>
-              <nav className="flex-grow p-2 space-y-1 overflow-y-auto">
-                {navItems.map(category => (
-                  <CollapsibleNavLink
-                    key={category.label}
-                    category={category}
+              <nav className="flex flex-1 flex-col gap-1 overflow-y-auto p-2">
+                {navItems.map((item) => (
+                  <NavLink
+                    key={item.basePath}
+                    item={item}
                     currentPath={currentPath}
-                    isSidebarOpen={true} // In mobile, categories always behave as if sidebar is open for accordion
-                    onFlyoutToggle={() => {}} // No flyouts in mobile menu
-                    activeFlyoutLabel={null}
-                    onMobileLinkClick={closeMobileMenu}
-                    themeColor={themeColor} // Pass theme color to your CollapsibleNavLink
+                    isSidebarOpen
+                    onClick={closeMobileMenu}
                     buildLink={buildLink}
                   />
                 ))}
-                <div className="mt-auto pt-4 border-t border-line">
-                  <NavLink
-                    item={{ label: "Settings", basePath: "/account/settings", icon: FiUser }}
-                    buildLink={buildLink} currentPath={currentPath}
-                    isSidebarOpen={true} onClick={closeMobileMenu}
-                    themeColor={themeColor}
-                  />
-                  <NavLink
-                    item={{ label: "My Profile", basePath: "/account/profile", icon: FiUser }}
-                    buildLink={buildLink} currentPath={currentPath}
-                    isSidebarOpen={true} onClick={closeMobileMenu}
-                    themeColor={themeColor}
-                  />
-                  <NavLink
-                    item={{ label: "Security", basePath: "/account/security", icon: FiShield }}
-                    buildLink={buildLink}
-                    currentPath={currentPath}
-                    isSidebarOpen={true}
-                    onClick={closeMobileMenu}
-                    themeColor={themeColor}
-                  />
-                  <button onClick={handleLogout} className="flex items-center text-sm p-2 rounded-md transition-colors w-full justify-start pl-3 text-accent-text hover:bg-accent-soft">
-                    <FiLogOut className="w-5 h-5 mr-3" />
-                    Logout
+                <div className="mt-auto flex flex-col gap-1 border-t border-line pt-3">
+                  {accountNavItems.map((item) => (
+                    <NavLink
+                      key={item.basePath}
+                      item={item}
+                      currentPath={currentPath}
+                      isSidebarOpen
+                      onClick={closeMobileMenu}
+                      buildLink={buildLink}
+                    />
+                  ))}
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center gap-3 rounded-md px-3 py-2 text-sm text-ink-muted transition-colors hover:bg-negative-soft hover:text-negative"
+                  >
+                    <FiLogOut className="h-[18px] w-[18px] shrink-0" />
+                    Se déconnecter
                   </button>
                 </div>
               </nav>
@@ -283,19 +256,6 @@ export default function AppLayout({
           </main>
         </div>
 
-        {/* Flyout (collapsed sidebar) */}
-        {activeFlyoutLabel && !isSidebarOpen && flyoutPosition && (
-          <FlyoutMenu
-            items={navItems.find(cat => cat.label === activeFlyoutLabel)?.subItems || []}
-            position={flyoutPosition}
-            currentPath={currentPath}
-            onClose={closeFlyout}
-            onLinkClick={closeFlyout}
-            triggerRef={currentFlyoutTriggerRef}
-            themeColor={themeColor}
-            buildLink={buildLink}
-          />
-        )}
       </div>
     </div>
   );

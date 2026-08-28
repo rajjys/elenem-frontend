@@ -21,7 +21,7 @@ export default function PricingPage() {
               <span className="text-primary italic">starting this season</span>
             </h1>
             
-            <p className="mt-8 text-xl text-muted leading-relaxed max-w-2xl mx-auto">
+            <p className="mt-8 text-xl text-ink-muted leading-relaxed max-w-2xl mx-auto">
               Pricing is based on the structure and complexity of your competition — not arbitrary feature limits.
             </p>
 

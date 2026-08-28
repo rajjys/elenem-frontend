@@ -381,7 +381,7 @@ const TenantLandingPage = ({ params }: { params: Promise<{ tenantSlug: string }>
                         ) : (
                             <div className="text-center py-16 rounded-lg">
                                 <h3 className="text-xl font-semibold">Pas d&apos;actualitvs disponibles</h3>
-                                <p className="mt-2 text-muted-foreground">Aucune actualité n&apos;est disponible pour le moment.</p>
+                                <p className="mt-2 text-ink-muted">Aucune actualité n&apos;est disponible pour le moment.</p>
                             </div>
                         )
                     }

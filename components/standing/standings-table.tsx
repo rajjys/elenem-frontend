@@ -63,7 +63,7 @@ export function StandingsTable({ standings, managingTeamId }: StandingsTableProp
                     {item.team.businessProfile.logoAsset?.url ? (
                       <Avatar src={item.team.businessProfile.logoAsset.url} name={item.team.name} size={40} />
                     ) : (
-                      <div className="h-6 w-6 rounded-full bg-muted flex items-center justify-center text-xs">
+                      <div className="h-6 w-6 rounded-full bg-surface-sunk flex items-center justify-center text-xs">
                         {item.team.name.charAt(0)}
                       </div>
                     )}

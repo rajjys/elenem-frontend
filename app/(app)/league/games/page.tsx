@@ -168,7 +168,7 @@ export default function LeagueGamesPage() {
             <div className="flex flex-col space-y-4 mb-4">
                 <div>
                     <h1 className="text-3xl font-bold tracking-tight text-ink">Games</h1>
-                    <p className="text-muted-foreground text-ink-muted">View and manage games within your league.</p>
+                    <p className="text-ink-muted text-ink-muted">View and manage games within your league.</p>
                 </div>
                 <div className="flex justify-between items-center">
                     <GamesFilters

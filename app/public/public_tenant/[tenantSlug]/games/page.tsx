@@ -149,7 +149,7 @@ export default function PublicGamesPage({ params }: { params: Promise<{ tenantSl
         ) : (
             <div className="text-center py-16 bg-surface rounded-lg border">
                 <h3 className="text-xl font-semibold">Pas des Matchs Disponible</h3>
-                <p className="text-muted-foreground mt-2">Pas de matchs Disponible a la date selectionnee.</p>
+                <p className="text-ink-muted mt-2">Pas de matchs Disponible a la date selectionnee.</p>
             </div>
         )}
       </div>

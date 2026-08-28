@@ -40,7 +40,7 @@ export const LeagueCard: React.FC<LeagueCardProps> = ({ league, tenant, onDelete
               <Avatar name={league.name} size={40} className="shrink-0" />
             )}
             <div className="min-w-0">
-              <h3 className="font-semibold text-sm sm:text-base text-foreground truncate">
+              <h3 className="font-semibold text-sm sm:text-base text-ink truncate">
                 {league.name}
               </h3>
               <div className="flex items-center gap-2 text-xs text-ink-muted">
@@ -91,7 +91,7 @@ export const LeagueCard: React.FC<LeagueCardProps> = ({ league, tenant, onDelete
 
         {/* Stats – Hidden on XS */}
       <Link href={buildLink('/league/dashboard', { ctxLeagueId: league.id })} key={league.id}>
-        <div className="hidden sm:grid grid-cols-3 gap-4 text-xs text-muted-foreground">
+        <div className="hidden sm:grid grid-cols-3 gap-4 text-xs text-ink-muted">
           <div className="flex items-center gap-1">
             <Building2 className="h-3 w-3" />
             <span>{league.teams?.length || 0} Équipes</span>

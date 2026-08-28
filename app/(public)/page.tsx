@@ -15,7 +15,7 @@ export default function HomePage() {
               <span className="text-primary">your league</span>
             </h1>
 
-            <p className="mt-8 text-xl text-muted leading-relaxed max-w-2xl mx-auto">
+            <p className="mt-8 text-xl text-ink-muted leading-relaxed max-w-2xl mx-auto">
               Elenem replaces paper schedules, manual standings, and WhatsApp groups with one simple system to manage your league
                - games, standings, and communication in one place.
             </p>
@@ -47,7 +47,7 @@ export default function HomePage() {
                   Every Season. <br/>
                   <span className="text-primary font-medium italic">Same Problems.</span>
                 </h2>
-                <p className="text-muted">Elenem exists because these problems repeat every season.</p>
+                <p className="text-ink-muted">Elenem exists because these problems repeat every season.</p>
               </div>
               
               <ul className="grid gap-4">
@@ -103,7 +103,7 @@ export default function HomePage() {
                   Your identity. <br/>
                   <span className="text-primary font-medium italic">Our engine.</span>
                 </h2>
-                <p className='text-muted'>
+                <p className='text-ink-muted'>
                   Elenem centralizes fixtures, results, standings, and communication into one official system -
                   powering your league&apos;s digital presence while keeping your identity.
                 </p>
@@ -111,7 +111,7 @@ export default function HomePage() {
               <div className="space-y-8">
                 <div className='hidden md:block'>
                   <h3 className="text-xl font-bold text-ink">Total Brand Ownership</h3>
-                  <p className="text-muted mt-2 leading-relaxed">
+                  <p className="text-ink-muted mt-2 leading-relaxed">
                     Elenem lives on <strong> your website</strong>. It looks like you, feels like you, 
                     and builds your brand every matchday.
                   </p>
@@ -119,7 +119,7 @@ export default function HomePage() {
 
                 <div className='hidden md:block'>
                   <h3 className="text-xl font-bold text-ink">Automated league operations</h3>
-                  <p className="text-muted mt-2 leading-relaxed">
+                  <p className="text-ink-muted mt-2 leading-relaxed">
                     When a score is entered, your entire league updates instantly. 
                     The standings, the goal-difference, and the schedules all sync 
                     across mobile and desktop without you lifting a finger.
@@ -225,7 +225,7 @@ export default function HomePage() {
         <Container>
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-ink">How Elenem works</h2>
-            <p className="mt-4 text-muted max-w-xl mx-auto">We handle the system. You focus on the sport.</p>
+            <p className="mt-4 text-ink-muted max-w-xl mx-auto">We handle the system. You focus on the sport.</p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-12 relative">
@@ -258,7 +258,7 @@ export default function HomePage() {
               <h2 className="text-3xl font-bold text-ink mb-6">
                 Plans built for every level of play
               </h2>
-              <p className="text-lg text-muted mb-8 leading-relaxed">
+              <p className="text-lg text-ink-muted mb-8 leading-relaxed">
                 Whether you&apos;re running a local 8-team tournament or a national 
                 football federation, Elenem scales with you. 
               </p>
@@ -269,21 +269,21 @@ export default function HomePage() {
                   <div className="w-12 h-12 rounded-full bg-surface-sunk flex items-center justify-center font-bold text-ink-muted">B</div>
                   <div>
                     <p className="font-bold text-ink">Basic</p>
-                    <p className="text-sm text-muted">For small, local community leagues.</p>
+                    <p className="text-sm text-ink-muted">For small, local community leagues.</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-4 p-4 bg-surface rounded-2xl border-2 border-line shadow-md">
                   <div className="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center font-bold">P</div>
                   <div>
                     <p className="font-bold text-ink">Pro</p>
-                    <p className="text-sm text-muted">Advanced features for regional clubs.</p>
+                    <p className="text-sm text-ink-muted">Advanced features for regional clubs.</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-4 p-4 bg-surface rounded-2xl border border-line shadow-sm">
                   <div className="w-12 h-12 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold">F</div>
                   <div>
                     <p className="font-bold text-ink">Federation</p>
-                    <p className="text-sm text-muted">Custom solutions for large organizations.</p>
+                    <p className="text-sm text-ink-muted">Custom solutions for large organizations.</p>
                   </div>
                 </div>
               </div>
@@ -298,7 +298,7 @@ export default function HomePage() {
 
             <div className="flex-1 bg-primary rounded-[2rem] p-12 text-white relative overflow-hidden">
               <h3 className="text-2xl font-bold mb-4">Starting at $399/year</h3>
-              <p className="text-primary-foreground/80 mb-8">
+              <p className="text-accent-ink/80 mb-8">
                 All plans include core league management, 
                 automated standings, and our official mobile-ready fan portal.
               </p>
@@ -336,7 +336,7 @@ export default function HomePage() {
                 <span className="text-primary opacity-90">properly.</span>
               </h2>
               
-              <p className="mt-6 text-lg leading-8 text-muted">
+              <p className="mt-6 text-lg leading-8 text-ink-muted">
                 Stop improvising with spreadsheets and group chats. 
                 Start managing your league with an official system.
               </p>
@@ -373,7 +373,7 @@ function Step({ number, title, text }: { number: string; title: string; text: st
         <span className="text-xl font-bold text-primary">{number}</span>
       </div>
       <h3 className="text-xl font-bold text-ink mb-3">{title}</h3>
-      <p className="text-muted leading-relaxed">{text}</p>
+      <p className="text-ink-muted leading-relaxed">{text}</p>
     </div>
   );
 }

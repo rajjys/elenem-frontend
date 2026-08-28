@@ -1,50 +1,55 @@
-import Link from "next/link";
+import Link from 'next/link';
+import { cn } from '@/utils/cn';
 
 interface NavLinkProps {
-    item: { label: string; basePath: string; icon: React.ElementType };
-    currentPath: string;
-    isSidebarOpen: boolean;
-    isFlyout?: boolean;
-    onClick?: () => void;
-    themeColor: string;
-    buildLink: (basePath: string) => string;
+  item: { label: string; basePath: string; icon: React.ElementType };
+  currentPath: string;
+  isSidebarOpen: boolean;
+  isFlyout?: boolean;
+  onClick?: () => void;
+  buildLink: (basePath: string) => string;
 }
 
+/**
+ * A single sidebar link.
+ *
+ * Colours come from tokens only. The previous version set `backgroundColor` and `color` as inline
+ * styles from `var(--color-blue-100)` / `var(--color-blue-600)` — Tailwind's built-in palette,
+ * which has no dark variant. Inline styles also beat every class, so the active link rendered as
+ * pale blue on pale blue in dark mode and was effectively unreadable.
+ */
 export const NavLink: React.FC<NavLinkProps> = ({
-    item,
-    currentPath,
-    isSidebarOpen,
-    isFlyout,
-    onClick,
-    themeColor,
-    buildLink,
+  item,
+  currentPath,
+  isSidebarOpen,
+  isFlyout,
+  onClick,
+  buildLink,
 }) => {
-    const finalHref = buildLink(item.basePath);
-    const isActive = currentPath === item.basePath;
-    const Icon = item.icon;
+  const finalHref = buildLink(item.basePath);
+  // Match nested routes too, so /league/settings/general keeps /league/settings lit.
+  const isActive = currentPath === item.basePath || currentPath.startsWith(`${item.basePath}/`);
+  const Icon = item.icon;
+  const showLabel = isSidebarOpen || isFlyout;
 
-    // Define variables
-    const primary600 = `var(--color-${themeColor}-600)`;
-    const primary50 = `var(--color-${themeColor}-50)`;
-
-    return (
-        <Link
-            href={finalHref}
-            onClick={onClick}
-            className={`flex items-center py-2.5 px-4 rounded-md transition-all duration-200 ease-in-out border-l-4
-                ${isActive
-                    ? "font-semibold bg-[var(--hover-bg)] text-[var(--hover-text)] border-[var(--hover-text)]"
-                    : "text-ink-muted border-transparent nav-hover"}
-                ${!isSidebarOpen && !isFlyout ? "justify-center" : ""}
-                ${isFlyout ? "w-full" : ""}`}
-            title={isSidebarOpen || isFlyout ? "" : item.label}
-            style={{
-                backgroundColor: isActive ? primary50 : undefined,
-                color: isActive ? primary600 : undefined,
-            }}
-        >
-            <Icon className={`w-5 h-5 transition-transform duration-150 group-hover:scale-105 ${isSidebarOpen || isFlyout ? "mr-3" : ""}`} />
-            {(isSidebarOpen || isFlyout) && <span className="text-sm">{item.label}</span>}
-        </Link>
-    );
+  return (
+    <Link
+      href={finalHref}
+      onClick={onClick}
+      aria-current={isActive ? 'page' : undefined}
+      title={showLabel ? undefined : item.label}
+      className={cn(
+        'flex items-center gap-3 rounded-md border-l-2 px-3 py-2 text-sm transition-colors',
+        'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-accent',
+        isActive
+          ? 'border-accent bg-accent-soft font-medium text-accent-text'
+          : 'border-transparent text-ink-muted hover:bg-surface-sunk hover:text-ink',
+        !showLabel && 'justify-center',
+        isFlyout && 'w-full',
+      )}
+    >
+      <Icon className="h-[18px] w-[18px] shrink-0" />
+      {showLabel && <span className="truncate">{item.label}</span>}
+    </Link>
+  );
 };

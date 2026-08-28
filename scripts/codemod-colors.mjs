@@ -87,6 +87,24 @@ const MAP = [
   [/\bbg-(?:blue|indigo|primary)-(?:300|400)\b/g, 'bg-accent'],
   [/\bbg-(?:red|rose)-(?:300)\b/g, 'bg-negative'],
 
+
+  // --- legacy shadcn-style tokens ------------------------------------------
+  // Some were defined light-only (--foreground: #171717), so they rendered near-black on a dark
+  // surface — that is why league names vanished in dark mode. The rest (popover, ring, input,
+  // *-foreground) were never defined at all and generated no CSS, exactly like primary-* did.
+  [/\btext-card-foreground\b/g, 'text-ink'],
+  [/\btext-primary-foreground\b/g, 'text-accent-ink'],
+  [/\btext-accent-foreground\b/g, 'text-accent-text'],
+  [/\btext-muted-foreground\b/g, 'text-ink-muted'],
+  [/\btext-foreground\b/g, 'text-ink'],
+  [/\btext-popover\b/g, 'text-ink'],
+  [/\btext-muted\b/g, 'text-ink-muted'],
+  [/\bbg-background\b/g, 'bg-canvas'],
+  [/\bbg-popover\b/g, 'bg-elevated'],
+  [/\bbg-muted\b/g, 'bg-surface-sunk'],
+  [/\bring-ring\b/g, 'ring-accent'],
+  [/\bborder-input\b/g, 'border-line'],
+
   // --- the token layer owns light/dark now --------------------------------
   [/\bdark:[a-z0-9:[\]/.-]+\s?/g, ''],
 ];

@@ -27,10 +27,10 @@ export function PostCard({ post, href }: PostCardProps) {
         )}
         <CardContent className="flex flex-col justify-center p-4">
           <h3 className="text-lg font-semibold">{post.title}</h3>
-          <p className="text-sm text-muted-foreground line-clamp-2">
+          <p className="text-sm text-ink-muted line-clamp-2">
             {post.excerpt || post.content.slice(0, 120) + "..."}
           </p>
-          <span className="text-xs text-muted-foreground mt-2">
+          <span className="text-xs text-ink-muted mt-2">
             {new Date(post.publishedAt || post.createdAt).toLocaleDateString()}
           </span>
         </CardContent>

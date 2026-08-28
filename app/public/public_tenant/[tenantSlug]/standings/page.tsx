@@ -136,7 +136,7 @@ const TenantStandingsPage = ({ params }: { params: Promise<{ tenantSlug: string 
           ) : (
             <div className="text-center py-16">
               <h3 className="text-xl font-semibold">Pas de Classements Disponibles</h3>
-              <p className="mt-2 text-muted-foreground">Aucun classement n&apos;est disponible pour le moment.</p>
+              <p className="mt-2 text-ink-muted">Aucun classement n&apos;est disponible pour le moment.</p>
             </div>
           )}
         </CardContent>

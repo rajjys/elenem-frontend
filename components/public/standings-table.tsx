@@ -33,7 +33,7 @@ const StandingsTable: React.FC<StandingsTableProps> = ({ standings, rowsToShow =
     
     if (!standings || standings.length === 0) {
         return (
-            <div className="text-center py-8 text-muted-foreground">
+            <div className="text-center py-8 text-ink-muted">
                 Aucun classement disponible pour cette ligue.
             </div>
         );

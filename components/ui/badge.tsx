@@ -9,7 +9,7 @@ import { cn } from '@/utils/cn';
  * was cancelled) and caution (it needs attention) — plus a neutral for everything else. The
  * previous version reached for eight different palettes (yellow, orange, slate, and a
  * `text-ink-subtle` that isn't even a real Tailwind shade) and referenced
- * `bg-primary`/`text-primary-foreground` tokens that were never defined.
+ * `bg-primary`/`text-accent-ink` tokens that were never defined.
  */
 export type BadgeVariant =
   | 'default'

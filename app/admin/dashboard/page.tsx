@@ -109,7 +109,7 @@ const SystemAdminDashboard = () => {
         {/* Header */}
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-2xl font-bold text-foreground flex items-center gap-3">
+            <h1 className="text-2xl font-bold text-ink flex items-center gap-3">
               <Crown className="h-8 w-8 text-accent-text" />
               System Administration
             </h1>
@@ -167,8 +167,8 @@ const SystemAdminDashboard = () => {
                           alert.type === 'error' ? 'text-negative' : 'text-positive'
                         }`} />
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-foreground">{alert.message}</p>
-                          <p className="text-xs text-muted-foreground">{alert.time}</p>
+                          <p className="text-sm font-medium text-ink">{alert.message}</p>
+                          <p className="text-xs text-ink-muted">{alert.time}</p>
                         </div>
                       </div>
                     ))}
@@ -188,25 +188,25 @@ const SystemAdminDashboard = () => {
                 <CardContent>
                   <div className="space-y-4">
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-muted-foreground">Active Sessions</span>
+                      <span className="text-sm text-ink-muted">Active Sessions</span>
                       <span className="text-sm font-medium">2,847</span>
                     </div>
                     <Progress value={68} className="h-2" />
                     
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-muted-foreground">API Requests (24h)</span>
+                      <span className="text-sm text-ink-muted">API Requests (24h)</span>
                       <span className="text-sm font-medium">184,392</span>
                     </div>
                     <Progress value={82} className="h-2" />
                     
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-muted-foreground">Storage Usage</span>
+                      <span className="text-sm text-ink-muted">Storage Usage</span>
                       <span className="text-sm font-medium">67.3 GB / 100 GB</span>
                     </div>
                     <Progress value={67} className="h-2" />
                     
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-muted-foreground">Database Performance</span>
+                      <span className="text-sm text-ink-muted">Database Performance</span>
                       <span className="text-sm font-medium">Optimal</span>
                     </div>
                     <Progress value={94} className="h-2" />
@@ -240,8 +240,8 @@ const SystemAdminDashboard = () => {
                         activity.type === 'error' ? 'bg-negative' : 'bg-accent'
                       }`} />
                       <div className="flex-1">
-                        <p className="text-sm font-medium text-foreground">{activity.action}</p>
-                        <p className="text-xs text-muted-foreground">{activity.user} • {activity.time}</p>
+                        <p className="text-sm font-medium text-ink">{activity.action}</p>
+                        <p className="text-xs text-ink-muted">{activity.user} • {activity.time}</p>
                       </div>
                     </div>
                   ))}
@@ -281,7 +281,7 @@ const SystemAdminDashboard = () => {
                   
                   <div className="rounded-md border">
                     <table className="w-full">
-                      <thead className="border-b bg-muted/50">
+                      <thead className="border-b bg-surface-sunk/50">
                         <tr>
                           <th className="text-left p-4 font-medium">User</th>
                           <th className="text-left p-4 font-medium">Role</th>
@@ -299,8 +299,8 @@ const SystemAdminDashboard = () => {
                                 <Avatar className="h-8 w-8" name={user.name.split(' ').map(n => n[0]).join('')}>
                                 </Avatar>
                                 <div>
-                                  <p className="font-medium text-foreground">{user.name}</p>
-                                  <p className="text-sm text-muted-foreground">{user.email}</p>
+                                  <p className="font-medium text-ink">{user.name}</p>
+                                  <p className="text-sm text-ink-muted">{user.email}</p>
                                 </div>
                               </div>
                             </td>
@@ -311,7 +311,7 @@ const SystemAdminDashboard = () => {
                               <Badge className={getStatusBadge(user.status).color}>{user.status}</Badge>
                             </td>
                             <td className="p-4 text-sm">{user.leagues}</td>
-                            <td className="p-4 text-sm text-muted-foreground">{user.joinDate}</td>
+                            <td className="p-4 text-sm text-ink-muted">{user.joinDate}</td>
                             <td className="p-4">
                               <div className="flex gap-2">
                                 <Button variant="ghost" size="sm">
@@ -356,13 +356,13 @@ const SystemAdminDashboard = () => {
                             service.status === 'Warning' ? 'bg-caution' : 'bg-negative'
                           }`} />
                           <div>
-                            <p className="font-medium text-foreground">{service.service}</p>
-                            <p className="text-sm text-muted-foreground">Uptime: {service.uptime}</p>
+                            <p className="font-medium text-ink">{service.service}</p>
+                            <p className="text-sm text-ink-muted">Uptime: {service.uptime}</p>
                           </div>
                         </div>
                         <div className="text-right">
                           <Badge className={getStatusBadge(service.status).color}>{service.status}</Badge>
-                          <p className="text-xs text-muted-foreground mt-1">{service.responseTime}</p>
+                          <p className="text-xs text-ink-muted mt-1">{service.responseTime}</p>
                         </div>
                       </div>
                     ))}
@@ -386,7 +386,7 @@ const SystemAdminDashboard = () => {
                           <HardDrive className="h-4 w-4" />
                           CPU Usage
                         </span>
-                        <span className="text-sm text-muted-foreground">23%</span>
+                        <span className="text-sm text-ink-muted">23%</span>
                       </div>
                       <Progress value={23} className="h-2" />
                     </div>
@@ -397,7 +397,7 @@ const SystemAdminDashboard = () => {
                           <Database className="h-4 w-4" />
                           Memory Usage
                         </span>
-                        <span className="text-sm text-muted-foreground">67%</span>
+                        <span className="text-sm text-ink-muted">67%</span>
                       </div>
                       <Progress value={67} className="h-2" />
                     </div>
@@ -408,7 +408,7 @@ const SystemAdminDashboard = () => {
                           <HardDrive className="h-4 w-4" />
                           Disk Usage
                         </span>
-                        <span className="text-sm text-muted-foreground">45%</span>
+                        <span className="text-sm text-ink-muted">45%</span>
                       </div>
                       <Progress value={45} className="h-2" />
                     </div>
@@ -419,7 +419,7 @@ const SystemAdminDashboard = () => {
                           <Wifi className="h-4 w-4" />
                           Network I/O
                         </span>
-                        <span className="text-sm text-muted-foreground">12%</span>
+                        <span className="text-sm text-ink-muted">12%</span>
                       </div>
                       <Progress value={12} className="h-2" />
                     </div>
@@ -444,21 +444,21 @@ const SystemAdminDashboard = () => {
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                     <div className="p-4 rounded-lg border text-center">
                       <p className="text-2xl font-bold text-positive">$89,230</p>
-                      <p className="text-sm text-muted-foreground">Monthly Revenue</p>
+                      <p className="text-sm text-ink-muted">Monthly Revenue</p>
                     </div>
                     <div className="p-4 rounded-lg border text-center">
                       <p className="text-2xl font-bold text-accent-text">$1,048,760</p>
-                      <p className="text-sm text-muted-foreground">Annual Revenue</p>
+                      <p className="text-sm text-ink-muted">Annual Revenue</p>
                     </div>
                     <div className="p-4 rounded-lg border text-center">
                       <p className="text-2xl font-bold text-purple-600">15.3%</p>
-                      <p className="text-sm text-muted-foreground">Growth Rate</p>
+                      <p className="text-sm text-ink-muted">Growth Rate</p>
                     </div>
                   </div>
                   
                   <div className="rounded-md border">
                     <table className="w-full">
-                      <thead className="border-b bg-muted/50">
+                      <thead className="border-b bg-surface-sunk/50">
                         <tr>
                           <th className="text-left p-4 font-medium">Tenant</th>
                           <th className="text-left p-4 font-medium">Monthly Revenue</th>
@@ -469,8 +469,8 @@ const SystemAdminDashboard = () => {
                       <tbody>
                         {revenueData.map((tenant, index) => (
                           <tr key={index} className="border-b">
-                            <td className="p-4 font-medium text-foreground">{tenant.tenant}</td>
-                            <td className="p-4 text-foreground">{tenant.revenue}</td>
+                            <td className="p-4 font-medium text-ink">{tenant.tenant}</td>
+                            <td className="p-4 text-ink">{tenant.revenue}</td>
                             <td className="p-4">
                               <span className={`text-sm ${
                                 tenant.growth.startsWith('+') ? 'text-positive' : 'text-negative'
@@ -522,7 +522,7 @@ const SystemAdminDashboard = () => {
                   
                   <div className="rounded-md border">
                     <table className="w-full">
-                      <thead className="border-b bg-muted/50">
+                      <thead className="border-b bg-surface-sunk/50">
                         <tr>
                           <th className="text-left p-4 font-medium">Ticket ID</th>
                           <th className="text-left p-4 font-medium">User</th>
@@ -536,17 +536,17 @@ const SystemAdminDashboard = () => {
                         {supportTickets.map((ticket, index) => (
                           <tr key={index} className="border-b">
                             <td className="p-4">
-                              <code className="text-sm bg-muted px-2 py-1 rounded">{ticket.id}</code>
+                              <code className="text-sm bg-surface-sunk px-2 py-1 rounded">{ticket.id}</code>
                             </td>
-                            <td className="p-4 font-medium text-foreground">{ticket.user}</td>
-                            <td className="p-4 text-foreground">{ticket.issue}</td>
+                            <td className="p-4 font-medium text-ink">{ticket.user}</td>
+                            <td className="p-4 text-ink">{ticket.issue}</td>
                             <td className="p-4">
                               <Badge className={getPriorityBadge(ticket.priority)}>{ticket.priority}</Badge>
                             </td>
                             <td className="p-4">
                               <Badge className={getStatusBadge(ticket.status).color}>{ticket.status}</Badge>
                             </td>
-                            <td className="p-4 text-sm text-muted-foreground">{ticket.created}</td>
+                            <td className="p-4 text-sm text-ink-muted">{ticket.created}</td>
                           </tr>
                         ))}
                       </tbody>
@@ -572,32 +572,32 @@ const SystemAdminDashboard = () => {
                   <div className="space-y-4">
                     <div className="flex justify-between items-center p-3 rounded-lg border">
                       <div>
-                        <p className="font-medium text-foreground">Maintenance Mode</p>
-                        <p className="text-sm text-muted-foreground">Enable system-wide maintenance</p>
+                        <p className="font-medium text-ink">Maintenance Mode</p>
+                        <p className="text-sm text-ink-muted">Enable system-wide maintenance</p>
                       </div>
                       <Button variant="outline" size="sm">Configure</Button>
                     </div>
                     
                     <div className="flex justify-between items-center p-3 rounded-lg border">
                       <div>
-                        <p className="font-medium text-foreground">Rate Limiting</p>
-                        <p className="text-sm text-muted-foreground">API request limits and throttling</p>
+                        <p className="font-medium text-ink">Rate Limiting</p>
+                        <p className="text-sm text-ink-muted">API request limits and throttling</p>
                       </div>
                       <Button variant="outline" size="sm">Configure</Button>
                     </div>
                     
                     <div className="flex justify-between items-center p-3 rounded-lg border">
                       <div>
-                        <p className="font-medium text-foreground">Email Settings</p>
-                        <p className="text-sm text-muted-foreground">SMTP and notification settings</p>
+                        <p className="font-medium text-ink">Email Settings</p>
+                        <p className="text-sm text-ink-muted">SMTP and notification settings</p>
                       </div>
                       <Button variant="outline" size="sm">Configure</Button>
                     </div>
                     
                     <div className="flex justify-between items-center p-3 rounded-lg border">
                       <div>
-                        <p className="font-medium text-foreground">Backup Schedule</p>
-                        <p className="text-sm text-muted-foreground">Automated backup configuration</p>
+                        <p className="font-medium text-ink">Backup Schedule</p>
+                        <p className="text-sm text-ink-muted">Automated backup configuration</p>
                       </div>
                       <Button variant="outline" size="sm">Configure</Button>
                     </div>
@@ -617,32 +617,32 @@ const SystemAdminDashboard = () => {
                   <div className="space-y-4">
                     <div className="flex justify-between items-center p-3 rounded-lg border">
                       <div>
-                        <p className="font-medium text-foreground">Two-Factor Authentication</p>
-                        <p className="text-sm text-muted-foreground">Enforce 2FA for admin accounts</p>
+                        <p className="font-medium text-ink">Two-Factor Authentication</p>
+                        <p className="text-sm text-ink-muted">Enforce 2FA for admin accounts</p>
                       </div>
                       <Button variant="outline" size="sm">Configure</Button>
                     </div>
                     
                     <div className="flex justify-between items-center p-3 rounded-lg border">
                       <div>
-                        <p className="font-medium text-foreground">IP Whitelist</p>
-                        <p className="text-sm text-muted-foreground">Restrict access by IP address</p>
+                        <p className="font-medium text-ink">IP Whitelist</p>
+                        <p className="text-sm text-ink-muted">Restrict access by IP address</p>
                       </div>
                       <Button variant="outline" size="sm">Configure</Button>
                     </div>
                     
                     <div className="flex justify-between items-center p-3 rounded-lg border">
                       <div>
-                        <p className="font-medium text-foreground">Session Timeout</p>
-                        <p className="text-sm text-muted-foreground">Automatic session expiration</p>
+                        <p className="font-medium text-ink">Session Timeout</p>
+                        <p className="text-sm text-ink-muted">Automatic session expiration</p>
                       </div>
                       <Button variant="outline" size="sm">Configure</Button>
                     </div>
                     
                     <div className="flex justify-between items-center p-3 rounded-lg border">
                       <div>
-                        <p className="font-medium text-foreground">Audit Logging</p>
-                        <p className="text-sm text-muted-foreground">Track all admin actions</p>
+                        <p className="font-medium text-ink">Audit Logging</p>
+                        <p className="text-sm text-ink-muted">Track all admin actions</p>
                       </div>
                       <Button variant="outline" size="sm">Configure</Button>
                     </div>

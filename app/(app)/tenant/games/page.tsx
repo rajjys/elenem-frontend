@@ -125,7 +125,7 @@ export default function TenantGamesPage() {
       <div className="flex flex-col space-y-4 mb-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-ink">Games</h1>
-          <p className="text-muted-foreground text-ink-muted">View and manage games within your tenant.</p>
+          <p className="text-ink-muted text-ink-muted">View and manage games within your tenant.</p>
         </div>
         <div className="md:flex justify-between items-center space-y-3 md:space-y-0">
           <GamesFilters

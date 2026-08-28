@@ -52,7 +52,7 @@ export default function FeaturesPage() {
               The engine behind <br />
               <span className="text-primary">successful seasons.</span>
             </h1>
-            <p className="mt-8 text-xl text-muted leading-relaxed max-w-2xl mx-auto">
+            <p className="mt-8 text-xl text-ink-muted leading-relaxed max-w-2xl mx-auto">
               Elenem isn't just a website—it’s an operating system for sports 
               organizations. From the first registration to the final trophy, 
               we ensure your data stays authoritative and undisputed.
@@ -83,21 +83,21 @@ export default function FeaturesPage() {
             <div className="relative z-10 grid md:grid-cols-3 gap-12">
               <div>
                 <h3 className="text-primary-light font-bold mb-2">01. Setup</h3>
-                <p className="text-muted-foreground text-sm leading-relaxed">
+                <p className="text-ink-muted text-sm leading-relaxed">
                   Translate your league’s unique rules and structure into a 
                   digital foundation that enforces consistency.
                 </p>
               </div>
               <div>
                 <h3 className="text-primary-light font-bold mb-2">02. Execute</h3>
-                <p className="text-muted-foreground text-sm leading-relaxed">
+                <p className="text-ink-muted text-sm leading-relaxed">
                   Manage matches and results with a system that detects 
                   conflicts and updates standings in real-time.
                 </p>
               </div>
               <div>
                 <h3 className="text-primary-light font-bold mb-2">03. Scale</h3>
-                <p className="text-muted-foreground text-sm leading-relaxed">
+                <p className="text-ink-muted text-sm leading-relaxed">
                   Own your brand, grow your fan base, and maintain 
                   an undisputed official record of every season.
                 </p>
@@ -1061,7 +1061,7 @@ export default function FeaturesPage() {
       <div className="max-w-xl order-1 lg:order-2">
         <div className="flex items-center gap-2 text-primary mb-3">
           <TrendingUp className="w-4 h-4" />
-          <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-primary-foreground/60">
+          <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-accent-ink/60">
             Phase 08: Grow over time
           </p>
         </div>
@@ -1114,7 +1114,7 @@ export default function FeaturesPage() {
               <h2 className="text-3xl sm:text-5xl font-bold tracking-tight text-ink leading-[1.1]">
                 Ready for your next season?
               </h2>
-              <p className="mt-6 text-lg leading-8 text-muted">
+              <p className="mt-6 text-lg leading-8 text-ink-muted">
                 Stop improvising with spreadsheets and group chats. 
                 Run your league with a professional system built for sport.
               </p>

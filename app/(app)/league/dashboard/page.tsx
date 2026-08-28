@@ -415,26 +415,26 @@ export default function LeagueDashboard() {
                           </div>
                         </div>
                         
-                        <div className="p-4 border border border-line rounded-lg hover:bg-muted/50 transition-colors cursor-pointer">
+                        <div className="p-4 border border border-line rounded-lg hover:bg-surface-sunk/50 transition-colors cursor-pointer">
                           <div className="flex items-center gap-3">
                             <div className="h-10 w-10 rounded-lg bg-positive flex items-center justify-center text-white">
                               <Trophy className="h-5 w-5" />
                             </div>
                             <div>
                               <div className="font-medium text-sm">View Standings</div>
-                              <div className="text-xs text-muted-foreground">League rankings</div>
+                              <div className="text-xs text-ink-muted">League rankings</div>
                             </div>
                           </div>
                         </div>
                         
-                        <div className="p-4 border border border-line rounded-lg hover:bg-muted/50 transition-colors cursor-pointer">
+                        <div className="p-4 border border border-line rounded-lg hover:bg-surface-sunk/50 transition-colors cursor-pointer">
                           <div className="flex items-center gap-3">
                             <div className="h-10 w-10 rounded-lg bg-accent flex items-center justify-center text-white">
                               <Award className="h-5 w-5" />
                             </div>
                             <div>
                               <div className="font-medium text-sm">Player Stats</div>
-                              <div className="text-xs text-muted-foreground">Performance data</div>
+                              <div className="text-xs text-ink-muted">Performance data</div>
                             </div>
                           </div>
                         </div>

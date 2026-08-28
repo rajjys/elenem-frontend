@@ -153,7 +153,7 @@ export default function PublicTeamsPage({ params }: { params: Promise<{ tenantSl
         ) : (
           <div className="text-center py-16 bg-surface rounded-lg border">
             <h3 className="text-xl font-semibold">Aucune équipe trouvée</h3>
-            <p className="text-muted-foreground mt-2">
+            <p className="text-ink-muted mt-2">
               Essayez de modifier vos filtres ou votre recherche.
             </p>
           </div>
