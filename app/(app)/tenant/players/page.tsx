@@ -1,11 +1,6 @@
-import React from 'react'
+'use client';
+import { PlayersListView } from '@/components/players';
 
-const TenantPlayersPage = () => {
-  return (
-    <div>
-      Tenant Players Page
-    </div>
-  )
+export default function TenantPlayersPage() {
+  return <PlayersListView title="Joueurs de l'organisation" />;
 }
-
-export default TenantPlayersPage

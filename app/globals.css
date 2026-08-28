@@ -135,6 +135,25 @@
 }
 
 @theme {
+  /* The `primary` ramp. tailwind.config.ts declares these too, but that file is Tailwind v3
+     syntax and v4 never loads it without an @config directive — so until this block existed,
+     all 143 `primary-*` usages in the codebase (ring-primary-500, border-primary-500,
+     text-primary-600 …) compiled to nothing and every branded focus ring rendered invisible.
+     Registering the scale here is what makes them real. See docs/ANALYSIS_2026-08.md §3.2.
+
+     Anchored on --color-primary (#0a3a8d), the deep federation blue already chosen for the app. */
+  --color-primary-50: #eef3fb;
+  --color-primary-100: #d6e2f5;
+  --color-primary-200: #aec6ea;
+  --color-primary-300: #7fa4db;
+  --color-primary-400: #4d7cc6;
+  --color-primary-500: #2a5cae;
+  --color-primary-600: #14468f;
+  --color-primary-700: #0a3a8d;
+  --color-primary-800: #082e6f;
+  --color-primary-900: #072451;
+  --color-primary-950: #04162f;
+
   --color-primary: #0a3a8d;
   --color-primary-light: #e0e0ff;
   --color-primary-dark: #1e40af;

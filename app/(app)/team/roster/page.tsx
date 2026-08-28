@@ -1,11 +1,8 @@
-import React from 'react'
+'use client';
+import { PlayersListView } from '@/components/players';
+import { useCurrentUser } from '@/hooks';
 
-const TeamRosterPage = () => {
-  return (
-    <div>
-      Team Roster Page
-    </div>
-  )
+export default function TeamRosterPage() {
+  const user = useCurrentUser();
+  return <PlayersListView title="Effectif" teamId={user?.managingTeamId ?? undefined} />;
 }
-
-export default TeamRosterPage
