@@ -33,7 +33,6 @@ function toQuery(params: UserFilterParams): string {
   if (params.tenantId) qs.append('tenantId', params.tenantId);
   if (params.managingLeagueId) qs.append('managingLeagueId', params.managingLeagueId);
   if (params.managingTeamId) qs.append('managingTeamId', params.managingTeamId);
-  if (params.managingTeamId) qs.append('managingTeamId', params.managingTeamId);
   if (params.page) qs.append('page', String(params.page));
   if (params.pageSize) qs.append('pageSize', String(params.pageSize));
   if (params.sortBy) qs.append('sortBy', params.sortBy);

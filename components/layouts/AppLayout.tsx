@@ -147,7 +147,7 @@ export default function AppLayout({ children, navItems }: AppLayoutProps) {
   // they read tokens now rather than a palette shade, so nav hover follows the theme.
   return (
     <div
-      className="h-screen bg-canvas"
+      className="flex h-screen flex-col overflow-hidden bg-canvas"
       style={{
         ['--hover-bg' as string]: 'var(--t-accent-soft)',
         ['--hover-text' as string]: 'var(--t-accent-text)',
@@ -159,12 +159,12 @@ export default function AppLayout({ children, navItems }: AppLayoutProps) {
         ['--color-theme-hover-text' as string]: 'var(--t-accent)',
       }}
     >
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex min-h-0 flex-1 overflow-hidden">
         {/* Sidebar (desktop). It starts at the top of the viewport rather than under the navbar:
             it is the permanent frame, and it owns the brand. */}
         {shouldShowSidebar
           && (
-              <aside className={`sticky top-0 hidden h-screen shrink-0 flex-col border-r border-line bg-surface transition-[width] duration-200 ease-in-out md:flex
+              <aside className={`hidden h-full shrink-0 flex-col border-r border-line bg-surface transition-[width] duration-200 ease-in-out md:flex
                                 ${isSidebarOpen ? "w-64" : "w-20"}`}>
                 {/* The brand is deliberately not contextual: it is the way home to your own
                     dashboard, not a link deeper into whatever you have drilled into. */}

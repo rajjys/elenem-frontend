@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { ArrowUpRight, LogOut, MoreHorizontal, Shield, User } from 'lucide-react';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { cn } from '@/utils/cn';
+import { Tooltip } from '@/components/ui/tooltip';
 
 /**
  * The account block that sits at the very bottom of the sidebar.
@@ -123,12 +124,14 @@ export function SidebarUserMenu({
         </div>
       )}
 
+      {/* Docked, the avatar is a single letter with no label beside it — the same problem the nav
+          icons have, so it gets the same fast tooltip rather than the ~1s native one. */}
+      <Tooltip label={label} disabled={isSidebarOpen || open}>
       <button
         type="button"
         aria-haspopup="menu"
         aria-expanded={open}
         onClick={() => setOpen((o) => !o)}
-        title={isSidebarOpen ? undefined : label}
         className={cn(
           'flex w-full items-center gap-2 rounded-md px-2 py-2 text-left transition-colors hover:bg-surface-sunk',
           'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-accent',
@@ -145,6 +148,7 @@ export function SidebarUserMenu({
           </>
         )}
       </button>
+      </Tooltip>
     </div>
   );
 }
