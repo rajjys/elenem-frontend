@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useRouter, usePathname, useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { Check, ChevronDown, Search } from 'lucide-react';
 import { api } from '@/services/api';
@@ -15,8 +15,9 @@ import { cn } from '@/utils/cn';
  * nothing on the two ancestors. That keeps exactly one dropdown on screen and makes "switch to the
  * next team" a single click instead of a walk back up and down the tree.
  *
- * Switching preserves the page you are on: from `/league/teams` you land on `/league/teams` for
- * the new league, not back at its dashboard. You are changing the subject, not the task.
+ * Switching lands on the new subject's dashboard. Picking a different team is not "same task,
+ * different row" — you are picking up a different thing, and it also avoids landing on a page that
+ * made sense for the old subject and not the new one.
  *
  * The list scales in three steps, because a 5-team league and a 25-team league want different
  * things: show everything up to 5; show 5 and a "show all" for 6–10; add a search box past 10.
@@ -36,6 +37,13 @@ const PARAM: Record<ScopeKind, string> = {
   team: 'ctxTeamId',
 };
 
+/** Where a switch lands. */
+const HOME: Record<ScopeKind, string> = {
+  tenant: '/tenant/dashboard',
+  league: '/league/dashboard',
+  team: '/team/dashboard',
+};
+
 const INITIAL_VISIBLE = 5;
 const SEARCH_THRESHOLD = 10;
 
@@ -52,7 +60,6 @@ export function ScopeSwitcher({
   enabled?: boolean;
 }) {
   const router = useRouter();
-  const pathname = usePathname() ?? '';
   const params = useSearchParams();
   const [open, setOpen] = useState(false);
   const [showAll, setShowAll] = useState(false);
@@ -137,7 +144,11 @@ export function ScopeSwitcher({
     if (kind === 'league') next.delete('ctxTeamId');
     next.delete('ctxGameId');
     setOpen(false);
-    router.push(`${pathname}?${next.toString()}`);
+    // Land on the new subject's dashboard rather than the equivalent sub-page. Switching team is
+    // not "same task, different row" — you are picking up a different thing, and the dashboard is
+    // where you get your bearings. It also avoids landing on a page that made sense for the old
+    // subject and not the new one.
+    router.push(`${HOME[kind]}?${next.toString()}`);
   };
 
   if (!enabled) {

@@ -5,8 +5,10 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useAuthStore } from '@/store/auth.store';
 import { GameDetails, GameStatus, Gender, LeagueDetails, LeagueDetailsSchema, LeagueMetrics, LeagueMetricsSchema, Roles, SeasonDetails, SeasonStatus, StandingsBasic } from '@/schemas';
 import { api } from '@/services/api';
+import { parseResponse } from '@/services/parse-response';
 import { toast } from 'sonner';
 import { useContextualLink } from '@/hooks';
+import { toastApiError } from '@/utils';
 import { StatsCard } from '@/components/ui/stats-card';
 import { Award, Building2, Calendar, CalendarPlus, Clock, Clock1, Settings, Ticket, Trophy,  User2,  Users } from 'lucide-react';
 import { Avatar, Card, CardContent, CardFooter, CardHeader, CardTitle, Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, LoadingSpinner, SeasonStatusBadge, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui';
@@ -55,12 +57,11 @@ export default function LeagueDashboard() {
         }
         try {
           const response = await api.get(`/leagues/${currentLeagueId}`);
-          const validatedLeague = LeagueDetailsSchema.parse(response.data);
+          const validatedLeague = parseResponse(LeagueDetailsSchema, response.data);
           setLeague(validatedLeague);
         } catch (err) {
-          const errorMessage = "Failed to fetch League details.";
-          setError(errorMessage);
-          toast.error("Error loading League", { description: errorMessage });
+          setError("Impossible de charger cette ligue.");
+          toastApiError(err, "Impossible de charger cette ligue.");
           console.error('Fetch League details error:', err);
         } finally {
           setDetailsLoading(false);
@@ -75,11 +76,11 @@ export default function LeagueDashboard() {
       }
       try {
         const response = await api.get(`/leagues/${currentLeagueId}/metrics`);
-        const validatedMetrics = LeagueMetricsSchema.parse(response.data);
+        const validatedMetrics = parseResponse(LeagueMetricsSchema, response.data);
         setMetrics(validatedMetrics);
       } catch (err) {
         console.error("Failed to fetch metrics:", err);
-        toast.error("Error loading metrics", { description: "Could not load league metrics." });
+        toastApiError(err, "Impossible de charger les statistiques de la ligue.");
       } finally {
         setMetricsLoading(false)
       }
@@ -122,7 +123,7 @@ export default function LeagueDashboard() {
     }, [currentLeagueId]);
     /// Fetch league standings
     const fetchLeagueStandings = useCallback( async () => {
-      if(!currentLeagueId || league?.currentSeasonId) return;
+      if (!currentLeagueId || !league?.currentSeasonId) return;
       try {
         const response = await api.get('/games/standings', 
           { params: { 
@@ -159,7 +160,10 @@ export default function LeagueDashboard() {
           fetchUpcomingGames()
           fetchLeagueStandings();
         }
-    }, [currentLeagueId, fetchLeagueDetails, fetchLeagueMetrics, fetchRecentGames, fetchUpcomingGames, fetchLeagueStandings]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- keyed on the ids on purpose:
+        // depending on the callbacks re-ran this whole block whenever setLeague produced a new
+        // object, firing a second round of five requests on every scope switch.
+    }, [currentLeagueId, league?.currentSeasonId]);
     if(detailsLoading) return <LoadingSpinner />
     if(error) return <div className='text-negative text-center mt-8'>Error: {error}</div>;
     return (
