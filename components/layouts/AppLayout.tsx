@@ -6,7 +6,8 @@ import { FiLogOut, FiX } from 'react-icons/fi';
 import { useAuthStore } from '@/store/auth.store'; // Assuming this path is correct
 // Import your existing components. Replace these with your actual paths.
 import { NavLink } from '.';
-import { accountNavItems } from './nav-items';
+import type { NavGroup } from './nav-items';
+import { SidebarUserMenu } from './sidebar-user-menu';
 import { useContextualLink, useDashboardLinkEligibillity, useSidebarEligibility } from '@/hooks';
 import { Roles } from '@/schemas'; // Assuming Role enum is here
 import { AppLayoutHeader } from './AppLayoutHeader'; // Import the updated Navbar
@@ -25,10 +26,52 @@ interface NavLinkItem {
 
 interface AppLayoutProps {
   children: ReactNode;
-  /** Flat list. Collapsible groups were removed once each surface fitted in 3–9 links. */
-  navItems: NavLinkItem[];
+  /** Silent groups: a hairline and a quiet caption, never a collapsible. */
+  navItems: NavGroup[];
   /** Retained so existing call sites keep compiling; the product has one accent now. */
   themeColor?: string;
+}
+
+
+/**
+ * One silent group. The caption is deliberately quiet — it separates concerns without asking to
+ * be read, and disappears entirely when the sidebar is collapsed to icons, where a hairline does
+ * the same job in less space.
+ */
+function SidebarGroup({
+  group,
+  isFirst,
+  currentPath,
+  isSidebarOpen,
+  buildLink,
+  onItemClick,
+}: {
+  group: NavGroup;
+  isFirst: boolean;
+  currentPath: string;
+  isSidebarOpen: boolean;
+  buildLink: (basePath: string) => string;
+  onItemClick?: () => void;
+}) {
+  return (
+    <div className={isFirst ? 'flex flex-col gap-1' : 'mt-4 flex flex-col gap-1 border-t border-line pt-4'}>
+      {group.label && isSidebarOpen && (
+        <p className="px-3 pb-1 text-[11px] font-medium uppercase tracking-wider text-ink-subtle">
+          {group.label}
+        </p>
+      )}
+      {group.items.map((item) => (
+        <NavLink
+          key={item.basePath}
+          item={item}
+          currentPath={currentPath}
+          isSidebarOpen={isSidebarOpen}
+          onClick={onItemClick}
+          buildLink={buildLink}
+        />
+      ))}
+    </div>
+  );
 }
 
 export default function AppLayout({ children, navItems }: AppLayoutProps) {
@@ -135,39 +178,25 @@ export default function AppLayout({ children, navItems }: AppLayoutProps) {
                     {/* The space will be empty when collapsed, but the button is gone */}
                   </div>
                 )}
-                <nav className="flex flex-1 flex-col gap-1 overflow-y-auto p-2">
-                  {navItems.map((item) => (
-                    <NavLink
-                      key={item.basePath}
-                      item={item}
+                <nav className="flex flex-1 flex-col overflow-y-auto p-2">
+                  {navItems.map((group, gi) => (
+                    <SidebarGroup
+                      key={group.label ?? `group-${gi}`}
+                      group={group}
+                      isFirst={gi === 0}
                       currentPath={currentPath}
                       isSidebarOpen={isSidebarOpen}
                       buildLink={buildLink}
                     />
                   ))}
-
-                  {/* Account and session live at the bottom, separated by a rule: they are about
-                      you, not about the competition you are running. */}
-                  <div className="mt-auto flex flex-col gap-1 border-t border-line pt-3">
-                    {accountNavItems.map((item) => (
-                      <NavLink
-                        key={item.basePath}
-                        item={item}
-                        currentPath={currentPath}
-                        isSidebarOpen={isSidebarOpen}
-                        buildLink={buildLink}
-                      />
-                    ))}
-                    <button
-                      onClick={handleLogout}
-                      title={isSidebarOpen ? undefined : 'Se déconnecter'}
-                      className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm text-ink-muted transition-colors hover:bg-negative-soft hover:text-negative ${isSidebarOpen ? '' : 'justify-center'}`}
-                    >
-                      <FiLogOut className="h-[18px] w-[18px] shrink-0" />
-                      {isSidebarOpen && 'Se déconnecter'}
-                    </button>
-                  </div>
                 </nav>
+                <SidebarUserMenu
+                  name={[userAuth?.firstName, userAuth?.lastName].filter(Boolean).join(' ')}
+                  email={userAuth?.email}
+                  isSidebarOpen={isSidebarOpen}
+                  onLogout={handleLogout}
+                  buildLink={buildLink}
+                />
               </aside>
             )}
 
@@ -188,37 +217,27 @@ export default function AppLayout({ children, navItems }: AppLayoutProps) {
                   <FiX className="w-6 h-6" />
                 </button>
               </div>
-              <nav className="flex flex-1 flex-col gap-1 overflow-y-auto p-2">
-                {navItems.map((item) => (
-                  <NavLink
-                    key={item.basePath}
-                    item={item}
+              <nav className="flex flex-1 flex-col overflow-y-auto p-2">
+                {navItems.map((group, gi) => (
+                  <SidebarGroup
+                    key={group.label ?? `group-${gi}`}
+                    group={group}
+                    isFirst={gi === 0}
                     currentPath={currentPath}
                     isSidebarOpen
-                    onClick={closeMobileMenu}
+                    onItemClick={closeMobileMenu}
                     buildLink={buildLink}
                   />
                 ))}
-                <div className="mt-auto flex flex-col gap-1 border-t border-line pt-3">
-                  {accountNavItems.map((item) => (
-                    <NavLink
-                      key={item.basePath}
-                      item={item}
-                      currentPath={currentPath}
-                      isSidebarOpen
-                      onClick={closeMobileMenu}
-                      buildLink={buildLink}
-                    />
-                  ))}
-                  <button
-                    onClick={handleLogout}
-                    className="flex items-center gap-3 rounded-md px-3 py-2 text-sm text-ink-muted transition-colors hover:bg-negative-soft hover:text-negative"
-                  >
-                    <FiLogOut className="h-[18px] w-[18px] shrink-0" />
-                    Se déconnecter
-                  </button>
-                </div>
               </nav>
+              <SidebarUserMenu
+                name={[userAuth?.firstName, userAuth?.lastName].filter(Boolean).join(' ')}
+                email={userAuth?.email}
+                isSidebarOpen
+                onLogout={handleLogout}
+                buildLink={buildLink}
+                onNavigate={closeMobileMenu}
+              />
             </aside>
           </div>
         )}

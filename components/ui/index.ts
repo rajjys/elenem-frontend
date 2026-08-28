@@ -38,3 +38,4 @@ export * from './otp-input';
 export * from './dialog-modal';
 export * from './confirm-dialog';
 export * from './theme-toggle';
+export * from './page-header';

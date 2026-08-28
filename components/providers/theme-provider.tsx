@@ -2,33 +2,32 @@
 
 import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 
-export type ThemeChoice = 'light' | 'dark' | 'system';
+export type Theme = 'light' | 'dark';
 
 const STORAGE_KEY = 'elenem-theme';
 
 interface ThemeContextValue {
-  /** What the viewer chose. 'system' means "follow the OS". */
-  choice: ThemeChoice;
-  /** What is actually on screen right now. */
-  resolved: 'light' | 'dark';
-  setChoice: (c: ThemeChoice) => void;
+  /** The theme actually on screen. There is no third "system" state to render. */
+  theme: Theme;
+  setTheme: (t: Theme) => void;
+  toggle: () => void;
 }
 
 const ThemeContext = createContext<ThemeContextValue>({
-  choice: 'system',
-  resolved: 'light',
-  setChoice: () => {},
+  theme: 'light',
+  setTheme: () => {},
+  toggle: () => {},
 });
 
 /**
  * Runs before first paint, injected into <head> as a blocking script.
  *
- * Without this the server renders light, the client reads localStorage in an effect, and the page
- * visibly flips — the flash of wrong theme that makes a product feel unfinished. The old
- * `useI18n` hook has exactly this bug for language; we are not repeating it for colour.
+ * Without it the server renders light, the client reads localStorage in an effect, and the page
+ * visibly flips — the flash of wrong theme that makes a product feel unfinished.
  *
- * Reads as: an explicit choice wins; otherwise leave the attribute off and let the
- * prefers-color-scheme media query in globals.css decide.
+ * The stored value, when present, wins. When absent no attribute is set and the
+ * prefers-color-scheme block in globals.css decides — so a first-time visitor lands on whatever
+ * their device already prefers, with no flash and nothing to configure.
  */
 export const themeInitScript = `
 (function(){try{
@@ -39,60 +38,47 @@ export const themeInitScript = `
 `.trim();
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  // Start at 'system' on both server and client so hydration matches; the pre-paint script has
-  // already applied the real attribute, and the effect below syncs React's copy of it.
-  const [choice, setChoiceState] = useState<ThemeChoice>('system');
-  const [resolved, setResolved] = useState<'light' | 'dark'>('light');
-
-  const apply = useCallback((c: ThemeChoice) => {
-    const root = document.documentElement;
-    if (c === 'system') root.removeAttribute('data-theme');
-    else root.setAttribute('data-theme', c);
-
-    const isDark =
-      c === 'dark' ||
-      (c === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
-    setResolved(isDark ? 'dark' : 'light');
-  }, []);
+  // Server and first client render must agree, so start at 'light' and let the effect below
+  // reconcile with what the pre-paint script already applied.
+  const [theme, setThemeState] = useState<Theme>('light');
 
   useEffect(() => {
-    let stored: ThemeChoice = 'system';
+    let stored: Theme | null = null;
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (raw === 'dark' || raw === 'light') stored = raw;
     } catch {
-      // Private browsing, blocked storage — 'system' is a fine answer.
+      // Private browsing or blocked storage — fall through to the device preference.
     }
-    setChoiceState(stored);
-    apply(stored);
 
-    // Follow the OS live, but only while the viewer hasn't overridden it.
     const mq = window.matchMedia('(prefers-color-scheme: dark)');
+    setThemeState(stored ?? (mq.matches ? 'dark' : 'light'));
+
+    // Keep following the device until the viewer makes an explicit choice.
     const onChange = () => {
-      if (stored === 'system') setResolved(mq.matches ? 'dark' : 'light');
+      if (!stored) setThemeState(mq.matches ? 'dark' : 'light');
     };
     mq.addEventListener('change', onChange);
     return () => mq.removeEventListener('change', onChange);
-  }, [apply]);
+  }, []);
 
-  const setChoice = useCallback(
-    (c: ThemeChoice) => {
-      setChoiceState(c);
-      apply(c);
-      try {
-        if (c === 'system') localStorage.removeItem(STORAGE_KEY);
-        else localStorage.setItem(STORAGE_KEY, c);
-      } catch {
-        // Non-fatal: the theme still applies for this page view.
-      }
-    },
-    [apply],
+  const setTheme = useCallback((t: Theme) => {
+    setThemeState(t);
+    document.documentElement.setAttribute('data-theme', t);
+    try {
+      localStorage.setItem(STORAGE_KEY, t);
+    } catch {
+      // Non-fatal: the theme still applies for this page view.
+    }
+  }, []);
+
+  const toggle = useCallback(
+    () => setTheme(theme === 'dark' ? 'light' : 'dark'),
+    [theme, setTheme],
   );
 
   return (
-    <ThemeContext.Provider value={{ choice, resolved, setChoice }}>
-      {children}
-    </ThemeContext.Provider>
+    <ThemeContext.Provider value={{ theme, setTheme, toggle }}>{children}</ThemeContext.Provider>
   );
 }
 

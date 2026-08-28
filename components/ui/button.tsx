@@ -1,4 +1,5 @@
 import React from 'react';
+import { Slot } from '@radix-ui/react-slot';
 import { cn } from '@/utils/cn';
 
 /**
@@ -10,6 +11,8 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'default' | 'primary' | 'secondary' | 'danger' | 'outline' | 'ghost' | 'link';
   size?: 'sm' | 'md' | 'lg';
   isLoading?: boolean;
+  /** Render the child element with button styling — for links that should look like buttons. */
+  asChild?: boolean;
 }
 
 const base =
@@ -22,7 +25,7 @@ const variants: Record<NonNullable<ButtonProps['variant']>, string> = {
   default: 'bg-surface-sunk text-ink hover:bg-line border border-line',
   primary: 'bg-accent text-accent-ink hover:bg-accent-hover shadow-e1',
   secondary: 'bg-accent-soft text-accent-text hover:bg-accent-line/40',
-  danger: 'bg-negative-soft text-negative hover:bg-negative hover:text-ink-inverted font-semibold',
+  danger: 'bg-negative-soft text-negative hover:bg-negative/90 hover:text-ink-inverted font-semibold',
   outline: 'border border-line-strong bg-transparent text-ink hover:bg-surface-sunk',
   ghost: 'bg-transparent text-ink-muted hover:bg-surface-sunk hover:text-ink',
   link: 'bg-transparent text-accent-text underline underline-offset-2 hover:text-accent',
@@ -35,7 +38,18 @@ const sizes: Record<NonNullable<ButtonProps['size']>, string> = {
 };
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ children, className, variant = 'default', size = 'md', isLoading = false, disabled, ...props }, ref) => (
+  (
+    { children, className, variant = 'default', size = 'md', isLoading = false, disabled, asChild, ...props },
+    ref,
+  ) => {
+    // A link styled as a button must still be an anchor: keyboard users, middle-click and
+    // "open in new tab" all depend on it.
+    if (asChild) {
+      return (
+        <Slot className={cn(base, variants[variant], sizes[size], className)}>{children}</Slot>
+      );
+    }
+    return (
     <button
       ref={ref}
       type="button"
@@ -62,6 +76,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       )}
       {children}
     </button>
-  ),
+    );
+  },
 );
 Button.displayName = 'Button';

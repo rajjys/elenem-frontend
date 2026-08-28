@@ -84,9 +84,9 @@ export function StandingsTable({ standings, managingTeamId }: StandingsTableProp
                       <Badge
                         key={i}
                         className={`h-5 w-5 flex items-center justify-center text-xs font-semibold
-                          ${result === 'W' ? 'bg-positive hover:bg-positive' : ''}
+                          ${result === 'W' ? 'bg-positive hover:bg-positive/90' : ''}
                           ${result === 'D' ? 'bg-ink-subtle hover:bg-ink-subtle' : ''}
-                          ${result === 'L' ? 'bg-negative hover:bg-negative' : ''}
+                          ${result === 'L' ? 'bg-negative hover:bg-negative/90' : ''}
                         `}
                       >
                         {result}

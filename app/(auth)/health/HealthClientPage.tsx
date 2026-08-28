@@ -78,7 +78,7 @@ export default function HealthClientPage() {
         {status === 'error' && (
             <button
                 onClick={checkHealth} // Corrected: Directly call the checkHealth function
-                className="mt-4 px-4 py-2 bg-accent text-white rounded hover:bg-accent focus:outline-none focus:ring-2 focus:ring-accent focus:ring-opacity-50"
+                className="mt-4 px-4 py-2 bg-accent text-white rounded hover:bg-accent-hover focus:outline-none focus:ring-2 focus:ring-accent focus:ring-opacity-50"
             >
                 Retry
             </button>

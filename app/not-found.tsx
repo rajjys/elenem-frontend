@@ -58,7 +58,7 @@ export default function NotFound() {
                 <Desktop className="w-5 h-5 font-bold" />
                 <span className="pl-2">Page d&apos;accueil</span>
               </Link>
-              <Link href={dashboardLink} className="flex items-center justify-center w-full sm:w-auto px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-accent hover:bg-accent transition-all duration-300 ease-in-out">
+              <Link href={dashboardLink} className="flex items-center justify-center w-full sm:w-auto px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-accent hover:bg-accent-hover transition-all duration-300 ease-in-out">
                 <LayoutDashboard className="w-5 h-5 font-bold" />
                 <span className="pl-2">Tableau de bord</span>
               </Link>

@@ -260,3 +260,52 @@ Before Stage 1 starts, two answers are needed:
 
 And one that shapes Stage 3: **which league is going first, and do they know yet?** Building the
 onboarding wizard is much easier when there's a specific person on the other side of it.
+
+
+---
+
+## 7. Progress log
+
+### Stage 1 — Foundation `[x]` done (2026-08-28)
+
+| # | Item | Commit |
+|---|---|---|
+| 1 | Token layer, light + dark, one neutral (slate) | `9198138` |
+| 2 | Colour codemod — 2,275 raw utilities → 60 | `9198138` |
+| 3 | Primitives on tokens; real Radix dialog | `9198138`, `2a5c9f5` |
+| 4 | Page templates — `PageHeader` landed; List/Detail/Form next | `f-next` |
+| 5 | Both themes verified; every pairing clears WCAG AA | `9198138` |
+
+**Also fixed, from testing the built result rather than the plan:**
+
+- The **theme control is one two-position switch**, not three buttons, and lives inside the
+  account menu. There is no "system" option to render: the device preference decides where a
+  first-time visitor lands, then an explicit choice sticks. A third visible state made a default
+  look like a colour scheme.
+- The **sidebar is flat with silent grouping** — a hairline and a quiet caption, never a
+  collapsible. `CollapsibleNavLink` and `FlyoutMenu` are deleted.
+- The **account block is a collapsible menu pinned to the bottom**: avatar, identity, and a
+  popover holding profile, security, appearance, the public site, and sign-out.
+- Two dark-mode defects that only showed up in use:
+  `NavLink` set `backgroundColor`/`color` as **inline styles** from `var(--color-blue-100)`,
+  which has no dark variant and beats every class — hence pale blue on pale blue. And
+  `text-foreground` was defined light-only (`#171717`), so league names rendered near-black on a
+  dark surface. Auditing the second turned up **121 legacy shadcn-style token usages, six of which
+  were never defined at all** and generated no CSS. All migrated; the dead variables removed.
+- **CTA drift closed.** "Créer une Ligue" was a green pill, "Create New Game" a blue Button and
+  "Nouvelle Equipe" a gradient outline, on sibling screens. `PageHeader` now owns the primary
+  action: a page passes a label and a href and never styles a CTA, so changing one changes all.
+  (It also surfaced that the teams page's "new team" button pointed at `/league/create`.)
+- The codemod had collapsed `hover:bg-green-700` onto the same token as its base, making **hover a
+  no-op on 19 files**. Hover states now point at `-hover` / `/90` variants.
+
+### Domain correction — how standings rank
+
+LIPROBAKIN's published table settled a default I had guessed at. Their scoring is
+`PTS = 2W + 1(L − FI)` — win 2, loss 1, forfeit 0 — verified on 17 rows. And ranking by
+**POINTS with a point-differential tiebreak reproduces their order 14/14**, where win-percentage
+reproduces 4/14. The default changed accordingly (`bfceb6a`); win% stays available for leagues
+that rank the NBA way. Detail in `ANALYSIS_2026-08.md`.
+
+**Next: Stage 1 item 4** — `ListPage`, `DetailPage` and `FormPage` templates, then Stage 2
+(dashboard remodel and the onboarding wizard, built for LIPROBAKIN specifically).

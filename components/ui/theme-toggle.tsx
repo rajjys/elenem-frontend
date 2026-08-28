@@ -1,41 +1,53 @@
 'use client';
 
-import { Monitor, Moon, Sun } from 'lucide-react';
-import { useTheme, type ThemeChoice } from '@/components/providers/theme-provider';
+import { Moon, Sun } from 'lucide-react';
+import { useTheme, type Theme } from '@/components/providers/theme-provider';
+import { cn } from '@/utils/cn';
 
-const NEXT: Record<ThemeChoice, ThemeChoice> = {
-  system: 'light',
-  light: 'dark',
-  dark: 'system',
-};
-
-const FACE: Record<ThemeChoice, { icon: typeof Sun; label: string }> = {
-  system: { icon: Monitor, label: 'Thème : système' },
-  light: { icon: Sun, label: 'Thème : clair' },
-  dark: { icon: Moon, label: 'Thème : sombre' },
-};
+const OPTIONS: { value: Theme; icon: typeof Sun; label: string }[] = [
+  { value: 'light', icon: Sun, label: 'Clair' },
+  { value: 'dark', icon: Moon, label: 'Sombre' },
+];
 
 /**
- * One button, not three.
+ * Two positions, no "system".
  *
- * It starts on "system" and shows the monitor icon; each click advances
- * system → light → dark → system, and the icon becomes whichever mode is active. A segmented
- * three-way control spent a lot of header width on a setting most people touch once, and made
- * "system" look like a third colour scheme rather than the default it is.
+ * The device preference still decides where a first-time visitor lands — it is the starting
+ * value, not a third choice to render. Once someone picks a side it sticks, which is what people
+ * expect from a control that shows a sun and a moon.
  */
 export function ThemeToggle({ className = '' }: { className?: string }) {
-  const { choice, setChoice } = useTheme();
-  const { icon: Icon, label } = FACE[choice];
+  const { theme, setTheme } = useTheme();
 
   return (
-    <button
-      type="button"
-      onClick={() => setChoice(NEXT[choice])}
-      aria-label={label}
-      title={label}
-      className={`inline-flex h-9 w-9 items-center justify-center rounded-md border border-line text-ink-muted transition-colors hover:bg-surface-sunk hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${className}`}
+    <div
+      role="radiogroup"
+      aria-label="Apparence"
+      className={cn('inline-flex rounded-full bg-surface-sunk p-0.5', className)}
     >
-      <Icon className="h-4 w-4" />
-    </button>
+      {OPTIONS.map(({ value, icon: Icon, label }) => {
+        const active = theme === value;
+        return (
+          <button
+            key={value}
+            type="button"
+            role="radio"
+            aria-checked={active}
+            aria-label={label}
+            title={label}
+            onClick={() => setTheme(value)}
+            className={cn(
+              'rounded-full p-1.5 transition-colors',
+              'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-accent',
+              active
+                ? 'bg-elevated text-ink shadow-e1'
+                : 'text-ink-subtle hover:text-ink-muted',
+            )}
+          >
+            <Icon className="h-3.5 w-3.5" />
+          </button>
+        );
+      })}
+    </div>
   );
 }

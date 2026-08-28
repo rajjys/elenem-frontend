@@ -9,7 +9,7 @@ import { LoadingSpinner } from '@/components/ui';
 export default function PostLayout({ children }: { children: ReactNode }) {
   const params = useParams();
   const postId = params?.postId;
-  const navItems = [{ label: 'Article', basePath: `/post/${postId}`, icon: FileText }];
+  const navItems = [{ items: [{ label: 'Article', basePath: `/post/${postId}`, icon: FileText }] }];
 
   return (
     <React.Suspense fallback={<LoadingSpinner />}>

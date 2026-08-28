@@ -97,7 +97,7 @@ export default function UploadTestPage() {
 
             <button
             onClick={onUpload}
-            className="px-4 py-2 bg-accent text-white rounded-md hover:bg-accent transition"
+            className="px-4 py-2 bg-accent text-white rounded-md hover:bg-accent-hover transition"
             >
             Upload
             </button>

@@ -144,7 +144,7 @@ export function TenantFilters({ filters, onFilterChange, onPageSizeChange }: Ten
       {/* Filter Button and Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogTrigger asChild>
-          <Button variant="outline" className="rounded-md shadow-sm bg-accent hover:bg-accent text-white font-semibold py-2 px-4 transition duration-300 ease-in-out transform hover:scale-105">
+          <Button variant="outline" className="rounded-md shadow-sm bg-accent hover:bg-accent-hover text-white font-semibold py-2 px-4 transition duration-300 ease-in-out transform hover:scale-105">
             <FilterIcon />
             More Filters
           </Button>
@@ -254,14 +254,14 @@ export function TenantFilters({ filters, onFilterChange, onPageSizeChange }: Ten
             <Button
               variant="outline"
               onClick={handleClearAllFilters}
-              className="bg-negative hover:bg-negative text-white rounded-md shadow-sm transition duration-300 ease-in-out"
+              className="bg-negative hover:bg-negative/90 text-white rounded-md shadow-sm transition duration-300 ease-in-out"
             >
               Clear All Filters
             </Button>
             <Button
               type="button"
               onClick={() => setIsDialogOpen(false)}
-              className="bg-accent hover:bg-accent text-white rounded-md shadow-sm transition duration-300 ease-in-out"
+              className="bg-accent hover:bg-accent-hover text-white rounded-md shadow-sm transition duration-300 ease-in-out"
             >
               Close
             </Button>

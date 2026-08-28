@@ -10,6 +10,7 @@ import { api, isAxiosError } from '@/services/api';
 import { toast } from 'sonner';
 import { LeagueDetails, PaginatedLeaguesResponseSchema, Roles } from '@/schemas';
 import { useContextualLink } from '@/hooks';
+import { PageHeader } from '@/components/ui';
 import { Trophy } from 'lucide-react';
 import { LeagueCard } from '@/components/ui';
 
@@ -117,17 +118,11 @@ export default function TenantLeaguesPage() {
         <title>Leagues - ELENEM Sports</title>
       </Head>
 
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-lg md:text-xl lg:text-2xl font-bold text-ink">{totalItems} Ligues</h1>
-        <div className='flex whitespace-nowrap text-sm gap-3'>
-          <Link
-          href={buildLink("/league/create")}
-          className="flex items-center gap-2 bg-positive text-white px-3 py-2 rounded-md hover:bg-positive transition-colors">
-              <Trophy className="h-4 w-4" />
-              <span className="">Créer une Ligue</span>
-          </Link>
-        </div>
-      </div>
+      <PageHeader
+        title="Ligues"
+        description={`${totalItems} ${totalItems === 1 ? 'compétition' : 'compétitions'}`}
+        action={{ label: 'Créer une ligue', href: buildLink('/league/create'), icon: Trophy }}
+      />
       {leagues.length === 0 && !loading && !error ? (
         <div className="text-center text-ink-muted text-lg mt-10">Pas de ligues disponibles pour cette organisation.</div>
       ) : (

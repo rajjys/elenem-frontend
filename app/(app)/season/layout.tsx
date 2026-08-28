@@ -10,7 +10,7 @@ export default function SeasonLayout({ children }: { children: ReactNode }) {
   const params = useParams();
   const seasonId = params?.seasonId;
   const navItems = [
-    { label: 'Saison', basePath: `/season/${seasonId}/dashboard`, icon: CalendarDays },
+    { items: [{ label: 'Saison', basePath: `/season/${seasonId}/dashboard`, icon: CalendarDays }] },
   ];
 
   return (

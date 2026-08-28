@@ -164,7 +164,7 @@ export function PostForm({ initialData, onSuccess, onCancel }: PostFormProps) {
         
         <label
           htmlFor="heroImage"
-          className="inline-flex items-center px-4 py-2 bg-accent text-white rounded cursor-pointer hover:bg-accent transition-colors duration-300">
+          className="inline-flex items-center px-4 py-2 bg-accent text-white rounded cursor-pointer hover:bg-accent-hover transition-colors duration-300">
           Select Image
         </label>
         

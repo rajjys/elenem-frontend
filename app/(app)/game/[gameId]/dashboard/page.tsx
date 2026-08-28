@@ -206,7 +206,7 @@ export default function GameManagementDashboard() {
           {game.status === GameStatus.LIVE && canEdit && (
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <Button variant='danger' className="bg-negative hover:bg-negative text-white rounded-xl">
+                <Button variant='danger' className="bg-negative hover:bg-negative/90 text-white rounded-xl">
                   <Flag className="w-4 h-4 mr-2" /> Clôturer le match
                 </Button>
               </AlertDialogTrigger>

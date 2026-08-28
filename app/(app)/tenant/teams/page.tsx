@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { api } from '@/services/api';
 import { TeamDetails, TeamFilterParams, TeamFilterParamsSchema, Roles, SortableColumn } from '@/schemas/';
 import { TeamsFilters, TeamsTable } from '@/components/team/';
-import { Pagination, LoadingSpinner } from '@/components/ui/';
+import { Pagination, LoadingSpinner, Button } from '@/components/ui/';
 import { toast } from 'sonner';
 import { useAuthStore } from '@/store/auth.store';
 import { useSearchParams } from 'next/navigation';
@@ -161,10 +161,12 @@ export default function TenantTeamsPage() {
           onPageSizeChange={handlePageSizeChange}
           fixedTenantId={currentTenantId} // Pass fixed tenant ID to filters
         />
-        <Link href={buildLink("/league/create")} className="flex items-center text-sm gap-2 px-3 py-2 rounded-md transition-all duration-150 soft-theme-gradient">
-          <Plus className="h-4 w-4"/>
-          <span className="whitespace-nowrap">Nouvelle Equipe</span>
-        </Link>
+        <Button variant="primary" asChild>
+          <Link href={buildLink('/team/create')}>
+            <Plus className="h-4 w-4" />
+            <span className="whitespace-nowrap">Nouvelle équipe</span>
+          </Link>
+        </Button>
       </div>
       <span hidden>{totalItems} Teams</span>
       <TeamsTable

@@ -6,7 +6,7 @@ import AppLayout from '@/components/layouts/AppLayout';
 import { LoadingSpinner } from '@/components/ui';
 
 const accountAreaNavItems = [
-  { label: 'Tableau de bord', basePath: '/account/dashboard', icon: LayoutDashboard },
+  { items: [{ label: 'Tableau de bord', basePath: '/account/dashboard', icon: LayoutDashboard }] },
 ];
 
 export default function AccountLayout({ children }: { children: ReactNode }) {

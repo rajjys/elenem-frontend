@@ -117,7 +117,7 @@ export default function PublicPostPage({
         </p>
         <button
           onClick={() => router.push("/")}
-          className="px-6 py-3 bg-accent hover:bg-accent text-white font-semibold rounded-lg shadow-md transition duration-200"
+          className="px-6 py-3 bg-accent hover:bg-accent-hover text-white font-semibold rounded-lg shadow-md transition duration-200"
         >
           Go to Homepage
         </button>

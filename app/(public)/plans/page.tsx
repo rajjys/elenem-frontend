@@ -163,7 +163,7 @@ export default function PlansPage() {
                 ) : (
                   <Link
                     href={handleRedirectByPlan(plan.slug)}
-                    className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-full text-white bg-accent hover:bg-accent focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent transition duration-300 ease-in-out"
+                    className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-full text-white bg-accent hover:bg-accent-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent transition duration-300 ease-in-out"
                   >
                     {plan.cta}
                   </Link>

@@ -32,7 +32,7 @@ export default function WelcomePage() {
             canCreateTenant ? 
             <Link
                 href="/tenant/create"
-                className="mt-auto inline-block bg-accent text-white px-4 py-2 rounded-lg font-medium hover:bg-accent">
+                className="mt-auto inline-block bg-accent text-white px-4 py-2 rounded-lg font-medium hover:bg-accent-hover">
                 Créer une organisation →
             </Link>
             :

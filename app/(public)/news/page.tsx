@@ -136,7 +136,7 @@ export default function HomePage() {
           <button
             onClick={handlePreviousPage}
             disabled={currentPage === 1}
-            className="px-6 py-3 bg-accent text-white rounded-lg hover:bg-accent disabled:bg-ink-subtle disabled:cursor-not-allowed transition-colors duration-200"
+            className="px-6 py-3 bg-accent text-white rounded-lg hover:bg-accent-hover disabled:bg-ink-subtle disabled:cursor-not-allowed transition-colors duration-200"
           >
             Previous
           </button>
@@ -144,7 +144,7 @@ export default function HomePage() {
           <button
             onClick={handleNextPage}
             disabled={currentPage * postsPerPage >= mockBlogPosts.length}
-            className="px-6 py-3 bg-accent text-white rounded-lg hover:bg-accent disabled:bg-ink-subtle disabled:cursor-not-allowed transition-colors duration-200"
+            className="px-6 py-3 bg-accent text-white rounded-lg hover:bg-accent-hover disabled:bg-ink-subtle disabled:cursor-not-allowed transition-colors duration-200"
           >
             Next
           </button>
