@@ -85,7 +85,10 @@ const CommandItem = React.forwardRef<
   <CommandPrimitive.Item
     ref={ref}
     className={cn(
-      "relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none aria-selected:bg-accent aria-selected:text-accent-text data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50",
+      // `text-accent-ink` is the token for text sitting ON the accent fill. This paired
+      // `bg-accent` with `text-accent-text`, which is the same blue as the fill — so the
+      // highlighted row rendered its label invisibly, in every command palette in the app.
+      "relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none aria-selected:bg-accent aria-selected:text-accent-ink data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50",
       className
     )}
     {...props}

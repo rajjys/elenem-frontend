@@ -1580,6 +1580,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/onboarding/availability": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Check whether an email, organisation name or code is still free */
+        post: operations["OnboardingController_availability"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/onboarding/register": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create the account and its organisation together, in one transaction */
+        post: operations["OnboardingController_register"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -3476,6 +3510,43 @@ export interface components {
              * @example Terrain 2
              */
             name: string;
+        };
+        CheckAvailabilityDto: {
+            email?: string;
+            organisationName?: string;
+            tenantCode?: string;
+        };
+        RegisterOrganisationDto: {
+            /** @example Jean */
+            firstName: string;
+            /** @example Bisimwa */
+            lastName: string;
+            /** @example jean.bisimwa@example.cd */
+            email: string;
+            /** @description At least 8 characters, with upper, lower, and a digit or symbol. */
+            password: string;
+            /** @example Ligue Provinciale de Basketball de Kinshasa */
+            organisationName: string;
+            /**
+             * @description Public subdomain. Derived from the name as an acronym when omitted.
+             * @example LIPROBAKIN
+             */
+            tenantCode?: string;
+            /**
+             * @example BASKETBALL
+             * @enum {string}
+             */
+            sportType: "SOCCER" | "BASKETBALL" | "FOOTBALL" | "BASEBALL" | "TENNIS" | "HOCKEY" | "GOLF" | "CRICKET" | "RUGBY" | "VOLLEYBALL" | "OTHER";
+            /**
+             * @description ISO 3166-1 alpha-2.
+             * @example CD
+             */
+            country: string;
+            /**
+             * @default NON_PROFIT
+             * @enum {string}
+             */
+            tenantType: "COMMERCIAL" | "NON_PROFIT" | "GOVERNMENT" | "EDUCATIONAL" | "OTHER";
         };
     };
     responses: never;
@@ -7637,6 +7708,57 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["VenueResponseDto"];
                 };
+            };
+        };
+    };
+    OnboardingController_availability: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CheckAvailabilityDto"];
+            };
+        };
+        responses: {
+            /** @description Each supplied field reported as 'free' or 'taken'. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    OnboardingController_register: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RegisterOrganisationDto"];
+            };
+        };
+        responses: {
+            /** @description Tokens for the new organisation admin, and the organisation. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Email, organisation name or code already in use. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };

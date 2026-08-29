@@ -1,19 +1,16 @@
-// app/(auth)/login/LoginClientPage.tsx
-'use client'; // THIS IS CRUCIAL: Marks this as a Client Component
+'use client';
 
-import { LoginForm } from "@/components/forms/login-form";
-import { getPostAuthRedirect } from "@/utils";
-import { useAuthStore } from "@/store/auth.store";
-import { ArrowLeft } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
-import React, { useEffect } from "react"; // Import useEffect and React
+import { useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { LoginForm } from '@/components/forms/login-form';
+import { AuthShell } from '@/components/auth';
+import { getPostAuthRedirect } from '@/utils';
+import { useAuthStore } from '@/store/auth.store';
 
 export default function LoginClientPage() {
   const { user, tokens } = useAuthStore();
   const router = useRouter();
-  const searchParams = useSearchParams(); // This hook is now inside a client component
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     if (tokens?.accessToken && user) {
@@ -23,24 +20,16 @@ export default function LoginClientPage() {
   }, [user, tokens, router, searchParams]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-surface-sunk">
-      <div className="relative bg-surface p-4 rounded-lg shadow-md w-full max-w-md">
-        <Link href="/" className="absolute top-0 left-0 rounded-full flex items-center text-white text-sm font-medium bg-ink-subtle/60 hover:bg-ink-subtle/80 mt-10 ml-8 p-2 transition-all duration-300 ease-in-out">
-          <ArrowLeft className="h-6 w-6" />
-        </Link>
-        <div className="flex items-center justify-center mb-4 pb-4 border-b border-accent-line">
-          <Image
-            src='/logos/elenem-sport.png'
-            alt='Elenem Logo'
-            width={180}
-            height={120}
-            //fallbackText={userAuth?.username.charAt(0) || "Logo"}
-          />
-        </div>
-        <h1 className="text-2xl font-bold text-center text-ink mb-4">Se connecter</h1>
-        {/* LoginForm is already a client component, so it can be rendered directly here */}
-        <LoginForm />
-      </div>
-    </div>
+    <AuthShell
+      title="Content de vous revoir"
+      subtitle="Connectez-vous pour gérer vos compétitions."
+      crossLink={{
+        prompt: "Vous n'avez pas encore de compte ?",
+        label: 'Créez votre organisation',
+        href: '/register',
+      }}
+    >
+      <LoginForm />
+    </AuthShell>
   );
 }

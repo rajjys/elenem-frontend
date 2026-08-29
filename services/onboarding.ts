@@ -1,136 +1,150 @@
 import { useMutation } from '@tanstack/react-query';
 import { z } from 'zod';
-import { api } from './api';
+import { api, isAxiosError } from './api';
 import { parseResponse } from './parse-response';
 import { useAuthStore } from '@/store/auth.store';
-import type { SportType } from '@/schemas';
 
 /**
- * Sign-up and organisation creation, as one flow.
+ * Bringing a league onto the platform.
  *
- * These were two disconnected forms with an email round-trip between them, which is why a new
- * league stalled at exactly the point it had shown the most intent. They are one sequence now,
- * and each step asks for the fewest fields the backend can work with — everything else has a
- * default or a derivation and belongs on a settings page the organiser visits later, if ever.
+ * Nothing is written until the last step. The account and the organisation are created together
+ * by one request, so abandoning the flow halfway leaves nothing behind and — the reason this
+ * changed — going back to fix a typo in your own name is possible, because that name has not
+ * been submitted anywhere yet.
+ *
+ * The cost is that a taken email would otherwise only surface at the very end, after six fields.
+ * `useCheckAvailability` pays that back by asking as the organiser leaves the step where they
+ * typed it.
  */
 
-// --- Step 1: the account ------------------------------------------------------------------
+// --- validation ---------------------------------------------------------------------------
 
 export const AccountStepSchema = z.object({
-  firstName: z.string().min(2, 'Prénom requis'),
-  lastName: z.string().min(2, 'Nom requis'),
-  email: z.string().email('Adresse email invalide'),
+  firstName: z.string().trim().min(2, 'Prénom requis'),
+  lastName: z.string().trim().min(2, 'Nom requis'),
+  email: z.string().trim().email('Adresse email invalide'),
   password: z
     .string()
     .min(8, 'Au moins 8 caractères')
-    .regex(/(?=.*[a-z])/, 'Il faut au moins une minuscule')
-    .regex(/(?=.*[A-Z])/, 'Il faut au moins une majuscule')
-    .regex(/(?=.*[\d\W])/, 'Il faut au moins un chiffre ou un symbole'),
+    .regex(/(?=.*[a-z])/, 'Il manque une minuscule')
+    .regex(/(?=.*[A-Z])/, 'Il manque une majuscule')
+    .regex(/(?=.*[\d\W])/, 'Il manque un chiffre ou un symbole'),
 });
+
+export const OrganisationStepSchema = z.object({
+  organisationName: z.string().trim().min(3, "Nom de l'organisation requis"),
+  tenantCode: z
+    .string()
+    .trim()
+    .regex(/^[A-Za-z0-9-]*$/, 'Lettres, chiffres et tirets seulement')
+    .max(12, '12 caractères au maximum')
+    .optional(),
+  sportType: z.string().min(1, 'Choisissez un sport'),
+  country: z.string().length(2, 'Choisissez un pays'),
+});
+
+export const RegisterOrganisationSchema = AccountStepSchema.merge(OrganisationStepSchema);
 
 export type AccountStepValues = z.infer<typeof AccountStepSchema>;
+export type OrganisationStepValues = z.infer<typeof OrganisationStepSchema>;
+export type RegisterOrganisationValues = z.infer<typeof RegisterOrganisationSchema>;
 
-// The response carries tokens; `user` is whatever the backend chose to include, and this schema
-// deliberately does not try to mirror all of it. parseResponse falls back to the raw payload on
-// drift, so listing every profile field here would only add ways to be wrong.
-const AuthResultSchema = z.object({
-  accessToken: z.string(),
-  refreshToken: z.string(),
-  user: z.unknown().optional(),
-});
+/** Fields the server can reject by name, so the message lands under the input it concerns. */
+export type OnboardingField = 'email' | 'organisationName' | 'tenantCode';
 
 /**
- * Creates the account and signs the user straight in.
+ * Server errors carry the field they belong to.
  *
- * No username is sent: the backend derives one from the email address. It stays a valid login
- * credential, it just is not a field anyone has to invent while signing up.
+ * Without it a 409 became a floating toast, which then outlived the thing it described: clear
+ * the email, submit again, and the stale "that address already exists" was still on screen next
+ * to an empty box. A field error is bound to its input and disappears when the input changes.
  */
-export function useCreateAccount() {
-  const setTokens = useAuthStore((s) => s.setTokens);
+export function onboardingError(error: unknown): { field?: OnboardingField; message: string } {
+  if (isAxiosError(error)) {
+    const data = error.response?.data as { message?: string | string[]; field?: OnboardingField } | undefined;
+    const raw = data?.message;
+    const message = Array.isArray(raw) ? raw[0] : raw;
+    if (message) return { field: data?.field, message };
+  }
+  return { message: 'Une erreur est survenue. Réessayez.' };
+}
 
+// --- availability -------------------------------------------------------------------------
+
+const AvailabilitySchema = z.object({
+  email: z.enum(['free', 'taken']).optional(),
+  organisationName: z.enum(['free', 'taken']).optional(),
+  tenantCode: z.enum(['free', 'taken']).optional(),
+});
+
+export type AvailabilityQuery = { email?: string; organisationName?: string; tenantCode?: string };
+
+export function useCheckAvailability() {
   return useMutation({
-    mutationFn: async (values: AccountStepValues) => {
-      const res = await api.post('/auth/register', values);
-      return parseResponse(AuthResultSchema, res.data);
-    },
-    onSuccess: (data) => {
-      setTokens({ accessToken: data.accessToken, refreshToken: data.refreshToken });
+    mutationFn: async (query: AvailabilityQuery) => {
+      const res = await api.post('/onboarding/availability', query);
+      return parseResponse(AvailabilitySchema, res.data);
     },
   });
 }
 
-// --- Step 2: the organisation -------------------------------------------------------------
+// --- the one write ------------------------------------------------------------------------
 
-export const OrganisationStepSchema = z.object({
-  name: z.string().min(3, "Nom de l'organisation requis"),
-  // Prefilled from the name and editable, because it is the public web address. Left blank the
-  // backend derives an acronym.
-  tenantCode: z
-    .string()
-    .regex(/^[A-Za-z0-9-]*$/, 'Lettres, chiffres et tirets seulement')
-    .max(12, 'Douze caractères au maximum')
-    .optional(),
-  sportType: z.string().min(1, 'Choisissez un sport'),
-  country: z.string().min(2, 'Choisissez un pays'),
+const RegisterResultSchema = z.object({
+  accessToken: z.string(),
+  refreshToken: z.string(),
+  tenant: z.object({
+    id: z.string(),
+    name: z.string(),
+    slug: z.string(),
+    tenantCode: z.string(),
+    sportType: z.string().optional(),
+  }),
 });
 
-export type OrganisationStepValues = z.infer<typeof OrganisationStepSchema>;
+export type RegisterResult = z.infer<typeof RegisterResultSchema>;
 
-const OrganisationResultSchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  slug: z.string(),
-  tenantCode: z.string(),
-  // Present when the creator became the owner — see below.
-  auth: z
-    .object({ accessToken: z.string(), refreshToken: z.string() })
-    .optional(),
-});
-
-/**
- * Creates the organisation and swaps in the tokens it returns.
- *
- * That swap is not optional. Creating an organisation turns a GENERAL_USER into its
- * TENANT_ADMIN, and a JWT records the roles held when it was signed — so without new tokens the
- * very next request is rejected as a tenant mismatch and onboarding ends in a logout one step
- * after sign-up. The backend hands back fresh tokens for exactly this reason.
- */
-export function useCreateOrganisation() {
+export function useRegisterOrganisation() {
   const setTokens = useAuthStore((s) => s.setTokens);
   const fetchUser = useAuthStore((s) => s.fetchUser);
 
   return useMutation({
-    mutationFn: async (values: OrganisationStepValues) => {
-      const res = await api.post('/tenants/create', {
-        name: values.name,
+    mutationFn: async (values: RegisterOrganisationValues) => {
+      const res = await api.post('/onboarding/register', {
+        firstName: values.firstName,
+        lastName: values.lastName,
+        email: values.email,
+        password: values.password,
+        organisationName: values.organisationName,
         tenantCode: values.tenantCode?.trim() ? values.tenantCode.trim().toUpperCase() : undefined,
-        sportType: values.sportType as SportType,
-        country: values.country,
+        sportType: values.sportType,
+        country: values.country.toUpperCase(),
       });
-      return parseResponse(OrganisationResultSchema, res.data);
+      return parseResponse(RegisterResultSchema, res.data);
     },
     onSuccess: async (data) => {
-      if (data.auth) {
-        setTokens(data.auth);
-        // Only now can this succeed: the previous token described a user with no organisation.
-        await fetchUser();
-      }
+      // The response already describes the new TENANT_ADMIN. Signing in with the tokens issued
+      // here rather than re-authenticating is what keeps the flow unbroken.
+      setTokens({ accessToken: data.accessToken, refreshToken: data.refreshToken });
+      await fetchUser();
     },
   });
 }
 
+// --- derivation ---------------------------------------------------------------------------
+
 /**
- * A short code suggested from the organisation's name.
+ * The short code suggested from an organisation's name.
  *
- * Mirrors the backend's derivation so the field is prefilled with what would happen anyway, and
- * an organiser who has an acronym they already use — LIPROBAKIN, say — can simply type it over.
+ * Mirrors the backend so the field can be prefilled with what would happen anyway, and an
+ * organiser who already has an acronym — LIPROBAKIN — can simply type it over.
  */
 export function suggestTenantCode(name: string): string {
   const words = name
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
     .split(/[^A-Za-z0-9]+/)
-    .filter((w) => w.length > 2);
+    .filter((w) => w.length >= 3);
 
   const base =
     words.length >= 2
