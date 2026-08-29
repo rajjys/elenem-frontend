@@ -330,6 +330,7 @@ export function TeamsFilters({ filters, onFilterChange, onPageSizeChange, fixedT
               <CountryDropdown
                 value={selectedCountry}
                 onChange={(val) => setSelectedCountry(val)}
+                valueType="short"
                 className="w-full px-3 py-2 border border-line rounded-md shadow-sm focus:outline-none focus:ring-accent focus:border-accent sm:text-sm"
               />
             </div>

@@ -229,6 +229,8 @@ export default function TenantGeneralSettings({ tenant, onSuccess  }: TenantGene
                 value={country} // Use watched value
                 aria-placeholder="Pays"
                 onChange={(val) => field.onChange(val)} // Update field value on change
+                // ISO-3166 alpha-2, matching what the API validates and stores.
+                valueType="short"
                 className="w-full h-10 px-3 py-2 text-sm border rounded-md border-line focus:outline-none focus:ring-2 focus:ring-accent"
               />
             )}

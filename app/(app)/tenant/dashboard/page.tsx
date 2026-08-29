@@ -11,7 +11,7 @@ import { useContextualLink } from '@/hooks';
 import { StatsCard } from '@/components/ui/stats-card';
 import { Building, CalendarPlus, Clock, Clock1, Newspaper, Plus, Ticket, TrendingUp, Trophy, UserPlus, Users } from 'lucide-react';
 import { Avatar, Card, CardContent, CardFooter, CardHeader, CardTitle, getStatusBadge, LeagueCard, LoadingSpinner } from '@/components/ui';
-import { capitalizeFirst, countryNameToCode } from '@/utils';
+import { countryNameToCode } from '@/utils';
 import Image from 'next/image';
 import CountryFlag from 'react-country-flag';
 import { format } from 'date-fns';
@@ -206,10 +206,10 @@ export default function TenantDashboard() {
 
     // Dynamically generate stat cards based on tenant data
     const statCards = [
-        { title: "Ligues", value: counts.leagues, description: "Ligues Actives de l'organisation", trend: {isPositive: true, value: 3.6, timespan: "season"}, icon: Trophy, bgColorClass: "bg-accent", textColorClass: "text-white", href: buildLink("/tenant/leagues") },
-        { title: "Equipes", value: counts.teams, description: "Equipes actives de l'organisation", trend: {isPositive: false, value: 2.6, timespan: "season"}, icon: Building, bgColorClass: "bg-positive", textColorClass: "text-white", href: buildLink("/tenant/teams") },
-        { title: "Athletes", value: counts.players, description: "Athletes actifs dans l'organisation", trend: {isPositive: true, value: 0, timespan: "season"}, icon: Users, bgColorClass: "bg-caution", textColorClass: "text-white", href: buildLink("/tenant/players") },
-        { title: "Ventes (Aujourdh'hui)", value: 0, description: "Billets Vendus Aujourd'hui", trend: {isPositive: true, value: 0, timespan: "season"}, icon: Ticket, bgColorClass: "bg-negative", textColorClass: "text-white", href: buildLink("/tenant/tickets") }, // Keeping mock for now as per request
+        { title: "Ligues", value: counts.leagues, description: "Ligues Actives de l'organisation", icon: Trophy, bgColorClass: "bg-accent", textColorClass: "text-white", href: buildLink("/tenant/leagues") },
+        { title: "Equipes", value: counts.teams, description: "Equipes actives de l'organisation", icon: Building, bgColorClass: "bg-positive", textColorClass: "text-white", href: buildLink("/tenant/teams") },
+        { title: "Athletes", value: counts.players, description: "Athletes actifs dans l'organisation", icon: Users, bgColorClass: "bg-caution", textColorClass: "text-white", href: buildLink("/tenant/players") },
+        { title: "Ventes (Aujourdh'hui)", value: 0, description: "Billets Vendus Aujourd'hui", icon: Ticket, bgColorClass: "bg-negative", textColorClass: "text-white", href: buildLink("/tenant/tickets") }, // Keeping mock for now as per request
     ]
 
     return (
@@ -237,7 +237,7 @@ export default function TenantDashboard() {
                     </h1>
                     {tenant?.tenantCode && (
                         <p className="text-sm text-ink-muted flex items-center gap-1">
-                            <span>{capitalizeFirst(tenant.tenantCode)}</span>
+                            <span>{tenant.tenantCode}</span>
                             -
                             <CountryFlag countryCode={countryNameToCode[tenant.country ?? ''] || tenant.country || ''} svg style={{ width: '2em', height: '1em' }} />
                         </p>

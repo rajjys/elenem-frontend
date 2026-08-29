@@ -41,8 +41,7 @@ const TeamDashboard = () => {
       bgColorClass: "bg-accent",
       textColorClass: "text-white",
       description: "+2 this month",
-      href: buildLink("/team/roster"),
-      trend: { value: 8.7, isPositive: true, timespan: "season" }
+      href: buildLink("/team/roster")
     },
     {
       title: "Wins This Season",
@@ -51,8 +50,7 @@ const TeamDashboard = () => {
       bgColorClass: "bg-positive",
       textColorClass: "text-white",
       description: "75% win rate",
-      href: buildLink("/team/stats"),
-      trend: { value: 15.2, isPositive: true, timespan: "season" }
+      href: buildLink("/team/stats")
     },
     {
       title: "Goals Scored",
@@ -61,8 +59,7 @@ const TeamDashboard = () => {
       bgColorClass: "bg-caution",
       textColorClass: "text-white",
       description: "+8 this month",
-      href: buildLink("/team/stats"),
-      trend: { value: 23.5, isPositive: true, timespan: "season" }
+      href: buildLink("/team/stats")
     },
     {
       title: "League Position",
@@ -71,8 +68,7 @@ const TeamDashboard = () => {
       bgColorClass: "bg-negative",
       textColorClass: "text-white",
       description: "↑1 from last week",
-      href: buildLink("/team/standings"),
-      trend: { value: 12.0, isPositive: true, timespan: "season" }
+      href: buildLink("/team/standings")
     }
   ];
 

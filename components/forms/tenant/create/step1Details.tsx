@@ -61,6 +61,7 @@ export function Step1TenantDetails({ form }: Step1Props) {
           value={country}
           aria-placeholder="Pays"
           onChange={(val) => setValue("country", val)}
+                valueType="short"
           className="w-full h-10 px-3 py-2 text-sm border rounded-md border-line focus:outline-none focus:ring-2 focus:ring-accent"
         />
         {errors.country && <p className="text-negative text-xs">{errors.country.message}</p>}

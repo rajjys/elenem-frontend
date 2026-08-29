@@ -39,10 +39,10 @@ const SystemAdminDashboard = () => {
   const { buildLink } = useContextualLink();
 
   const systemMetrics = [
-    { title: "Total Users", value: "12,847", description: "Active Individual Users", trend: {isPositive: true, value: 3.6, timespan: "season"}, icon: Users, bgColorClass: "bg-accent", textColorClass: "text-white", href: buildLink("/admin/users") },
-    { title: "Active Tenants", value: "324", description: "Tenants with active subscriptions", trend: {isPositive: true, value: 3.6, timespan: "season"}, icon: Building2, bgColorClass: "bg-positive", textColorClass: "text-white", href: buildLink("/admin/tenants") },
-    { title: "Monthly Revenue", value: "$89,230", description: "Income From Subscriptions",trend: {isPositive: true, value: 3.6, timespan: "season"}, icon: DollarSign, bgColorClass: "bg-caution", textColorClass: "text-white", href: buildLink("/admin/financials/revenue")  },
-    { title: "System Uptime", value: "99.97%", description: "Average Time Alive", trend: {isPositive: true, value: 4.8, timespan: "season"}, icon: Activity, color: "text-purple-600", bgColorClass: "bg-negative", textColorClass: "text-white", href: buildLink("/admin/system/status")  },
+    { title: "Total Users", value: "12,847", description: "Active Individual Users", icon: Users, bgColorClass: "bg-accent", textColorClass: "text-white", href: buildLink("/admin/users") },
+    { title: "Active Tenants", value: "324", description: "Tenants with active subscriptions", icon: Building2, bgColorClass: "bg-positive", textColorClass: "text-white", href: buildLink("/admin/tenants") },
+    { title: "Monthly Revenue", value: "$89,230", description: "Income From Subscriptions", icon: DollarSign, bgColorClass: "bg-caution", textColorClass: "text-white", href: buildLink("/admin/financials/revenue")  },
+    { title: "System Uptime", value: "99.97%", description: "Average Time Alive", icon: Activity, color: "text-purple-600", bgColorClass: "bg-negative", textColorClass: "text-white", href: buildLink("/admin/system/status")  },
   ];
 
   const userManagement = [

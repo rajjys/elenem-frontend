@@ -74,6 +74,7 @@ function PublicTenantsFilters({ onFilterChange }: { onFilterChange: (filters: {s
                 <CountryDropdown
                 value={country}
                 onChange={setCountry}
+                valueType="short"
                 className="w-full px-3 py-2 border border-accent rounded-md bg-surface text-sm text-accent-text focus:outline-none focus:ring-2 focus:ring-accent transition-all duration-200"
                 />
             </div>
