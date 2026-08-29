@@ -1,4 +1,4 @@
-// components/forms/loginForm.tsx
+// components/forms/login-form.tsx
 "use client";
 import { useForm } from "react-hook-form";
 import { isAxiosError } from '@/services/api';
@@ -13,63 +13,40 @@ import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
 
+// Sign-in takes a credential and nothing else. The organisation is resolved from the account —
+// username and email are both unique platform-wide — so there is no code to remember and no
+// "am I a system admin?" question to answer about yourself before you are allowed to try.
+const loginSchema = z.object({
+  usernameOrEmail: z.string().min(1, "Identifiant ou email requis"),
+  password: z.string().min(1, "Mot de passe requis"),
+});
+
+type LoginFormValues = z.infer<typeof loginSchema>;
+
 export function LoginForm() {
   const login = useAuthStore((state) => state.login);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [isSystemAdminLogin, setIsSystemAdminLogin] = useState(false);
-
-
-    // Define a more robust login schema that conditionally requires tenantCode
-    const loginSchema = z.object({
-      usernameOrEmail: z.string().min(1, "Username or Email is required"),
-      password: z.string().min(1, "Password is required"),
-      tenantCode: z.string().optional(), // Initially optional, conditional validation below
-    }).superRefine((data, ctx) => {
-      // If not a system admin login, tenantCode is required
-      // We'll rely on the backend to tell us the user's role after login,
-      // but for the login form, we assume if SYSTEM_ADMIN checkbox is not checked, a tenantCode is needed.
-      // This simplified client-side check aligns with the backend DTO logic.
-      if (!data.tenantCode && !isSystemAdminLogin) { // `isSystemAdminLogin` is a UI state, not part of DTO directly
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "Tenant Code is required for non-System Admin logins",
-          path: ['tenantCode'],
-        });
-      }
-    });
-
-    type LoginFormValues = z.infer<typeof loginSchema> & { isSystemAdminLogin?: boolean }; // Add UI state to type
-
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
-    defaultValues: { usernameOrEmail: "", password: "", tenantCode: "" },
+    defaultValues: { usernameOrEmail: "", password: "" },
   });
-
-  // Manually register isSystemAdminLogin with react-hook-form if you want Zod to validate it
-  // Or manage it purely as local state as done here, which is simpler for a UI flag.
-  // If using `superRefine`, ensure `isSystemAdminLogin` is part of the form data or accessible.
-  // For now, let's pass it via the `onSubmit` context.
 
   async function onSubmit(data: LoginFormValues) {
     setError(null);
     setLoading(true);
     try {
-      await login(
-        data.usernameOrEmail,
-        data.password,
-        isSystemAdminLogin ? undefined : data.tenantCode // Pass tenantCode only if not system admin login
-      );
+      await login(data.usernameOrEmail, data.password);
       // Redirection is handled by login/page.tsx's useEffect and middleware
     } catch (error) {
-      let errorMessage = "Login failed";
+      let errorMessage = "Connexion échouée";
       if (isAxiosError(error)) {
         errorMessage = error.response?.data?.message || errorMessage;
       }
       toast.error(errorMessage);
       setError(errorMessage);
-    }finally {
+    } finally {
       setLoading(false);
     }
   }
@@ -91,33 +68,7 @@ export function LoginForm() {
         </div>
       </div>
 
-      <div className="flex items-center space-x-2">
-        <input 
-          type="checkbox" 
-          id="systemAdminLogin" 
-          checked={isSystemAdminLogin}
-          onChange={(e) => {
-            setIsSystemAdminLogin(e.target.checked);
-            if (e.target.checked) {
-                form.setValue("tenantCode", undefined); // Clear tenant code for system admin
-                form.clearErrors("tenantCode"); // Clear any tenantCode errors
-            } else {
-                form.setValue("tenantCode", ""); // Reset for re-entry if unchecked
-            }
-          }}
-          className="h-4 w-4 text-accent-text border border-line rounded focus:ring-accent"
-        />
-        <label htmlFor="systemAdminLogin" className="text-sm text-ink">Pas de code d&apos;organisation</label>
-      </div>
-
-      {!isSystemAdminLogin && (
-        <div>
-          <label htmlFor="tenantCode" className="block text-sm font-medium text-ink">Code d&apos;organisation</label>
-          <Input id="tenantCode" placeholder="LIGUE1"{...form.register("tenantCode")} />
-          {form.formState.errors.tenantCode && <p className="text-negative text-xs mt-1">{form.formState.errors.tenantCode.message}</p>}
-        </div>
-      )}
-      <Button type="submit" variant='primary' disabled={loading} className="w-full">{loading ? 
+      <Button type="submit" variant='primary' disabled={loading} className="w-full">{loading ?
         (
          <>
            <Loader2 className="animate-spin" size={16} />

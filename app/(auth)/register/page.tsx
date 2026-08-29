@@ -1,35 +1,34 @@
-import { RegisterForm } from '@/components/forms/register-form';
 import { LoadingSpinner } from '@/components/ui';
+import { SignUpFlow } from '@/components/onboarding';
 import { ArrowLeft } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import React, { Suspense } from 'react'
+import React, { Suspense } from 'react';
 
 const RegisterPage = () => {
   return (
-    <div className='min-h-screen flex items-center justify-center bg-surface-sunk'>
-      <div className="relative bg-surface p-4 rounded-lg shadow-md w-full max-w-md">
-        <Link href="/login" className="absolute top-0 left-0 rounded-full flex items-center text-white text-sm font-medium bg-ink-subtle/60 hover:bg-ink-subtle/80 mt-10 ml-8 p-2 transition-all duration-300 ease-in-out">
-          <ArrowLeft className="h-6 w-6" />
+    <div className="min-h-screen flex items-center justify-center bg-surface-sunk p-4">
+      <div className="relative bg-surface p-6 sm:p-8 rounded-lg shadow-md w-full max-w-lg">
+        <Link
+          href="/login"
+          aria-label="Retour à la connexion"
+          className="absolute top-4 left-4 rounded-full flex items-center text-ink-inverted bg-ink-subtle/60 hover:bg-ink-subtle/80 p-2 transition-colors"
+        >
+          <ArrowLeft className="h-5 w-5" />
         </Link>
-        <div className="flex items-center justify-center mb-4 pb-4 border-b border-accent-line">
-          <Image
-            src='/logos/elenem-sport.png'
-            alt='Elenem Logo'
-            width={180}
-            height={120}
-            //fallbackText={userAuth?.username.charAt(0) || "Logo"}
-          />
+        <div className="flex items-center justify-center mb-6 pb-6 border-b border-accent-line">
+          <Image src="/logos/elenem-sport.png" alt="Elenem" width={180} height={120} />
         </div>
-        <h1 className="text-2xl font-bold text-center text-ink mb-4">Creez votre compte</h1>
-      {// Wrap the client component in Suspense
-      }
-        <Suspense fallback={<LoadingSpinner message="Loading login..." />}>
-          <RegisterForm />
+        <h1 className="text-2xl font-bold text-center text-ink mb-2">Créez votre organisation</h1>
+        <p className="text-sm text-ink-muted text-center mb-8">
+          Deux étapes, et votre ligue est prête à recevoir ses équipes.
+        </p>
+        <Suspense fallback={<LoadingSpinner message="Chargement…" />}>
+          <SignUpFlow />
         </Suspense>
       </div>
     </div>
-    );
-}
+  );
+};
 
-export default RegisterPage
+export default RegisterPage;

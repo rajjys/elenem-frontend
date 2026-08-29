@@ -4,12 +4,8 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { api, setAuthToken } from '@/services/api';
 import Cookies from 'js-cookie';
-import { RegisterFormSchema, User } from '@/schemas'; // Import User and Role from your new frontend types
-import z from 'zod';
+import { User } from '@/schemas'; // Import User and Role from your new frontend types
 
-
-// Define the form schema for validation
-type RegisterFormValues = z.infer<typeof RegisterFormSchema>;
 
 interface AuthTokens {
   accessToken: string;
@@ -19,8 +15,7 @@ interface AuthTokens {
 interface AuthState {
   user: User | null;
   tokens: AuthTokens | null;
-  register: (values: RegisterFormValues) => Promise<void>;
-  login: (usernameOrEmail: string, password: string, tenantCode?: string) => Promise<void>;
+  login: (usernameOrEmail: string, password: string) => Promise<void>;
   logout: () => void;
   fetchUser: () => Promise<User | undefined>;
   setTokens: (tokens: AuthTokens | null) => void;
@@ -46,19 +41,8 @@ export const useAuthStore = create<AuthState>()(
           // Cookies.remove('userRole'); // Removed as discussed.
         }
       },
-      register: async (values) => {
-        const response = await api.post('/auth/register', values);
-
-        const { accessToken, refreshToken, user } = response.data;
-        get().setTokens({ accessToken, refreshToken });
-        set({ user });
-
-        // Optionally: redirect right here or let the caller handle it
-        // router.push('/account/dashboard');
-      },
-      login: async (usernameOrEmail, password, tenantCode) => {
-        const payload = tenantCode ? { usernameOrEmail, password, tenantCode } : { usernameOrEmail, password };
-        const response = await api.post('/auth/login', payload);
+      login: async (usernameOrEmail, password) => {
+        const response = await api.post('/auth/login', { usernameOrEmail, password });
         const { accessToken, refreshToken, user } = response.data; // Assuming backend returns user object on login
         get().setTokens({ accessToken, refreshToken });
         set({ user }); // Set the user object directly from login response

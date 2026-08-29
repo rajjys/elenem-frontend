@@ -13,6 +13,7 @@ import { useContextualLink, useDashboardLinkEligibillity, useSidebarEligibility 
 import { Roles } from '@/schemas'; // Assuming Role enum is here
 import { AppLayoutHeader } from './AppLayoutHeader'; // Import the updated Navbar
 import { ArrowLeft } from 'lucide-react';
+import { VerifyEmailBanner } from '@/components/onboarding';
 
 // Type for a React Icon component
 type IconType = React.ComponentType<React.SVGProps<SVGSVGElement>>;
@@ -241,7 +242,13 @@ export default function AppLayout({ children, navItems }: AppLayoutProps) {
             removed later without the app losing its frame. */}
         <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
           <AppLayoutHeader onMobileMenuToggle={toggleMobileMenu} handleLogout={handleLogout} />
-          <main className="flex-1 overflow-y-auto bg-canvas p-6">{children}</main>
+          <main className="flex-1 overflow-y-auto bg-canvas p-6">
+            {/* Renders nothing once the address is verified. It lives here rather than on one
+                dashboard because verification now gates inviting people, which can be attempted
+                from several surfaces. */}
+            <VerifyEmailBanner />
+            {children}
+          </main>
         </div>
 
       </div>

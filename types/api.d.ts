@@ -957,6 +957,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/games/generate-fixtures": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Generate a round-robin fixture list for a season
+         * @description Builds the whole schedule in one call instead of creating games one at a time. Send dryRun=true first to preview the matchdays, then repeat with dryRun=false to write them. Fixtures that clash are reported and skipped rather than failing the whole run.
+         */
+        post: operations["GamesController_generateFixtures"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/games/standings": {
         parameters: {
             query?: never;
@@ -1489,16 +1509,87 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/venues": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List the organisation's venues */
+        get: operations["VenuesController_list"];
+        put?: never;
+        /** Add a venue to the organisation */
+        post: operations["VenuesController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/venues/{venueId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get one venue */
+        get: operations["VenuesController_getOne"];
+        /** Edit a venue */
+        put: operations["VenuesController_update"];
+        post?: never;
+        /** Remove a venue (refused while fixtures are booked into it) */
+        delete: operations["VenuesController_remove"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/venues/{venueId}/courts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Add a bookable floor to a venue */
+        post: operations["VenuesController_addCourt"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/venues/{venueId}/courts/{courtId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Take a floor out of use */
+        delete: operations["VenuesController_removeCourt"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
         RegisterDto: {
             /**
-             * @description A unique username for the user.
+             * @description A unique username. Optional — when omitted it is derived from the email address, suffixed if that is taken. One fewer field to invent at the most abandonable moment in the product, and one fewer uniqueness error to hit while inventing it.
              * @example johndoe123
              */
-            username: string;
+            username?: string;
             /**
              * @description The unique email address of the user.
              * @example john.doe@example.com
@@ -1569,7 +1660,6 @@ export interface components {
         LoginDto: {
             usernameOrEmail: string;
             password: string;
-            tenantCode?: string;
         };
         RefreshTokenDto: {
             refreshToken: string;
@@ -1861,7 +1951,7 @@ export interface components {
             forfeitPoints: number;
             yellowCardPoints: number;
             redCardPoints: number;
-            tieBreakerOrder: ("POINTS" | "GOAL_DIFFERENCE" | "GOALS_FOR" | "GOALS_AGAINST" | "WINS" | "AWAY_WINS" | "AWAY_GOALS" | "HEAD_TO_HEAD_POINTS" | "HEAD_TO_HEAD_GOAL_DIFFERENCE" | "HEAD_TO_HEAD_GOALS_FOR" | "FAIR_PLAY_POINTS" | "WIN_PERCENTAGE" | "DIVISION_WIN_PERCENTAGE" | "CONFERENCE_WIN_PERCENTAGE" | "STRENGTH_OF_SCHEDULE" | "STRENGTH_OF_VICTORY" | "RANDOM_DRAW")[];
+            tieBreakerOrder: ("POINTS" | "GOAL_DIFFERENCE" | "GOALS_FOR" | "GOALS_AGAINST" | "WINS" | "AWAY_WINS" | "AWAY_GOALS" | "HEAD_TO_HEAD_POINTS" | "HEAD_TO_HEAD_GOAL_DIFFERENCE" | "HEAD_TO_HEAD_GOALS_FOR" | "HEAD_TO_HEAD_WIN_PERCENTAGE" | "FAIR_PLAY_POINTS" | "WIN_PERCENTAGE" | "DIVISION_WIN_PERCENTAGE" | "CONFERENCE_WIN_PERCENTAGE" | "STRENGTH_OF_SCHEDULE" | "STRENGTH_OF_VICTORY" | "RANDOM_DRAW")[];
             customRules?: Record<string, never>;
         };
         UserLiteResponseDto: {
@@ -1933,7 +2023,7 @@ export interface components {
              */
             redCardPoints: number;
             /** @description Ordered list of tie-breaker criteria. */
-            tieBreakerOrder: ("POINTS" | "GOAL_DIFFERENCE" | "GOALS_FOR" | "GOALS_AGAINST" | "WINS" | "AWAY_WINS" | "AWAY_GOALS" | "HEAD_TO_HEAD_POINTS" | "HEAD_TO_HEAD_GOAL_DIFFERENCE" | "HEAD_TO_HEAD_GOALS_FOR" | "FAIR_PLAY_POINTS" | "WIN_PERCENTAGE" | "DIVISION_WIN_PERCENTAGE" | "CONFERENCE_WIN_PERCENTAGE" | "STRENGTH_OF_SCHEDULE" | "STRENGTH_OF_VICTORY" | "RANDOM_DRAW")[];
+            tieBreakerOrder: ("POINTS" | "GOAL_DIFFERENCE" | "GOALS_FOR" | "GOALS_AGAINST" | "WINS" | "AWAY_WINS" | "AWAY_GOALS" | "HEAD_TO_HEAD_POINTS" | "HEAD_TO_HEAD_GOAL_DIFFERENCE" | "HEAD_TO_HEAD_GOALS_FOR" | "HEAD_TO_HEAD_WIN_PERCENTAGE" | "FAIR_PLAY_POINTS" | "WIN_PERCENTAGE" | "DIVISION_WIN_PERCENTAGE" | "CONFERENCE_WIN_PERCENTAGE" | "STRENGTH_OF_SCHEDULE" | "STRENGTH_OF_VICTORY" | "RANDOM_DRAW")[];
             /** @description Custom rules for sport-specific scenarios. */
             customRules?: Record<string, never>;
         };
@@ -2845,13 +2935,13 @@ export interface components {
              */
             name: string;
             /**
-             * @description Unique short code for the new tenant (e.g., "GLOBALSPORTS"). Must be alphanumeric and can contain a dash.
-             * @example GLOBAL-SPORTS
+             * @description Short code, which is also the public subdomain (<code>.elenem.site). Optional — derived from the name when omitted. Worth offering as an editable suggestion rather than a required field: "Ligue Provinciale de Basketball de Kinshasa" derives to something no one would want as an address, but LIPROBAKIN is the acronym they already use.
+             * @example LIPROBAKIN
              */
-            tenantCode: string;
+            tenantCode?: string;
             /**
-             * @description The categorization of the tenant (e.g., COMMERCIAL, NON_PROFIT).
-             * @example COMMERCIAL
+             * @description What kind of organisation this is. Optional — defaults to NON_PROFIT, which is what a provincial league federation is. Nobody signing up to publish a basketball table should have to classify their legal structure first.
+             * @default NON_PROFIT
              * @enum {string}
              */
             tenantType: "COMMERCIAL" | "NON_PROFIT" | "GOVERNMENT" | "EDUCATIONAL" | "OTHER";
@@ -2882,8 +2972,8 @@ export interface components {
              * @enum {string}
              */
             visibility: "PUBLIC" | "PRIVATE" | "HIDDEN" | "ARCHIVED";
-            /** @description Detailed organization information including contact details, branding, and location. */
-            businessProfile: components["schemas"]["BusinessProfileDto"];
+            /** @description Contact details, branding and location. Optional — when omitted a profile is created carrying just the organisation name, and everything else is filled in later from the organisation settings page, where there is room for it. */
+            businessProfile?: components["schemas"]["BusinessProfileDto"];
         };
         UpdateTenantDto: {
             /**
@@ -3000,6 +3090,59 @@ export interface components {
             pointSystem: components["schemas"]["PointSystemConfigDto"];
             /** @description Ordered list of tie-breaker rules */
             tieBreakers: components["schemas"]["TieBreakerRuleDto"][];
+        };
+        GenerateFixturesDto: {
+            /** @description Season to generate the fixture list for. */
+            seasonId: string;
+            /** @description Teams to include, in draw order. Omit to use every active team in the season’s league. */
+            teamIds?: string[];
+            /**
+             * @description 1 = single round robin (each pair meets once), 2 = double (home and away).
+             * @default 1
+             */
+            legs: number;
+            /** @description Date of the first matchday (YYYY-MM-DD). */
+            startDate: string;
+            /**
+             * @description Days between matchdays. Ignored when daysOfWeek is supplied.
+             * @default 7
+             */
+            intervalDays: number;
+            /** @description Restrict matchdays to these weekdays (0 = Sunday … 6 = Saturday), e.g. [6, 0] for weekends. Takes precedence over intervalDays. */
+            daysOfWeek?: number[];
+            /**
+             * @description Kick-off time on each matchday, 24h HH:mm.
+             * @default 16:00
+             */
+            kickOffTime: string;
+            /**
+             * @description Preview only — return the generated schedule without writing any games. Always run this first in the UI.
+             * @default false
+             */
+            dryRun: boolean;
+        };
+        GeneratedFixtureDto: {
+            matchday: number;
+            dateTime: string;
+            homeTeamId: string;
+            homeTeamName: string;
+            awayTeamId: string;
+            awayTeamName: string;
+            /** @description Set when this fixture could not be created. */
+            error?: string;
+            /** @description Id of the created game. Absent on a dry run. */
+            gameId?: string;
+        };
+        GenerateFixturesResponseDto: {
+            dryRun: boolean;
+            teamCount: number;
+            matchdayCount: number;
+            fixtureCount: number;
+            /** @description Games actually written. 0 on a dry run. */
+            createdCount: number;
+            /** @description Fixtures that could not be created (see each fixture’s error). */
+            skippedCount: number;
+            fixtures: components["schemas"]["GeneratedFixtureDto"][];
         };
         CreateGameDto: {
             /** @description The ID of the home team. */
@@ -3256,6 +3399,83 @@ export interface components {
             scheduledAt?: string;
             /** @description Optional hero image asset ID. */
             heroImageId?: string;
+        };
+        VenueCourtDto: {
+            id: string;
+            name: string;
+            isActive: boolean;
+        };
+        VenueResponseDto: {
+            id: string;
+            name: string;
+            address?: Record<string, never>;
+            city?: Record<string, never>;
+            capacity?: Record<string, never>;
+            description?: Record<string, never>;
+            isActive: boolean;
+            tenantId: string;
+            courts: components["schemas"]["VenueCourtDto"][];
+            /** @description Teams that call this their home ground. */
+            teamCount: number;
+            /** @description Fixtures scheduled here that have not been played yet. */
+            upcomingGameCount: number;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        CreateVenueDto: {
+            /**
+             * @description What people call the hall.
+             * @example Gymnase Tata Raphaël
+             */
+            name: string;
+            /** @description Street address, if it has one. */
+            address?: string;
+            /**
+             * @description City or commune.
+             * @example Kinshasa
+             */
+            city?: string;
+            /** @description Seating capacity. */
+            capacity?: number;
+            /** @description Anything worth noting — access, floor, lighting. */
+            description?: string;
+            /**
+             * @description Names of the individually bookable floors, if the venue has more than one. Leave empty for the ordinary case of one hall, one floor: the venue is then treated as a single space.
+             * @example [
+             *       "Terrain 1",
+             *       "Terrain 2"
+             *     ]
+             */
+            courtNames?: string[];
+        };
+        UpdateVenueDto: {
+            /**
+             * @description What people call the hall.
+             * @example Gymnase Tata Raphaël
+             */
+            name?: string;
+            /** @description Street address, if it has one. */
+            address?: string;
+            /**
+             * @description City or commune.
+             * @example Kinshasa
+             */
+            city?: string;
+            /** @description Seating capacity. */
+            capacity?: number;
+            /** @description Anything worth noting — access, floor, lighting. */
+            description?: string;
+            /** @description Take the venue out of use without deleting its history. */
+            isActive?: boolean;
+        };
+        AddCourtDto: {
+            /**
+             * @description What this floor is called.
+             * @example Terrain 2
+             */
+            name: string;
         };
     };
     responses: never;
@@ -6101,6 +6321,30 @@ export interface operations {
             };
         };
     };
+    GamesController_generateFixtures: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenerateFixturesDto"];
+            };
+        };
+        responses: {
+            /** @description The generated schedule. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenerateFixturesResponseDto"];
+                };
+            };
+        };
+    };
     GamesController_getLeagueStandings: {
         parameters: {
             query: {
@@ -7202,6 +7446,196 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PostResponseDto"];
+                };
+            };
+        };
+    };
+    VenuesController_list: {
+        parameters: {
+            query?: {
+                /** @description Number of items to skip (offset) */
+                skip?: number;
+                /** @description Number of items to take (limit) */
+                take?: number;
+                /** @description Current page number */
+                page?: number;
+                /** @description Page size */
+                pageSize?: number;
+                /** @description Field to sort by */
+                sortBy?: string;
+                /** @description Sort order (asc/desc) */
+                sortOrder?: "asc" | "desc";
+                /** @description Search venue names and cities. */
+                q?: string;
+                /** @description Filter by organisation (system admin only). */
+                tenantId?: components["schemas"]["Object"];
+                /** @description Filter by active status. */
+                isActive?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description A paginated list of venues. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedResponseDto"];
+                };
+            };
+        };
+    };
+    VenuesController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateVenueDto"];
+            };
+        };
+        responses: {
+            /** @description Venue created. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VenueResponseDto"];
+                };
+            };
+            /** @description A venue with this name already exists. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    VenuesController_getOne: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                venueId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VenueResponseDto"];
+                };
+            };
+        };
+    };
+    VenuesController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                venueId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateVenueDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VenueResponseDto"];
+                };
+            };
+        };
+    };
+    VenuesController_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                venueId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Venue removed. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Venue still hosts scheduled games. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    VenuesController_addCourt: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                venueId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AddCourtDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VenueResponseDto"];
+                };
+            };
+        };
+    };
+    VenuesController_removeCourt: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                venueId: string;
+                courtId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VenueResponseDto"];
                 };
             };
         };
