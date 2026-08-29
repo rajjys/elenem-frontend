@@ -137,6 +137,16 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
+  // Onboarding: the guided setup an organiser lands in straight after creating their
+  // organisation, and can return to later. Open to anyone who can create a competition, which is
+  // the same set that may reach /tenant and /league.
+  if (pathname === '/onboarding' || pathname.startsWith('/onboarding/')) {
+    if (!hasRole(Roles.TENANT_ADMIN) && !hasRole(Roles.LEAGUE_ADMIN) && !hasRole(Roles.SYSTEM_ADMIN)) {
+      return redirectToAccessDenied('tenant_access_required');
+    }
+    return NextResponse.next();
+  }
+
   // Tenant Admin routes
   if (pathname.startsWith('/tenant')) {
     if (!hasRole(Roles.TENANT_ADMIN) && !hasRole(Roles.SYSTEM_ADMIN)) {

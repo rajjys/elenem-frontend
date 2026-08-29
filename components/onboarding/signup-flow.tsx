@@ -1,13 +1,21 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ArrowLeft, ArrowRight, Check, Loader2, PartyPopper } from 'lucide-react';
 
-import { Button, CountryPicker, Input, Label, PasswordInput, SportPicker } from '@/components/ui';
+import {
+  Button,
+  CountryPicker,
+  Input,
+  Label,
+  PasswordChecklist,
+  PasswordInput,
+  SportPicker,
+} from '@/components/ui';
 import { AuthShell } from '@/components/auth/auth-shell';
 import { SportType } from '@/schemas';
 import {
@@ -20,6 +28,36 @@ import {
   useRegisterOrganisation,
   type RegisterOrganisationValues,
 } from '@/services/onboarding';
+
+/**
+ * A first guess at the organiser's country, from their device's time zone.
+ *
+ * The default was a flat 'CD', which is right for nearly everyone this launches to and wrong the
+ * moment a Kigali or Brazzaville league signs up. The zone is a better signal than
+ * `navigator.language`, which reports fr-FR for a Congolese phone set to French. Only the region
+ * actually served is mapped; everywhere else keeps the DRC default, because a wrong guess drawn
+ * from a long table is worse than a predictable one.
+ */
+const ZONE_TO_COUNTRY: Record<string, string> = {
+  'Africa/Kinshasa': 'CD',
+  'Africa/Lubumbashi': 'CD',
+  'Africa/Kigali': 'RW',
+  'Africa/Bujumbura': 'BI',
+  'Africa/Brazzaville': 'CG',
+  'Africa/Kampala': 'UG',
+  'Africa/Dar_es_Salaam': 'TZ',
+  'Africa/Nairobi': 'KE',
+  'Europe/Paris': 'FR',
+  'Europe/Brussels': 'BE',
+};
+
+function guessCountry(): string | undefined {
+  try {
+    return ZONE_TO_COUNTRY[Intl.DateTimeFormat().resolvedOptions().timeZone];
+  } catch {
+    return undefined;
+  }
+}
 
 /**
  * Sign-up, as one form that submits once.
@@ -91,7 +129,15 @@ export function SignUpFlow() {
   const [step, setStep] = useState<Step>('account');
   const [created, setCreated] = useState<{ name: string; tenantCode: string } | null>(null);
 
+  const [passwordTouched, setPasswordTouched] = useState(false);
+  // Once the organiser edits the code themselves it stops following the organisation name —
+  // their acronym is a decision, not a draft to be overwritten on the next keystroke.
+  const codeEdited = useRef(false);
+  const [codeStatus, setCodeStatus] = useState<'idle' | 'checking' | 'free' | 'taken'>('idle');
+  const countryTouched = useRef(false);
+
   const checkAvailability = useCheckAvailability();
+  const checkCode = useCheckAvailability();
   const registerOrganisation = useRegisterOrganisation();
 
   const form = useForm<RegisterOrganisationValues>({
@@ -114,13 +160,63 @@ export function SignUpFlow() {
   });
 
   const { register, watch, setValue, setError, clearErrors, getValues, formState } = form;
-  const firstName = watch('firstName');
-  const organisationName = watch('organisationName');
-  const tenantCode = watch('tenantCode');
-  const sportType = watch('sportType');
-  const country = watch('country');
+  const values = watch();
+  const { firstName, organisationName, tenantCode, sportType, country, password } = values;
+
+  /**
+   * Inputs are controlled rather than left to `register` alone.
+   *
+   * Switching step unmounts one set of fields and remounts them on the way back, and the
+   * remounted email input came back visually empty while react-hook-form still held the address.
+   * The form then advanced on a field the organiser could see was blank — the value was fine,
+   * the display was lying. Binding `value` removes the possibility.
+   */
+  const bind = (name: keyof RegisterOrganisationValues) => ({
+    ...register(name),
+    value: (values[name] ?? '') as string,
+  });
 
   const previewCode = (tenantCode?.trim() || suggestTenantCode(organisationName || '')).toLowerCase();
+
+  // Applied after mount rather than as a default value: reading the time zone during render
+  // would make the server and the client disagree about what the field says.
+  useEffect(() => {
+    if (countryTouched.current) return;
+    const guess = guessCountry();
+    if (guess) setValue('country', guess, { shouldValidate: false });
+  }, [setValue]);
+
+  // The code is prefilled from the organisation name and stays in step with it until the
+  // organiser types their own. It is not really optional — every organisation gets one, and it is
+  // the public web address — so it is shown answered rather than blank with a caveat.
+  useEffect(() => {
+    if (codeEdited.current) return;
+    const suggestion = suggestTenantCode(organisationName || '');
+    if (suggestion !== (tenantCode ?? '')) {
+      setValue('tenantCode', suggestion, { shouldValidate: false });
+    }
+  }, [organisationName, tenantCode, setValue]);
+
+  // Checked as it settles, so a taken code is known before the submit rather than by being
+  // refused by it. Previously the field was labelled optional and could still fail the request,
+  // which is a contradiction the organiser had no way to see coming.
+  useEffect(() => {
+    const code = (tenantCode ?? '').trim();
+    if (code.length < 2) {
+      setCodeStatus('idle');
+      return;
+    }
+    setCodeStatus('checking');
+    const timer = setTimeout(() => {
+      checkCode
+        .mutateAsync({ tenantCode: code })
+        .then((r) => setCodeStatus(r.tenantCode === 'taken' ? 'taken' : 'free'))
+        .catch(() => setCodeStatus('idle'));
+    }, 450);
+    return () => clearTimeout(timer);
+    // checkCode is a stable mutation handle; including it would restart the timer every render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tenantCode]);
 
   /** Validate one step's fields only, so the other step's emptiness is not an error yet. */
   function validateStep(fields: readonly (keyof RegisterOrganisationValues)[]) {
@@ -136,6 +232,7 @@ export function SignUpFlow() {
   }
 
   async function onAccountNext() {
+    setPasswordTouched(true);
     if (!validateStep(['firstName', 'lastName', 'email', 'password'])) return;
 
     // Asked here rather than after the organisation step, so a taken address is reported on the
@@ -154,6 +251,10 @@ export function SignUpFlow() {
 
   async function onSubmit() {
     if (!validateStep(['organisationName', 'tenantCode', 'sportType', 'country'])) return;
+    if (codeStatus === 'taken') {
+      setError('tenantCode', { message: 'Ce code est déjà pris. Choisissez-en un autre.' });
+      return;
+    }
 
     try {
       const result = await registerOrganisation.mutateAsync(getValues());
@@ -176,12 +277,13 @@ export function SignUpFlow() {
   if (step === 'done' && created) {
     return (
       <AuthShell
+        align="center"
         title={`${created.name} est créée.`}
         subtitle="Il reste une chose avant que vos supporters puissent voir quelque chose : une compétition."
       >
         <div className="space-y-6">
-          <div className="flex items-start gap-3 rounded-lg border border-positive/30 bg-positive-soft px-4 py-3">
-            <PartyPopper className="h-5 w-5 shrink-0 text-positive mt-0.5" aria-hidden />
+          <div className="flex items-center justify-center gap-2.5 rounded-lg border border-positive/30 bg-positive-soft px-4 py-3">
+            <PartyPopper className="h-5 w-5 shrink-0 text-positive" aria-hidden />
             <p className="text-sm text-ink">
               Votre adresse publique&nbsp;:{' '}
               <span className="font-medium">{created.tenantCode.toLowerCase()}.elenem.site</span>
@@ -192,7 +294,7 @@ export function SignUpFlow() {
             <Button
               variant="primary"
               className="w-full h-11"
-              onClick={() => router.push('/league/create')}
+              onClick={() => router.push('/onboarding')}
             >
               Créer votre première ligue
               <ArrowRight size={16} className="ml-2" />
@@ -261,12 +363,12 @@ export function SignUpFlow() {
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <Label htmlFor="firstName">Prénom</Label>
-                <Input id="firstName" autoComplete="given-name" placeholder="Jean" {...register('firstName')} />
+                <Input id="firstName" autoComplete="given-name" placeholder="Jean" {...bind('firstName')} />
                 <FieldError message={formState.errors.firstName?.message} />
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="lastName">Nom</Label>
-                <Input id="lastName" autoComplete="family-name" placeholder="Bisimwa" {...register('lastName')} />
+                <Input id="lastName" autoComplete="family-name" placeholder="Bisimwa" {...bind('lastName')} />
                 <FieldError message={formState.errors.lastName?.message} />
               </div>
             </div>
@@ -278,7 +380,7 @@ export function SignUpFlow() {
                 type="email"
                 autoComplete="email"
                 placeholder="jean.bisimwa@example.cd"
-                {...register('email')}
+                {...bind('email')}
               />
               <FieldError message={formState.errors.email?.message} />
             </div>
@@ -290,14 +392,12 @@ export function SignUpFlow() {
                 autoComplete="new-password"
                 placeholder="••••••••"
                 {...register('password')}
+                value={password ?? ''}
               />
-              {formState.errors.password ? (
-                <FieldError message={formState.errors.password.message} />
-              ) : (
-                <p className="text-xs text-ink-subtle">
-                  8 caractères au minimum, avec une majuscule, une minuscule et un chiffre.
-                </p>
-              )}
+              <PasswordChecklist
+                value={password ?? ''}
+                showFailures={passwordTouched && !!formState.errors.password}
+              />
             </div>
 
             <Button
@@ -328,30 +428,46 @@ export function SignUpFlow() {
                 // Named for the browser, so it stops offering the email typed on the step before.
                 autoComplete="organization"
                 placeholder="Ligue Provinciale de Basketball de Kinshasa"
-                {...register('organisationName')}
+                {...bind('organisationName')}
               />
               <FieldError message={formState.errors.organisationName?.message} />
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="tenantCode">
-                Code court <span className="font-normal text-ink-subtle">— facultatif</span>
-              </Label>
+              <Label htmlFor="tenantCode">Code court</Label>
               <Input
                 id="tenantCode"
                 autoComplete="off"
                 transform="uppercase"
                 maxCharacters={12}
-                placeholder={suggestTenantCode(organisationName || '') || 'LIPROBAKIN'}
+                placeholder="LIPROBAKIN"
                 {...register('tenantCode')}
+                value={tenantCode ?? ''}
+                onChange={(e) => {
+                  codeEdited.current = true;
+                  setValue('tenantCode', e.target.value.toUpperCase(), { shouldValidate: false });
+                  clearErrors('tenantCode');
+                }}
               />
               {formState.errors.tenantCode ? (
                 <FieldError message={formState.errors.tenantCode.message} />
+              ) : codeStatus === 'taken' ? (
+                <p className="text-negative text-xs" role="alert">
+                  <span className="font-medium">{previewCode}</span>.elenem.site est déjà pris.
+                  Choisissez un autre code.
+                </p>
               ) : (
                 <p className="text-xs text-ink-subtle">
                   Votre adresse publique&nbsp;:{' '}
-                  <span className="text-accent-text font-medium">{previewCode || 'votre-code'}</span>
+                  <span
+                    className={
+                      codeStatus === 'free' ? 'text-positive font-medium' : 'text-accent-text font-medium'
+                    }
+                  >
+                    {previewCode || 'votre-code'}
+                  </span>
                   .elenem.site
+                  {codeStatus === 'free' && ' — disponible'}
                 </p>
               )}
             </div>
@@ -371,7 +487,10 @@ export function SignUpFlow() {
               <CountryPicker
                 id="country"
                 value={country}
-                onChange={(code) => setValue('country', code, { shouldValidate: true })}
+                onChange={(code) => {
+                  countryTouched.current = true;
+                  setValue('country', code, { shouldValidate: true });
+                }}
                 invalid={!!formState.errors.country}
               />
               <FieldError message={formState.errors.country?.message} />

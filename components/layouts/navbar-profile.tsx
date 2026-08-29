@@ -3,9 +3,8 @@
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Building2, Camera, Mail, SquarePen } from 'lucide-react';
+import { Building2, Camera, LogOut, Mail, SquarePen } from 'lucide-react';
 import { useAuthStore } from '@/store/auth.store';
-import { cn } from '@/utils/cn';
 
 const ROLE_LABELS: Record<string, string> = {
   SYSTEM_ADMIN: 'Administrateur plateforme',
@@ -29,6 +28,7 @@ const ROLE_LABELS: Record<string, string> = {
  */
 export function NavbarProfile({ onEditAvatar }: { onEditAvatar?: () => void }) {
   const user = useAuthStore((s) => s.user);
+  const logout = useAuthStore((s) => s.logout);
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -126,15 +126,17 @@ export function NavbarProfile({ onEditAvatar }: { onEditAvatar?: () => void }) {
                 <dt className="mb-1 text-[11px] font-medium uppercase tracking-wider text-ink-subtle">
                   Organisation
                 </dt>
-                <dd className="flex items-center gap-2 text-ink">
-                  <Building2 className="h-3.5 w-3.5 shrink-0 text-ink-subtle" />
-                  <span className="truncate">{user.tenant.name}</span>
+                <dd className="flex items-start gap-2 text-ink">
+                  <Building2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-ink-subtle" />
+                  {/* Wraps rather than truncates: the tail of a league's name is the part that
+                      says which league it is. */}
+                  <span className="min-w-0 break-words leading-snug">{user.tenant.name}</span>
                 </dd>
               </div>
             )}
           </dl>
 
-          <div className="border-t border-line px-4 py-2.5">
+          <div className="flex items-center justify-between gap-3 border-t border-line px-4 py-2.5">
             <Link
               href="/account/profile"
               onClick={() => setOpen(false)}
@@ -142,6 +144,20 @@ export function NavbarProfile({ onEditAvatar }: { onEditAvatar?: () => void }) {
             >
               Voir mon profil complet
             </Link>
+            {/* Signing out is also in the sidebar account menu, but this card is what the navbar
+                avatar opens — and an identity popover that cannot end the session sends you
+                hunting for the one that can. */}
+            <button
+              type="button"
+              onClick={() => {
+                setOpen(false);
+                logout();
+              }}
+              className="flex items-center gap-1.5 rounded-md px-2 py-1 text-sm text-ink-muted transition-colors hover:bg-surface-sunk hover:text-negative focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            >
+              <LogOut className="h-3.5 w-3.5" aria-hidden />
+              Déconnexion
+            </button>
           </div>
         </div>
       )}

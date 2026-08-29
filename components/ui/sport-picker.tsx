@@ -99,7 +99,12 @@ export function SportPicker({
             <CommandList>
               <CommandEmpty>Aucun sport trouvé.</CommandEmpty>
               <CommandGroup>
-                {Object.values(SportType).map((sport) => {
+                {/* The three cards above are not repeated here: offering the same choice twice
+                    in one control makes the list look like it does not know what it already
+                    showed. */}
+                {Object.values(SportType)
+                  .filter((sport) => !FEATURED_VALUES.has(sport))
+                  .map((sport) => {
                   const Icon = getSportIcon(sport);
                   return (
                     <CommandItem
@@ -115,8 +120,8 @@ export function SportPicker({
                       <span className="flex-1 truncate">{prettify(sport)}</span>
                       {value === sport && <Check className="h-4 w-4 shrink-0 opacity-80" aria-hidden />}
                     </CommandItem>
-                  );
-                })}
+                    );
+                  })}
               </CommandGroup>
             </CommandList>
           </Command>

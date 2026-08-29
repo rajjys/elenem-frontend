@@ -34,6 +34,7 @@ export * from './post/post-rich-text-editor';
 export * from './post/lexical-renderer';
 export * from './error-state';
 export * from './password-input';
+export * from './password-checklist';
 export * from './otp-input';
 export * from './dialog-modal';
 export * from './confirm-dialog';

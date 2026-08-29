@@ -23,6 +23,7 @@ export function AuthShell({
   crossLink,
   children,
   footer,
+  align = 'start',
 }: {
   title: string;
   subtitle?: ReactNode;
@@ -31,7 +32,13 @@ export function AuthShell({
   children: ReactNode;
   /** Legal text or equivalent, in the quiet zone under the form. */
   footer?: ReactNode;
+  /**
+   * Centred for outcome screens, where the heading announces something rather than labelling a
+   * form. A left-aligned heading over centred buttons reads as two layouts sharing a page.
+   */
+  align?: 'start' | 'center';
 }) {
+  const centered = align === 'center';
   return (
     <div className="min-h-dvh bg-canvas text-ink flex flex-col lg:flex-row">
       {/* --- form column --- */}
@@ -48,7 +55,7 @@ export function AuthShell({
         </header>
 
         <main className="flex-1 flex items-start sm:items-center justify-center px-5 sm:px-8 pb-10">
-          <div className="w-full max-w-[27rem] py-6 sm:py-10">
+          <div className={`w-full max-w-[27rem] py-6 sm:py-10 ${centered ? 'text-center' : ''}`}>
             <h1 className="text-[1.75rem] sm:text-4xl font-bold tracking-tight text-ink text-balance">
               {title}
             </h1>
