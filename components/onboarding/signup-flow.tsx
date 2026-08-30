@@ -363,12 +363,28 @@ export function SignUpFlow() {
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <Label htmlFor="firstName">Prénom</Label>
-                <Input id="firstName" autoComplete="given-name" placeholder="Jean" {...bind('firstName')} />
+                <Input
+                  id="firstName"
+                  autoComplete="given-name"
+                  placeholder="Jean"
+                  transform="name"
+                  maxCharacters={50}
+                  autoTrim
+                  {...bind('firstName')}
+                />
                 <FieldError message={formState.errors.firstName?.message} />
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="lastName">Nom</Label>
-                <Input id="lastName" autoComplete="family-name" placeholder="Bisimwa" {...bind('lastName')} />
+                <Input
+                  id="lastName"
+                  autoComplete="family-name"
+                  placeholder="Bisimwa"
+                  transform="name"
+                  maxCharacters={50}
+                  autoTrim
+                  {...bind('lastName')}
+                />
                 <FieldError message={formState.errors.lastName?.message} />
               </div>
             </div>
@@ -380,6 +396,8 @@ export function SignUpFlow() {
                 type="email"
                 autoComplete="email"
                 placeholder="jean.bisimwa@example.cd"
+                maxCharacters={254}
+                autoTrim
                 {...bind('email')}
               />
               <FieldError message={formState.errors.email?.message} />
@@ -428,6 +446,9 @@ export function SignUpFlow() {
                 // Named for the browser, so it stops offering the email typed on the step before.
                 autoComplete="organization"
                 placeholder="Ligue Provinciale de Basketball de Kinshasa"
+                transform="name"
+                maxCharacters={100}
+                autoTrim
                 {...bind('organisationName')}
               />
               <FieldError message={formState.errors.organisationName?.message} />

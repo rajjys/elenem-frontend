@@ -20,12 +20,19 @@ import { parseTeamLines, suggestShortCode, type TeamRow } from '@/services/setup
 export interface EditableTeamRow extends TeamRow {
   /** Stable across re-orders, so React does not reuse the wrong input when a row is removed. */
   key: string;
+  /**
+   * Set once the organiser types their own code, after which the field stops following the
+   * name. A league already publishing VIR, CHX and MAE has to keep them, so a suggestion must
+   * never overwrite a decision.
+   */
+  codeEdited?: boolean;
 }
 
 let rowCounter = 0;
 function newRow(name = '', shortCode = ''): EditableTeamRow {
   rowCounter += 1;
-  return { key: `row-${rowCounter}`, name, shortCode };
+  // A code that arrived with a pasted line is the organiser's, so it is already "edited".
+  return { key: `row-${rowCounter}`, name, shortCode, codeEdited: !!shortCode };
 }
 
 export function emptyRows(count = 3): EditableTeamRow[] {
@@ -60,6 +67,15 @@ export function TeamRowsEditor({
 
   function update(index: number, patch: Partial<EditableTeamRow>) {
     onChange(rows.map((r, i) => (i === index ? { ...r, ...patch } : r)));
+  }
+
+  /** Typing a name fills the code in, until the organiser writes their own. */
+  function updateName(index: number, name: string) {
+    const row = rows[index];
+    update(index, {
+      name,
+      ...(row.codeEdited ? {} : { shortCode: suggestShortCode(name) }),
+    });
   }
 
   function addRow() {
@@ -132,19 +148,22 @@ export function TeamRowsEditor({
             <Input
               aria-label={`Nom de l'équipe ${index + 1}`}
               placeholder="BC Virunga"
+              transform="name"
+              maxCharacters={80}
+              autoTrim
               value={row.name}
               ref={index === rows.length - 1 ? lastNameRef : undefined}
-              onChange={(e) => update(index, { name: e.target.value })}
+              onChange={(e) => updateName(index, e.target.value)}
             />
             <Input
               aria-label={`Sigle de l'équipe ${index + 1}`}
               transform="uppercase"
               maxCharacters={4}
-              // The derived code sits in the placeholder, so it is visibly a suggestion: leave it
-              // and the server derives the same thing, type over it and yours is kept.
-              placeholder={suggestShortCode(row.name) || '—'}
+              placeholder="—"
               value={row.shortCode ?? ''}
-              onChange={(e) => update(index, { shortCode: e.target.value.toUpperCase() })}
+              onChange={(e) =>
+                update(index, { shortCode: e.target.value.toUpperCase(), codeEdited: true })
+              }
             />
             <button
               type="button"

@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ArrowLeft, ArrowRight, Check, CircleAlert, Loader2 } from 'lucide-react';
 
-import { Button, Input, Label } from '@/components/ui';
+import { Button, DatePicker, Input, Label } from '@/components/ui';
 import { SplitShell } from '@/components/auth';
 import { useAuthStore } from '@/store/auth.store';
 import { Gender } from '@/schemas';
@@ -250,6 +250,9 @@ export function SetupWizard() {
             <Input
               id="leagueName"
               placeholder="Championnat Provincial Messieurs"
+              transform="name"
+              maxCharacters={100}
+              autoTrim
               {...leagueForm.register('name')}
             />
             {leagueForm.formState.errors.name && (
@@ -346,7 +349,13 @@ export function SetupWizard() {
         <form key="season-step" onSubmit={seasonForm.handleSubmit(submitSeason)} className="space-y-5">
           <div className="space-y-1.5">
             <Label htmlFor="seasonName">Nom de la saison</Label>
-            <Input id="seasonName" placeholder="Saison 2026-2027" {...seasonForm.register('name')} />
+            <Input
+              id="seasonName"
+              placeholder="Saison 2026-2027"
+              maxCharacters={60}
+              autoTrim
+              {...seasonForm.register('name')}
+            />
             {seasonForm.formState.errors.name && (
               <p className="text-negative text-xs" role="alert">
                 {seasonForm.formState.errors.name.message}
@@ -357,11 +366,20 @@ export function SetupWizard() {
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <Label htmlFor="startDate">Début</Label>
-              <Input id="startDate" type="date" {...seasonForm.register('startDate')} />
+              <DatePicker
+                id="startDate"
+                value={seasonForm.watch('startDate')}
+                onChange={(iso) => seasonForm.setValue('startDate', iso, { shouldValidate: true })}
+              />
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="endDate">Fin</Label>
-              <Input id="endDate" type="date" {...seasonForm.register('endDate')} />
+              <DatePicker
+                id="endDate"
+                value={seasonForm.watch('endDate')}
+                onChange={(iso) => seasonForm.setValue('endDate', iso, { shouldValidate: true })}
+                invalid={!!seasonForm.formState.errors.endDate}
+              />
               {seasonForm.formState.errors.endDate && (
                 <p className="text-negative text-xs" role="alert">
                   {seasonForm.formState.errors.endDate.message}

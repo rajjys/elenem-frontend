@@ -40,7 +40,7 @@ export function SplitShell({
   const centered = align === 'center';
 
   return (
-    <div className="min-h-dvh bg-canvas text-ink flex flex-col lg:flex-row">
+    <div className="min-h-dvh bg-canvas text-ink flex flex-col lg:flex-row lg:items-stretch">
       <div className="flex-1 flex flex-col min-w-0">
         <header className="flex items-center justify-between px-5 sm:px-8 py-4">
           <Link
@@ -83,7 +83,10 @@ export function SplitShell({
       </div>
 
       {aside && (
-        <aside className="hidden lg:flex lg:w-[46%] xl:w-[42%] shrink-0 relative overflow-hidden bg-accent text-accent-ink">
+        // Sticky and full-height, so it stays put while the form column grows. It was scrolling
+        // away with the page — opening the paste box pushed the summary panel down with it,
+        // which made a fixed reference point behave like content.
+        <aside className="hidden lg:flex lg:w-[46%] xl:w-[42%] shrink-0 relative overflow-hidden bg-accent text-accent-ink lg:sticky lg:top-0 lg:h-dvh">
           {/* Two soft sweeps, so the block does not read as a solid rectangle without competing
               with the form. */}
           <div
@@ -94,7 +97,9 @@ export function SplitShell({
             }}
             aria-hidden
           />
-          <div className="relative flex flex-col justify-center px-12 xl:px-16 py-16 w-full">
+          {/* Scrolls within itself if the panel ever outgrows the viewport, rather than
+              stretching the page. */}
+          <div className="relative flex flex-col justify-center px-12 xl:px-16 py-16 w-full overflow-y-auto">
             {aside}
           </div>
         </aside>
