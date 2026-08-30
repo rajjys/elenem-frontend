@@ -190,16 +190,22 @@ that nobody argues about what changed.
 
 ---
 
-## 5. Open questions
+## 5. Questions, answered 2026-08-30
 
-1. **Spreadsheet shape for 4.2** — we need one real file from LIPROBAKIN to design against. A
-   guessed column layout will be wrong.
-2. **Does a fixture require a venue to be published?** Currently optional. Leaning: optional,
-   because a published fixture with a date is better than no fixture.
-3. **Who may publish a draft** once more than one person uses the system — the §1 permission axis,
-   deferred but not forgotten.
-4. **Average game duration per sport** — basketball ≈ 100 min including stoppages; volleyball has
-   no clock at all and is the harder case. Needs a number per sport before 4.3.
+1. **Spreadsheet shape for 4.2** — there is no existing file and there does not need to be. **We
+   design and publish a downloadable template** a league manager can keep the schedule and the
+   results in. Primary information only; no formulas, no computed standings — the calculation is
+   the thing they are coming to us to stop doing by hand. The template is the contract the
+   importer reads.
+2. **Venue on a fixture: optional.** Both launch customers use one hall, so requiring it would buy
+   nothing and block publishing.
+3. **Who may publish a draft** — a tenant admin by default; a league admin publishing their own
+   competition is fine when they have only taken empty slots. A 2027 problem, recorded so the
+   permission axis in §1 is not designed away in the meantime.
+4. **Game duration is settled** — see §2.1 and `common/utils/game-duration.util.ts`. Basketball
+   100, football 120, volleyball 100, rugby 110, and so on for every sport in the enum. These are
+   slot lengths (warm-up, half-time and changeover included), not playing time, and every one is
+   editable on the calendar screen.
 
 ---
 
@@ -216,3 +222,5 @@ that nobody argues about what changed.
 | Mid-season entry via spreadsheet of completed results | §4.2 |
 | Venue placement optional in V1 | §2.4, §4.4 |
 | Nothing written until Publish | §3 |
+| Import template is ours to design; no existing file to match | §5.1 |
+| Game durations are slot lengths, per sport, editable | §2.1, §5.4 |

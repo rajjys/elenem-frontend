@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Check, ChevronsUpDown } from 'lucide-react';
-import { SportType } from '@/schemas';
+import { DEPRECATED_SPORTS, SportType } from '@/schemas';
 import { getSportIcon } from './getSportIcon';
 import { Popover, PopoverContent, PopoverTrigger } from './popover';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from './command';
@@ -104,6 +104,7 @@ export function SportPicker({
                     showed. */}
                 {Object.values(SportType)
                   .filter((sport) => !FEATURED_VALUES.has(sport))
+                  .filter((sport) => !DEPRECATED_SPORTS.includes(sport))
                   .map((sport) => {
                   const Icon = getSportIcon(sport);
                   return (

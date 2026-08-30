@@ -45,10 +45,18 @@ export enum TenantTypes {
   OTHER = 'OTHER',
 }
 
+// Mirrors the Prisma SportType enum exactly. It did not: this carried AMERICAN_FOOTBALL, which
+// the backend has never had, so choosing it in the sport picker sent a value @IsEnum rejected
+// with a 400 — and it lacked SOCCER, so a tenant holding that value had no label to render.
+//
+// SOCCER is a legacy duplicate of FOOTBALL: it carries no entry in the backend's sport-rules
+// dictionary, so a league created under it silently inherits football-shaped defaults anyway.
+// Kept in the type so existing rows render; hidden from the picker by DEPRECATED_SPORTS below,
+// because offering "Soccer" beside "Football" asks the organiser a question with no right answer.
 export enum SportType {
   BASKETBALL = 'BASKETBALL',
   FOOTBALL = 'FOOTBALL',
-  AMERICAN_FOOTBALL = 'AMERICAN_FOOTBALL',
+  SOCCER = 'SOCCER',
   BASEBALL = 'BASEBALL',
   TENNIS = 'TENNIS',
   HOCKEY = 'HOCKEY',
@@ -58,6 +66,9 @@ export enum SportType {
   VOLLEYBALL = 'VOLLEYBALL',
   OTHER = 'OTHER',
 }
+
+/** Selectable everywhere except a new-organisation picker. */
+export const DEPRECATED_SPORTS: SportType[] = [SportType.SOCCER];
 
 export enum VisibilityLevel {
   PUBLIC = "PUBLIC",

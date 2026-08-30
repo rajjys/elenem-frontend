@@ -22,7 +22,8 @@ const sportIconMap: Record<SportType, React.ElementType> = {
   [SportType.VOLLEYBALL]: Volleyball,
   [SportType.TENNIS]: TennisBallIcon,
   [SportType.RUGBY]: FootballIcon,
-  [SportType.AMERICAN_FOOTBALL]: FootballIcon,
+  // Legacy duplicate of FOOTBALL; same icon so an existing row still renders.
+  [SportType.SOCCER]: SoccerBallIcon,
   [SportType.BASEBALL]: BaseballIcon,
   [SportType.HOCKEY]: HockeyIcon,
   [SportType.GOLF]: GolfIcon,
