@@ -1546,6 +1546,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/venues/{venueId}/blackouts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Close a venue for a period (its own diary — see AddBlackoutDto) */
+        post: operations["VenuesController_addBlackout"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/venues/{venueId}/blackouts/{blackoutId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Reopen a venue */
+        delete: operations["VenuesController_removeBlackout"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/venues/{venueId}/courts": {
         parameters: {
             query?: never;
@@ -1608,6 +1642,23 @@ export interface paths {
         put?: never;
         /** Create the account and its organisation together, in one transaction */
         post: operations["OnboardingController_register"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/calendar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The organisation's calendar over a date range, every competition */
+        get: operations["CalendarController_getCalendar"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -3135,6 +3186,8 @@ export interface components {
              * @default 1
              */
             legs: number;
+            /** @description Hall every generated fixture is played in. Optional: a fixture with a date and no venue is still worth publishing, and both launch customers use a single hall anyway. When set, each fixture passes the same venue conflict check as one created by hand, so a clash against another competition is reported and skipped rather than double-booked. */
+            homeVenueId?: string;
             /** @description Date of the first matchday (YYYY-MM-DD). */
             startDate: string;
             /**
@@ -3475,6 +3528,8 @@ export interface components {
             capacity?: number;
             /** @description Anything worth noting — access, floor, lighting. */
             description?: string;
+            /** @description Organisation this hall belongs to. Only a system admin may send it — they have no organisation of their own, so without it they cannot create a venue at all. Everyone else has theirs resolved from the token, and passing another is refused. */
+            tenantId?: string;
             /**
              * @description Names of the individually bookable floors, if the venue has more than one. Leave empty for the ordinary case of one hall, one floor: the venue is then treated as a single space.
              * @example [
@@ -3501,8 +3556,21 @@ export interface components {
             capacity?: number;
             /** @description Anything worth noting — access, floor, lighting. */
             description?: string;
+            /** @description Organisation this hall belongs to. Only a system admin may send it — they have no organisation of their own, so without it they cannot create a venue at all. Everyone else has theirs resolved from the token, and passing another is refused. */
+            tenantId?: string;
             /** @description Take the venue out of use without deleting its history. */
             isActive?: boolean;
+        };
+        AddBlackoutDto: {
+            /** @description Start of the closure (ISO 8601). */
+            start: string;
+            /** @description End of the closure (ISO 8601). */
+            end: string;
+            /**
+             * @description Why, so the calendar can say so.
+             * @example Examens d’État
+             */
+            reason?: string;
         };
         AddCourtDto: {
             /**
@@ -3547,6 +3615,56 @@ export interface components {
              * @enum {string}
              */
             tenantType: "COMMERCIAL" | "NON_PROFIT" | "GOVERNMENT" | "EDUCATIONAL" | "OTHER";
+        };
+        CalendarCompetitionDto: {
+            id: string;
+            name: string;
+            division?: Record<string, never>;
+            gender?: Record<string, never>;
+            /** @description Short label, e.g. "D1 M". */
+            shortLabel: string;
+        };
+        CalendarVenueDto: {
+            id: string;
+            name: string;
+            city?: Record<string, never>;
+        };
+        CalendarSideDto: {
+            id: string;
+            name: string;
+            shortCode: string;
+        };
+        CalendarEntryDto: {
+            id: string;
+            /** Format: date-time */
+            dateTime: string;
+            /** @description Minutes the fixture occupies its hall, from the sport default. */
+            durationMinutes: number;
+            /** @enum {string} */
+            status: "DRAFT" | "SCHEDULED" | "CONFIRMED" | "LIVE" | "PAUSED" | "COMPLETED" | "CANCELLED" | "POSTPONED" | "RESCHEDULED";
+            leagueId: string;
+            venueId?: Record<string, never>;
+            courtId?: Record<string, never>;
+            home: components["schemas"]["CalendarSideDto"];
+            away: components["schemas"]["CalendarSideDto"];
+            homeScore?: Record<string, never>;
+            awayScore?: Record<string, never>;
+        };
+        CalendarBlackoutDto: {
+            venueId: string;
+            /** Format: date-time */
+            start: string;
+            /** Format: date-time */
+            end: string;
+            reason?: Record<string, never>;
+        };
+        CalendarResponseDto: {
+            from: string;
+            to: string;
+            competitions: components["schemas"]["CalendarCompetitionDto"][];
+            venues: components["schemas"]["CalendarVenueDto"][];
+            entries: components["schemas"]["CalendarEntryDto"][];
+            blackouts: components["schemas"]["CalendarBlackoutDto"][];
         };
     };
     responses: never;
@@ -7664,6 +7782,50 @@ export interface operations {
             };
         };
     };
+    VenuesController_addBlackout: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                venueId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AddBlackoutDto"];
+            };
+        };
+        responses: {
+            /** @description Closure recorded, with a count of fixtures inside it. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    VenuesController_removeBlackout: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                venueId: string;
+                blackoutId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     VenuesController_addCourt: {
         parameters: {
             query?: never;
@@ -7759,6 +7921,34 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    CalendarController_getCalendar: {
+        parameters: {
+            query: {
+                /** @description First day shown, inclusive (YYYY-MM-DD). */
+                from: string;
+                /** @description Last day shown, inclusive (YYYY-MM-DD). */
+                to: string;
+                /** @description Narrow to particular competitions. Omit for the whole organisation — which is the point of the calendar: one hall on one Saturday is a single resource however many competitions want it. */
+                leagueIds?: string[];
+                /** @description Organisation to read (system admins only). */
+                tenantId?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CalendarResponseDto"];
+                };
             };
         };
     };

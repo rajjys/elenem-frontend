@@ -18,7 +18,6 @@ import {
   Settings,
   Building2,
   UserSquare2,
-  Wand2,
 } from 'lucide-react';
 
 type IconType = React.ComponentType<React.SVGProps<SVGSVGElement>>;
@@ -87,7 +86,7 @@ export const tenantNavItems: NavGroup[] = [
     { label: 'Ligues', basePath: '/tenant/leagues', icon: Trophy },
     { label: 'Équipes', basePath: '/tenant/teams', icon: Shield },
     { label: 'Joueurs', basePath: '/tenant/players', icon: UserSquare2 },
-    { label: 'Calendrier', basePath: '/tenant/schedule', icon: Wand2 },
+    { label: 'Calendrier', basePath: '/calendar', icon: CalendarDays },
     { label: 'Matchs', basePath: '/tenant/games', icon: ListOrdered },
     ],
   },
@@ -114,7 +113,7 @@ export const leagueNavItems: NavGroup[] = [
     { label: 'Équipes', basePath: '/league/teams', icon: Shield },
     { label: 'Joueurs', basePath: '/league/players', icon: UserSquare2 },
     { label: 'Saisons', basePath: '/league/seasons', icon: CalendarDays },
-    { label: 'Calendrier', basePath: '/league/schedule', icon: Wand2 },
+    { label: 'Calendrier', basePath: '/calendar', icon: CalendarDays },
     { label: 'Matchs', basePath: '/league/games', icon: ListOrdered },
     { label: 'Classement', basePath: '/league/standings', icon: Trophy },
     ],

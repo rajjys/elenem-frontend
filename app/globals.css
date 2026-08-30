@@ -189,6 +189,19 @@
   --t-caution:       #8a5306;
   --t-caution-soft:  #fef3c7;
 
+  /* Category. Identity, not judgement — "which competition is this", where positive/negative
+     would say "won/lost" and mean the wrong thing entirely. Four hues, deliberately drawn away
+     from the semantic ones so a fixture chip is never mistaken for a result. Reused past four:
+     an organisation running five simultaneous competitions has a bigger problem than a repeat. */
+  --t-cat-1:      #0a3a8d;   /* the accent itself, for the first competition */
+  --t-cat-1-soft: #e6edf9;
+  --t-cat-2:      #7c3aed;
+  --t-cat-2-soft: #f0e9fe;
+  --t-cat-3:      #0e7490;
+  --t-cat-3-soft: #dcf1f6;
+  --t-cat-4:      #a16207;
+  --t-cat-4-soft: #fdf0d4;
+
   /* Elevation. Two levels: things that rest, and things that float. */
   --t-shadow-1: 0 1px 2px rgb(15 23 42 / 0.06), 0 1px 3px rgb(15 23 42 / 0.04);
   --t-shadow-2: 0 4px 6px -2px rgb(15 23 42 / 0.08), 0 12px 28px -8px rgb(15 23 42 / 0.18);
@@ -225,6 +238,15 @@
     --t-negative-soft: #2c1718;
     --t-caution:       #d9a441;
     --t-caution-soft:  #2b2214;
+
+    --t-cat-1:      #6f9fe4;
+    --t-cat-1-soft: #15263c;
+    --t-cat-2:      #b18cf5;
+    --t-cat-2-soft: #23193a;
+    --t-cat-3:      #57b6cd;
+    --t-cat-3-soft: #10262c;
+    --t-cat-4:      #d9a441;
+    --t-cat-4-soft: #2b2214;
 
     --t-shadow-1: 0 1px 2px rgb(0 0 0 / 0.4), 0 1px 3px rgb(0 0 0 / 0.3);
     --t-shadow-2: 0 4px 6px -2px rgb(0 0 0 / 0.5), 0 12px 28px -8px rgb(0 0 0 / 0.7);
@@ -295,6 +317,15 @@
   --color-negative-soft: var(--t-negative-soft);
   --color-caution:       var(--t-caution);
   --color-caution-soft:  var(--t-caution-soft);
+
+  --color-cat-1:      var(--t-cat-1);
+  --color-cat-1-soft: var(--t-cat-1-soft);
+  --color-cat-2:      var(--t-cat-2);
+  --color-cat-2-soft: var(--t-cat-2-soft);
+  --color-cat-3:      var(--t-cat-3);
+  --color-cat-3-soft: var(--t-cat-3-soft);
+  --color-cat-4:      var(--t-cat-4);
+  --color-cat-4-soft: var(--t-cat-4-soft);
 
   --shadow-e1: var(--t-shadow-1);
   --shadow-e2: var(--t-shadow-2);
