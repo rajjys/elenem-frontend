@@ -136,11 +136,11 @@ export function NavbarProfile({ onEditAvatar }: { onEditAvatar?: () => void }) {
             )}
           </dl>
 
-          <div className="flex items-center justify-between gap-3 border-t border-line px-4 py-2.5">
+          <div className="flex flex-col items-start gap-0.5 border-t border-line px-2 py-2">
             <Link
               href="/account/profile"
               onClick={() => setOpen(false)}
-              className="text-sm text-accent-text hover:underline"
+              className="w-full rounded-md px-2 py-1.5 text-sm text-accent-text transition-colors hover:bg-surface-sunk"
             >
               Voir mon profil complet
             </Link>
@@ -153,7 +153,7 @@ export function NavbarProfile({ onEditAvatar }: { onEditAvatar?: () => void }) {
                 setOpen(false);
                 logout();
               }}
-              className="flex items-center gap-1.5 rounded-md px-2 py-1 text-sm text-ink-muted transition-colors hover:bg-surface-sunk hover:text-negative focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm text-ink-muted transition-colors hover:bg-surface-sunk hover:text-negative focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             >
               <LogOut className="h-3.5 w-3.5" aria-hidden />
               Déconnexion

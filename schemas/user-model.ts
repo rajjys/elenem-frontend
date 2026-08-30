@@ -8,7 +8,12 @@ interface BasicTenant {
   id: string;
   externalId: string;
   name: string;
-  sportType: SportType 
+  // The sport decides which scoring rules a new league is created under; the code is the
+  // organisation's public subdomain. Both are declared here and both are now actually returned
+  // by /auth/me — the projection there used to drop them, so `sportType` was typed but never
+  // present, and anything reading it silently got undefined.
+  sportType?: SportType;
+  tenantCode?: string;
 }
 
 // Basic League type for nested relations in User
@@ -82,7 +87,8 @@ export const UserSchema = z.object({
     id: z.string().cuid(),
     externalId: z.string().uuid(),
     name: z.string(),
-    //sportType: z.nativeEnum(SportType),
+    sportType: z.nativeEnum(SportType).optional(),
+    tenantCode: z.string().optional(),
   }).nullable().optional(),
 
   managingLeagueId: z.string().cuid().nullable().optional(),

@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { z } from 'zod';
 import { api, getApiErrorMessage } from './api';
 import { parseResponse } from './parse-response';
@@ -30,6 +30,68 @@ const CreatedLeagueSchema = z.object({
   slug: z.string().optional(),
 });
 
+/**
+ * The scoring and tie-break rules a league will be created with.
+ *
+ * Seeded server-side from the organisation's sport, so a basketball league starts at 2 points a
+ * win and 1 a loss — LIPROBAKIN's own convention — rather than football's 3/1/0. The organiser
+ * never had to set it, which is right, but they also never got to SEE it, which is not: the
+ * whole promise of the product is that the table is not disputed, and the rule producing that
+ * table is the first thing a federation would want confirmed.
+ */
+const SportRulesSchema = z.object({
+  sportType: z.string(),
+  pointSystem: z.object({
+    rules: z.array(z.object({ outcome: z.string(), points: z.number() })),
+  }),
+  tieBreakers: z.array(
+    z.object({ order: z.number(), rule: z.string(), label: z.string().optional() }),
+  ),
+});
+
+export type SportRules = z.infer<typeof SportRulesSchema>;
+
+export function useSportRules(sportType?: string) {
+  return useQuery({
+    queryKey: ['sport-rules', sportType],
+    enabled: !!sportType,
+    // Constants per sport; refetching them on every focus would be noise.
+    staleTime: Infinity,
+    queryFn: async () => {
+      const res = await api.get(`/sport-rules/${sportType}`);
+      return parseResponse(SportRulesSchema, res.data);
+    },
+  });
+}
+
+/** The dictionary's tie-break names, in the product's language. */
+export const TIE_BREAK_LABELS: Record<string, string> = {
+  GOALS_DIFFERENCE: 'Différence de points',
+  GOAL_DIFFERENCE: 'Différence de points',
+  HEAD_TO_HEAD_POINTS: 'Confrontation directe',
+  HEAD_TO_HEAD_GOAL_DIFFERENCE: 'Différence en confrontation directe',
+  HEAD_TO_HEAD_GOALS_FOR: 'Points marqués en confrontation directe',
+  HEAD_TO_HEAD_WIN_PERCENTAGE: 'Pourcentage en confrontation directe',
+  GOALS_SCORED: 'Points marqués',
+  GOALS_FOR: 'Points marqués',
+  GOALS_AGAINST: 'Points encaissés',
+  WINS: 'Nombre de victoires',
+  MOST_WINS: 'Nombre de victoires',
+  WIN_PERCENTAGE: 'Pourcentage de victoires',
+  AWAY_WINS: 'Victoires à l\u2019extérieur',
+  AWAY_GOALS: 'Points marqués à l\u2019extérieur',
+  FAIR_PLAY_POINTS: 'Fair-play',
+  DISCIPLINE: 'Fair-play',
+};
+
+export const OUTCOME_LABELS: Record<string, string> = {
+  WIN: 'Victoire',
+  DRAW: 'Match nul',
+  LOSS: 'Défaite',
+  FORFEIT_WIN: 'Victoire par forfait',
+  FORFEIT_LOSS: 'Forfait',
+};
+
 export function useCreateLeague() {
   const queryClient = useQueryClient();
   return useMutation({
@@ -37,6 +99,28 @@ export function useCreateLeague() {
       const res = await api.post('/leagues', {
         name: values.name,
         tenantId: values.tenantId,
+        gender: values.gender,
+        division: values.division?.trim() || 'D1',
+      });
+      return parseResponse(CreatedLeagueSchema, res.data);
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['leagues'] }),
+  });
+}
+
+/**
+ * Editing a league already created by this wizard.
+ *
+ * The steps write as they complete, so going back cannot mean "create it again". It means
+ * amending what exists — which is also what an organiser expects from a Back button that sits
+ * next to fields already filled in.
+ */
+export function useUpdateLeague() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, ...values }: LeagueEssentialsValues & { id: string }) => {
+      const res = await api.put(`/leagues/${id}`, {
+        name: values.name,
         gender: values.gender,
         division: values.division?.trim() || 'D1',
       });
@@ -92,6 +176,21 @@ export function suggestSeasonName(start: Date): string {
   return start.getMonth() >= 6 ? `Saison ${year}-${year + 1}` : `Saison ${year}`;
 }
 
+export function useUpdateSeason() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, ...values }: SeasonEssentialsValues & { id: string }) => {
+      const res = await api.put(`/seasons/${id}`, {
+        name: values.name,
+        startDate: values.startDate,
+        endDate: values.endDate,
+      });
+      return parseResponse(CreatedSeasonSchema, res.data);
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['seasons'] }),
+  });
+}
+
 // --- teams ----------------------------------------------------------------------------------
 
 export interface TeamRow {
@@ -134,6 +233,24 @@ export function parseTeamLines(block: string): TeamRow[] {
   }
 
   return rows;
+}
+
+/**
+ * The short code the server would derive, offered while the organiser types the name.
+ *
+ * Mirrors `TeamsService.deriveShortCode`: clubs here are "<prefix> <name>" — BC Virunga, AS Vita
+ * — so the longest word carries the identity. Shown as a suggestion rather than imposed, because
+ * a league that already publishes VIR, CHX and MAE has to be able to keep them.
+ */
+export function suggestShortCode(name: string): string {
+  const words = name
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .split(/[^A-Za-z0-9]+/)
+    .filter(Boolean);
+  if (!words.length) return '';
+  const distinctive = words.reduce((longest, w) => (w.length > longest.length ? w : longest));
+  return distinctive.slice(0, 3).toUpperCase();
 }
 
 export interface BulkTeamResult {

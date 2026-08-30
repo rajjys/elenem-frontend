@@ -20,23 +20,9 @@ const ROWS = [
   { pos: 5, team: 'Ngaba BC', p: 12, w: 5, l: 7, diff: '−19', pts: 17 },
 ];
 
-export function AuthAside() {
+export function StandingsPreview() {
   return (
-    <aside
-      className="hidden lg:flex lg:w-[46%] xl:w-[42%] shrink-0 relative overflow-hidden bg-accent text-accent-ink"
-    >
-      {/* Two soft sweeps, borrowed from the way Resend lights a flat panel: enough shape that the
-          block does not read as a solid rectangle, not so much that it competes with the form. */}
-      <div
-        className="pointer-events-none absolute inset-0 opacity-[0.14]"
-        style={{
-          background:
-            'radial-gradient(120% 80% at 85% 0%, #fff 0%, transparent 55%), radial-gradient(90% 70% at 10% 100%, #fff 0%, transparent 60%)',
-        }}
-        aria-hidden
-      />
-
-      <div className="relative flex flex-col justify-center px-12 xl:px-16 py-16 w-full">
+    <>
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent-ink/60">
           Championnat provincial
         </p>
@@ -82,7 +68,6 @@ export function AuthAside() {
         <p className="mt-4 text-xs text-accent-ink/45">
           Exemple illustratif · 2 points par victoire, 1 par défaite
         </p>
-      </div>
-    </aside>
+    </>
   );
 }
