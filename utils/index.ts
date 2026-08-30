@@ -10,3 +10,4 @@ export * from './flatten-errors'
 export * from './toast-error';
 
 export * from './post-auth-redirect';
+export * from './proper-name';

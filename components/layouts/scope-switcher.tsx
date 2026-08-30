@@ -79,12 +79,29 @@ export function ScopeSwitcher({
       }
       if (kind === 'league') {
         const r = await api.get(`/leagues?pageSize=100${parentId ? `&tenantId=${parentId}` : ''}`);
-        return (r.data?.data ?? []).map((l: any) => ({
-          id: l.id,
-          name: l.name,
-          short:
-            l.division && l.gender ? `${l.division} ${l.gender === 'FEMALE' ? 'F' : 'M'}` : l.name,
-        }));
+        type LeagueRow = { id: string; name: string; division?: string | null; gender?: string | null };
+        const leagues: LeagueRow[] = r.data?.data ?? [];
+
+        // "D1 M" is a good short label right up until a second D1 Messieurs exists, at which
+        // point the breadcrumb names two different competitions identically and the switcher
+        // offers you a choice between two things that look the same. So the abbreviation is used
+        // only while it still distinguishes; otherwise the league's own name is.
+        const abbrev = (l: LeagueRow) =>
+          l.division && l.gender ? `${l.division} ${l.gender === 'FEMALE' ? 'F' : 'M'}` : null;
+        const counts = new Map<string, number>();
+        for (const l of leagues) {
+          const a = abbrev(l);
+          if (a) counts.set(a, (counts.get(a) ?? 0) + 1);
+        }
+
+        return leagues.map((l) => {
+          const a = abbrev(l);
+          return {
+            id: l.id,
+            name: l.name,
+            short: a && counts.get(a) === 1 ? a : l.name,
+          };
+        });
       }
       const r = await api.get(`/teams?pageSize=100${parentId ? `&leagueId=${parentId}` : ''}`);
       return (r.data?.data ?? []).map((t: any) => ({

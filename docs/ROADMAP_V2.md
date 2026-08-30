@@ -275,3 +275,25 @@ fixture generation) as well as Phase 3.
 
 The scoresheet photo referenced in A1 did not come through. Worth having before designing the box
 score entry screen, so the field order matches the paper.
+
+---
+
+## 7. Calendar module — split out (2026-08-30)
+
+Fixture generation has its own document: **`CALENDAR_MODULE.md`**. It outgrew a roadmap line the
+moment the customer explained how the calendar is actually decided.
+
+The headline, because it changes who we are building for first:
+
+**The first operator does not decide the calendar.** At LIPROBAKIN the community manager is not in
+the room where fixtures are agreed; he receives a final draft to publish and results to record.
+So *recording a calendar decided elsewhere* is a first-class path that ships BEFORE generation,
+not a fallback after it. A module that only generates is a module our first customer cannot use.
+
+Second correction: the calendar is **tenant-level, not season-level**. `Season` belongs to a
+`League`, so a season-scoped screen can only ever show one competition — but men's, women's and D2
+share halls and matchdays, and one Saturday in one hall is a single resource. The screen takes a
+set of seasons.
+
+Phase 2 item 3c is therefore replaced by the slices in `CALENDAR_MODULE.md` §4, of which 4.1
+(calendar view, read-only) and 4.2 (record + import results) are the ones with launch value.

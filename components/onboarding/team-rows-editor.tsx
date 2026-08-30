@@ -94,7 +94,12 @@ export function TeamRowsEditor({
     // Replaces empty rows rather than appending under them, so pasting into a fresh form does
     // not leave three blanks at the top.
     const kept = rows.filter((r) => r.name.trim());
-    onChange([...kept, ...parsed.map((t) => newRow(t.name, t.shortCode ?? ''))]);
+    // A pasted line without a code still gets one. Leaving "—" there would hand the organiser
+    // twenty-five blanks to fill in, which is the work this box exists to remove.
+    onChange([
+      ...kept,
+      ...parsed.map((t) => newRow(t.name, t.shortCode ?? suggestShortCode(t.name))),
+    ]);
     setBlock('');
     setPasting(false);
   }
@@ -137,14 +142,19 @@ export function TeamRowsEditor({
       )}
 
       <div className="space-y-2">
-        <div className="grid grid-cols-[1fr_5.5rem_2rem] gap-2 px-0.5">
+        {/* Empty spans rather than sr-only ones: sr-only is absolutely positioned, so it leaves
+            the grid flow entirely and every following header slides a column to the left. */}
+        <div className="grid grid-cols-[1.5rem_1fr_5.5rem_2rem] gap-2 px-0.5" aria-hidden>
+          <span />
           <span className="text-[0.6875rem] uppercase tracking-wider text-ink-subtle">Nom</span>
           <span className="text-[0.6875rem] uppercase tracking-wider text-ink-subtle">Sigle</span>
-          <span className="sr-only">Retirer</span>
+          <span />
         </div>
 
         {rows.map((row, index) => (
-          <div key={row.key} className="grid grid-cols-[1fr_5.5rem_2rem] gap-2 items-center">
+          <div key={row.key} className="grid grid-cols-[1.5rem_1fr_5.5rem_2rem] gap-2 items-center">
+            {/* Numbered, because on a phone the list is the only place the count is visible. */}
+            <span className="text-right text-xs tabular-nums text-ink-subtle">{index + 1}</span>
             <Input
               aria-label={`Nom de l'équipe ${index + 1}`}
               placeholder="BC Virunga"

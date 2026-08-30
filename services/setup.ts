@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { api, getApiErrorMessage } from './api';
 import { parseResponse } from './parse-response';
 import { Gender, SeasonStatus } from '@/schemas';
+import { toProperName } from '@/utils';
 
 /**
  * Creating the three things a league needs before it can publish anything: a competition, a
@@ -91,6 +92,49 @@ export const OUTCOME_LABELS: Record<string, string> = {
   FORFEIT_WIN: 'Victoire par forfait',
   FORFEIT_LOSS: 'Forfait',
 };
+
+/**
+ * The organisation's existing competitions, used to suggest a division that is not already taken.
+ *
+ * Every league defaulted to D1, so a second one created without thinking about it produced two
+ * "D1 Messieurs" in the same organisation — indistinguishable in the breadcrumb and meaningless
+ * as a division.
+ */
+const ExistingLeaguesSchema = z.object({
+  data: z.array(z.object({ id: z.string(), division: z.string().nullable().optional(), gender: z.string().nullable().optional() })),
+});
+
+export function useExistingLeagues(tenantId?: string) {
+  return useQuery({
+    queryKey: ['leagues', 'divisions', tenantId],
+    enabled: !!tenantId,
+    queryFn: async () => {
+      const res = await api.get(`/leagues?pageSize=100&tenantId=${tenantId}`);
+      return parseResponse(ExistingLeaguesSchema, res.data);
+    },
+  });
+}
+
+/**
+ * The lowest division not already used for this category.
+ *
+ * Suggested, never imposed: two competitions genuinely can share a division, and the organiser
+ * may simply be creating "Coupe" alongside "Championnat". It just should not happen by accident.
+ */
+export function suggestDivision(
+  existing: { division?: string | null; gender?: string | null }[] | undefined,
+  gender: string,
+): string {
+  const taken = new Set(
+    (existing ?? [])
+      .filter((l) => l.gender === gender)
+      .map((l) => (l.division ?? '').toUpperCase()),
+  );
+  for (let n = 1; n <= 20; n++) {
+    if (!taken.has(`D${n}`)) return `D${n}`;
+  }
+  return 'D1';
+}
 
 export function useCreateLeague() {
   const queryClient = useQueryClient();
@@ -225,11 +269,15 @@ export function parseTeamLines(block: string): TeamRow[] {
     const tail = parts[1];
     const shortCode = tail && /^[A-Za-z0-9]{2,4}$/.test(tail) ? tail.toUpperCase() : undefined;
 
-    const key = name.toLocaleLowerCase('fr');
+    // Tidied here as well as in the field, so a club pasted in and a club typed in end up
+    // spelled the same way — "VC MaNIta" pasted was reaching the database untouched.
+    const tidied = toProperName(name);
+
+    const key = tidied.toLocaleLowerCase('fr');
     if (seen.has(key)) continue;
     seen.add(key);
 
-    rows.push({ name, shortCode });
+    rows.push({ name: tidied, shortCode });
   }
 
   return rows;

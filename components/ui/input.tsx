@@ -1,5 +1,6 @@
 import { SearchIcon } from "lucide-react";
 import React from "react";
+import { toProperName } from "@/utils";
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
@@ -18,12 +19,6 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   hint?: string;
   autoTrim?: boolean;
 }
-
-/** Words that stay lowercase inside a French name. */
-const NAME_PARTICLES = new Set([
-  'de', 'du', 'des', 'la', 'le', 'les', 'et', 'a', 'au', 'aux', 'en', 'sur', 'sous', 'pour',
-  'par', 'dans', 'chez', 'lez',
-]);
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
   (
@@ -92,33 +87,6 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
       return value;
     };
 
-    /**
-     * Title-cases a proper noun, leaving acronyms and French particles alone.
-     *
-     * Three rules, each earning its place:
-     *  - Short all-caps tokens stay as typed. Clubs here are "BC Virunga", "AS Vita", "FC
-     *    Renaissance", and those prefixes are acronyms rather than words; blanket title-casing
-     *    renders them "Bc", "As", "Fc".
-     *  - Particles stay lowercase unless they open the name, because "Ligue de Basketball de
-     *    Kinshasa" is how the organisation writes itself, not "Ligue De Basketball De Kinshasa".
-     *  - Everything else is normalised, so "LEbrOn" becomes "Lebron" and "MAsu" becomes "Masu".
-     */
-    const normalizeName = (value: string) => {
-      let isFirst = true;
-      return value.replace(/[^\s-]+/g, (word) => {
-        const leading = isFirst;
-        isFirst = false;
-
-        // Particles first: "DU" is short and all-caps, so the acronym rule would otherwise
-        // claim it and "Ligue Provinciale DU Nord-Kivu" would keep shouting.
-        const lower = word.toLocaleLowerCase('fr');
-        if (!leading && NAME_PARTICLES.has(lower)) return lower;
-
-        if (word.length <= 3 && word === word.toUpperCase() && /[A-Z]/.test(word)) return word;
-
-        return word.charAt(0).toLocaleUpperCase('fr') + word.slice(1).toLocaleLowerCase('fr');
-      });
-    };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       let value = e.target.value;
@@ -155,7 +123,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
         if (alphaFirst) {
           value = value.replace(/^[^\p{L}]+/u, '');
         }
-        value = transform === 'name' ? normalizeName(value) : applyTransform(value);
+        value = transform === 'name' ? toProperName(value) : applyTransform(value);
         if (autoTrim && value.trim() !== value) {
           value = value.trim();
         }

@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -14,8 +14,10 @@ import { getApiErrorMessage } from '@/services/api';
 import {
   LeagueEssentialsSchema,
   SeasonEssentialsSchema,
+  suggestDivision,
   suggestSeasonName,
   useCreateLeague,
+  useExistingLeagues,
   useCreateSeason,
   useCreateTeamsBulk,
   useUpdateLeague,
@@ -123,6 +125,7 @@ export function SetupWizard() {
   const [outcome, setOutcome] = useState<BulkTeamResult | null>(null);
   const [failure, setFailure] = useState<string | null>(null);
 
+  const existingLeagues = useExistingLeagues(user?.tenantId ?? undefined);
   const createLeague = useCreateLeague();
   const updateLeague = useUpdateLeague();
   const createSeason = useCreateSeason();
@@ -145,6 +148,15 @@ export function SetupWizard() {
   });
 
   const teams = useMemo(() => filledRows(teamRows), [teamRows]);
+
+  // The division follows the chosen category until the organiser types one, so creating a second
+  // competition does not silently produce a second "D1 Messieurs".
+  const leagueGender = leagueForm.watch('gender');
+  const divisionEdited = useRef(false);
+  useEffect(() => {
+    if (divisionEdited.current || league) return;
+    leagueForm.setValue('division', suggestDivision(existingLeagues.data?.data, leagueGender));
+  }, [leagueGender, existingLeagues.data, league, leagueForm]);
   const seasonStart = seasonForm.watch('startDate');
   const startsInPast = useMemo(
     () => !!seasonStart && new Date(seasonStart) < new Date(new Date().toDateString()),
