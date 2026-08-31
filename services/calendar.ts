@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { z } from 'zod';
 import { api } from './api';
 import { parseResponse } from './parse-response';
@@ -127,6 +127,75 @@ export function useDownloadResultsSheet() {
       link.remove();
       // Revoked on the next tick: releasing it synchronously can cancel the download in Safari.
       setTimeout(() => URL.revokeObjectURL(url), 0);
+    },
+  });
+}
+
+// --- reading a filled-in sheet back ---------------------------------------------------------
+
+const ImportRowSchema = z.object({
+  line: z.number(),
+  outcome: z.enum(['score', 'unchanged', 'create', 'error']),
+  home: z.string(),
+  away: z.string(),
+  date: z.string().optional(),
+  homeScore: z.number().nullable().optional(),
+  awayScore: z.number().nullable().optional(),
+  gameId: z.string().optional(),
+  message: z.string().optional(),
+});
+
+const ImportReportSchema = z.object({
+  dryRun: z.boolean(),
+  seasonId: z.string(),
+  totals: z.object({
+    score: z.number(),
+    unchanged: z.number(),
+    create: z.number(),
+    error: z.number(),
+  }),
+  rows: z.array(ImportRowSchema),
+});
+
+export type ImportReport = z.infer<typeof ImportReportSchema>;
+export type ImportRow = z.infer<typeof ImportRowSchema>;
+
+/**
+ * Sends the sheet back.
+ *
+ * Always previewed first from the UI. A spreadsheet somebody else filled in is the one input an
+ * organiser cannot check by eye, so seeing what it will do — and that the preview matches what
+ * the apply then does — is the whole point.
+ */
+export function useImportResults() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      seasonId,
+      file,
+      dryRun,
+    }: {
+      seasonId: string;
+      file: File;
+      dryRun: boolean;
+    }) => {
+      const body = new FormData();
+      body.append('file', file);
+      body.append('dryRun', String(dryRun));
+      // The shared instance defaults to application/json. Leaving that on a FormData body sends
+      // multipart without its boundary, and the server sees no file at all — which is exactly
+      // what it reported. Undefined lets the browser set the header, boundary included.
+      const res = await api.post(`/calendar/import/${seasonId}`, body, {
+        headers: { 'Content-Type': undefined },
+      });
+      return parseResponse(ImportReportSchema, res.data);
+    },
+    onSuccess: (report) => {
+      if (!report.dryRun) {
+        queryClient.invalidateQueries({ queryKey: ['calendar'] });
+        queryClient.invalidateQueries({ queryKey: ['standings'] });
+      }
     },
   });
 }

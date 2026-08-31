@@ -1665,6 +1665,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/calendar/template/{seasonId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Download the season's calendar and results as a spreadsheet
+         * @description A round trip rather than a blank form: every known fixture is written in, the operator fills the two score columns, and the same file is sent back.
+         */
+        get: operations["CalendarController_downloadTemplate"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/calendar/import/{seasonId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Read a filled-in results spreadsheet back
+         * @description Rows carrying an ID update that fixture. Rows without one create it, which is how a match agreed somewhere we could not see gets recorded. Send dryRun=true first: nothing is written and the response says exactly what would be.
+         */
+        post: operations["CalendarController_importResults"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -7949,6 +7989,45 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["CalendarResponseDto"];
                 };
+            };
+        };
+    };
+    CalendarController_downloadTemplate: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                seasonId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    CalendarController_importResults: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                seasonId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Per-row outcome, and totals. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
