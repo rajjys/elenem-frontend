@@ -137,19 +137,6 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // The organisation's calendar. Readable by anyone with a competition role, including a team
-  // admin: knowing when the hall is taken is not privileged information, and the person who most
-  // needs the calendar on day one is the one who cannot change it.
-  if (pathname === '/calendar' || pathname.startsWith('/calendar/')) {
-    if (
-      !hasRole(Roles.TENANT_ADMIN) && !hasRole(Roles.LEAGUE_ADMIN) &&
-      !hasRole(Roles.TEAM_ADMIN) && !hasRole(Roles.SYSTEM_ADMIN)
-    ) {
-      return redirectToAccessDenied('tenant_access_required');
-    }
-    return NextResponse.next();
-  }
-
   // Onboarding: the guided setup an organiser lands in straight after creating their
   // organisation, and can return to later. Open to anyone who can create a competition, which is
   // the same set that may reach /tenant and /league.

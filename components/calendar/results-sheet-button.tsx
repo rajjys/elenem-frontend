@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Download, FileSpreadsheet, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui';
@@ -22,10 +22,19 @@ import { cn } from '@/utils';
  */
 export function ResultsSheetButton({ leagueId }: { leagueId?: string }) {
   const [open, setOpen] = useState(false);
+  // Rendered only after mount. Radix derives the popover's aria-controls id from the tree, and
+  // the server's tree does not match the client's here — the seasons query has no data during
+  // SSR — so hydration warned about a mismatched attribute on every calendar load. Nothing on
+  // this control is needed for first paint, so not rendering it server-side is the honest fix
+  // rather than suppressing the warning.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
   const seasons = useSeasonsForDownload(leagueId);
   const download = useDownloadResultsSheet();
 
   const rows = seasons.data?.data ?? [];
+
+  if (!mounted) return null;
 
   async function grab(seasonId: string) {
     try {

@@ -15,6 +15,7 @@ import { useScopeContext } from '@/hooks';
 import { cn } from '@/utils';
 import { FixtureChip } from './fixture-chip';
 import { FixtureDrawer } from './fixture-drawer';
+import { CalendarList } from './calendar-list';
 import { ResultsSheetButton } from './results-sheet-button';
 import { YearGrid } from './year-grid';
 
@@ -81,7 +82,13 @@ function timeOf(iso: string): string {
   return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
 }
 
-type Scale = 'month' | 'year';
+type Scale = 'month' | 'year' | 'list';
+
+const SCALES: { key: Scale; label: string }[] = [
+  { key: 'month', label: 'Mois' },
+  { key: 'year', label: 'Année' },
+  { key: 'list', label: 'Liste' },
+];
 
 export function CalendarView() {
   /**
@@ -110,6 +117,13 @@ export function CalendarView() {
   const range = useMemo(() => {
     if (scale === 'year') {
       return { from: `${cursor.getFullYear()}-01-01`, to: `${cursor.getFullYear()}-12-31` };
+    }
+    if (scale === 'list') {
+      // A list is for finding a fixture, not for reading a month, so it spans the season either
+      // side of where the reader is standing.
+      const from = new Date(cursor.getFullYear(), cursor.getMonth() - 3, 1);
+      const to = new Date(cursor.getFullYear(), cursor.getMonth() + 4, 0);
+      return { from: isoDay(from), to: isoDay(to) };
     }
     return { from: isoDay(cells[0]), to: isoDay(cells[cells.length - 1]) };
   }, [scale, cursor, cells]);
@@ -201,63 +215,61 @@ export function CalendarView() {
         openDay !== null && 'lg:pr-[23rem]',
       )}
     >
-      {/* ---------- controls: period on the left, filters below, count on the right ---------- */}
+      {/* Two rows, and they stack rather than wrap on a phone: period and view on one line,
+          everything that narrows the grid on the next. It was one long line that wrapped into
+          four ragged ones at 390px. */}
       <div className="space-y-3">
-        <div className="flex flex-wrap items-center gap-3">
-          <div className="flex items-center gap-0.5">
-            <button
-              type="button"
-              onClick={() => shift(-1)}
-              aria-label={scale === 'year' ? 'Année précédente' : 'Mois précédent'}
-              className="flex h-9 w-9 items-center justify-center rounded-md text-ink-muted transition-colors hover:bg-surface-sunk hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-            >
-              <ChevronLeft className="h-4 w-4" aria-hidden />
-            </button>
-            <h2 className="min-w-[9rem] text-center text-base font-semibold capitalize text-ink">
-              {scale === 'year'
-                ? cursor.getFullYear()
-                : `${MONTHS[cursor.getMonth()]} ${cursor.getFullYear()}`}
-            </h2>
-            <button
-              type="button"
-              onClick={() => shift(1)}
-              aria-label={scale === 'year' ? 'Année suivante' : 'Mois suivant'}
-              className="flex h-9 w-9 items-center justify-center rounded-md text-ink-muted transition-colors hover:bg-surface-sunk hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-            >
-              <ChevronRight className="h-4 w-4" aria-hidden />
-            </button>
-          </div>
+        <div className="flex flex-wrap items-center gap-1">
+          <button
+            type="button"
+            onClick={() => shift(-1)}
+            aria-label={scale === 'year' ? 'Année précédente' : 'Mois précédent'}
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-ink-muted transition-colors hover:bg-surface-sunk hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          >
+            <ChevronLeft className="h-4 w-4" aria-hidden />
+          </button>
+          <h2 className="min-w-[8.5rem] text-center text-base font-semibold capitalize text-ink">
+            {scale === 'year'
+              ? cursor.getFullYear()
+              : `${MONTHS[cursor.getMonth()]} ${cursor.getFullYear()}`}
+          </h2>
+          <button
+            type="button"
+            onClick={() => shift(1)}
+            aria-label={scale === 'year' ? 'Année suivante' : 'Mois suivant'}
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-ink-muted transition-colors hover:bg-surface-sunk hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          >
+            <ChevronRight className="h-4 w-4" aria-hidden />
+          </button>
 
-          <Button variant="ghost" onClick={() => setCursor(new Date())}>
+          <Button variant="ghost" onClick={() => setCursor(new Date())} className="ml-1 shrink-0">
             Aujourd&apos;hui
           </Button>
 
-          <ResultsSheetButton leagueId={scope.leagueId} />
-
-          {/* Two scales answer two questions: the month says what is on Saturday, the year says
-              where the season sits. */}
-          <div className="ml-auto flex rounded-lg border border-line bg-surface p-0.5">
-            {(['month', 'year'] as const).map((s) => (
+          {/* Three ways of reading the same fixtures: what is on Saturday, where the season
+              sits, and the plain list a phone wants anyway. */}
+          {/* Wraps to its own line on a phone rather than being pushed off the right edge, which
+              is where it went when this row could not fit. */}
+          <div className="ml-auto mt-1 flex shrink-0 rounded-lg border border-line bg-surface p-0.5 sm:mt-0">
+            {SCALES.map((sc) => (
               <button
-                key={s}
+                key={sc.key}
                 type="button"
-                onClick={() => setScale(s)}
-                aria-pressed={scale === s}
+                onClick={() => setScale(sc.key)}
+                aria-pressed={scale === sc.key}
                 className={cn(
-                  'rounded-md px-3 py-1 text-xs font-medium transition-colors',
+                  'rounded-md px-2.5 py-1 text-xs font-medium transition-colors',
                   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent',
-                  scale === s ? 'bg-accent text-accent-ink' : 'text-ink-muted hover:text-ink',
+                  scale === sc.key ? 'bg-accent text-accent-ink' : 'text-ink-muted hover:text-ink',
                 )}
               >
-                {s === 'month' ? 'Mois' : 'Année'}
+                {sc.label}
               </button>
             ))}
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-          {/* Filtering is the one interaction a read-only calendar needs: with three competitions
-              on one grid, isolating D2 is how you see whether it fits. */}
+        <div className="flex flex-wrap items-center gap-2">
           <div className="flex flex-wrap items-center gap-1.5">
             {(data?.competitions ?? []).map((c: CalendarCompetition) => {
               const tone = toneFor(c.id);
@@ -289,14 +301,12 @@ export function CalendarView() {
             })}
           </div>
 
-          {/* Team and venue narrow the same grid two different ways: "when do we play" and
-              "what is in that hall". Both only offer what the period actually contains. */}
           <div className="ml-auto flex flex-wrap items-center gap-2">
             <select
               value={teamFilter}
               onChange={(e) => setTeamFilter(e.target.value)}
               aria-label="Filtrer par équipe"
-              className="h-8 rounded-lg border border-line bg-surface px-2 text-xs text-ink focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+              className="h-8 max-w-[10rem] rounded-lg border border-line bg-surface px-2 text-xs text-ink focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
             >
               <option value="">Toutes les équipes</option>
               {teamsInRange.map((t) => (
@@ -311,7 +321,7 @@ export function CalendarView() {
                 value={venueFilter}
                 onChange={(e) => setVenueFilter(e.target.value)}
                 aria-label="Filtrer par salle"
-                className="h-8 rounded-lg border border-line bg-surface px-2 text-xs text-ink focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+                className="h-8 max-w-[10rem] rounded-lg border border-line bg-surface px-2 text-xs text-ink focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
               >
                 <option value="">Toutes les salles</option>
                 {(data?.venues ?? []).map((v) => (
@@ -321,6 +331,8 @@ export function CalendarView() {
                 ))}
               </select>
             )}
+
+            <ResultsSheetButton leagueId={scope.leagueId} />
 
             {(teamFilter || venueFilter) && (
               <button
@@ -357,6 +369,14 @@ export function CalendarView() {
 
       {isPending ? (
         <LoadingSpinner message="Chargement du calendrier…" />
+      ) : scale === 'list' ? (
+        <CalendarList
+          entries={visible}
+          competitions={data?.competitions ?? []}
+          venues={data?.venues ?? []}
+          toneFor={toneFor}
+          onOpen={(entry) => openDrawer(isoDay(new Date(entry.dateTime)), entry)}
+        />
       ) : scale === 'year' ? (
         <YearGrid
           year={cursor.getFullYear()}

@@ -1,3 +1,4 @@
+export * from './calendar-list';
 export * from './calendar-view';
 export * from './fixture-chip';
 export * from './fixture-drawer';

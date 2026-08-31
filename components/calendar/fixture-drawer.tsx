@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import Link from 'next/link';
-import { ArrowRight, CalendarDays, MapPin, X } from 'lucide-react';
+import { ArrowLeft, ArrowRight, CalendarDays, MapPin, X } from 'lucide-react';
 import { Button } from '@/components/ui';
 import type { CalendarCompetition, CalendarEntry, CalendarVenue } from '@/services/calendar';
 import { cn } from '@/utils';
@@ -195,12 +195,15 @@ export function FixtureDrawer({
         <div className="min-h-0 flex-1 overflow-y-auto">
           {focused ? (
             <div className="p-4 space-y-4">
+              {/* A real control rather than an arrow glyph in a line of text: it is the only way
+                  back to the day, and it was rendering as small as the label beside it. */}
               <button
                 type="button"
                 onClick={() => onFocus(null)}
-                className="text-xs text-accent-text hover:underline"
+                className="-ml-1 flex items-center gap-1.5 rounded-md px-2 py-1.5 text-sm font-medium text-accent-text transition-colors hover:bg-accent-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
               >
-                ← Tous les matchs du jour
+                <ArrowLeft className="h-4 w-4 shrink-0" aria-hidden />
+                Tous les matchs du jour
               </button>
 
               {/* The matchup and its score read as one block: two teams either side of the
@@ -293,11 +296,15 @@ export function FixtureDrawer({
                   Ouvrir le match
                   <ArrowRight size={16} className="ml-2" />
                 </Button>
+                {/* "Saisir" is wrong once a score exists — the job is then to correct it, and
+                    offering to enter a score that is already on screen reads as a bug. */}
                 <Link
                   href={`/game/manage?ctxGameId=${focused.id}`}
                   className="block w-full rounded-lg border border-line px-3 py-2 text-center text-sm text-ink-muted transition-colors hover:border-line-strong hover:text-ink"
                 >
-                  Saisir le score
+                  {focused.status === 'COMPLETED' && focused.homeScore != null
+                    ? 'Corriger le score'
+                    : 'Saisir le score'}
                 </Link>
               </div>
             </div>
