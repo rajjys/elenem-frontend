@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { z } from 'zod';
 import { api } from './api';
 import { parseResponse } from './parse-response';
@@ -76,6 +76,58 @@ export function useCalendar(params: { from: string; to: string; leagueIds?: stri
     // A month of fixtures does not change while you look at it, and this is read on a connection
     // that pays for every request.
     staleTime: 60_000,
+  });
+}
+
+/** The seasons the organiser could download a results sheet for. */
+const SeasonsSchema = z.object({
+  data: z.array(
+    z.object({
+      id: z.string(),
+      name: z.string(),
+      leagueId: z.string(),
+      league: z.object({ id: z.string(), name: z.string() }).optional(),
+    }),
+  ),
+});
+
+export function useSeasonsForDownload(leagueId?: string) {
+  return useQuery({
+    queryKey: ['seasons', 'download', leagueId ?? 'all'],
+    queryFn: async () => {
+      const res = await api.get('/seasons', {
+        params: { pageSize: 50, ...(leagueId ? { leagueId } : {}) },
+      });
+      return parseResponse(SeasonsSchema, res.data);
+    },
+    staleTime: 5 * 60_000,
+  });
+}
+
+/**
+ * Downloads the season's results sheet.
+ *
+ * A blob rather than a link, because the endpoint is authenticated: an <a href> sends no bearer
+ * token, so the browser would be handed a 401 page named .xlsx.
+ */
+export function useDownloadResultsSheet() {
+  return useMutation({
+    mutationFn: async (seasonId: string) => {
+      const res = await api.get(`/calendar/template/${seasonId}`, { responseType: 'blob' });
+
+      const disposition = String(res.headers?.['content-disposition'] ?? '');
+      const named = /filename="?([^"]+)"?/.exec(disposition)?.[1];
+
+      const url = URL.createObjectURL(res.data as Blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = named ?? 'elenem-calendrier.xlsx';
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      // Revoked on the next tick: releasing it synchronously can cancel the download in Safari.
+      setTimeout(() => URL.revokeObjectURL(url), 0);
+    },
   });
 }
 

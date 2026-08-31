@@ -15,6 +15,7 @@ import { useScopeContext } from '@/hooks';
 import { cn } from '@/utils';
 import { FixtureChip } from './fixture-chip';
 import { FixtureDrawer } from './fixture-drawer';
+import { ResultsSheetButton } from './results-sheet-button';
 import { YearGrid } from './year-grid';
 
 /**
@@ -230,6 +231,8 @@ export function CalendarView() {
           <Button variant="ghost" onClick={() => setCursor(new Date())}>
             Aujourd&apos;hui
           </Button>
+
+          <ResultsSheetButton leagueId={scope.leagueId} />
 
           {/* Two scales answer two questions: the month says what is on Saturday, the year says
               where the season sits. */}
