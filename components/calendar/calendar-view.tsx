@@ -2,7 +2,7 @@
 
 import { useCallback, useMemo, useState } from 'react';
 import { Ban, ChevronLeft, ChevronRight, MapPin } from 'lucide-react';
-import { Button, LoadingSpinner } from '@/components/ui';
+import { Button, LoadingSpinner, SelectField } from '@/components/ui';
 import { ErrorState } from '@/components/ui/error-state';
 import {
   blackoutDays,
@@ -215,10 +215,14 @@ export function CalendarView() {
         openDay !== null && 'lg:pr-[23rem]',
       )}
     >
-      {/* Two rows, and they stack rather than wrap on a phone: period and view on one line,
+      {/* Two rows, stacking rather than wrapping on a phone: period and view on one line,
           everything that narrows the grid on the next. It was one long line that wrapped into
-          four ragged ones at 390px. */}
-      <div className="space-y-3">
+          four ragged ones at 390px.
+
+          Sticky, because the list and year views are several screens tall and the controls that
+          change what you are looking at should not be somewhere above it. Offset by the main
+          pane's own padding so it does not leave a gap where the content scrolls under. */}
+      <div className="sticky -top-6 z-20 -mx-6 space-y-3 border-b border-line bg-canvas px-6 pb-3 pt-6">
         <div className="flex flex-wrap items-center gap-1">
           <button
             type="button"
@@ -242,9 +246,13 @@ export function CalendarView() {
             <ChevronRight className="h-4 w-4" aria-hidden />
           </button>
 
-          <Button variant="ghost" onClick={() => setCursor(new Date())} className="ml-1 shrink-0">
-            Aujourd&apos;hui
-          </Button>
+          {/* Only the month grid has a "today" to jump to — a year already contains it, and the
+              list is a range rather than a position. */}
+          {scale === 'month' && (
+            <Button variant="ghost" onClick={() => setCursor(new Date())} className="ml-1 shrink-0">
+              Aujourd&apos;hui
+            </Button>
+          )}
 
           {/* Three ways of reading the same fixtures: what is on Saturday, where the season
               sits, and the plain list a phone wants anyway. */}
@@ -302,34 +310,24 @@ export function CalendarView() {
           </div>
 
           <div className="ml-auto flex flex-wrap items-center gap-2">
-            <select
+            <SelectField
+              label="Filtrer par équipe"
+              placeholder="Toutes les équipes"
               value={teamFilter}
-              onChange={(e) => setTeamFilter(e.target.value)}
-              aria-label="Filtrer par équipe"
-              className="h-8 max-w-[10rem] rounded-lg border border-line bg-surface px-2 text-xs text-ink focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
-            >
-              <option value="">Toutes les équipes</option>
-              {teamsInRange.map((t) => (
-                <option key={t.id} value={t.id}>
-                  {t.name}
-                </option>
-              ))}
-            </select>
+              onChange={setTeamFilter}
+              options={teamsInRange.map((t) => ({ value: t.id, label: t.name }))}
+              className="w-40"
+            />
 
             {(data?.venues.length ?? 0) > 0 && (
-              <select
+              <SelectField
+                label="Filtrer par salle"
+                placeholder="Toutes les salles"
                 value={venueFilter}
-                onChange={(e) => setVenueFilter(e.target.value)}
-                aria-label="Filtrer par salle"
-                className="h-8 max-w-[10rem] rounded-lg border border-line bg-surface px-2 text-xs text-ink focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
-              >
-                <option value="">Toutes les salles</option>
-                {(data?.venues ?? []).map((v) => (
-                  <option key={v.id} value={v.id}>
-                    {v.name}
-                  </option>
-                ))}
-              </select>
+                onChange={setVenueFilter}
+                options={(data?.venues ?? []).map((v) => ({ value: v.id, label: v.name }))}
+                className="w-40"
+              />
             )}
 
             <ResultsSheetButton leagueId={scope.leagueId} />

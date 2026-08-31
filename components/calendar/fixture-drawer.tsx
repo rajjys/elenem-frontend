@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, ArrowRight, CalendarDays, MapPin, X } from 'lucide-react';
+import { ArrowLeft, ArrowRight, CalendarDays, MapPin, Plus, X } from 'lucide-react';
 import { Button } from '@/components/ui';
 import type { CalendarCompetition, CalendarEntry, CalendarVenue } from '@/services/calendar';
 import { cn } from '@/utils';
@@ -326,6 +326,17 @@ export function FixtureDrawer({
                   Aucun match ce jour-là.
                 </li>
               )}
+              {/* Adding a fixture was reachable only from a dashboard link — not from the screen
+                  where you notice one is missing. */}
+              <li className="p-3">
+                <Link
+                  href="/game/create"
+                  className="flex w-full items-center justify-center gap-1.5 rounded-lg border border-dashed border-line px-3 py-2.5 text-sm text-ink-muted transition-colors hover:border-accent hover:text-accent-text"
+                >
+                  <Plus className="h-4 w-4" aria-hidden />
+                  Ajouter un match
+                </Link>
+              </li>
             </ul>
           )}
         </div>

@@ -1,7 +1,7 @@
 'use client';
 
 import { Fragment, useMemo, useState } from 'react';
-import { MapPin, Search } from 'lucide-react';
+import { MapPin, Search, X } from 'lucide-react';
 import { Input } from '@/components/ui';
 import type { CalendarCompetition, CalendarEntry, CalendarVenue } from '@/services/calendar';
 import { cn } from '@/utils';
@@ -67,9 +67,11 @@ export function CalendarList({
 
   return (
     <div className="space-y-3">
+      {/* The icon sits inside the field rather than beside it, and the field is the same height
+          as the filters it sits under — it was a bare Input with a floating magnifier. */}
       <div className="relative max-w-sm">
         <Search
-          className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-subtle"
+          className="pointer-events-none absolute left-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-ink-subtle"
           aria-hidden
         />
         <Input
@@ -77,8 +79,18 @@ export function CalendarList({
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Rechercher une équipe…"
           aria-label="Rechercher une équipe"
-          className="pl-9"
+          className="h-9 rounded-lg border-line bg-surface pl-9 transition-colors hover:border-line-strong focus:border-accent focus:ring-1 focus:ring-accent"
         />
+        {query && (
+          <button
+            type="button"
+            onClick={() => setQuery('')}
+            aria-label="Effacer la recherche"
+            className="absolute right-2 top-1/2 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-md text-ink-subtle transition-colors hover:bg-surface-sunk hover:text-ink"
+          >
+            <X className="h-3.5 w-3.5" aria-hidden />
+          </button>
+        )}
       </div>
 
       <div className="overflow-hidden rounded-lg border border-line bg-surface">

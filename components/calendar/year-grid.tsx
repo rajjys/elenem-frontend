@@ -89,6 +89,15 @@ export function YearGrid({
                     type="button"
                     onClick={() => onPickDay(key)}
                     disabled={count === 0 && !closed}
+                    // An accessible name rather than an sr-only child. `sr-only` is
+                    // position:absolute, and with no positioned ancestor its containing block is
+                    // <html> — so 360 of them escaped the scrolling main, stretched the document
+                    // past the viewport, and the whole page (sidebar included) started scrolling.
+                    aria-label={
+                      closed
+                        ? `${i + 1} ${label} — ${closedDays.get(key)?.[0]}`
+                        : `${i + 1} ${label} — ${count} match${count > 1 ? 's' : ''}`
+                    }
                     title={
                       closed
                         ? `${i + 1} ${label} — ${closedDays.get(key)?.[0]}`
@@ -102,9 +111,7 @@ export function YearGrid({
                       key === todayKey && 'ring-1 ring-accent',
                       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent',
                     )}
-                  >
-                    <span className="sr-only">{key}</span>
-                  </button>
+                  />
                 );
               })}
             </div>

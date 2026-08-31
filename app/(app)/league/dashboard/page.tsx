@@ -290,7 +290,7 @@ export default function LeagueDashboard() {
                     }} 
                     icon={Calendar} 
                     variant="danger" 
-                    href={buildLink("/league/games")}  
+                    href={buildLink("/league/calendar")}  
                     loading={metricsLoading}/>
                   <StatsCard 
                     title="Billets vendus (Aujourd'hui)" 
@@ -310,7 +310,7 @@ export default function LeagueDashboard() {
                     <Card className="h-full flex flex-col justify-between shadow-elevated bg-surface-sunk">
                       <CardHeader className="flex flex-row items-center justify-between gap-2 sm:gap-4 px-4 border-b border-line">
                           <CardTitle className="text-lg font-semibold text-ink-muted">Matchs Recents</CardTitle>
-                          <Link href={buildLink('/league/games#results')} className="inline-flex items-center text-sm font-medium text-ink-muted nav-hover">
+                          <Link href={buildLink('/league/calendar')} className="inline-flex items-center text-sm font-medium text-ink-muted nav-hover">
                               <Clock1 className="h-4 w-4 mr-1" />
                               <span>Resultats</span>
                           </Link>
@@ -326,7 +326,7 @@ export default function LeagueDashboard() {
                         }
                       </CardContent>
                       <CardFooter className='flex items-center justify-center border-t border-line'>
-                          <Link href={buildLink('/league/games#results')} className="py-1 flex items-center justify-center text-sm font-medium text-ink-muted nav-hover">
+                          <Link href={buildLink('/league/calendar')} className="py-1 flex items-center justify-center text-sm font-medium text-ink-muted nav-hover">
                               <Clock className="h-4 w-4 mr-1" />
                               <span>Tout les Resultats</span>
                           </Link>
@@ -338,7 +338,7 @@ export default function LeagueDashboard() {
                     <Card className="h-full flex flex-col justify-between shadow-elevated bg-surface-sunk">
                       <CardHeader className="flex flex-row items-center justify-between gap-2 sm:gap-4 px-4 border-b border-line">
                           <CardTitle className="text-lg font-semibold text-ink-muted">Prochains Matchs</CardTitle>
-                          <Link href={buildLink('/league/games#schedule')} className="inline-flex items-center text-sm font-medium text-ink-muted nav-hover">
+                          <Link href={buildLink('/league/calendar')} className="inline-flex items-center text-sm font-medium text-ink-muted nav-hover">
                               <Clock1 className="h-4 w-4 mr-1" />
                               <span>Calendriers</span>
                           </Link>
@@ -354,7 +354,7 @@ export default function LeagueDashboard() {
                         }
                       </CardContent>
                       <CardFooter className='flex items-center justify-center border-t border-line'>
-                          <Link href={buildLink('/league/games#schedule')} className="py-1 flex items-center justify-center text-sm font-medium text-ink-muted nav-hover">
+                          <Link href={buildLink('/league/calendar')} className="py-1 flex items-center justify-center text-sm font-medium text-ink-muted nav-hover">
                               <Clock className="h-4 w-4 mr-1" />
                               <span>Calendriers Complets</span>
                           </Link>

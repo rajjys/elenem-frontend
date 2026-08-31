@@ -87,7 +87,6 @@ export const tenantNavItems: NavGroup[] = [
     { label: 'Équipes', basePath: '/tenant/teams', icon: Shield },
     { label: 'Joueurs', basePath: '/tenant/players', icon: UserSquare2 },
     { label: 'Calendrier', basePath: '/tenant/calendar', icon: CalendarDays },
-    { label: 'Matchs', basePath: '/tenant/games', icon: ListOrdered },
     ],
   },
   {
@@ -114,7 +113,6 @@ export const leagueNavItems: NavGroup[] = [
     { label: 'Joueurs', basePath: '/league/players', icon: UserSquare2 },
     { label: 'Saisons', basePath: '/league/seasons', icon: CalendarDays },
     { label: 'Calendrier', basePath: '/league/calendar', icon: CalendarDays },
-    { label: 'Matchs', basePath: '/league/games', icon: ListOrdered },
     { label: 'Classement', basePath: '/league/standings', icon: Trophy },
     ],
   },

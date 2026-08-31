@@ -304,7 +304,7 @@ export default function TenantDashboard() {
                     <Card className="h-full flex flex-col justify-between shadow-elevated">
                         <CardHeader className="flex flex-row items-center justify-between gap-2 sm:gap-4 px-4 py-2 border-b border-line">
                             <CardTitle className="text-xl font-semibold text-ink">Matchs</CardTitle>
-                            <Link href={buildLink('/tenant/games')} className="inline-flex items-center text-sm font-medium text-positive hover:text-positive transition-colors">
+                            <Link href={buildLink('/tenant/calendar')} className="inline-flex items-center text-sm font-medium text-positive hover:text-positive transition-colors">
                                 <Clock1 className="h-4 w-4 mr-1 text-positive" />
                                 <span>Tout les Matchs</span>
                             </Link>
@@ -384,7 +384,7 @@ export default function TenantDashboard() {
                             </div>       
                         </CardContent>
                         <CardFooter className='flex items-center justify-center border-t border-line'>
-                            <Link href={buildLink('/tenant/games')} className="py-1 flex items-center justify-center text-sm font-medium text-positive hover:text-positive transition-colors">
+                            <Link href={buildLink('/tenant/calendar')} className="py-1 flex items-center justify-center text-sm font-medium text-positive hover:text-positive transition-colors">
                                 <Clock className="h-4 w-4 mr-1 text-positive" />
                                 <span>Resultats & Calendrier</span>
                             </Link>

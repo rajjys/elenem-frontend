@@ -78,8 +78,8 @@ export default function GameManagementDashboard() {
   const isLeagueAdmin = currentUserRoles.includes(Roles.LEAGUE_ADMIN);
   const isTeamAdmin = currentUserRoles.includes(Roles.TEAM_ADMIN);
   const redirectPath = isSystemAdmin ? "/admin/games":
-                         isTenantAdmin ? "/tenant/games" :
-                         isLeagueAdmin ? "/league/games" :
+                         isTenantAdmin ? "/tenant/calendar" :
+                         isLeagueAdmin ? "/league/calendar" :
                          "/team/games"; // Team admin 
 
   // Use debounced values for API calls to avoid spamming the backend

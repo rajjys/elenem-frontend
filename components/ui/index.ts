@@ -1,6 +1,7 @@
 export * from './button';
 export * from './input';
 export * from './select';
+export * from './select-field';
 export * from './textarea';
 export * from './loading-spinner';
 export * from './switch';

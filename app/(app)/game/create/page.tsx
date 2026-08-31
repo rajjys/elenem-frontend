@@ -20,8 +20,8 @@ export default function CreateGamePage() {
       const isLeagueAdmin = currentUserRoles.includes(Roles.LEAGUE_ADMIN);
     
     const redirectPath = isSystemAdmin ? "/admin/games":
-                         isTenantAdmin ? "/tenant/games" :
-                         isLeagueAdmin ? "/league/games" :
+                         isTenantAdmin ? "/tenant/calendar" :
+                         isLeagueAdmin ? "/league/calendar" :
                          "/games"; // Default fallback path  
 
   const handleSuccess = useCallback((game: GameDetails) => {

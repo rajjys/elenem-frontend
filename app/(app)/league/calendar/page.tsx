@@ -1,6 +1,6 @@
 'use client';
 
-import { Wand2 } from 'lucide-react';
+import { Plus, Wand2 } from 'lucide-react';
 import { CalendarView } from '@/components/calendar';
 import { PageHeader } from '@/components/ui';
 
@@ -16,7 +16,8 @@ export default function LeagueCalendarPage() {
       <PageHeader
         title="Calendrier"
         description="Les matchs de votre compétition."
-        action={{ label: 'Générer des matchs', href: '/league/schedule', icon: Wand2 }}
+        action={{ label: 'Nouveau match', href: '/game/create', icon: Plus }}
+        secondaryAction={{ label: 'Générer des matchs', href: '/league/schedule', icon: Wand2 }}
       />
       <div className="mt-5">
         <CalendarView />
