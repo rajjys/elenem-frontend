@@ -1,7 +1,7 @@
 'use client';
 
-import { useMemo, useState } from 'react';
-import { CalendarDays, ChevronLeft, ChevronRight, MapPin, Ban } from 'lucide-react';
+import { useCallback, useMemo, useState } from 'react';
+import { Ban, ChevronLeft, ChevronRight, MapPin } from 'lucide-react';
 import { Button, LoadingSpinner } from '@/components/ui';
 import { ErrorState } from '@/components/ui/error-state';
 import {
@@ -12,6 +12,9 @@ import {
   type CalendarEntry,
 } from '@/services/calendar';
 import { cn } from '@/utils';
+import { FixtureChip } from './fixture-chip';
+import { FixtureDrawer } from './fixture-drawer';
+import { YearGrid } from './year-grid';
 
 /**
  * The organisation's calendar, read-only.
@@ -45,26 +48,18 @@ const COMPETITION_TONES = [
   { dot: 'bg-cat-4', chip: 'bg-cat-4-soft text-cat-4 ring-cat-4/25' },
 ] as const;
 
-function toneFor(competitionId: string, competitions: CalendarCompetition[]) {
-  const index = competitions.findIndex((c) => c.id === competitionId);
-  return COMPETITION_TONES[(index < 0 ? 0 : index) % COMPETITION_TONES.length];
-}
-
 const MONTHS = [
   'janvier', 'février', 'mars', 'avril', 'mai', 'juin',
   'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre',
 ];
 const WEEKDAYS = ['lun', 'mar', 'mer', 'jeu', 'ven', 'sam', 'dim'];
 
-function monthBounds(cursor: Date) {
+/** How many chips fit a month cell before the rest become a "+N" the reader can open. */
+const CHIPS_PER_CELL = 3;
+
+function monthGrid(cursor: Date): Date[] {
   const first = new Date(cursor.getFullYear(), cursor.getMonth(), 1);
   const last = new Date(cursor.getFullYear(), cursor.getMonth() + 1, 0);
-  return { first, last };
-}
-
-/** The six-week grid a month is drawn on, Monday first. */
-function monthGrid(cursor: Date): Date[] {
-  const { first, last } = monthBounds(cursor);
   const lead = (first.getDay() + 6) % 7;
   const start = new Date(first);
   start.setDate(first.getDate() - lead);
@@ -84,55 +79,34 @@ function timeOf(iso: string): string {
   return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
 }
 
-function EntryChip({
-  entry,
-  competitions,
-  compact = false,
-}: {
-  entry: CalendarEntry;
-  competitions: CalendarCompetition[];
-  compact?: boolean;
-}) {
-  const tone = toneFor(entry.leagueId, competitions);
-  const played = entry.status === 'COMPLETED';
-
-  return (
-    <div
-      className={cn(
-        'flex items-center gap-1.5 rounded px-1.5 py-1 text-[0.6875rem] leading-tight',
-        'ring-1',
-        tone.chip,
-        played && 'opacity-70',
-      )}
-      title={`${timeOf(entry.dateTime)} · ${entry.home.name} — ${entry.away.name}`}
-    >
-      {!compact && <span className="tabular-nums opacity-70">{timeOf(entry.dateTime)}</span>}
-      <span className="truncate font-medium">
-        {entry.home.shortCode} <span className="opacity-50">·</span> {entry.away.shortCode}
-      </span>
-      {played && entry.homeScore != null && (
-        <span className="ml-auto shrink-0 tabular-nums font-semibold">
-          {entry.homeScore}–{entry.awayScore}
-        </span>
-      )}
-    </div>
-  );
-}
+type Scale = 'month' | 'year';
 
 export function CalendarView() {
+  const [scale, setScale] = useState<Scale>('month');
   const [cursor, setCursor] = useState(() => new Date());
   const [hidden, setHidden] = useState<Set<string>>(new Set());
+  const [openDay, setOpenDay] = useState<string | null>(null);
+  const [focused, setFocused] = useState<CalendarEntry | null>(null);
 
-  const { first, last } = useMemo(() => monthBounds(cursor), [cursor]);
   const cells = useMemo(() => monthGrid(cursor), [cursor]);
 
-  // The grid shows a few days either side of the month, so the query covers them too.
-  const range = useMemo(
-    () => ({ from: isoDay(cells[0] ?? first), to: isoDay(cells[cells.length - 1] ?? last) }),
-    [cells, first, last],
-  );
+  // A year needs the whole year; a month needs the grid's overhang either side of it.
+  const range = useMemo(() => {
+    if (scale === 'year') {
+      return { from: `${cursor.getFullYear()}-01-01`, to: `${cursor.getFullYear()}-12-31` };
+    }
+    return { from: isoDay(cells[0]), to: isoDay(cells[cells.length - 1]) };
+  }, [scale, cursor, cells]);
 
   const { data, isPending, isError, refetch } = useCalendar(range);
+
+  const toneFor = useCallback(
+    (leagueId: string) => {
+      const index = (data?.competitions ?? []).findIndex((c) => c.id === leagueId);
+      return COMPETITION_TONES[(index < 0 ? 0 : index) % COMPETITION_TONES.length];
+    },
+    [data],
+  );
 
   const visible = useMemo(
     () => (data?.entries ?? []).filter((e) => !hidden.has(e.leagueId)),
@@ -151,96 +125,161 @@ export function CalendarView() {
 
   const closed = useMemo(() => blackoutDays(data?.blackouts ?? []), [data]);
   const todayKey = isoDay(new Date());
-  const venueName = (id?: string | null) => data?.venues.find((v) => v.id === id)?.name;
+  const placed = visible.filter((e) => e.venueId).length;
 
-  function toggle(leagueId: string) {
-    setHidden((prev) => {
-      const next = new Set(prev);
-      if (next.has(leagueId)) next.delete(leagueId);
-      else next.add(leagueId);
-      return next;
-    });
+  function openDrawer(day: string, entry: CalendarEntry | null = null) {
+    setOpenDay(day);
+    setFocused(entry);
+  }
+  function closeDrawer() {
+    setOpenDay(null);
+    setFocused(null);
   }
 
-  function shiftMonth(delta: number) {
-    setCursor((c) => new Date(c.getFullYear(), c.getMonth() + delta, 1));
-  }
-
-  if (isError) {
-    return (
-      <ErrorState
-        title="Le calendrier n'a pas pu être chargé."
-        reset={() => void refetch()}
-      />
+  function shift(delta: number) {
+    setCursor((c) =>
+      scale === 'year'
+        ? new Date(c.getFullYear() + delta, c.getMonth(), 1)
+        : new Date(c.getFullYear(), c.getMonth() + delta, 1),
     );
   }
 
+  if (isError) {
+    return <ErrorState title="Le calendrier n'a pas pu être chargé." reset={() => void refetch()} />;
+  }
+
   return (
-    <div className="space-y-4">
-      {/* ---- month control + competition legend ---- */}
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-3">
-        <div className="flex items-center gap-1">
-          <button
-            type="button"
-            onClick={() => shiftMonth(-1)}
-            aria-label="Mois précédent"
-            className="flex h-9 w-9 items-center justify-center rounded-md text-ink-muted hover:bg-surface-sunk hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-          >
-            <ChevronLeft className="h-4 w-4" aria-hidden />
-          </button>
-          <h2 className="min-w-[9.5rem] text-center text-base font-semibold text-ink capitalize">
-            {MONTHS[cursor.getMonth()]} {cursor.getFullYear()}
-          </h2>
-          <button
-            type="button"
-            onClick={() => shiftMonth(1)}
-            aria-label="Mois suivant"
-            className="flex h-9 w-9 items-center justify-center rounded-md text-ink-muted hover:bg-surface-sunk hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-          >
-            <ChevronRight className="h-4 w-4" aria-hidden />
-          </button>
-          <Button variant="ghost" onClick={() => setCursor(new Date())} className="ml-1">
+    <div
+      className={cn(
+        'space-y-4 transition-[padding] duration-200',
+        // Space is reserved on wide screens rather than the panel simply covering the grid.
+        // Overlaying keeps the month from reflowing, which is why it does so on phones — but
+        // Sunday is the rightmost column, so on a desktop the panel would hide the very day it
+        // describes, highlight and all. Reserving is the honest resolution: the grid shifts once,
+        // predictably, and nothing you clicked disappears underneath.
+        openDay !== null && 'lg:pr-[23rem]',
+      )}
+    >
+      {/* ---------- controls: period on the left, filters below, count on the right ---------- */}
+      <div className="space-y-3">
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="flex items-center gap-0.5">
+            <button
+              type="button"
+              onClick={() => shift(-1)}
+              aria-label={scale === 'year' ? 'Année précédente' : 'Mois précédent'}
+              className="flex h-9 w-9 items-center justify-center rounded-md text-ink-muted transition-colors hover:bg-surface-sunk hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            >
+              <ChevronLeft className="h-4 w-4" aria-hidden />
+            </button>
+            <h2 className="min-w-[9rem] text-center text-base font-semibold capitalize text-ink">
+              {scale === 'year'
+                ? cursor.getFullYear()
+                : `${MONTHS[cursor.getMonth()]} ${cursor.getFullYear()}`}
+            </h2>
+            <button
+              type="button"
+              onClick={() => shift(1)}
+              aria-label={scale === 'year' ? 'Année suivante' : 'Mois suivant'}
+              className="flex h-9 w-9 items-center justify-center rounded-md text-ink-muted transition-colors hover:bg-surface-sunk hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            >
+              <ChevronRight className="h-4 w-4" aria-hidden />
+            </button>
+          </div>
+
+          <Button variant="ghost" onClick={() => setCursor(new Date())}>
             Aujourd&apos;hui
           </Button>
-        </div>
 
-        {/* Filtering by competition is the one interaction a read-only calendar needs: with three
-            competitions on one grid, isolating D2 is how you see whether it fits. */}
-        <div className="flex flex-wrap items-center gap-1.5">
-          {(data?.competitions ?? []).map((c) => {
-            const tone = toneFor(c.id, data?.competitions ?? []);
-            const off = hidden.has(c.id);
-            return (
+          {/* Two scales answer two questions: the month says what is on Saturday, the year says
+              where the season sits. */}
+          <div className="ml-auto flex rounded-lg border border-line bg-surface p-0.5">
+            {(['month', 'year'] as const).map((s) => (
               <button
-                key={c.id}
+                key={s}
                 type="button"
-                onClick={() => toggle(c.id)}
-                aria-pressed={!off}
-                title={c.name}
+                onClick={() => setScale(s)}
+                aria-pressed={scale === s}
                 className={cn(
-                  'flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium transition-colors ring-1',
+                  'rounded-md px-3 py-1 text-xs font-medium transition-colors',
                   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent',
-                  off ? 'bg-surface text-ink-subtle ring-line' : tone.chip,
+                  scale === s ? 'bg-accent text-accent-ink' : 'text-ink-muted hover:text-ink',
                 )}
               >
-                <span className={cn('h-2 w-2 rounded-full', off ? 'bg-line-strong' : tone.dot)} />
-                {c.shortLabel}
+                {s === 'month' ? 'Mois' : 'Année'}
               </button>
-            );
-          })}
+            ))}
+          </div>
         </div>
 
-        <span className="ml-auto text-xs text-ink-subtle tabular-nums">
-          {visible.length} match{visible.length > 1 ? 's' : ''}
-        </span>
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+          {/* Filtering is the one interaction a read-only calendar needs: with three competitions
+              on one grid, isolating D2 is how you see whether it fits. */}
+          <div className="flex flex-wrap items-center gap-1.5">
+            {(data?.competitions ?? []).map((c: CalendarCompetition) => {
+              const tone = toneFor(c.id);
+              const off = hidden.has(c.id);
+              return (
+                <button
+                  key={c.id}
+                  type="button"
+                  onClick={() =>
+                    setHidden((prev) => {
+                      const next = new Set(prev);
+                      if (next.has(c.id)) next.delete(c.id);
+                      else next.add(c.id);
+                      return next;
+                    })
+                  }
+                  aria-pressed={!off}
+                  title={c.name}
+                  className={cn(
+                    'flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ring-1 transition-colors',
+                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent',
+                    off ? 'bg-surface text-ink-subtle ring-line' : tone.chip,
+                  )}
+                >
+                  <span className={cn('h-2 w-2 rounded-full', off ? 'bg-line-strong' : tone.dot)} />
+                  {c.shortLabel}
+                </button>
+              );
+            })}
+          </div>
+
+          <p className="ml-auto text-xs text-ink-subtle">
+            <span className="tabular-nums">{visible.length}</span> match
+            {visible.length > 1 ? 's' : ''}
+            {data && data.venues.length > 0 && (
+              <>
+                {' · '}
+                <span className="tabular-nums">{placed}</span> avec salle
+              </>
+            )}
+          </p>
+        </div>
       </div>
 
       {isPending ? (
         <LoadingSpinner message="Chargement du calendrier…" />
+      ) : scale === 'year' ? (
+        <YearGrid
+          year={cursor.getFullYear()}
+          entries={visible}
+          closedDays={closed}
+          onPickMonth={(month) => {
+            setCursor(new Date(cursor.getFullYear(), month, 1));
+            setScale('month');
+          }}
+          onPickDay={(day) => {
+            setCursor(new Date(day));
+            setScale('month');
+            openDrawer(day);
+          }}
+        />
       ) : (
         <>
-          {/* ---- month grid: sm and up ---- */}
-          <div className="hidden sm:block overflow-hidden rounded-lg border border-line bg-surface">
+          {/* ---------- month grid, sm and up ---------- */}
+          <div className="hidden overflow-hidden rounded-lg border border-line bg-surface sm:block">
             <div className="grid grid-cols-7 border-b border-line">
               {WEEKDAYS.map((d) => (
                 <div
@@ -258,46 +297,65 @@ export function CalendarView() {
                 const entries = byDay.get(key) ?? [];
                 const outside = day.getMonth() !== cursor.getMonth();
                 const reasons = closed.get(key);
+                const isOpen = openDay === key;
+                const overflow = entries.length - CHIPS_PER_CELL;
 
                 return (
                   <div
                     key={key}
                     className={cn(
-                      'min-h-[6.5rem] border-b border-r border-line p-1.5 last:border-r-0',
-                      '[&:nth-child(7n)]:border-r-0',
+                      'min-h-[7rem] border-b border-r border-line p-1.5 transition-colors [&:nth-child(7n)]:border-r-0',
                       outside && 'bg-surface-sunk/40',
                       reasons && 'bg-caution-soft/40',
+                      // The day the panel is about is lit, so the reader can find it again after
+                      // their eye has moved to the panel.
+                      isOpen && 'bg-accent-soft ring-2 ring-inset ring-accent',
                     )}
                   >
                     <div className="flex items-center justify-between gap-1 px-0.5 pb-1">
-                      <span
+                      <button
+                        type="button"
+                        onClick={() => openDrawer(key)}
                         className={cn(
-                          'inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-xs tabular-nums',
+                          'inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-xs tabular-nums transition-colors',
+                          'hover:bg-accent-soft hover:text-accent-text',
+                          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent',
                           key === todayKey
-                            ? 'bg-accent font-semibold text-accent-ink'
+                            ? 'bg-accent font-semibold text-accent-ink hover:bg-accent hover:text-accent-ink'
                             : outside
                               ? 'text-ink-subtle'
                               : 'text-ink-muted',
                         )}
                       >
                         {day.getDate()}
-                      </span>
+                      </button>
                       {reasons && (
-                        <Ban
-                          className="h-3 w-3 shrink-0 text-caution"
-                          aria-label={reasons[0]}
-                        />
+                        <Ban className="h-3 w-3 shrink-0 text-caution" aria-label={reasons[0]} />
                       )}
                     </div>
 
                     <div className="space-y-1">
-                      {entries.slice(0, 3).map((e) => (
-                        <EntryChip key={e.id} entry={e} competitions={data?.competitions ?? []} />
+                      {entries.slice(0, CHIPS_PER_CELL).map((e) => (
+                        <FixtureChip
+                          key={e.id}
+                          entry={e}
+                          competitions={data?.competitions ?? []}
+                          venues={data?.venues ?? []}
+                          tone={toneFor(e.leagueId)}
+                          onOpen={() => openDrawer(key, e)}
+                          dimmed={e.status === 'COMPLETED'}
+                        />
                       ))}
-                      {entries.length > 3 && (
-                        <p className="px-1 text-[0.6875rem] text-ink-subtle">
-                          +{entries.length - 3} autre{entries.length - 3 > 1 ? 's' : ''}
-                        </p>
+                      {overflow > 0 && (
+                        // Previously this was plain text, which named something the reader could
+                        // not reach. It opens the day.
+                        <button
+                          type="button"
+                          onClick={() => openDrawer(key)}
+                          className="w-full rounded px-1 py-0.5 text-left text-[0.6875rem] text-ink-muted transition-colors hover:bg-surface-sunk hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                        >
+                          +{overflow} autre{overflow > 1 ? 's' : ''}
+                        </button>
                       )}
                     </div>
                   </div>
@@ -306,8 +364,8 @@ export function CalendarView() {
             </div>
           </div>
 
-          {/* ---- agenda: below sm ---- */}
-          <div className="sm:hidden space-y-3">
+          {/* ---------- agenda, below sm ---------- */}
+          <div className="space-y-3 sm:hidden">
             {[...byDay.entries()]
               .filter(([key]) => new Date(key).getMonth() === cursor.getMonth())
               .sort(([a], [b]) => a.localeCompare(b))
@@ -315,7 +373,7 @@ export function CalendarView() {
                 const day = new Date(key);
                 const reasons = closed.get(key);
                 return (
-                  <div key={key} className="rounded-lg border border-line bg-surface">
+                  <div key={key} className="overflow-hidden rounded-lg border border-line bg-surface">
                     <div className="flex items-center gap-2 border-b border-line px-3 py-2">
                       <span
                         className={cn(
@@ -337,30 +395,37 @@ export function CalendarView() {
                     </div>
                     <ul className="divide-y divide-line">
                       {entries.map((e) => {
-                        const tone = toneFor(e.leagueId, data?.competitions ?? []);
-                        const venue = venueName(e.venueId);
+                        const tone = toneFor(e.leagueId);
+                        const venue = data?.venues.find((v) => v.id === e.venueId);
                         return (
-                          <li key={e.id} className="flex items-center gap-2.5 px-3 py-2.5">
-                            <span className={cn('h-2 w-2 shrink-0 rounded-full', tone.dot)} />
-                            <span className="w-11 shrink-0 text-xs tabular-nums text-ink-muted">
-                              {timeOf(e.dateTime)}
-                            </span>
-                            <div className="min-w-0 flex-1">
-                              <p className="truncate text-sm text-ink">
-                                {e.home.name} <span className="text-ink-subtle">—</span> {e.away.name}
-                              </p>
-                              {venue && (
-                                <p className="flex items-center gap-1 truncate text-xs text-ink-subtle">
-                                  <MapPin className="h-3 w-3 shrink-0" aria-hidden />
-                                  {venue}
-                                </p>
-                              )}
-                            </div>
-                            {e.status === 'COMPLETED' && e.homeScore != null && (
-                              <span className="shrink-0 text-sm font-semibold tabular-nums text-ink">
-                                {e.homeScore}–{e.awayScore}
+                          <li key={e.id}>
+                            <button
+                              type="button"
+                              onClick={() => openDrawer(key, e)}
+                              className="flex w-full items-center gap-2.5 px-3 py-2.5 text-left transition-colors hover:bg-surface-sunk focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent"
+                            >
+                              <span className={cn('h-2 w-2 shrink-0 rounded-full', tone.dot)} />
+                              <span className="w-11 shrink-0 text-xs tabular-nums text-ink-muted">
+                                {timeOf(e.dateTime)}
                               </span>
-                            )}
+                              <span className="min-w-0 flex-1">
+                                <span className="block truncate text-sm text-ink">
+                                  {e.home.name} <span className="text-ink-subtle">—</span>{' '}
+                                  {e.away.name}
+                                </span>
+                                {venue && (
+                                  <span className="flex items-center gap-1 truncate text-xs text-ink-subtle">
+                                    <MapPin className="h-3 w-3 shrink-0" aria-hidden />
+                                    {venue.name}
+                                  </span>
+                                )}
+                              </span>
+                              {e.status === 'COMPLETED' && e.homeScore != null && (
+                                <span className="shrink-0 text-sm font-semibold tabular-nums text-ink">
+                                  {e.homeScore}–{e.awayScore}
+                                </span>
+                              )}
+                            </button>
                           </li>
                         );
                       })}
@@ -375,18 +440,21 @@ export function CalendarView() {
               </p>
             )}
           </div>
-
-          {/* ---- what the calendar cannot yet tell you ---- */}
-          {data && data.venues.length > 0 && (
-            <p className="flex items-center gap-1.5 text-xs text-ink-subtle">
-              <CalendarDays className="h-3.5 w-3.5 shrink-0" aria-hidden />
-              {visible.filter((e) => e.venueId).length} match
-              {visible.filter((e) => e.venueId).length > 1 ? 's' : ''} sur {visible.length} ont une
-              salle attribuée. Les autres ont une date mais pas encore de lieu.
-            </p>
-          )}
         </>
       )}
+
+      <FixtureDrawer
+        open={openDay !== null}
+        onClose={closeDrawer}
+        day={openDay}
+        entries={openDay ? (byDay.get(openDay) ?? []) : []}
+        focused={focused}
+        onFocus={setFocused}
+        competitions={data?.competitions ?? []}
+        venues={data?.venues ?? []}
+        toneFor={toneFor}
+        closedReasons={openDay ? closed.get(openDay) : undefined}
+      />
     </div>
   );
 }
