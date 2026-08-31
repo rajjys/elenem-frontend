@@ -11,6 +11,7 @@ import {
   type CalendarCompetition,
   type CalendarEntry,
 } from '@/services/calendar';
+import { useScopeContext } from '@/hooks';
 import { cn } from '@/utils';
 import { FixtureChip } from './fixture-chip';
 import { FixtureDrawer } from './fixture-drawer';
@@ -82,11 +83,25 @@ function timeOf(iso: string): string {
 type Scale = 'month' | 'year';
 
 export function CalendarView() {
+  /**
+   * Scope, resolved the way every other surface resolves it: the URL wins, the JWT is the floor.
+   *
+   * This is what the flat route buys. `/calendar` is one screen serving every role — a tenant
+   * admin sees the whole organisation, a league admin sees their competition, and drilling into
+   * a league narrows it — rather than /tenant/calendar and /league/calendar being two pages that
+   * drift apart. Without this wiring the page ignored context entirely and showed a league admin
+   * every competition in the organisation, which is the exact failure the convention exists to
+   * prevent.
+   */
+  const scope = useScopeContext();
+
   const [scale, setScale] = useState<Scale>('month');
   const [cursor, setCursor] = useState(() => new Date());
   const [hidden, setHidden] = useState<Set<string>>(new Set());
   const [openDay, setOpenDay] = useState<string | null>(null);
   const [focused, setFocused] = useState<CalendarEntry | null>(null);
+  const [teamFilter, setTeamFilter] = useState<string>('');
+  const [venueFilter, setVenueFilter] = useState<string>('');
 
   const cells = useMemo(() => monthGrid(cursor), [cursor]);
 
@@ -98,7 +113,11 @@ export function CalendarView() {
     return { from: isoDay(cells[0]), to: isoDay(cells[cells.length - 1]) };
   }, [scale, cursor, cells]);
 
-  const { data, isPending, isError, refetch } = useCalendar(range);
+  const { data, isPending, isError, refetch } = useCalendar({
+    ...range,
+    // A league admin, or anyone who drilled into a league, sees that league only.
+    leagueIds: scope.leagueId ? [scope.leagueId] : undefined,
+  });
 
   const toneFor = useCallback(
     (leagueId: string) => {
@@ -108,9 +127,30 @@ export function CalendarView() {
     [data],
   );
 
+  /** Every club appearing this period, so the filter offers only what is actually there. */
+  const teamsInRange = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const e of data?.entries ?? []) {
+      map.set(e.home.id, e.home.name);
+      map.set(e.away.id, e.away.name);
+    }
+    return [...map.entries()]
+      .map(([id, name]) => ({ id, name }))
+      .sort((a, b) => a.name.localeCompare(b.name, 'fr'));
+  }, [data]);
+
   const visible = useMemo(
-    () => (data?.entries ?? []).filter((e) => !hidden.has(e.leagueId)),
-    [data, hidden],
+    () =>
+      (data?.entries ?? []).filter((e) => {
+        if (hidden.has(e.leagueId)) return false;
+        // A team filter answers "when do we play"; a venue filter answers "what is in that hall".
+        // Both are applied here rather than server-side: the period's fixtures are already loaded,
+        // and a round trip per keystroke would cost more than the filtering saves.
+        if (teamFilter && e.home.id !== teamFilter && e.away.id !== teamFilter) return false;
+        if (venueFilter && e.venueId !== venueFilter) return false;
+        return true;
+      }),
+    [data, hidden, teamFilter, venueFilter],
   );
 
   const byDay = useMemo(() => {
@@ -246,17 +286,70 @@ export function CalendarView() {
             })}
           </div>
 
-          <p className="ml-auto text-xs text-ink-subtle">
-            <span className="tabular-nums">{visible.length}</span> match
-            {visible.length > 1 ? 's' : ''}
-            {data && data.venues.length > 0 && (
-              <>
-                {' · '}
-                <span className="tabular-nums">{placed}</span> avec salle
-              </>
+          {/* Team and venue narrow the same grid two different ways: "when do we play" and
+              "what is in that hall". Both only offer what the period actually contains. */}
+          <div className="ml-auto flex flex-wrap items-center gap-2">
+            <select
+              value={teamFilter}
+              onChange={(e) => setTeamFilter(e.target.value)}
+              aria-label="Filtrer par équipe"
+              className="h-8 rounded-lg border border-line bg-surface px-2 text-xs text-ink focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+            >
+              <option value="">Toutes les équipes</option>
+              {teamsInRange.map((t) => (
+                <option key={t.id} value={t.id}>
+                  {t.name}
+                </option>
+              ))}
+            </select>
+
+            {(data?.venues.length ?? 0) > 0 && (
+              <select
+                value={venueFilter}
+                onChange={(e) => setVenueFilter(e.target.value)}
+                aria-label="Filtrer par salle"
+                className="h-8 rounded-lg border border-line bg-surface px-2 text-xs text-ink focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+              >
+                <option value="">Toutes les salles</option>
+                {(data?.venues ?? []).map((v) => (
+                  <option key={v.id} value={v.id}>
+                    {v.name}
+                  </option>
+                ))}
+              </select>
             )}
-          </p>
+
+            {(teamFilter || venueFilter) && (
+              <button
+                type="button"
+                onClick={() => {
+                  setTeamFilter('');
+                  setVenueFilter('');
+                }}
+                className="text-xs text-accent-text hover:underline"
+              >
+                Effacer
+              </button>
+            )}
+          </div>
         </div>
+
+        <p className="text-xs text-ink-subtle">
+          <span className="tabular-nums">{visible.length}</span> match
+          {visible.length > 1 ? 's' : ''}
+          {data && data.venues.length > 0 && (
+            <>
+              {' · '}
+              <span className="tabular-nums">{placed}</span> avec salle
+            </>
+          )}
+          {scope.league && (
+            <>
+              {' · '}
+              <span className="text-ink-muted">{scope.league.name}</span>
+            </>
+          )}
+        </p>
       </div>
 
       {isPending ? (

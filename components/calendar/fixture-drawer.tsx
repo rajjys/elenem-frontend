@@ -203,63 +203,83 @@ export function FixtureDrawer({
                 ← Tous les matchs du jour
               </button>
 
-              <div className="space-y-1">
-                <p className="text-lg font-semibold leading-snug text-ink">{focused.home.name}</p>
-                <p className="text-xs uppercase tracking-wider text-ink-subtle">contre</p>
-                <p className="text-lg font-semibold leading-snug text-ink">{focused.away.name}</p>
+              {/* The matchup and its score read as one block: two teams either side of the
+                  number that settled it, rather than a name, a label, a name and then a score
+                  floating below them all. */}
+              <div className="rounded-lg border border-line bg-surface-sunk p-3.5">
+                <div className="flex items-center gap-3">
+                  <p className="min-w-0 flex-1 text-sm font-semibold leading-snug text-ink">
+                    {focused.home.name}
+                  </p>
+                  {focused.status === 'COMPLETED' && focused.homeScore != null ? (
+                    <p className="shrink-0 text-2xl font-bold tabular-nums text-ink">
+                      {focused.homeScore}
+                    </p>
+                  ) : (
+                    <span className="shrink-0 text-xs text-ink-subtle">dom.</span>
+                  )}
+                </div>
+                <div className="my-2 h-px bg-line" />
+                <div className="flex items-center gap-3">
+                  <p className="min-w-0 flex-1 text-sm font-semibold leading-snug text-ink">
+                    {focused.away.name}
+                  </p>
+                  {focused.status === 'COMPLETED' && focused.awayScore != null ? (
+                    <p className="shrink-0 text-2xl font-bold tabular-nums text-ink">
+                      {focused.awayScore}
+                    </p>
+                  ) : (
+                    <span className="shrink-0 text-xs text-ink-subtle">ext.</span>
+                  )}
+                </div>
               </div>
 
-              {focused.status === 'COMPLETED' && focused.homeScore != null && (
-                <p className="text-3xl font-bold tabular-nums text-ink">
-                  {focused.homeScore} <span className="text-ink-subtle">–</span> {focused.awayScore}
-                </p>
-              )}
-
-              <dl className="space-y-2 text-sm">
-                <div className="flex items-baseline gap-3">
-                  <dt className="w-24 shrink-0 text-xs uppercase tracking-wider text-ink-subtle">
-                    État
-                  </dt>
-                  <dd>
-                    <span
-                      className={cn(
-                        'rounded-full px-2 py-0.5 text-xs font-medium ring-1',
-                        statusTone(focused.status),
-                      )}
-                    >
-                      {STATUS_LABELS[focused.status] ?? focused.status}
-                    </span>
-                  </dd>
-                </div>
-                <div className="flex items-baseline gap-3">
-                  <dt className="w-24 shrink-0 text-xs uppercase tracking-wider text-ink-subtle">
-                    Heure
-                  </dt>
-                  <dd className="tabular-nums text-ink">
-                    {timeOf(focused.dateTime)}
-                    <span className="text-ink-subtle"> · {focused.durationMinutes} min</span>
-                  </dd>
-                </div>
-                {competition && (
-                  <div className="flex items-baseline gap-3">
-                    <dt className="w-24 shrink-0 text-xs uppercase tracking-wider text-ink-subtle">
-                      Compétition
-                    </dt>
-                    <dd className="min-w-0 text-ink">{competition.name}</dd>
-                  </div>
-                )}
-                <div className="flex items-baseline gap-3">
-                  <dt className="w-24 shrink-0 text-xs uppercase tracking-wider text-ink-subtle">
-                    Salle
-                  </dt>
-                  <dd className="min-w-0 text-ink">
-                    {venue ? (
-                      venue.name
+              <dl className="divide-y divide-line rounded-lg border border-line">
+                {[
+                  {
+                    label: 'État',
+                    value: (
+                      <span
+                        className={cn(
+                          'rounded-full px-2 py-0.5 text-xs font-medium ring-1',
+                          statusTone(focused.status),
+                        )}
+                      >
+                        {STATUS_LABELS[focused.status] ?? focused.status}
+                      </span>
+                    ),
+                  },
+                  {
+                    label: 'Heure',
+                    value: (
+                      <span className="tabular-nums text-ink">
+                        {timeOf(focused.dateTime)}
+                        <span className="text-ink-subtle"> · {focused.durationMinutes} min</span>
+                      </span>
+                    ),
+                  },
+                  ...(competition
+                    ? [{ label: 'Compétition', value: <span className="text-ink">{competition.name}</span> }]
+                    : []),
+                  {
+                    label: 'Salle',
+                    value: venue ? (
+                      <span className="flex items-center gap-1.5 text-ink">
+                        <MapPin className="h-3.5 w-3.5 shrink-0 text-ink-subtle" aria-hidden />
+                        {venue.name}
+                      </span>
                     ) : (
                       <span className="text-ink-subtle">Pas encore attribuée</span>
-                    )}
-                  </dd>
-                </div>
+                    ),
+                  },
+                ].map((row) => (
+                  <div key={row.label} className="flex items-baseline gap-3 px-3 py-2.5 text-sm">
+                    <dt className="w-24 shrink-0 text-xs uppercase tracking-wider text-ink-subtle">
+                      {row.label}
+                    </dt>
+                    <dd className="min-w-0 flex-1">{row.value}</dd>
+                  </div>
+                ))}
               </dl>
 
               <div className="space-y-2 pt-1">
