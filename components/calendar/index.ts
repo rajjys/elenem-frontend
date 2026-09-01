@@ -5,3 +5,5 @@ export * from './fixture-chip';
 export * from './fixture-drawer';
 export * from './results-sheet-button';
 export * from './year-grid';
+export * from './calendar-generate';
+export * from './draft-insights';

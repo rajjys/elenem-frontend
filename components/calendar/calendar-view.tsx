@@ -90,7 +90,22 @@ const SCALES: { key: Scale; label: string }[] = [
   { key: 'list', label: 'Liste' },
 ];
 
-export function CalendarView() {
+export interface CalendarViewProps {
+  /**
+   * Fixtures that do not exist yet, laid over the ones that do.
+   *
+   * The draft is studied on the calendar rather than in a list beside it, because the questions
+   * it has to answer are spatial — is that hall taken, does this land in the exam fortnight, does
+   * the women's fixture sit on top of the men's. A list of matchdays cannot answer any of them.
+   * They arrive shaped as ordinary entries with `status: 'DRAFT'`, so every existing behaviour —
+   * filters, the day panel, the year map — works on them without knowing what they are.
+   */
+  draftEntries?: CalendarEntry[];
+  /** Where to open. A draft's first month, rather than the month the reader happens to be in. */
+  initialMonth?: Date;
+}
+
+export function CalendarView({ draftEntries, initialMonth }: CalendarViewProps = {}) {
   /**
    * Scope, resolved the way every other surface resolves it: the URL wins, the JWT is the floor.
    *
@@ -104,7 +119,7 @@ export function CalendarView() {
   const scope = useScopeContext();
 
   const [scale, setScale] = useState<Scale>('month');
-  const [cursor, setCursor] = useState(() => new Date());
+  const [cursor, setCursor] = useState(() => initialMonth ?? new Date());
   const [hidden, setHidden] = useState<Set<string>>(new Set());
   const [openDay, setOpenDay] = useState<string | null>(null);
   const [focused, setFocused] = useState<CalendarEntry | null>(null);
@@ -145,18 +160,18 @@ export function CalendarView() {
   /** Every club appearing this period, so the filter offers only what is actually there. */
   const teamsInRange = useMemo(() => {
     const map = new Map<string, string>();
-    for (const e of data?.entries ?? []) {
+    for (const e of [...(data?.entries ?? []), ...(draftEntries ?? [])]) {
       map.set(e.home.id, e.home.name);
       map.set(e.away.id, e.away.name);
     }
     return [...map.entries()]
       .map(([id, name]) => ({ id, name }))
       .sort((a, b) => a.name.localeCompare(b.name, 'fr'));
-  }, [data]);
+  }, [data, draftEntries]);
 
   const visible = useMemo(
     () =>
-      (data?.entries ?? []).filter((e) => {
+      [...(data?.entries ?? []), ...(draftEntries ?? [])].filter((e) => {
         if (hidden.has(e.leagueId)) return false;
         // A team filter answers "when do we play"; a venue filter answers "what is in that hall".
         // Both are applied here rather than server-side: the period's fixtures are already loaded,
@@ -165,7 +180,7 @@ export function CalendarView() {
         if (venueFilter && e.venueId !== venueFilter) return false;
         return true;
       }),
-    [data, hidden, teamFilter, venueFilter],
+    [data, draftEntries, hidden, teamFilter, venueFilter],
   );
 
   const byDay = useMemo(() => {
@@ -181,6 +196,7 @@ export function CalendarView() {
   const closed = useMemo(() => blackoutDays(data?.blackouts ?? []), [data]);
   const todayKey = isoDay(new Date());
   const placed = visible.filter((e) => e.venueId).length;
+  const drafted = visible.filter((e) => e.status === 'DRAFT').length;
 
   function openDrawer(day: string, entry: CalendarEntry | null = null) {
     setOpenDay(day);
@@ -348,8 +364,16 @@ export function CalendarView() {
         </div>
 
         <p className="text-xs text-ink-subtle">
-          <span className="tabular-nums">{visible.length}</span> match
-          {visible.length > 1 ? 's' : ''}
+          <span className="tabular-nums">{visible.length - drafted}</span> match
+          {visible.length - drafted > 1 ? 's' : ''}
+          {drafted > 0 && (
+            <>
+              {' · '}
+              <span className="font-medium text-accent-text">
+                <span className="tabular-nums">{drafted}</span> en projet
+              </span>
+            </>
+          )}
           {data && data.venues.length > 0 && (
             <>
               {' · '}
@@ -458,6 +482,7 @@ export function CalendarView() {
                           tone={toneFor(e.leagueId)}
                           onOpen={() => openDrawer(key, e)}
                           dimmed={e.status === 'COMPLETED'}
+                          draft={e.status === 'DRAFT'}
                         />
                       ))}
                       {overflow > 0 && (

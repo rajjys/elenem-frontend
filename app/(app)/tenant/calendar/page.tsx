@@ -18,7 +18,7 @@ export default function TenantCalendarPage() {
         title="Calendrier"
         description="Toutes vos compétitions sur une seule grille."
         action={{ label: 'Nouveau match', href: '/game/create', icon: Plus }}
-        secondaryAction={{ label: 'Générer des matchs', href: '/tenant/schedule', icon: Wand2 }}
+        secondaryAction={{ label: 'Générer des matchs', href: '/tenant/calendar/generate', icon: Wand2 }}
       />
       <div className="mt-5">
         <CalendarView />

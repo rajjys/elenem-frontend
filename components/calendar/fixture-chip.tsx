@@ -36,6 +36,7 @@ export function FixtureChip({
   tone,
   onOpen,
   dimmed = false,
+  draft = false,
 }: {
   entry: CalendarEntry;
   competitions: CalendarCompetition[];
@@ -43,6 +44,8 @@ export function FixtureChip({
   tone: { dot: string; chip: string };
   onOpen: () => void;
   dimmed?: boolean;
+  /** A fixture that does not exist yet. Drawn as an outline, because it is a proposal. */
+  draft?: boolean;
 }) {
   const [hovered, setHovered] = useState(false);
   const competition = competitions.find((c) => c.id === entry.leagueId);
@@ -65,6 +68,11 @@ export function FixtureChip({
           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent',
           tone.chip,
           dimmed && 'opacity-70',
+          // A dashed outline over a hollow ground, so a draft never reads as a fixture that
+          // exists. The competition's colour is kept — you still need to see whose proposal it
+          // is — but the fill is dropped, which is the difference the eye picks up first when
+          // scanning a month that holds both.
+          draft && 'border border-dashed border-current bg-transparent ring-0',
         )}
       >
         <span className="tabular-nums opacity-70">{timeOf(entry.dateTime)}</span>

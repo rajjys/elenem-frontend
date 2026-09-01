@@ -17,7 +17,7 @@ export default function LeagueCalendarPage() {
         title="Calendrier"
         description="Les matchs de votre compétition."
         action={{ label: 'Nouveau match', href: '/game/create', icon: Plus }}
-        secondaryAction={{ label: 'Générer des matchs', href: '/league/schedule', icon: Wand2 }}
+        secondaryAction={{ label: 'Générer des matchs', href: '/league/calendar/generate', icon: Wand2 }}
       />
       <div className="mt-5">
         <CalendarView />

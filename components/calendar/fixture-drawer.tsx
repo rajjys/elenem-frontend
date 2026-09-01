@@ -285,6 +285,15 @@ export function FixtureDrawer({
                 ))}
               </dl>
 
+              {/* A draft has no game to open and no score to enter — it does not exist yet. The
+                  buttons were still rendered, pointing at `/game/undefined`. What it does have is
+                  the one fact worth knowing about it here: which matchday it belongs to. */}
+              {focused.status === 'DRAFT' ? (
+                <p className="rounded-lg border border-dashed border-line px-3 py-2.5 text-center text-xs text-ink-muted">
+                  Ce match n&apos;est pas encore enregistré. Publiez le projet de calendrier pour
+                  le créer.
+                </p>
+              ) : (
               <div className="space-y-2 pt-1">
                 <Button
                   variant="primary"
@@ -307,6 +316,7 @@ export function FixtureDrawer({
                     : 'Saisir le score'}
                 </Link>
               </div>
+              )}
             </div>
           ) : (
             <ul className="divide-y divide-line">
