@@ -1,7 +1,8 @@
 'use client';
 
 import { useCallback, useMemo, useState } from 'react';
-import { Ban, ChevronLeft, ChevronRight, MapPin } from 'lucide-react';
+import Link from 'next/link';
+import { Ban, ChevronLeft, ChevronRight, MapPin, Plus } from 'lucide-react';
 import { Button, LoadingSpinner, SelectField } from '@/components/ui';
 import { ErrorState } from '@/components/ui/error-state';
 import {
@@ -18,6 +19,8 @@ import { FixtureDrawer } from './fixture-drawer';
 import { CalendarList } from './calendar-list';
 import { ResultsSheetButton } from './results-sheet-button';
 import { YearGrid } from './year-grid';
+import { FixtureDialog } from './fixture-dialog';
+import { ScoreDialog } from './score-dialog';
 
 /**
  * The organisation's calendar, read-only.
@@ -126,6 +129,20 @@ export function CalendarView({ draftEntries, initialMonth }: CalendarViewProps =
   const [teamFilter, setTeamFilter] = useState<string>('');
   const [venueFilter, setVenueFilter] = useState<string>('');
 
+  /**
+   * The write surface.
+   *
+   * `editing` distinguishes adding from changing by whether it carries a fixture, so one dialog
+   * serves both — they differ in exactly that. `scoring` is separate because entering a weekend
+   * of results is a different job from placing one match, and it deserves a screen that opens
+   * onto two number fields rather than a form.
+   */
+  const [editing, setEditing] = useState<{ day: string; entry: CalendarEntry | null } | null>(null);
+  const [scoring, setScoring] = useState<CalendarEntry | null>(null);
+
+  /** Read-only surfaces stay read-only: a draft workspace is not where you edit real fixtures. */
+  const writable = !draftEntries;
+
   const cells = useMemo(() => monthGrid(cursor), [cursor]);
 
   // A year needs the whole year; a month needs the grid's overhang either side of it.
@@ -192,6 +209,25 @@ export function CalendarView({ draftEntries, initialMonth }: CalendarViewProps =
     for (const list of map.values()) list.sort((a, b) => a.dateTime.localeCompare(b.dateTime));
     return map;
   }, [visible]);
+
+  /** The span the current view actually queried, so an empty state can name it honestly. */
+  const periodLabel = useMemo(() => {
+    const from = new Date(`${range.from}T12:00:00`);
+    const to = new Date(`${range.to}T12:00:00`);
+    const one = (d: Date) => `${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
+    return one(from) === one(to) ? one(from) : `${one(from)} – ${one(to)}`;
+  }, [range]);
+
+  /**
+   * Whether this month holds anything at all.
+   *
+   * It decides how loudly each day offers to be filled. A month with fixtures in it only needs a
+   * quiet `+` on hover — the content is the point and 25 repetitions of the word "Ajouter" down
+   * the weekday columns of a league that plays weekends is noise. A month with nothing in it is
+   * the opposite case: thirty-five silent boxes whose only way in was guessing that the date
+   * number opened a panel with a link inside it. That is the moment to say so plainly.
+   */
+  const monthIsEmpty = byDay.size === 0;
 
   const closed = useMemo(() => blackoutDays(data?.blackouts ?? []), [data]);
   const todayKey = isoDay(new Date());
@@ -332,7 +368,7 @@ export function CalendarView({ draftEntries, initialMonth }: CalendarViewProps =
               value={teamFilter}
               onChange={setTeamFilter}
               options={teamsInRange.map((t) => ({ value: t.id, label: t.name }))}
-              className="w-40"
+              className="w-44"
             />
 
             {(data?.venues.length ?? 0) > 0 && (
@@ -342,7 +378,7 @@ export function CalendarView({ draftEntries, initialMonth }: CalendarViewProps =
                 value={venueFilter}
                 onChange={setVenueFilter}
                 options={(data?.venues ?? []).map((v) => ({ value: v.id, label: v.name }))}
-                className="w-40"
+                className="w-44"
               />
             )}
 
@@ -398,6 +434,10 @@ export function CalendarView({ draftEntries, initialMonth }: CalendarViewProps =
           venues={data?.venues ?? []}
           toneFor={toneFor}
           onOpen={(entry) => openDrawer(isoDay(new Date(entry.dateTime)), entry)}
+          onAdd={writable ? () => setEditing({ day: isoDay(cursor), entry: null }) : undefined}
+          // The list deliberately spans the season either side of the cursor, so naming the
+          // cursor's month here would claim an emptiness the query never checked.
+          periodLabel={periodLabel}
         />
       ) : scale === 'year' ? (
         <YearGrid
@@ -416,6 +456,27 @@ export function CalendarView({ draftEntries, initialMonth }: CalendarViewProps =
         />
       ) : (
         <>
+          {/* A month with nothing in it is the first thing a new organisation sees, and it used
+              to be the screen that said least. Two doors, because a calendar arrives one of two
+              ways: generated whole, or decided in a committee and typed in day by day. */}
+          {monthIsEmpty && writable && (
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-lg border border-dashed border-line bg-surface px-4 py-3">
+              <p className="text-sm text-ink-muted">
+                Aucun match en{' '}
+                <span className="text-ink">
+                  {MONTHS[cursor.getMonth()]} {cursor.getFullYear()}
+                </span>
+                . Cliquez un jour pour en ajouter un,
+              </p>
+              <Link
+                href={scope.leagueId ? '/league/calendar/generate' : '/tenant/calendar/generate'}
+                className="text-sm font-medium text-accent-text hover:underline"
+              >
+                ou générez toute la saison d&apos;un coup
+              </Link>
+            </div>
+          )}
+
           {/* ---------- month grid, sm and up ---------- */}
           <div className="hidden overflow-hidden rounded-lg border border-line bg-surface sm:block">
             <div className="grid grid-cols-7 border-b border-line">
@@ -442,7 +503,7 @@ export function CalendarView({ draftEntries, initialMonth }: CalendarViewProps =
                   <div
                     key={key}
                     className={cn(
-                      'min-h-[7rem] border-b border-r border-line p-1.5 transition-colors [&:nth-child(7n)]:border-r-0',
+                      'group/day relative min-h-[7rem] border-b border-r border-line p-1.5 transition-colors [&:nth-child(7n)]:border-r-0',
                       outside && 'bg-surface-sunk/40',
                       reasons && 'bg-caution-soft/40',
                       // The day the panel is about is lit, so the reader can find it again after
@@ -494,6 +555,35 @@ export function CalendarView({ draftEntries, initialMonth }: CalendarViewProps =
                           className="w-full rounded px-1 py-0.5 text-left text-[0.6875rem] text-ink-muted transition-colors hover:bg-surface-sunk hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                         >
                           +{overflow} autre{overflow > 1 ? 's' : ''}
+                        </button>
+                      )}
+
+                      {/* Adding a match, from the day you noticed it was missing.
+                          
+                          The whole free area of the cell is the target, with a `+` that is always
+                          drawn and only strengthens on hover — the date number keeps its place,
+                          because it is how the eye navigates the month, and a hover-only
+                          affordance would not exist at all on a phone. An empty month used to be
+                          thirty-five silent boxes whose only way in was guessing that the date
+                          number opened a panel with a link on it. */}
+                      {writable && (
+                        <button
+                          type="button"
+                          onClick={() => setEditing({ day: key, entry: null })}
+                          title={`Ajouter un match — ${day.getDate()} ${MONTHS[day.getMonth()]}`}
+                          aria-label={`Ajouter un match le ${day.getDate()} ${MONTHS[day.getMonth()]}`}
+                          className={cn(
+                            'flex w-full items-center justify-center gap-1 rounded py-1',
+                            'text-[0.6875rem] font-medium transition-colors',
+                            'text-ink-subtle/45 hover:bg-accent-soft hover:text-accent-text',
+                            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent',
+                            // Named only where naming it is the difference between finding the
+                            // feature and not; everywhere else it waits for the pointer.
+                            !monthIsEmpty && 'opacity-0 group-hover/day:opacity-100',
+                          )}
+                        >
+                          <Plus className="h-3 w-3" aria-hidden />
+                          {monthIsEmpty && 'Ajouter'}
                         </button>
                       )}
                     </div>
@@ -574,9 +664,19 @@ export function CalendarView({ draftEntries, initialMonth }: CalendarViewProps =
               })}
 
             {byDay.size === 0 && (
-              <p className="rounded-lg border border-line bg-surface px-4 py-8 text-center text-sm text-ink-muted">
-                Aucun match ce mois-ci.
-              </p>
+              <div className="rounded-lg border border-dashed border-line bg-surface px-4 py-8 text-center">
+                <p className="text-sm text-ink-muted">Aucun match ce mois-ci.</p>
+                {writable && (
+                  <button
+                    type="button"
+                    onClick={() => setEditing({ day: isoDay(cursor), entry: null })}
+                    className="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-accent px-3 py-2 text-sm font-medium text-accent-ink transition-colors hover:bg-accent/90"
+                  >
+                    <Plus className="h-4 w-4" aria-hidden />
+                    Ajouter un match
+                  </button>
+                )}
+              </div>
             )}
           </div>
         </>
@@ -593,7 +693,30 @@ export function CalendarView({ draftEntries, initialMonth }: CalendarViewProps =
         venues={data?.venues ?? []}
         toneFor={toneFor}
         closedReasons={openDay ? closed.get(openDay) : undefined}
+        // The panel used to offer two links that left the calendar — one to a page-sized wizard,
+        // one to a route that renders the words "Game Management page". They open here now.
+        onAdd={writable && openDay ? () => setEditing({ day: openDay, entry: null }) : undefined}
+        onEdit={
+          writable ? (entry) => setEditing({ day: isoDay(new Date(entry.dateTime)), entry }) : undefined
+        }
+        onScore={writable ? (entry) => setScoring(entry) : undefined}
       />
+
+      {writable && (
+        <>
+          <FixtureDialog
+            open={editing !== null}
+            onClose={() => setEditing(null)}
+            day={editing?.day ?? null}
+            entry={editing?.entry ?? null}
+            competitions={data?.competitions ?? []}
+            venues={data?.venues ?? []}
+            entriesThatDay={editing ? (byDay.get(editing.day) ?? []) : []}
+            durationMinutes={data?.entries[0]?.durationMinutes ?? 100}
+          />
+          <ScoreDialog open={scoring !== null} onClose={() => setScoring(null)} entry={scoring} />
+        </>
+      )}
     </div>
   );
 }

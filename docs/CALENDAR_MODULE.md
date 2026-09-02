@@ -317,3 +317,88 @@ Worth recording because none of them were in the calendar module.
   a migration, so it belongs with 4.5 or the `Stage` work, not here.
 - **One competition at a time.** `seasonIds[]` and the D1 → D1F → D2 ordered pass are 4.4. The
   planner already reports its free slots, which is the input that pass needs.
+
+
+---
+
+## 8. The calendar became writable (2026-09-02)
+
+`4.1` shipped a calendar you could read and nothing else. Every write bounced to `/game/create`
+— a 690-line page-sized wizard — and the one action the day panel offered pointed at
+`/game/manage`, a route that renders the words "Game Management page". The screen that showed you
+the problem could not fix it.
+
+Leaving mattered more than the clicks it cost. What you decide when you place a fixture is *this
+hall, this Saturday, this hour, given everything else already on that day*, and the only surface
+holding all of it is the grid you were just looking at. A separate page asks the same questions
+with the answers removed.
+
+### 8.1 Six editable things are three concerns
+
+The temptation is to group by column — day, time, venue, status, score, stats — and end up with
+six flows. The useful axis is different: **what else must be true for the change to be legal, and
+what does it invalidate downstream.** On that axis it collapses.
+
+| Concern | What it is | Constraint | Downstream | Where it lives |
+|---|---|---|---|---|
+| **Slot** | day + time + hall + court | the venue and team conflict window | nothing | the calendar |
+| **State** | verbs from a machine | the server's transition map | nothing | the calendar |
+| **Result** | score, then lineups and stats | terminal; `COMPLETED` has no exits | rebuilds the table | its own dialog, and later the game screen |
+
+- **Day, time, hall and court are one edit.** You never move a fixture to Tuesday without
+  choosing an hour, and you never change hall without re-checking the hour. Splitting them would
+  be an artefact of the form. It is also exactly what a drag gesture expresses — *this fixture,
+  that slot* — which is why direct manipulation drops onto this shape rather than needing another.
+- **State is never a field.** It is the two or three moves legal from where the fixture is now.
+  A dropdown of nine statuses would let an organiser type an illegal transition and receive a 409
+  for it. Reporting and cancelling demand a reason, because those are the two that cost somebody
+  a journey.
+- **A result is not a property.** It is entered courtside from a paper sheet, it is terminal, and
+  it rebuilds the standings. Its own dialog: two big number fields, first one focused, forfeit as
+  a checkbox. A2 and A3 say one community manager types a whole weekend in a sitting, so this is
+  a batch surface, not a form.
+
+### 8.2 The pairing is the fixture's identity
+
+Teams are not editable and `UpdateGameDto` has never accepted them. The slug is built from the
+pairing, every shared link carries it, and once a score exists the two numbers hang off it.
+Changing who plays is a cancelled fixture and a new one — which is also what the league actually
+did, and what the audit trail should say.
+
+The one exception is **inverting home and away**, which is not a different match, it is the same
+match typed the wrong way round. Its own endpoint, it regenerates the slug, and it is refused
+once a score exists because home and away then say which club scored what.
+
+### 8.3 A change says why
+
+`AuditLog` already existed and was global; only the state machine and auth ever wrote to it. Every
+move, correction, inversion and deletion now does, and the table gained a first-class `reason`
+column rather than burying it in the `after` blob. `GET /games/:id/audit` reads it back with the
+actor's name resolved, and the fixture editor shows it — a record only the database can see is
+not the feature.
+
+**This was pulled forward out of 4.5 deliberately.** Dragging a fixture is the easiest possible
+way to move one, which makes it the easiest possible way to lose track of who moved it and why.
+Shipping frictionless moves before accountability is backwards for this product specifically.
+
+### 8.4 Discoverability, on an empty month
+
+The day cell is the target. A `+` sits in its free space and strengthens on hover; the whole
+empty area is clickable, so it is discoverable by trying rather than by knowing. It does **not**
+replace the date number — that is how the eye navigates a month — and it does not rely on hover
+alone, which does not exist on a phone.
+
+The label next to it appears only when the month holds nothing, which is the case a new
+organisation actually meets: thirty-five silent boxes whose only way in was guessing that the date
+number opened a panel with a link inside it. In a month with fixtures on it, twenty-five
+repetitions of the word "Ajouter" down the weekday columns of a league that plays weekends is
+noise, so there it waits for the pointer. An empty month also carries a banner naming the two
+doors, because a season is better generated whole than typed in day by day.
+
+### 8.5 Still to come
+
+- **Drag and drop.** Dropping on a day has no *hour*, so the honest first version is: drop opens
+  the editor pre-filled with the new day and you pick the slot. Free dragging needs the cell to
+  render slots rather than chips, which is a bigger change to the grid.
+- **Lineups and per-player stats** — Phase 3 item 12, and not calendar work.
+- **`/game/create` survives** as a full-page path, but nothing in the calendar needs it any more.

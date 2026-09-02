@@ -1,7 +1,7 @@
 'use client';
 
 import { Fragment, useMemo, useState } from 'react';
-import { MapPin, Search, X } from 'lucide-react';
+import { CalendarPlus, MapPin, Plus, Search, X } from 'lucide-react';
 import { Input } from '@/components/ui';
 import type { CalendarCompetition, CalendarEntry, CalendarVenue } from '@/services/calendar';
 import { cn } from '@/utils';
@@ -34,12 +34,18 @@ export function CalendarList({
   venues,
   toneFor,
   onOpen,
+  onAdd,
+  periodLabel,
 }: {
   entries: CalendarEntry[];
   competitions: CalendarCompetition[];
   venues: CalendarVenue[];
   toneFor: (leagueId: string) => { dot: string; chip: string };
   onOpen: (entry: CalendarEntry) => void;
+  /** Adds a fixture in this period. Absent where the calendar is read-only. */
+  onAdd?: () => void;
+  /** What "this period" is, so the empty state can name it rather than gesture at it. */
+  periodLabel?: string;
 }) {
   const [query, setQuery] = useState('');
 
@@ -95,9 +101,47 @@ export function CalendarList({
 
       <div className="overflow-hidden rounded-lg border border-line bg-surface">
         {grouped.length === 0 ? (
-          <p className="px-4 py-10 text-center text-sm text-ink-muted">
-            {query ? 'Aucun match pour cette recherche.' : 'Aucun match sur cette période.'}
-          </p>
+          /* An empty period is the moment an organiser most needs a way forward, and it used to
+             be the moment the screen said least — one grey sentence and no way to act on it.
+             A failed *search* is different: the answer there is to search for something else,
+             not to invent a fixture, so it keeps the plain sentence and offers to clear. */
+          <div className="px-4 py-12 text-center">
+            {query ? (
+              <>
+                <p className="text-sm text-ink-muted">
+                  Aucun match ne correspond à « {query} ».
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setQuery('')}
+                  className="mt-2 text-sm text-accent-text hover:underline"
+                >
+                  Effacer la recherche
+                </button>
+              </>
+            ) : (
+              <>
+                <CalendarPlus className="mx-auto h-8 w-8 text-ink-subtle" aria-hidden />
+                <p className="mt-3 text-sm font-medium text-ink">
+                  Aucun match {periodLabel ? `entre ${periodLabel}` : 'sur cette période'}.
+                </p>
+                <p className="mx-auto mt-1 max-w-xs text-sm text-ink-muted">
+                  Ajoutez-les un par un, ou générez toute la saison d’un coup depuis le
+                  calendrier.
+                </p>
+                {onAdd && (
+                  <button
+                    type="button"
+                    onClick={onAdd}
+                    className="mt-4 inline-flex items-center gap-1.5 rounded-lg bg-accent px-3.5 py-2 text-sm font-medium text-accent-ink transition-colors hover:bg-accent/90"
+                  >
+                    <Plus className="h-4 w-4" aria-hidden />
+                    Ajouter un match
+                  </button>
+                )}
+              </>
+            )}
+          </div>
         ) : (
           grouped.map(([day, rows]) => {
             const date = new Date(`${day}T12:00:00`);

@@ -560,17 +560,40 @@ export function SetupWizard() {
           </ul>
         )}
 
+        {/* The next thing to do is the calendar, not a dashboard.
+            
+            A league that has just typed in its teams has no fixtures, so every counter on the
+            dashboard reads zero and nothing on it suggests a next step — it is the least useful
+            screen in the product at exactly this moment. The wizard's own closing line already
+            said "générer le calendrier" and then sent them somewhere else, and the page it named
+            no longer exists. Two doors, matching the two ways a calendar actually arrives:
+            generated here, or decided in a committee and typed in day by day. */}
         <div className="space-y-2.5">
           <Button
             variant="primary"
-            className="w-full h-11"
-            onClick={() => router.push('/tenant/dashboard')}
+            className="h-11 w-full"
+            onClick={() => router.push('/tenant/calendar/generate')}
           >
-            Aller au tableau de bord
+            Générer le calendrier
             <ArrowRight size={16} className="ml-2" />
           </Button>
-          <p className="text-xs text-ink-subtle">
-            Prochaine étape : générer le calendrier depuis la page de la saison.
+          <Button
+            variant="outline"
+            className="h-11 w-full"
+            onClick={() => router.push('/tenant/calendar')}
+          >
+            Voir le calendrier
+          </Button>
+          <button
+            type="button"
+            onClick={() => router.push('/tenant/dashboard')}
+            className="w-full rounded-md py-1.5 text-sm text-ink-muted transition-colors hover:text-ink"
+          >
+            Plus tard — aller au tableau de bord
+          </button>
+          <p className="pt-1 text-xs text-ink-subtle">
+            Le calendrier est vide pour l’instant. Générez-le d’un coup, ou ajoutez les matchs
+            au fur et à mesure qu’ils sont décidés.
           </p>
         </div>
       </div>

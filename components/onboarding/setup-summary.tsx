@@ -50,7 +50,7 @@ export function SetupSummary({
       </h2>
       <p className="mt-4 text-[0.9375rem] leading-relaxed text-accent-ink/75 max-w-sm">
         {current === 'done'
-          ? 'Il ne reste qu’à générer le calendrier, puis à saisir les scores.'
+          ? 'Il ne reste qu’à poser le calendrier, puis à saisir les scores.'
           : 'Trois informations et votre championnat pourra recevoir ses matchs, son calendrier et son classement.'}
       </p>
 

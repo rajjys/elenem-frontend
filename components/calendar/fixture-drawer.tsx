@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, ArrowRight, CalendarDays, MapPin, Plus, X } from 'lucide-react';
+import { ArrowLeft, ArrowRight, CalendarDays, MapPin, Pencil, Plus, SquarePen, X } from 'lucide-react';
 import { Button } from '@/components/ui';
 import type { CalendarCompetition, CalendarEntry, CalendarVenue } from '@/services/calendar';
 import { cn } from '@/utils';
@@ -62,12 +62,15 @@ function FixtureRow({
   venues,
   tone,
   onOpen,
+  onScore,
 }: {
   entry: CalendarEntry;
   competitions: CalendarCompetition[];
   venues: CalendarVenue[];
   tone: { dot: string; chip: string };
   onOpen?: () => void;
+  /** Straight to the score, skipping the detail view — the batch case, thirty results in a row. */
+  onScore?: (entry: CalendarEntry) => void;
 }) {
   const competition = competitions.find((c) => c.id === entry.leagueId);
   const venue = venues.find((v) => v.id === entry.venueId);
@@ -104,13 +107,28 @@ function FixtureRow({
   if (!onOpen) return <div className="flex gap-2.5 px-4 py-3">{body}</div>;
 
   return (
-    <button
-      type="button"
-      onClick={onOpen}
-      className="flex w-full gap-2.5 px-4 py-3 text-left transition-colors hover:bg-surface-sunk focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent"
-    >
-      {body}
-    </button>
+    <div className="group/row relative flex items-stretch">
+      <button
+        type="button"
+        onClick={onOpen}
+        className="flex min-w-0 flex-1 gap-2.5 py-3 pl-4 pr-2 text-left transition-colors hover:bg-surface-sunk focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent"
+      >
+        {body}
+      </button>
+      {/* The batch case: a weekend of results arrives as a list of scores, and opening each
+          fixture's detail view to type two numbers is thirty extra round trips. */}
+      {onScore && (
+        <button
+          type="button"
+          onClick={() => onScore(entry)}
+          aria-label={`Saisir le score de ${entry.home.name} contre ${entry.away.name}`}
+          title="Saisir le score"
+          className="flex w-10 shrink-0 items-center justify-center text-ink-subtle opacity-0 transition-opacity hover:bg-accent-soft hover:text-accent-text focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent group-hover/row:opacity-100"
+        >
+          <SquarePen className="h-4 w-4" aria-hidden />
+        </button>
+      )}
+    </div>
   );
 }
 
@@ -125,6 +143,9 @@ export function FixtureDrawer({
   venues,
   toneFor,
   closedReasons,
+  onAdd,
+  onEdit,
+  onScore,
 }: {
   open: boolean;
   onClose: () => void;
@@ -139,6 +160,12 @@ export function FixtureDrawer({
   venues: CalendarVenue[];
   toneFor: (leagueId: string) => { dot: string; chip: string };
   closedReasons?: string[];
+  /** Opens the add dialog on this day. Absent where the calendar is read-only. */
+  onAdd?: () => void;
+  /** Opens the fixture editor. */
+  onEdit?: (entry: CalendarEntry) => void;
+  /** Opens the score dialog. */
+  onScore?: (entry: CalendarEntry) => void;
 }) {
   // Escape closes, because a panel that overlays content must be dismissible without aiming.
   useEffect(() => {
@@ -295,25 +322,33 @@ export function FixtureDrawer({
                 </p>
               ) : (
               <div className="space-y-2 pt-1">
-                <Button
-                  variant="primary"
-                  className="w-full"
-                  onClick={() => {
-                    window.location.href = `/game/${focused.id}`;
-                  }}
-                >
-                  Ouvrir le match
-                  <ArrowRight size={16} className="ml-2" />
-                </Button>
-                {/* "Saisir" is wrong once a score exists — the job is then to correct it, and
-                    offering to enter a score that is already on screen reads as a bug. */}
+                {/* Both of these used to leave the calendar — one to a page-sized wizard, the
+                    other to a route that renders the words "Game Management page". Deciding
+                    where a fixture goes means weighing it against the rest of that day, and the
+                    only surface holding that is the grid behind this panel. */}
+                {onScore && (
+                  <Button variant="primary" className="w-full" onClick={() => onScore(focused)}>
+                    {focused.status === 'COMPLETED' && focused.homeScore != null
+                      ? 'Corriger le score'
+                      : 'Saisir le score'}
+                  </Button>
+                )}
+                {onEdit && (
+                  <button
+                    type="button"
+                    onClick={() => onEdit(focused)}
+                    className="flex w-full items-center justify-center gap-1.5 rounded-lg border border-line px-3 py-2 text-sm text-ink-muted transition-colors hover:border-line-strong hover:text-ink"
+                  >
+                    <Pencil className="h-3.5 w-3.5" aria-hidden />
+                    Déplacer, reporter, supprimer…
+                  </button>
+                )}
                 <Link
-                  href={`/game/manage?ctxGameId=${focused.id}`}
-                  className="block w-full rounded-lg border border-line px-3 py-2 text-center text-sm text-ink-muted transition-colors hover:border-line-strong hover:text-ink"
+                  href={`/game/${focused.id}`}
+                  className="flex w-full items-center justify-center gap-1 rounded-lg px-3 py-1.5 text-xs text-ink-subtle transition-colors hover:text-ink"
                 >
-                  {focused.status === 'COMPLETED' && focused.homeScore != null
-                    ? 'Corriger le score'
-                    : 'Saisir le score'}
+                  Fiche complète du match
+                  <ArrowRight size={13} />
                 </Link>
               </div>
               )}
@@ -328,6 +363,7 @@ export function FixtureDrawer({
                     venues={venues}
                     tone={toneFor(e.leagueId)}
                     onOpen={() => onFocus(e)}
+                    onScore={e.status !== 'DRAFT' ? onScore : undefined}
                   />
                 </li>
               ))}
@@ -337,16 +373,19 @@ export function FixtureDrawer({
                 </li>
               )}
               {/* Adding a fixture was reachable only from a dashboard link — not from the screen
-                  where you notice one is missing. */}
-              <li className="p-3">
-                <Link
-                  href="/game/create"
-                  className="flex w-full items-center justify-center gap-1.5 rounded-lg border border-dashed border-line px-3 py-2.5 text-sm text-ink-muted transition-colors hover:border-accent hover:text-accent-text"
-                >
-                  <Plus className="h-4 w-4" aria-hidden />
-                  Ajouter un match
-                </Link>
-              </li>
+                  where you notice one is missing. It now opens here, on the day you are reading. */}
+              {onAdd && (
+                <li className="p-3">
+                  <button
+                    type="button"
+                    onClick={onAdd}
+                    className="flex w-full items-center justify-center gap-1.5 rounded-lg border border-dashed border-line px-3 py-2.5 text-sm text-ink-muted transition-colors hover:border-accent hover:bg-accent-soft hover:text-accent-text"
+                  >
+                    <Plus className="h-4 w-4" aria-hidden />
+                    Ajouter un match
+                  </button>
+                </li>
+              )}
             </ul>
           )}
         </div>
