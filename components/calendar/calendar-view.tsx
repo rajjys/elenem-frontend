@@ -14,7 +14,10 @@ import {
   type CalendarVenue,
 } from '@/services/calendar';
 import { useScopeContext } from '@/hooks';
+import { toastApiError } from '@/utils';
+import { useAnnotate, useMoveGame, useReorderStack } from '@/services/games';
 import { cn } from '@/utils';
+import { DragDropContext, Draggable, Droppable, type DropResult } from '@hello-pangea/dnd';
 import { FixtureChip } from './fixture-chip';
 import { FixtureDrawer } from './fixture-drawer';
 import { CalendarList } from './calendar-list';
@@ -22,6 +25,7 @@ import { ResultsSheetButton } from './results-sheet-button';
 import { YearGrid } from './year-grid';
 import { FixtureDialog } from './fixture-dialog';
 import { ScoreDialog } from './score-dialog';
+import { ReasonBar } from './reason-bar';
 
 /**
  * The organisation's calendar, read-only.
@@ -123,6 +127,71 @@ function matchesQuery(entry: CalendarEntry, raw: string, venues: CalendarVenue[]
   return !!venue && fold(venue.name).includes(q);
 }
 
+/**
+ * Fixtures a drag may touch.
+ *
+ * Dragging is how a calendar gets planned; it is not a way to rearrange what already happened. A
+ * played fixture keeps its hour and its day — the date can still be corrected deliberately from
+ * the editor, where the correction is an act rather than a slip of the wrist.
+ */
+const isPlannable = (e: CalendarEntry) => e.status !== 'COMPLETED' && e.status !== 'DRAFT';
+
+/** The local wall-clock minutes of an instant. */
+function minutesOf(iso: string): number {
+  const d = new Date(iso);
+  return d.getHours() * 60 + d.getMinutes();
+}
+
+/** A local day plus local minutes, as an instant. */
+function instantOn(day: string, minutes: number): string {
+  const [y, m, d] = day.split('-').map(Number);
+  return new Date(y, m - 1, d, Math.floor(minutes / 60), minutes % 60, 0, 0).toISOString();
+}
+
+/**
+ * Where a dragged fixture lands on its new day.
+ *
+ * It keeps its hour, which is what the organiser meant: they were answering "this fixture, that
+ * day", not re-choosing a time. When that hour is already taken in the destination — the hall is
+ * busy, or one of the clubs is already committed — the fixture goes to **the back of that day's
+ * stack**, one slot after its last game.
+ *
+ * Refusing instead would tell the organiser their gesture failed and leave them to work out where
+ * else it could go. Appending answers the question they asked and leaves the ordering to a second,
+ * cheaper gesture — the drag handles in the day panel, which is exactly what they are for.
+ */
+function landingSlot(
+  entry: CalendarEntry,
+  targetDay: string,
+  dayEntries: CalendarEntry[],
+  durationMinutes: number,
+): { dateTime: string; appended: boolean } {
+  const wanted = minutesOf(entry.dateTime);
+  const others = dayEntries.filter((e) => e.id !== entry.id);
+
+  const overlaps = (a: number, b: number) => Math.abs(a - b) < durationMinutes;
+  const taken = others.some((o) => {
+    if (!overlaps(minutesOf(o.dateTime), wanted)) return false;
+    // Same hall is a clash; so is a club being in two places. Two fixtures in different rooms
+    // with no club in common are simply two fixtures at the same hour, which is normal.
+    const sameHall = (o.venueId ?? null) === (entry.venueId ?? null);
+    const sharedClub =
+      o.home.id === entry.home.id ||
+      o.home.id === entry.away.id ||
+      o.away.id === entry.home.id ||
+      o.away.id === entry.away.id;
+    return sameHall || sharedClub;
+  });
+
+  if (!taken) return { dateTime: instantOn(targetDay, wanted), appended: false };
+
+  const last = others.reduce((max, e) => Math.max(max, minutesOf(e.dateTime)), 0);
+  // Capped inside the day: a stack that has run to midnight takes the fixture at the last slot
+  // rather than tipping it into tomorrow, which would silently move it two days.
+  const appended = Math.min(last + durationMinutes, 23 * 60 + 30);
+  return { dateTime: instantOn(targetDay, appended), appended: true };
+}
+
 type Scale = 'month' | 'year' | 'list';
 
 const SCALES: { key: Scale; label: string }[] = [
@@ -178,6 +247,10 @@ export function CalendarView({ draftEntries, initialMonth }: CalendarViewProps =
   const [editing, setEditing] = useState<{ day: string; entry: CalendarEntry | null } | null>(null);
   const [scoring, setScoring] = useState<CalendarEntry | null>(null);
 
+  const moveMut = useMoveGame();
+  const reorderMut = useReorderStack();
+  const annotateMut = useAnnotate();
+
   /** Read-only surfaces stay read-only: a draft workspace is not where you edit real fixtures. */
   const writable = !draftEntries;
 
@@ -203,6 +276,9 @@ export function CalendarView({ draftEntries, initialMonth }: CalendarViewProps =
     // A league admin, or anyone who drilled into a league, sees that league only.
     leagueIds: scope.leagueId ? [scope.leagueId] : undefined,
   });
+
+  /** How long a fixture holds its hall — the gap between one slot and the next. */
+  const durationMinutes = data?.entries[0]?.durationMinutes ?? 100;
 
   const toneFor = useCallback(
     (leagueId: string) => {
@@ -282,6 +358,79 @@ export function CalendarView({ draftEntries, initialMonth }: CalendarViewProps =
     () => (focusedId ? (visible.find((e) => e.id === focusedId) ?? null) : null),
     [focusedId, visible],
   );
+
+  /**
+   * A drop in the month grid, and a reorder in the day panel, both land here.
+   *
+   * They commit immediately — a drag that opens a dialog before it takes effect is a drag nobody
+   * uses — and then `pendingReason` puts a bar under the panel asking why. The change is already
+   * written by then, so the bar annotates the audit rows the change produced rather than creating
+   * new ones: one decision, one line in the history.
+   */
+  const [pendingReason, setPendingReason] = useState<{
+    gameIds: string[];
+    summary: string;
+    undo?: () => void;
+  } | null>(null);
+
+  function handleMonthDrop(result: DropResult) {
+    if (!result.destination || !writable) return;
+    const targetDay = result.destination.droppableId;
+    const sourceDay = result.source.droppableId;
+    if (targetDay === sourceDay) return;
+
+    const entry = visible.find((e) => e.id === result.draggableId);
+    if (!entry || !isPlannable(entry)) return;
+
+    const from = entry.dateTime;
+    const { dateTime, appended } = landingSlot(
+      entry,
+      targetDay,
+      byDay.get(targetDay) ?? [],
+      durationMinutes,
+    );
+
+    moveMut.mutate(
+      { gameId: entry.id, dateTime },
+      {
+        onSuccess: () => {
+          const when = new Date(dateTime);
+          const label = `${entry.home.shortCode} — ${entry.away.shortCode} déplacé au ${when.getDate()} ${MONTHS[when.getMonth()]}, ${String(when.getHours()).padStart(2, '0')}:${String(when.getMinutes()).padStart(2, '0')}`;
+          setPendingReason({
+            gameIds: [entry.id],
+            summary: appended
+              ? `${label} — l’heure d’origine était prise, il passe en fin de journée.`
+              : `${label}.`,
+            undo: () => {
+              moveMut.mutate(
+                { gameId: entry.id, dateTime: from, reason: 'Déplacement annulé' },
+                { onError: (e) => toastApiError(e) },
+              );
+              setPendingReason(null);
+            },
+          });
+          if (!openDay) openDrawer(targetDay);
+        },
+        onError: (e) => toastApiError(e),
+      },
+    );
+  }
+
+  function handleReorder(assignments: { gameId: string; dateTime: string }[]) {
+    reorderMut.mutate(
+      { assignments },
+      {
+        onSuccess: (report) => {
+          if (report.movedCount === 0) return;
+          setPendingReason({
+            gameIds: report.gameIds,
+            summary: `${report.movedCount} match${report.movedCount > 1 ? 's' : ''} réordonné${report.movedCount > 1 ? 's' : ''}.`,
+          });
+        },
+        onError: (e) => toastApiError(e),
+      },
+    );
+  }
 
   function openDrawer(day: string, entry: CalendarEntry | null = null) {
     setOpenDay(day);
@@ -639,6 +788,7 @@ export function CalendarView({ draftEntries, initialMonth }: CalendarViewProps =
               ))}
             </div>
 
+            <DragDropContext onDragEnd={handleMonthDrop}>
             <div className="grid grid-cols-7">
               {cells.map((day) => {
                 const key = isoDay(day);
@@ -649,8 +799,11 @@ export function CalendarView({ draftEntries, initialMonth }: CalendarViewProps =
                 const overflow = entries.length - CHIPS_PER_CELL;
 
                 return (
+                  <Droppable key={key} droppableId={key} isDropDisabled={!writable}>
+                  {(cellProvided, cellSnapshot) => (
                   <div
-                    key={key}
+                    ref={cellProvided.innerRef}
+                    {...cellProvided.droppableProps}
                     className={cn(
                       'group/day relative min-h-[7rem] border-b border-r border-line p-1.5 transition-colors [&:nth-child(7n)]:border-r-0',
                       outside && 'bg-surface-sunk/40',
@@ -658,6 +811,9 @@ export function CalendarView({ draftEntries, initialMonth }: CalendarViewProps =
                       // The day the panel is about is lit, so the reader can find it again after
                       // their eye has moved to the panel.
                       isOpen && 'bg-accent-soft ring-2 ring-inset ring-accent',
+                      // The day under the pointer, so a drop is never a guess about which cell
+                      // the fixture is about to land in.
+                      cellSnapshot.isDraggingOver && 'bg-accent-soft ring-2 ring-inset ring-accent',
                     )}
                   >
                     <div className="flex items-center justify-between gap-1 px-0.5 pb-1">
@@ -683,18 +839,41 @@ export function CalendarView({ draftEntries, initialMonth }: CalendarViewProps =
                     </div>
 
                     <div className="space-y-1">
-                      {entries.slice(0, CHIPS_PER_CELL).map((e) => (
-                        <FixtureChip
+                      {entries.slice(0, CHIPS_PER_CELL).map((e, index) => (
+                        <Draggable
                           key={e.id}
-                          entry={e}
-                          competitions={data?.competitions ?? []}
-                          venues={data?.venues ?? []}
-                          tone={toneFor(e.leagueId)}
-                          onOpen={() => openDrawer(key, e)}
-                          dimmed={e.status === 'COMPLETED'}
-                          draft={e.status === 'DRAFT'}
-                        />
+                          draggableId={e.id}
+                          index={index}
+                          // Dragging is how a calendar is planned, not how history is rearranged.
+                          isDragDisabled={!writable || !isPlannable(e)}
+                          // The chip is a button, and the library refuses by default to start a
+                          // drag on an interactive element — sensibly, since it cannot know
+                          // whether you meant to press it. Here it can: the chip is the fixture,
+                          // pressing opens it and dragging moves it, and the library still only
+                          // suppresses the click when a drag actually happened.
+                          disableInteractiveElementBlocking
+                        >
+                          {(chipProvided, chipSnapshot) => (
+                            <div
+                              ref={chipProvided.innerRef}
+                              {...chipProvided.draggableProps}
+                              {...chipProvided.dragHandleProps}
+                              className={chipSnapshot.isDragging ? 'shadow-e2' : undefined}
+                            >
+                              <FixtureChip
+                                entry={e}
+                                competitions={data?.competitions ?? []}
+                                venues={data?.venues ?? []}
+                                tone={toneFor(e.leagueId)}
+                                onOpen={() => openDrawer(key, e)}
+                                dimmed={e.status === 'COMPLETED'}
+                                draft={e.status === 'DRAFT'}
+                              />
+                            </div>
+                          )}
+                        </Draggable>
                       ))}
+                      {cellProvided.placeholder}
                       {overflow > 0 && (
                         // Previously this was plain text, which named something the reader could
                         // not reach. It opens the day.
@@ -737,9 +916,12 @@ export function CalendarView({ draftEntries, initialMonth }: CalendarViewProps =
                       )}
                     </div>
                   </div>
+                  )}
+                  </Droppable>
                 );
               })}
             </div>
+            </DragDropContext>
           </div>
 
           {/* ---------- agenda, below sm ---------- */}
@@ -851,6 +1033,34 @@ export function CalendarView({ draftEntries, initialMonth }: CalendarViewProps =
           writable ? (entry) => setEditing({ day: isoDay(new Date(entry.dateTime)), entry }) : undefined
         }
         onScore={writable ? (entry) => setScoring(entry) : undefined}
+        onReorder={writable ? handleReorder : undefined}
+        /* A reorder reassigns times among the fixtures on screen. With a competition hidden or a
+           search active, the ones off screen keep theirs — and the collision is invisible to the
+           person causing it. So the handles come off rather than being subtly wrong. */
+        reorderBlockedReason={
+          writable && filtersActive
+            ? 'Réordonner est désactivé tant qu’un filtre est actif : les matchs masqués gardent leur horaire.'
+            : undefined
+        }
+        reasonBar={
+          pendingReason ? (
+            <ReasonBar
+              summary={pendingReason.summary}
+              saving={annotateMut.isPending}
+              onUndo={pendingReason.undo}
+              onSkip={() => setPendingReason(null)}
+              onSave={(reason) =>
+                annotateMut.mutate(
+                  { gameIds: pendingReason.gameIds, reason },
+                  {
+                    onSuccess: () => setPendingReason(null),
+                    onError: (e) => toastApiError(e),
+                  },
+                )
+              }
+            />
+          ) : null
+        }
       />
 
       {writable && (

@@ -232,3 +232,52 @@ export function useDeleteGame() {
     onSuccess: invalidate,
   });
 }
+
+// --- dragging ------------------------------------------------------------------------------------
+
+/**
+ * Reassigns the start times inside one stack — a hall on a day, not a day.
+ *
+ * Sent as one call because the operation cannot be expressed as a series of moves: swapping 14:00
+ * and 16:00 means the first request collides with the fixture still sitting on the slot it wants.
+ * The server checks that the times are a permutation of the ones these fixtures already hold,
+ * which is what makes "reorder" a meaningful word rather than a bulk edit wearing the name.
+ */
+export function useReorderStack() {
+  const invalidate = useFixtureInvalidation();
+  return useMutation({
+    mutationFn: async ({
+      assignments,
+      reason,
+    }: {
+      assignments: { gameId: string; dateTime: string }[];
+      reason?: string;
+    }) => {
+      const res = await api.post('/calendar/reorder', {
+        assignments,
+        ...(reason ? { reason } : {}),
+      });
+      return res.data as { movedCount: number; gameIds: string[] };
+    },
+    onSuccess: invalidate,
+  });
+}
+
+/**
+ * Explains a change that has already landed.
+ *
+ * A drag has to commit instantly or it is not worth doing, so the reason cannot be asked for
+ * first. It is asked for immediately afterwards and written onto the audit entries the change
+ * produced — the same rows, not new ones, because there was one decision and the trail should
+ * read that way.
+ */
+export function useAnnotate() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ gameIds, reason }: { gameIds: string[]; reason: string }) => {
+      const res = await api.post('/calendar/annotate', { gameIds, reason });
+      return res.data as { annotated: number };
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['game'] }),
+  });
+}

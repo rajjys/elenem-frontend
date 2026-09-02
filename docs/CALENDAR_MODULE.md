@@ -491,56 +491,92 @@ thing it could not.
   generator use the same `DatePicker` the season step uses, with a compact month format so two
   of them fit a narrow rail.
 
-### Still to come — drag and drop, designed 2026-09-02, unbuilt
+### Drag and drop — shipped 2026-09-02
 
-Two gestures that mean different things and must not be built as one.
+Two gestures that mean different things, built as two things.
 
 #### A stack is a hall, not a day
 
 The question that looked hardest — "if I drop game 3 above game 1, whose time does it take?" —
-dissolves once you ask what a start time actually belongs to. **Two fixtures in different rooms
-do not compete for the same hours**, so they are not in the same sequence and reordering one must
-not touch the other. A day therefore partitions into one stack per hall, and a reorder reassigns
-start times *within a stack*.
+dissolves once you ask what a start time belongs to. **Two fixtures in different rooms do not
+compete for the same hours**, so they are not in the same sequence and reordering one must not
+touch the other. A day therefore partitions into one stack per hall, and a reorder reassigns start
+times *within* a stack.
 
-Fixtures with no hall named form a single stack together. That is not a shortcut: it is the same
-reasoning `checkVenueConflict` already applies — when either game leaves the room unspecified we
-cannot prove they are in different ones, so we treat them as sharing a space.
+Fixtures with no hall named form one stack together — the same reasoning `checkVenueConflict`
+already applies, since two unplaced games cannot be proved to be in different rooms.
 
-Both launch customers run one hall, so they get exactly one stack and the model is invisible to
-them. It simply does not break when a second hall arrives.
+The day panel is grouped accordingly, and the heading only appears when there is more than one
+stack. Both launch customers run a single hall, so they see one ungrouped list and never meet the
+model; it simply does not break when a second hall arrives.
 
-**Stack, not swap.** Dropping C above A over `A@14:00, B@16:00, C@18:00` yields `C@14:00,
-A@16:00, B@18:00` — the day's existing set of start times is preserved exactly, including any
-deliberate gap, and only *which fixture holds which* changes. A swap would move two fixtures and
-leave the list in an order nobody asked for.
+**Stack, not swap.** Dropping the third fixture above the first over `14:30, 16:10, 17:50` gives
+the third 16:10 and pushes the others down. The day's existing set of start times is preserved
+exactly — deliberate gaps included — and only *which fixture holds which* changes.
 
-#### Reordering is blocked while the view is filtered
+#### Played fixtures are pinned
+
+Dragging is how a calendar is planned, not how history is rearranged. A completed game cannot be
+picked up, and the times a reorder redistributes are only those held by fixtures that can move.
+
+It stays **in its place in the day**, though, with a lock and *joué — horaire figé* rather than
+being swept to the bottom: reading the day in order is what the panel is for, and a played 14:30
+listed after a scheduled 21:30 is simply wrong. Only the movable rows are draggable and their
+indices stay contiguous, so the pinned ones sit between them as the fixed points they are.
+
+Its date can still be corrected from the editor, where doing so is a deliberate act rather than a
+slip of the wrist.
+
+#### Reordering is off while the view is filtered
 
 A reorder reassigns times among the fixtures on screen. With a competition hidden or a search
-active, the ones off screen keep theirs — and the collision is invisible to the person causing
-it. So the handles are disabled whenever the day panel is not showing everything on that day,
-with a line saying why and a way to clear the filter.
+active the ones off screen keep theirs, and the collision is invisible to the person causing it.
+The handles come off entirely and a line says why.
 
-#### One reason for the whole gesture
+#### Dropping on another day keeps the hour, or goes to the back of the stack
 
-A reorder is several moves. Asking per fixture would turn a one-second gesture into a form and be
-resented by the tenth reorder; asking for nothing loses the half people actually argue about. So
-the drop lands, and a small bar asks for one reason applied to every fixture that moved —
-*Enregistrer* or *Sans raison*. It also reads correctly in the audit trail: one decision moved
-them all.
+The drop commits at the same time of day, because that is what the organiser meant: they were
+answering "this fixture, that day", not re-choosing an hour.
 
-#### Dropping on another day keeps the hour, and falls to the back of the stack if it is taken
+When that hour is taken in the destination — same hall, or a club already committed — the fixture
+is placed **one slot after that day's last game**. Refusing would tell them their gesture failed
+and leave them to work out where else it fits; appending answers the question they asked and
+leaves the ordering to a second, cheaper gesture. The bar says which happened: *"l'heure d'origine
+était prise, il passe en fin de journée."*
 
-The drop commits immediately at the same time of day, with a toast offering *Annuler*. Speed is
-the point of dragging, and undo carries the risk.
+The free slot is computed from the day's fixtures the grid already holds, so the common case costs
+no extra round trip.
 
-When that hour is already taken in the destination — the hall is busy, or a club is committed —
-the fixture is **appended to the end of that day's stack** rather than refused: one slot after the
-day's last game, i.e. the last game of the day. A refusal at that moment tells the organiser their
-gesture failed and leaves them to work out where else it could go; appending answers the question
-they were asking ("this fixture, that day") and leaves the ordering to a second, cheaper gesture.
-The toast says which happened.
+#### One reason for the whole gesture, asked afterwards
 
-The free slot is computed client-side from the day's fixtures, which the grid already holds, so
-the common case costs no extra round trip; a 409 from the server is still handled as the backstop.
+A drag has to land instantly or it is not worth doing, so the reason cannot be collected first.
+`POST /calendar/annotate` writes it onto the audit rows the change already produced — the same
+rows, not new ones, because there was one decision and the trail should read that way. Bounded to
+the caller's own entries from the last quarter hour, so it can only ever explain what the person
+at the screen just did.
+
+`Sans raison` is a real button rather than a dismissal, and a single move also offers `Annuler`,
+which is a second move and is audited as one.
+
+#### The endpoint, and why there is one
+
+`POST /calendar/reorder` exists because the operation cannot be expressed as a series of moves:
+swapping 14:30 and 16:10 means the first request collides with the fixture still sitting on the
+slot it wants. Done one at a time it either fails or needs a temporary hour nobody asked for.
+
+The invariant that makes it safe is that the requested times are a **permutation** of the times
+those fixtures already hold. Nothing is invented and no slot is dropped, so the hall is provably as
+free afterwards as before — and it is what makes "reorder" a meaningful word rather than a bulk
+edit wearing the name. Team clashes are still checked against fixtures *outside* the stack, since
+a club playing twice in a day can be handed an hour it is already committed to.
+
+Refused: mixed halls, mixed days, and any played fixture. Verified against the seed, in French.
+
+#### Still to come
+
+- **Touch.** The library supports a long-press drag, but the phone shows an agenda rather than a
+  grid and reordering there has not been designed. Desktop and keyboard work today —
+  `@hello-pangea/dnd` gives lift/move/drop on the space and arrow keys for free, which is how the
+  reorder was tested.
+- **Dragging between halls.** Moving a fixture from one room to another is a *placement*, not a
+  reorder, and belongs to the editor until someone asks for it.

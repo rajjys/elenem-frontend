@@ -2,10 +2,11 @@
 
 import { useEffect } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, ArrowRight, CalendarDays, MapPin, Pencil, Plus, SquarePen, X } from 'lucide-react';
+import { ArrowLeft, ArrowRight, CalendarDays, MapPin, Pencil, Plus, X } from 'lucide-react';
 import { Button } from '@/components/ui';
 import type { CalendarCompetition, CalendarEntry, CalendarVenue } from '@/services/calendar';
 import { cn } from '@/utils';
+import { DayStacks } from './day-stacks';
 
 /**
  * The panel that opens when a fixture — or a whole day — is clicked.
@@ -56,82 +57,6 @@ function timeOf(iso: string): string {
   return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
 }
 
-function FixtureRow({
-  entry,
-  competitions,
-  venues,
-  tone,
-  onOpen,
-  onScore,
-}: {
-  entry: CalendarEntry;
-  competitions: CalendarCompetition[];
-  venues: CalendarVenue[];
-  tone: { dot: string; chip: string };
-  onOpen?: () => void;
-  /** Straight to the score, skipping the detail view — the batch case, thirty results in a row. */
-  onScore?: (entry: CalendarEntry) => void;
-}) {
-  const competition = competitions.find((c) => c.id === entry.leagueId);
-  const venue = venues.find((v) => v.id === entry.venueId);
-  const played = entry.status === 'COMPLETED' && entry.homeScore != null;
-
-  const body = (
-    <>
-      <span className={cn('mt-1.5 h-2 w-2 shrink-0 rounded-full', tone.dot)} aria-hidden />
-      <span className="w-11 shrink-0 pt-0.5 text-xs tabular-nums text-ink-muted">
-        {timeOf(entry.dateTime)}
-      </span>
-      <span className="min-w-0 flex-1">
-        <span className="block truncate text-sm text-ink">
-          {entry.home.name} <span className="text-ink-subtle">—</span> {entry.away.name}
-        </span>
-        <span className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-ink-subtle">
-          {competition && <span>{competition.shortLabel}</span>}
-          {venue && (
-            <span className="flex items-center gap-1 truncate">
-              <MapPin className="h-3 w-3 shrink-0" aria-hidden />
-              {venue.name}
-            </span>
-          )}
-        </span>
-      </span>
-      {played && (
-        <span className="shrink-0 pt-0.5 text-sm font-semibold tabular-nums text-ink">
-          {entry.homeScore}–{entry.awayScore}
-        </span>
-      )}
-    </>
-  );
-
-  if (!onOpen) return <div className="flex gap-2.5 px-4 py-3">{body}</div>;
-
-  return (
-    <div className="group/row relative flex items-stretch">
-      <button
-        type="button"
-        onClick={onOpen}
-        className="flex min-w-0 flex-1 gap-2.5 py-3 pl-4 pr-2 text-left transition-colors hover:bg-surface-sunk focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent"
-      >
-        {body}
-      </button>
-      {/* The batch case: a weekend of results arrives as a list of scores, and opening each
-          fixture's detail view to type two numbers is thirty extra round trips. */}
-      {onScore && (
-        <button
-          type="button"
-          onClick={() => onScore(entry)}
-          aria-label={`Saisir le score de ${entry.home.name} contre ${entry.away.name}`}
-          title="Saisir le score"
-          className="flex w-10 shrink-0 items-center justify-center text-ink-subtle opacity-0 transition-opacity hover:bg-accent-soft hover:text-accent-text focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent group-hover/row:opacity-100"
-        >
-          <SquarePen className="h-4 w-4" aria-hidden />
-        </button>
-      )}
-    </div>
-  );
-}
-
 export function FixtureDrawer({
   open,
   onClose,
@@ -146,6 +71,9 @@ export function FixtureDrawer({
   onAdd,
   onEdit,
   onScore,
+  onReorder,
+  reorderBlockedReason,
+  reasonBar,
 }: {
   open: boolean;
   onClose: () => void;
@@ -166,6 +94,12 @@ export function FixtureDrawer({
   onEdit?: (entry: CalendarEntry) => void;
   /** Opens the score dialog. */
   onScore?: (entry: CalendarEntry) => void;
+  /** Commits a reordering of one stack. Absent where the calendar is read-only. */
+  onReorder?: (assignments: { gameId: string; dateTime: string }[]) => void;
+  /** Why the handles are off, when they are. */
+  reorderBlockedReason?: string;
+  /** The "why did that move?" bar, pinned to the bottom after a drop. */
+  reasonBar?: React.ReactNode;
 }) {
   // Escape closes, because a panel that overlays content must be dismissible without aiming.
   useEffect(() => {
@@ -354,19 +288,22 @@ export function FixtureDrawer({
               )}
             </div>
           ) : (
-            <ul className="divide-y divide-line">
-              {entries.map((e) => (
-                <li key={e.id}>
-                  <FixtureRow
-                    entry={e}
-                    competitions={competitions}
-                    venues={venues}
-                    tone={toneFor(e.leagueId)}
-                    onOpen={() => onFocus(e)}
-                    onScore={e.status !== 'DRAFT' ? onScore : undefined}
-                  />
-                </li>
-              ))}
+            <div>
+              {/* Grouped by hall, because that is what a stack is. Two fixtures in different rooms
+                  do not compete for the same hours, so they are not in the same sequence — and
+                  without the grouping that boundary is invisible, which is how the first
+                  cross-hall drag surprises someone. */}
+              <DayStacks
+                entries={entries}
+                competitions={competitions}
+                venues={venues}
+                toneFor={toneFor}
+                onOpen={onFocus}
+                onScore={onScore}
+                onReorder={onReorder}
+                reorderBlockedReason={reorderBlockedReason}
+              />
+              <ul>
               {entries.length === 0 && (
                 <li className="px-4 py-8 text-center text-sm text-ink-muted">
                   Aucun match ce jour-là.
@@ -386,9 +323,12 @@ export function FixtureDrawer({
                   </button>
                 </li>
               )}
-            </ul>
+              </ul>
+            </div>
           )}
         </div>
+
+        {reasonBar}
 
         {closedReasons?.length ? (
           <p className="flex items-center gap-2 border-t border-line bg-caution-soft px-4 py-2.5 text-xs text-ink">
