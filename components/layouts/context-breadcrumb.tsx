@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ChevronRight } from 'lucide-react';
+import { cn } from '@/utils/cn';
 import { useScopeContext } from '@/hooks/useScopeContext';
 import { useCurrentUser } from '@/hooks';
 import { Roles } from '@/schemas';
@@ -44,26 +45,59 @@ const PAGE_TITLES: Record<string, string> = {
   roster: 'Effectif',
   users: 'Utilisateurs',
   games: 'Matchs',
-  schedule: 'Calendrier',
+  calendar: 'Calendrier',
+  generate: 'Génération',
   seasons: 'Saisons',
+  season: 'Saison',
   standings: 'Classement',
+  analytics: 'Statistiques',
   posts: 'Actualités',
+  post: 'Actualité',
   settings: 'Paramètres',
+  rules: 'Règles',
   tenants: 'Organisations',
+  tickets: 'Billetterie',
   general: 'Paramètres',
   profile: 'Mon profil',
   security: 'Sécurité',
+  account: 'Mon compte',
+  onboarding: 'Configuration',
+  game: 'Match',
+  player: 'Joueur',
+  team: 'Équipe',
+  league: 'Compétition',
+  tenant: 'Organisation',
+  admin: 'Plateforme',
   create: 'Nouveau',
   edit: 'Modifier',
+  manage: 'Gestion',
 };
 
-function currentPageTitle(pathname: string): string | undefined {
+/**
+ * The trail's own tail: the pages below the entity, deepest last.
+ *
+ * It used to return one label — the first path segment it recognised, scanning from the end — so
+ * `/tenant/calendar/generate` produced nothing at all, because neither `calendar` nor `generate`
+ * was in the table and the loop fell through to the surface prefix. The breadcrumb rendered
+ * `LIBAGO ›` and stopped, chevron dangling at a page it could not name.
+ *
+ * Collecting the segments instead gives `Calendrier › Génération`, which is the actual answer to
+ * "where am I", and the surface prefix (`tenant`, `league`) is dropped because the entity crumb
+ * beside it already says which organisation you are in.
+ */
+const SURFACE_SEGMENTS = new Set(['tenant', 'league', 'team', 'admin', 'app']);
+
+function pageTrail(pathname: string): string[] {
   const parts = pathname.split('/').filter(Boolean);
-  for (let i = parts.length - 1; i >= 0; i--) {
-    const t = PAGE_TITLES[parts[i]];
-    if (t) return t;
+  const trail: string[] = [];
+  for (const [i, part] of parts.entries()) {
+    // The leading surface segment is the entity's, not the page's.
+    if (i === 0 && SURFACE_SEGMENTS.has(part)) continue;
+    // Ids and slugs name nothing a reader would recognise.
+    if (!PAGE_TITLES[part]) continue;
+    trail.push(PAGE_TITLES[part]);
   }
-  return undefined;
+  return trail;
 }
 
 interface Crumb {
@@ -130,10 +164,10 @@ export function ContextBreadcrumb() {
     });
   }
 
-  const page = currentPageTitle(pathname);
+  const trail = pageTrail(pathname);
 
   // Nothing to orient by: a system admin on their own dashboard just gets the page name.
-  if (crumbs.length === 0 && !page) return null;
+  if (crumbs.length === 0 && trail.length === 0) return null;
 
   return (
     <nav aria-label="Fil d'Ariane" className="min-w-0">
@@ -159,14 +193,33 @@ export function ContextBreadcrumb() {
                 {c.label}
               </span>
             )}
-            <ChevronRight className="h-3.5 w-3.5 shrink-0 text-ink-subtle" aria-hidden="true" />
+            {/* The separator belongs *between* crumbs. Rendering it after every one left a
+                chevron pointing at nothing whenever the page had no name — which is exactly
+                what `/tenant/calendar` did. */}
+            {(i < crumbs.length - 1 || trail.length > 0) && (
+              <ChevronRight className="h-3.5 w-3.5 shrink-0 text-ink-subtle" aria-hidden="true" />
+            )}
           </li>
         ))}
-        {page && (
-          <li className="min-w-0 truncate px-1 font-semibold text-ink" aria-current="page">
-            {page}
+        {trail.map((label, i) => (
+          <li
+            key={`${label}-${i}`}
+            className="flex min-w-0 items-center gap-1.5"
+            aria-current={i === trail.length - 1 ? 'page' : undefined}
+          >
+            <span
+              className={cn(
+                'truncate px-1',
+                i === trail.length - 1 ? 'font-semibold text-ink' : 'font-medium text-ink-muted',
+              )}
+            >
+              {label}
+            </span>
+            {i < trail.length - 1 && (
+              <ChevronRight className="h-3.5 w-3.5 shrink-0 text-ink-subtle" aria-hidden="true" />
+            )}
           </li>
-        )}
+        ))}
       </ol>
     </nav>
   );

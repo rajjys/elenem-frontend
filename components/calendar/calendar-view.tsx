@@ -2,7 +2,7 @@
 
 import { useCallback, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { Ban, ChevronLeft, ChevronRight, MapPin, Plus } from 'lucide-react';
+import { Ban, ChevronLeft, ChevronRight, MapPin, Plus, Search, Wand2, X } from 'lucide-react';
 import { Button, LoadingSpinner, SelectField } from '@/components/ui';
 import { ErrorState } from '@/components/ui/error-state';
 import {
@@ -11,6 +11,7 @@ import {
   useCalendar,
   type CalendarCompetition,
   type CalendarEntry,
+  type CalendarVenue,
 } from '@/services/calendar';
 import { useScopeContext } from '@/hooks';
 import { cn } from '@/utils';
@@ -85,6 +86,43 @@ function timeOf(iso: string): string {
   return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
 }
 
+/** Accent- and case-insensitive, because nobody types "Nyiragongo" with the right diacritics. */
+function fold(value: string): string {
+  return value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase('fr');
+}
+
+/**
+ * Separators that mean "this club against that one".
+ *
+ * A secretary looking for a specific fixture types it the way they say it — "virunga contre
+ * vita", "VIR vs VIT", "virunga - vita" — and a search that only matched one team at a time
+ * answered a different question: every game Virunga plays, when what was wanted was the one
+ * against Vita.
+ */
+const MATCHUP_SPLIT = /\s+(?:vs?\.?|contre|c\/|[-–—])\s+/i;
+
+function matchesQuery(entry: CalendarEntry, raw: string, venues: CalendarVenue[]): boolean {
+  const query = raw.trim();
+  if (!query) return true;
+
+  const home = fold(`${entry.home.name} ${entry.home.shortCode}`);
+  const away = fold(`${entry.away.name} ${entry.away.shortCode}`);
+
+  const parts = query.split(MATCHUP_SPLIT).filter((p) => p.trim());
+  if (parts.length === 2) {
+    const [a, b] = parts.map(fold);
+    // Either way round: you are looking for the fixture, not for who happens to be at home.
+    return (
+      (home.includes(a) && away.includes(b)) || (home.includes(b) && away.includes(a))
+    );
+  }
+
+  const q = fold(query);
+  if (home.includes(q) || away.includes(q)) return true;
+  const venue = venues.find((v) => v.id === entry.venueId);
+  return !!venue && fold(venue.name).includes(q);
+}
+
 type Scale = 'month' | 'year' | 'list';
 
 const SCALES: { key: Scale; label: string }[] = [
@@ -125,8 +163,8 @@ export function CalendarView({ draftEntries, initialMonth }: CalendarViewProps =
   const [cursor, setCursor] = useState(() => initialMonth ?? new Date());
   const [hidden, setHidden] = useState<Set<string>>(new Set());
   const [openDay, setOpenDay] = useState<string | null>(null);
-  const [focused, setFocused] = useState<CalendarEntry | null>(null);
-  const [teamFilter, setTeamFilter] = useState<string>('');
+  const [focusedId, setFocusedId] = useState<string | null>(null);
+  const [query, setQuery] = useState('');
   const [venueFilter, setVenueFilter] = useState<string>('');
 
   /**
@@ -174,30 +212,19 @@ export function CalendarView({ draftEntries, initialMonth }: CalendarViewProps =
     [data],
   );
 
-  /** Every club appearing this period, so the filter offers only what is actually there. */
-  const teamsInRange = useMemo(() => {
-    const map = new Map<string, string>();
-    for (const e of [...(data?.entries ?? []), ...(draftEntries ?? [])]) {
-      map.set(e.home.id, e.home.name);
-      map.set(e.away.id, e.away.name);
-    }
-    return [...map.entries()]
-      .map(([id, name]) => ({ id, name }))
-      .sort((a, b) => a.name.localeCompare(b.name, 'fr'));
-  }, [data, draftEntries]);
+  const filtersActive = !!query.trim() || !!venueFilter || hidden.size > 0;
 
   const visible = useMemo(
     () =>
       [...(data?.entries ?? []), ...(draftEntries ?? [])].filter((e) => {
         if (hidden.has(e.leagueId)) return false;
-        // A team filter answers "when do we play"; a venue filter answers "what is in that hall".
-        // Both are applied here rather than server-side: the period's fixtures are already loaded,
-        // and a round trip per keystroke would cost more than the filtering saves.
-        if (teamFilter && e.home.id !== teamFilter && e.away.id !== teamFilter) return false;
+        // Applied here rather than server-side: the period's fixtures are already loaded, and a
+        // round trip per keystroke would cost more than the filtering saves.
         if (venueFilter && e.venueId !== venueFilter) return false;
+        if (!matchesQuery(e, query, data?.venues ?? [])) return false;
         return true;
       }),
-    [data, draftEntries, hidden, teamFilter, venueFilter],
+    [data, draftEntries, hidden, query, venueFilter],
   );
 
   const byDay = useMemo(() => {
@@ -227,20 +254,42 @@ export function CalendarView({ draftEntries, initialMonth }: CalendarViewProps =
    * the opposite case: thirty-five silent boxes whose only way in was guessing that the date
    * number opened a panel with a link inside it. That is the moment to say so plainly.
    */
-  const monthIsEmpty = byDay.size === 0;
+  /**
+   * Genuinely empty, as opposed to filtered empty.
+   *
+   * These must not be the same question. A month with thirty fixtures and a search for a club
+   * that does not play in it has nothing on the grid, but offering to "add a match" there answers
+   * a question nobody asked — the fix is to clear the search, not to invent a fixture.
+   */
+  const monthIsEmpty = (data?.entries.length ?? 0) === 0 && (draftEntries?.length ?? 0) === 0;
+  const nothingMatches = byDay.size === 0 && !monthIsEmpty;
 
   const closed = useMemo(() => blackoutDays(data?.blackouts ?? []), [data]);
   const todayKey = isoDay(new Date());
   const placed = visible.filter((e) => e.venueId).length;
   const drafted = visible.filter((e) => e.status === 'DRAFT').length;
 
+  /**
+   * The focused fixture, re-read from the freshly fetched calendar rather than remembered.
+   *
+   * `focused` holds an id, not a copy. It used to hold the entry object, so after saving a score
+   * or a new time the panel went on showing the values it had captured when it opened — the
+   * calendar behind it updated, the panel did not, and the only way to see the change was to
+   * close and reopen it. State that duplicates server data goes stale; state that points at it
+   * cannot.
+   */
+  const focused = useMemo(
+    () => (focusedId ? (visible.find((e) => e.id === focusedId) ?? null) : null),
+    [focusedId, visible],
+  );
+
   function openDrawer(day: string, entry: CalendarEntry | null = null) {
     setOpenDay(day);
-    setFocused(entry);
+    setFocusedId(entry?.id ?? null);
   }
   function closeDrawer() {
     setOpenDay(null);
-    setFocused(null);
+    setFocusedId(null);
   }
 
   function shift(delta: number) {
@@ -267,134 +316,204 @@ export function CalendarView({ draftEntries, initialMonth }: CalendarViewProps =
         openDay !== null && 'lg:pr-[23rem]',
       )}
     >
-      {/* Two rows, stacking rather than wrapping on a phone: period and view on one line,
-          everything that narrows the grid on the next. It was one long line that wrapped into
-          four ragged ones at 390px.
+      {/* One toolbar, ordered the way office software orders one.
+
+          The controls used to be three ragged rows that wrapped differently at every width, with
+          the page's own "Nouveau match" button above all of it — outside this container, which is
+          the one that reserves room for the day panel, so opening a fixture hid the button behind
+          the panel.
+
+          The people who run these calendars spend their working lives in Word and Excel, so the
+          layout borrows that grammar rather than inventing one: navigate on the left, choose the
+          view beside it, act on the right; find and filter on the row below. Groups are separated
+          by hairlines rather than by rows, which is what lets it reflow as units at 390px instead
+          of scattering into four ragged lines.
 
           Sticky, because the list and year views are several screens tall and the controls that
-          change what you are looking at should not be somewhere above it. Offset by the main
-          pane's own padding so it does not leave a gap where the content scrolls under. */}
-      <div className="sticky -top-6 z-20 -mx-6 space-y-3 border-b border-line bg-canvas px-6 pb-3 pt-6">
-        <div className="flex flex-wrap items-center gap-1">
+          change what you are looking at should not be somewhere above them. */}
+      <div className="sticky -top-6 z-20 -mx-6 space-y-2.5 border-b border-line bg-canvas px-6 pb-3 pt-6">
+        {/* ---- navigate · view · act ---- */}
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Arrows adjacent, then today, then the period — the order every calendar application
+              uses, so the hands that live in Outlook already know where to click. They used to
+              straddle "Aujourd'hui", which reads as three unrelated buttons. */}
+          <div className="flex items-center rounded-lg border border-line bg-surface">
+            <button
+              type="button"
+              onClick={() => shift(-1)}
+              aria-label={scale === 'year' ? 'Année précédente' : 'Mois précédent'}
+              className="flex h-9 w-9 items-center justify-center rounded-l-lg text-ink-muted transition-colors hover:bg-surface-sunk hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent"
+            >
+              <ChevronLeft className="h-4 w-4" aria-hidden />
+            </button>
+            <span className="h-5 w-px bg-line" aria-hidden />
+            <button
+              type="button"
+              onClick={() => shift(1)}
+              aria-label={scale === 'year' ? 'Année suivante' : 'Mois suivant'}
+              className="flex h-9 w-9 items-center justify-center rounded-r-lg text-ink-muted transition-colors hover:bg-surface-sunk hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent"
+            >
+              <ChevronRight className="h-4 w-4" aria-hidden />
+            </button>
+          </div>
+
           <button
             type="button"
-            onClick={() => shift(-1)}
-            aria-label={scale === 'year' ? 'Année précédente' : 'Mois précédent'}
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-ink-muted transition-colors hover:bg-surface-sunk hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            onClick={() => setCursor(new Date())}
+            className="h-9 shrink-0 rounded-lg border border-line bg-surface px-3 text-sm font-medium text-ink-muted transition-colors hover:border-line-strong hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
           >
-            <ChevronLeft className="h-4 w-4" aria-hidden />
+            Aujourd&apos;hui
           </button>
-          <h2 className="min-w-[8.5rem] text-center text-base font-semibold capitalize text-ink">
+
+          <h2 className="min-w-0 shrink truncate text-base font-semibold capitalize text-ink sm:text-lg">
             {scale === 'year'
               ? cursor.getFullYear()
               : `${MONTHS[cursor.getMonth()]} ${cursor.getFullYear()}`}
           </h2>
-          <button
-            type="button"
-            onClick={() => shift(1)}
-            aria-label={scale === 'year' ? 'Année suivante' : 'Mois suivant'}
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-ink-muted transition-colors hover:bg-surface-sunk hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-          >
-            <ChevronRight className="h-4 w-4" aria-hidden />
-          </button>
 
-          {/* Only the month grid has a "today" to jump to — a year already contains it, and the
-              list is a range rather than a position. */}
-          {scale === 'month' && (
-            <Button variant="ghost" onClick={() => setCursor(new Date())} className="ml-1 shrink-0">
-              Aujourd&apos;hui
-            </Button>
-          )}
+          <div className="ml-auto flex items-center gap-2">
+            {/* Three ways of reading the same fixtures: what is on Saturday, where the season
+                sits, and the plain list a phone wants anyway. */}
+            <div className="flex rounded-lg border border-line bg-surface p-0.5">
+              {SCALES.map((sc) => (
+                <button
+                  key={sc.key}
+                  type="button"
+                  onClick={() => setScale(sc.key)}
+                  aria-pressed={scale === sc.key}
+                  className={cn(
+                    'rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors',
+                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent',
+                    scale === sc.key ? 'bg-accent text-accent-ink' : 'text-ink-muted hover:text-ink',
+                  )}
+                >
+                  {sc.label}
+                </button>
+              ))}
+            </div>
 
-          {/* Three ways of reading the same fixtures: what is on Saturday, where the season
-              sits, and the plain list a phone wants anyway. */}
-          {/* Wraps to its own line on a phone rather than being pushed off the right edge, which
-              is where it went when this row could not fit. */}
-          <div className="ml-auto mt-1 flex shrink-0 rounded-lg border border-line bg-surface p-0.5 sm:mt-0">
-            {SCALES.map((sc) => (
-              <button
-                key={sc.key}
-                type="button"
-                onClick={() => setScale(sc.key)}
-                aria-pressed={scale === sc.key}
-                className={cn(
-                  'rounded-md px-2.5 py-1 text-xs font-medium transition-colors',
-                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent',
-                  scale === sc.key ? 'bg-accent text-accent-ink' : 'text-ink-muted hover:text-ink',
-                )}
-              >
-                {sc.label}
-              </button>
-            ))}
+            {writable && (
+              <Button variant="primary" onClick={() => setEditing({ day: isoDay(cursor), entry: null })}>
+                <Plus className="h-4 w-4" aria-hidden />
+                <span className="hidden sm:inline">Nouveau match</span>
+              </Button>
+            )}
           </div>
         </div>
 
+        {/* ---- find · filter ---- */}
         <div className="flex flex-wrap items-center gap-2">
-          <div className="flex flex-wrap items-center gap-1.5">
-            {(data?.competitions ?? []).map((c: CalendarCompetition) => {
-              const tone = toneFor(c.id);
-              const off = hidden.has(c.id);
-              return (
-                <button
-                  key={c.id}
-                  type="button"
-                  onClick={() =>
-                    setHidden((prev) => {
-                      const next = new Set(prev);
-                      if (next.has(c.id)) next.delete(c.id);
-                      else next.add(c.id);
-                      return next;
-                    })
-                  }
-                  aria-pressed={!off}
-                  title={c.name}
-                  className={cn(
-                    'flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ring-1 transition-colors',
-                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent',
-                    off ? 'bg-surface text-ink-subtle ring-line' : tone.chip,
-                  )}
-                >
-                  <span className={cn('h-2 w-2 rounded-full', off ? 'bg-line-strong' : tone.dot)} />
-                  {c.shortLabel}
-                </button>
-              );
-            })}
+          {/* One box for every view. It used to live inside the list only, so a month could not be
+              searched at all and the phone — which shows an agenda — had no way to find a fixture.
+              It also understands a matchup: "virunga vs vita" narrows to that pairing rather than
+              to every game either of them plays. */}
+          <div className="relative min-w-[12rem] flex-1 sm:max-w-xs">
+            <Search
+              className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-subtle"
+              aria-hidden
+            />
+            <input
+              // `type="search"` draws WebKit's own clear button on top of ours, so the field ended
+              // up with two crosses side by side. Ours stays, because it is the one that matches
+              // the rest of the toolbar.
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Équipe, salle, ou « A contre B »…"
+              aria-label="Rechercher un match"
+              className="h-9 w-full rounded-lg border border-line bg-surface pl-8 pr-8 text-sm text-ink transition-colors placeholder:text-ink-subtle hover:border-line-strong focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+            />
+            {query && (
+              <button
+                type="button"
+                onClick={() => setQuery('')}
+                aria-label="Effacer la recherche"
+                className="absolute right-1.5 top-1/2 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded text-ink-subtle transition-colors hover:bg-surface-sunk hover:text-ink"
+              >
+                <X className="h-3.5 w-3.5" aria-hidden />
+              </button>
+            )}
           </div>
 
-          <div className="ml-auto flex flex-wrap items-center gap-2">
-            <SelectField
-              label="Filtrer par équipe"
-              placeholder="Toutes les équipes"
-              value={teamFilter}
-              onChange={setTeamFilter}
-              options={teamsInRange.map((t) => ({ value: t.id, label: t.name }))}
-              className="w-44"
-            />
+          {(data?.competitions.length ?? 0) > 1 && (
+            <div className="flex flex-wrap items-center gap-1.5">
+              {(data?.competitions ?? []).map((c: CalendarCompetition) => {
+                const tone = toneFor(c.id);
+                const off = hidden.has(c.id);
+                return (
+                  <button
+                    key={c.id}
+                    type="button"
+                    onClick={() =>
+                      setHidden((prev) => {
+                        const next = new Set(prev);
+                        if (next.has(c.id)) next.delete(c.id);
+                        else next.add(c.id);
+                        return next;
+                      })
+                    }
+                    aria-pressed={!off}
+                    title={c.name}
+                    className={cn(
+                      'flex h-9 items-center gap-1.5 rounded-lg px-2.5 text-xs font-medium ring-1 transition-colors',
+                      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent',
+                      off ? 'bg-surface text-ink-subtle ring-line' : tone.chip,
+                    )}
+                  >
+                    <span className={cn('h-2 w-2 rounded-full', off ? 'bg-line-strong' : tone.dot)} />
+                    {c.shortLabel}
+                  </button>
+                );
+              })}
+            </div>
+          )}
 
-            {(data?.venues.length ?? 0) > 0 && (
+          <div className="ml-auto flex items-center gap-2">
+            {(data?.venues.length ?? 0) > 1 && (
               <SelectField
                 label="Filtrer par salle"
                 placeholder="Toutes les salles"
                 value={venueFilter}
                 onChange={setVenueFilter}
                 options={(data?.venues ?? []).map((v) => ({ value: v.id, label: v.name }))}
-                className="w-44"
+                className="w-40"
               />
             )}
 
-            <ResultsSheetButton leagueId={scope.leagueId} />
-
-            {(teamFilter || venueFilter) && (
+            {filtersActive && (
               <button
                 type="button"
                 onClick={() => {
-                  setTeamFilter('');
+                  setQuery('');
                   setVenueFilter('');
+                  setHidden(new Set());
                 }}
-                className="text-xs text-accent-text hover:underline"
+                className="h-9 whitespace-nowrap rounded-lg px-2 text-xs font-medium text-accent-text transition-colors hover:bg-accent-soft"
               >
-                Effacer
+                Tout afficher
               </button>
+            )}
+
+            <span className="hidden h-5 w-px bg-line sm:block" aria-hidden />
+            <ResultsSheetButton leagueId={scope.leagueId} />
+
+            {/* Generation sits beside the spreadsheet rather than at the top of the page, and it
+                is labelled for what it is. Deciding a fixture list is a political act inside a
+                federation — a committee agrees it, and handing that to software is not a feature
+                request, it is a change of who decides. So the calendar leads with recording, and
+                offers to generate the way it offers to export: a tool over there, for the leagues
+                that want it. */}
+            {writable && (
+              <Link
+                href={scope.leagueId ? '/league/calendar/generate' : '/tenant/calendar/generate'}
+                className="flex h-9 items-center gap-1.5 whitespace-nowrap rounded-lg px-2.5 text-sm text-ink-muted transition-colors hover:bg-surface-sunk hover:text-ink"
+              >
+                <Wand2 className="h-4 w-4 shrink-0" aria-hidden />
+                <span className="hidden lg:inline">Générer</span>
+                <span className="rounded bg-surface-sunk px-1 py-px text-[0.625rem] font-medium uppercase tracking-wide text-ink-subtle">
+                  bêta
+                </span>
+              </Link>
             )}
           </div>
         </div>
@@ -438,6 +557,8 @@ export function CalendarView({ draftEntries, initialMonth }: CalendarViewProps =
           // The list deliberately spans the season either side of the cursor, so naming the
           // cursor's month here would claim an emptiness the query never checked.
           periodLabel={periodLabel}
+          query={query}
+          onClearQuery={() => setQuery('')}
         />
       ) : scale === 'year' ? (
         <YearGrid
@@ -459,6 +580,34 @@ export function CalendarView({ draftEntries, initialMonth }: CalendarViewProps =
           {/* A month with nothing in it is the first thing a new organisation sees, and it used
               to be the screen that said least. Two doors, because a calendar arrives one of two
               ways: generated whole, or decided in a committee and typed in day by day. */}
+          {nothingMatches && (
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-lg border border-line bg-surface px-4 py-3">
+              <p className="text-sm text-ink-muted">
+                Aucun match ne correspond
+                {query.trim() ? (
+                  <>
+                    {' à '}
+                    <span className="text-ink">« {query.trim()} »</span>
+                  </>
+                ) : (
+                  ' aux filtres actifs'
+                )}
+                .
+              </p>
+              <button
+                type="button"
+                onClick={() => {
+                  setQuery('');
+                  setVenueFilter('');
+                  setHidden(new Set());
+                }}
+                className="text-sm font-medium text-accent-text hover:underline"
+              >
+                Tout afficher
+              </button>
+            </div>
+          )}
+
           {monthIsEmpty && writable && (
             <div className="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-lg border border-dashed border-line bg-surface px-4 py-3">
               <p className="text-sm text-ink-muted">
@@ -665,8 +814,10 @@ export function CalendarView({ draftEntries, initialMonth }: CalendarViewProps =
 
             {byDay.size === 0 && (
               <div className="rounded-lg border border-dashed border-line bg-surface px-4 py-8 text-center">
-                <p className="text-sm text-ink-muted">Aucun match ce mois-ci.</p>
-                {writable && (
+                <p className="text-sm text-ink-muted">
+                  {nothingMatches ? 'Aucun match ne correspond.' : 'Aucun match ce mois-ci.'}
+                </p>
+                {writable && !nothingMatches && (
                   <button
                     type="button"
                     onClick={() => setEditing({ day: isoDay(cursor), entry: null })}
@@ -688,7 +839,7 @@ export function CalendarView({ draftEntries, initialMonth }: CalendarViewProps =
         day={openDay}
         entries={openDay ? (byDay.get(openDay) ?? []) : []}
         focused={focused}
-        onFocus={setFocused}
+        onFocus={(entry) => setFocusedId(entry?.id ?? null)}
         competitions={data?.competitions ?? []}
         venues={data?.venues ?? []}
         toneFor={toneFor}

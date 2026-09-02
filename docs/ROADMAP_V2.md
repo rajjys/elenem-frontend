@@ -297,3 +297,35 @@ set of seasons.
 
 Phase 2 item 3c is therefore replaced by the slices in `CALENDAR_MODULE.md` §4, of which 4.1
 (calendar view, read-only) and 4.2 (record + import results) are the ones with launch value.
+
+
+---
+
+## 8. Re-prioritised (2026-09-02): the calendar is the product, generation is a demo
+
+`CALENDAR_MODULE.md` §9 has the full argument. The headline for this roadmap:
+
+**Fixture generation (4.4, 4.5) is off the critical path for at least two months.** It stays
+working and presentable, labelled *bêta*, and grows slowly. The reason is a step further along
+§0's own logic: the first operator does not decide the calendar, and for a league's first season
+*nobody* will want a generator — the committee that agrees the fixture list owns that work, and
+handing it to software is a change in who decides, not a feature. Generation is adopted after
+trust, not as the way of earning it. Its value today is that it makes an audience lean forward,
+which is a reason to keep it, not to finish it.
+
+The hours go to the calendar, which is now a real production tool: fixtures are added, moved,
+scored, corrected and deleted from the grid, every change is audited with a reason, and the
+season table is derived from the games rather than accumulated.
+
+**What this pulls forward**, since the calendar is where an organiser now lives:
+
+1. **Drag and drop** — move a fixture between days, and reorder a day's fixtures, which is a
+   reassignment of that day's start times rather than a free edit.
+2. **Mobile score entry** (Phase 3 item 11) — already half-served by the score dialog reachable
+   from the calendar's day panel; what remains is the box score.
+3. **Standings export** (§1.4 / A2) — unchanged in priority, and the artefact that replaces
+   LIPROBAKIN's current workflow.
+
+**What this pushes back:** 4.4's multi-competition ordered allocation and 4.5's draft persistence.
+The planner already reports its free slots, so the D1 → D1F → D2 pass remains a loop over
+competitions in priority order whenever it is wanted.

@@ -1,8 +1,7 @@
 'use client';
 
-import { Fragment, useMemo, useState } from 'react';
-import { CalendarPlus, MapPin, Plus, Search, X } from 'lucide-react';
-import { Input } from '@/components/ui';
+import { Fragment, useMemo } from 'react';
+import { CalendarPlus, MapPin, Plus } from 'lucide-react';
 import type { CalendarCompetition, CalendarEntry, CalendarVenue } from '@/services/calendar';
 import { cn } from '@/utils';
 
@@ -36,6 +35,8 @@ export function CalendarList({
   onOpen,
   onAdd,
   periodLabel,
+  query,
+  onClearQuery,
 }: {
   entries: CalendarEntry[];
   competitions: CalendarCompetition[];
@@ -46,20 +47,14 @@ export function CalendarList({
   onAdd?: () => void;
   /** What "this period" is, so the empty state can name it rather than gesture at it. */
   periodLabel?: string;
+  /** The toolbar's search, so an empty result can say whether it is the period or the query. */
+  query?: string;
+  onClearQuery?: () => void;
 }) {
-  const [query, setQuery] = useState('');
-
-  const matched = useMemo(() => {
-    const q = query.trim().toLocaleLowerCase('fr');
-    if (!q) return entries;
-    return entries.filter(
-      (e) =>
-        e.home.name.toLocaleLowerCase('fr').includes(q) ||
-        e.away.name.toLocaleLowerCase('fr').includes(q) ||
-        e.home.shortCode.toLocaleLowerCase('fr').includes(q) ||
-        e.away.shortCode.toLocaleLowerCase('fr').includes(q),
-    );
-  }, [entries, query]);
+  // The search box that used to live here is gone: it only filtered this view, so the month grid
+  // could not be searched at all and the phone's agenda had no way to find a fixture. One box in
+  // the toolbar now filters every view, and `entries` arrives already narrowed.
+  const matched = entries;
 
   // Day headings, so a run of fixtures still reads as a matchday rather than a wall of rows.
   const grouped = useMemo(() => {
@@ -73,32 +68,6 @@ export function CalendarList({
 
   return (
     <div className="space-y-3">
-      {/* The icon sits inside the field rather than beside it, and the field is the same height
-          as the filters it sits under — it was a bare Input with a floating magnifier. */}
-      <div className="relative max-w-sm">
-        <Search
-          className="pointer-events-none absolute left-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-ink-subtle"
-          aria-hidden
-        />
-        <Input
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Rechercher une équipe…"
-          aria-label="Rechercher une équipe"
-          className="h-9 rounded-lg border-line bg-surface pl-9 transition-colors hover:border-line-strong focus:border-accent focus:ring-1 focus:ring-accent"
-        />
-        {query && (
-          <button
-            type="button"
-            onClick={() => setQuery('')}
-            aria-label="Effacer la recherche"
-            className="absolute right-2 top-1/2 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-md text-ink-subtle transition-colors hover:bg-surface-sunk hover:text-ink"
-          >
-            <X className="h-3.5 w-3.5" aria-hidden />
-          </button>
-        )}
-      </div>
-
       <div className="overflow-hidden rounded-lg border border-line bg-surface">
         {grouped.length === 0 ? (
           /* An empty period is the moment an organiser most needs a way forward, and it used to
@@ -106,18 +75,20 @@ export function CalendarList({
              A failed *search* is different: the answer there is to search for something else,
              not to invent a fixture, so it keeps the plain sentence and offers to clear. */
           <div className="px-4 py-12 text-center">
-            {query ? (
+            {query?.trim() ? (
               <>
                 <p className="text-sm text-ink-muted">
                   Aucun match ne correspond à « {query} ».
                 </p>
-                <button
-                  type="button"
-                  onClick={() => setQuery('')}
-                  className="mt-2 text-sm text-accent-text hover:underline"
-                >
-                  Effacer la recherche
-                </button>
+                {onClearQuery && (
+                  <button
+                    type="button"
+                    onClick={onClearQuery}
+                    className="mt-2 text-sm text-accent-text hover:underline"
+                  >
+                    Effacer la recherche
+                  </button>
+                )}
               </>
             ) : (
               <>

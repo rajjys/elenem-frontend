@@ -130,7 +130,7 @@ export function ScoreDialog({
           />
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-semibold text-ink">{entry.away.name}</p>
-            <p className="text-xs text-ink-subtle">extérieur</p>
+            <p className="text-xs text-ink-subtle">visiteur</p>
           </div>
         </div>
 

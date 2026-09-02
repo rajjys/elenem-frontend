@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import Link from 'next/link';
 import { CalendarDays, CheckCircle2, ChevronDown, Wand2 } from 'lucide-react';
-import { Button, Label, LoadingSpinner, SelectField } from '@/components/ui';
+import { Button, DatePicker, Label, LoadingSpinner, SelectField } from '@/components/ui';
 import { ErrorState } from '@/components/ui/error-state';
 import { useScopeContext } from '@/hooks';
 import { toastApiError } from '@/utils';
@@ -239,28 +239,34 @@ export function CalendarGenerate() {
             are allowed to use. */}
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <Label>Du</Label>
-            <input
-              type="date"
-              value={from}
-              onChange={(e) => {
-                invalidate();
-                setFrom(e.target.value);
-              }}
-              className="mt-1 w-full rounded-md border border-line bg-surface px-3 py-2 text-sm text-ink focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
-            />
+            <Label htmlFor="gen-from">Du</Label>
+            <div className="mt-1">
+              <DatePicker
+                id="gen-from"
+                compact
+                size="sm"
+                value={from}
+                onChange={(v) => {
+                  invalidate();
+                  setFrom(v);
+                }}
+              />
+            </div>
           </div>
           <div>
-            <Label>Au</Label>
-            <input
-              type="date"
-              value={to}
-              onChange={(e) => {
-                invalidate();
-                setTo(e.target.value);
-              }}
-              className="mt-1 w-full rounded-md border border-line bg-surface px-3 py-2 text-sm text-ink focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
-            />
+            <Label htmlFor="gen-to">Au</Label>
+            <div className="mt-1">
+              <DatePicker
+                id="gen-to"
+                compact
+                size="sm"
+                value={to}
+                onChange={(v) => {
+                  invalidate();
+                  setTo(v);
+                }}
+              />
+            </div>
           </div>
         </div>
 

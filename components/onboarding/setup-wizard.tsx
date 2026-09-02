@@ -561,28 +561,25 @@ export function SetupWizard() {
         )}
 
         {/* The next thing to do is the calendar, not a dashboard.
-            
+
             A league that has just typed in its teams has no fixtures, so every counter on the
             dashboard reads zero and nothing on it suggests a next step — it is the least useful
-            screen in the product at exactly this moment. The wizard's own closing line already
-            said "générer le calendrier" and then sent them somewhere else, and the page it named
-            no longer exists. Two doors, matching the two ways a calendar actually arrives:
-            generated here, or decided in a committee and typed in day by day. */}
+            screen in the product at exactly this moment.
+
+            One door, not two. Generation used to be offered here as the headline, and it is the
+            wrong first thing to hand a new league: deciding a fixture list is a political act
+            inside a federation, agreed by a committee, and a league that has never used the
+            product does not begin by handing that over. They begin by writing down what has
+            already been decided. The calendar is where both paths start, and the generator is
+            waiting there for the ones who want it. */}
         <div className="space-y-2.5">
           <Button
             variant="primary"
             className="h-11 w-full"
-            onClick={() => router.push('/tenant/calendar/generate')}
-          >
-            Générer le calendrier
-            <ArrowRight size={16} className="ml-2" />
-          </Button>
-          <Button
-            variant="outline"
-            className="h-11 w-full"
             onClick={() => router.push('/tenant/calendar')}
           >
-            Voir le calendrier
+            Ouvrir le calendrier
+            <ArrowRight size={16} className="ml-2" />
           </Button>
           <button
             type="button"
@@ -592,8 +589,8 @@ export function SetupWizard() {
             Plus tard — aller au tableau de bord
           </button>
           <p className="pt-1 text-xs text-ink-subtle">
-            Le calendrier est vide pour l’instant. Générez-le d’un coup, ou ajoutez les matchs
-            au fur et à mesure qu’ils sont décidés.
+            Ajoutez vos matchs au fur et à mesure qu’ils sont décidés, ou importez-les depuis un
+            tableur.
           </p>
         </div>
       </div>

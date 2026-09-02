@@ -265,7 +265,7 @@ export default function GameManagementDashboard() {
           />
           
           <TeamScore
-            label="Extérieur"
+            label="Visiteur"
             score={awayScore}
             onIncrement={() => setAwayScore(s => s + 1)}
             onDecrement={() => setAwayScore(s => Math.max(0, s - 1))}
@@ -279,7 +279,7 @@ export default function GameManagementDashboard() {
           <div className="w-10 h-10 md:w-16 md:h-16 lg:w-20 lg:h-20 rounded-full overflow-hidden bg-line ">
             <Image
               src={game.awayTeam?.businessProfile?.logoAsset?.url || 'https://placehold.co/80x80/E2E8F0/1A202C?text=Away'}
-              alt={game.awayTeam.name || "Équipe Extérieure"}
+              alt={game.awayTeam.name || "Équipe visiteuse"}
               width={60}
               height={60}
               className="object-cover w-full h-full"

@@ -10,7 +10,7 @@ import {
   Loader2,
   Trash2,
 } from 'lucide-react';
-import { Button, Label, Modal, SelectField } from '@/components/ui';
+import { Button, DatePicker, Label, Modal, SelectField } from '@/components/ui';
 import { toastApiError } from '@/utils';
 import { useScopeContext } from '@/hooks';
 import type { CalendarCompetition, CalendarEntry, CalendarVenue } from '@/services/calendar';
@@ -79,6 +79,9 @@ function instantFrom(day: string, time: string): string | null {
   return Number.isNaN(at.getTime()) ? null : at.toISOString();
 }
 
+/** How many of the day's fixtures the panel lists before offering the rest. */
+const DAY_PREVIEW = 4;
+
 const isoDay = (d: Date) =>
   `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 
@@ -143,6 +146,7 @@ export function FixtureDialog({
   const [venueId, setVenueId] = useState('');
   const [reason, setReason] = useState('');
   const [showHistory, setShowHistory] = useState(false);
+  const [showAllThatDay, setShowAllThatDay] = useState(false);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
 
   const createMut = useCreateGame();
@@ -189,8 +193,33 @@ export function FixtureDialog({
     }
     setReason('');
     setShowHistory(false);
+    setShowAllThatDay(false);
     setConfirmingDelete(false);
   }, [open, entry, day, scope.leagueId, competitions, suggestedTime]);
+
+  /**
+   * The day's other fixtures, with the one being edited guaranteed a place.
+   *
+   * Truncating a nine-game Saturday to the first four used to hide the very fixture the dialog
+   * was about — the ninth game simply was not in the list, so the panel meant to show where it
+   * sat in the day showed everything except it.
+   */
+  const sortedThatDay = useMemo(
+    () => [...entriesThatDay].sort((a, b) => a.dateTime.localeCompare(b.dateTime)),
+    [entriesThatDay],
+  );
+
+  const shownThatDay = useMemo(() => {
+    if (showAllThatDay || sortedThatDay.length <= DAY_PREVIEW) return sortedThatDay;
+    const head = sortedThatDay.slice(0, DAY_PREVIEW);
+    if (!entry || head.some((e) => e.id === entry.id)) return head;
+    // Drop the last of the head to make room for the fixture in hand, keeping time order.
+    return [...head.slice(0, DAY_PREVIEW - 1), sortedThatDay.find((e) => e.id === entry.id)!].sort(
+      (a, b) => a.dateTime.localeCompare(b.dateTime),
+    );
+  }, [sortedThatDay, showAllThatDay, entry]);
+
+  const hiddenThatDay = sortedThatDay.length - shownThatDay.length;
 
   const teamOptions = (teams.data?.data ?? []).map((t) => ({
     value: t.id,
@@ -321,7 +350,7 @@ export function FixtureDialog({
                     { gameId: entry!.id, reason: reason.trim() || undefined },
                     {
                       onSuccess: () => {
-                        toast.success('Domicile et extérieur inversés.');
+                        toast.success('Domicile et visiteur inversés.');
                         onClose();
                       },
                       onError: (e) => toastApiError(e),
@@ -331,7 +360,7 @@ export function FixtureDialog({
                 title={
                   hasScore
                     ? 'Impossible : le score indique déjà qui a marqué quoi.'
-                    : 'Inverser domicile et extérieur'
+                    : 'Inverser domicile et visiteur'
                 }
                 className="flex shrink-0 items-center gap-1 rounded-md px-2 py-1 text-xs font-medium text-accent-text transition-colors hover:bg-accent-soft disabled:cursor-not-allowed disabled:text-ink-subtle disabled:hover:bg-transparent"
               >
@@ -381,11 +410,11 @@ export function FixtureDialog({
               </div>
               <div>
                 <Label htmlFor="fx-away" required>
-                  Extérieur
+                  Visiteur
                 </Label>
                 <SelectField
                   id="fx-away"
-                  label="Équipe à l’extérieur"
+                  label="Équipe visiteuse"
                   placeholder={teams.isPending && leagueId ? 'Chargement…' : 'Choisir…'}
                   value={awayTeamId}
                   onChange={setAwayTeamId}
@@ -404,13 +433,12 @@ export function FixtureDialog({
             <Label htmlFor="fx-date" required>
               Jour
             </Label>
-            <input
-              id="fx-date"
-              type="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              className="mt-1 h-9 w-full rounded-lg border border-line bg-surface px-3 text-sm text-ink transition-colors hover:border-line-strong focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
-            />
+            {/* The same picker the season step uses. `<input type="date">` renders whatever the
+                browser feels like — its own chrome, the OS locale rather than the product's, no
+                tokens — which on a French calendar is worse than the code it saves. */}
+            <div className="mt-1">
+              <DatePicker id="fx-date" value={date} onChange={setDate} size="sm" />
+            </div>
           </div>
           <div>
             <Label htmlFor="fx-time" required>
@@ -443,31 +471,57 @@ export function FixtureDialog({
 
         {/* The day the organiser is placing into, so they are not choosing an hour blind. */}
         {entriesThatDay.length > 0 && (
-          <div className="rounded-lg border border-line bg-surface-sunk px-3 py-2">
+          <div className="rounded-lg border border-line bg-surface-sunk px-3 py-2.5">
             <p className="text-xs font-medium text-ink-muted">
               Déjà ce jour-là ({entriesThatDay.length})
             </p>
-            <ul className="mt-1 space-y-0.5">
-              {entriesThatDay.slice(0, 4).map((e) => (
-                <li
-                  key={e.id}
-                  className={cn(
-                    'flex items-center gap-2 text-xs',
-                    e.id === entry?.id ? 'text-accent-text' : 'text-ink-subtle',
-                  )}
-                >
-                  <span className="w-10 shrink-0 tabular-nums">{timeOf(e.dateTime)}</span>
-                  <span className="truncate">
-                    {e.home.shortCode} — {e.away.shortCode}
-                  </span>
-                </li>
-              ))}
-              {entriesThatDay.length > 4 && (
-                <li className="text-xs text-ink-subtle">
-                  et {entriesThatDay.length - 4} autre{entriesThatDay.length - 4 > 1 ? 's' : ''}
-                </li>
-              )}
+            <ul className="mt-1.5 space-y-1">
+              {shownThatDay.map((e) => {
+                const isThisOne = e.id === entry?.id;
+                return (
+                  <li
+                    key={e.id}
+                    className={cn(
+                      'flex items-baseline gap-2 text-xs',
+                      // The fixture being edited is bolded and always present, so the organiser
+                      // can see where in the day's stack it sits — which is the whole reason
+                      // this list is on screen.
+                      isThisOne ? 'font-semibold text-accent-text' : 'text-ink-muted',
+                    )}
+                  >
+                    <span className="w-10 shrink-0 tabular-nums">{timeOf(e.dateTime)}</span>
+                    {/* Full names, not short codes. There is room for them here, and "GQN — HMQ"
+                        asks the reader to decode two clubs at the moment they are deciding
+                        whether the slot is free. */}
+                    <span className="min-w-0 flex-1 truncate">
+                      {e.home.name} <span className="opacity-60">—</span> {e.away.name}
+                    </span>
+                    {isThisOne && <span className="shrink-0 text-[0.6875rem]">ce match</span>}
+                  </li>
+                );
+              })}
             </ul>
+            {/* This said "et 5 autres" and named fixtures the reader could not reach — and if the
+                one being edited was among them it was invisible at exactly the moment it
+                mattered. It opens the rest now. */}
+            {hiddenThatDay > 0 && (
+              <button
+                type="button"
+                onClick={() => setShowAllThatDay(true)}
+                className="mt-1.5 text-xs font-medium text-accent-text hover:underline"
+              >
+                Voir les {hiddenThatDay} autre{hiddenThatDay > 1 ? 's' : ''}
+              </button>
+            )}
+            {showAllThatDay && entriesThatDay.length > DAY_PREVIEW && (
+              <button
+                type="button"
+                onClick={() => setShowAllThatDay(false)}
+                className="mt-1.5 text-xs font-medium text-ink-subtle hover:underline"
+              >
+                Réduire
+              </button>
+            )}
           </div>
         )}
 

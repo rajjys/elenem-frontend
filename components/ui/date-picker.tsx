@@ -38,8 +38,14 @@ function fromIso(value?: string): Date | null {
   return Number.isNaN(parsed.getTime()) ? null : parsed;
 }
 
-function formatFr(d: Date): string {
-  return `${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
+const MONTHS_SHORT = [
+  'janv.', 'févr.', 'mars', 'avr.', 'mai', 'juin',
+  'juil.', 'août', 'sept.', 'oct.', 'nov.', 'déc.',
+];
+
+function formatFr(d: Date, compact = false): string {
+  const month = compact ? MONTHS_SHORT[d.getMonth()] : MONTHS[d.getMonth()];
+  return `${d.getDate()} ${month} ${d.getFullYear()}`;
 }
 
 /** Days of the shown month, padded so the first lands under its weekday. Monday = 0. */
@@ -60,6 +66,8 @@ export function DatePicker({
   id,
   invalid = false,
   placeholder = 'Choisissez une date',
+  compact = false,
+  size = 'md',
 }: {
   /** yyyy-mm-dd */
   value?: string;
@@ -67,6 +75,14 @@ export function DatePicker({
   id?: string;
   invalid?: boolean;
   placeholder?: string;
+  /**
+   * Abbreviate the month, for the narrow places two of these sit side by side. "2 septembre 2026"
+   * does not fit a half-width field in a 21rem rail, and a truncated date is worse than a short
+   * one — "2 septembr…" tells the reader nothing the abbreviation does not.
+   */
+  compact?: boolean;
+  /** Matches the 2.25rem controls the calendar's toolbar uses; the default is the taller form. */
+  size?: 'md' | 'sm';
 }) {
   const [open, setOpen] = useState(false);
   const selected = useMemo(() => fromIso(value), [value]);
@@ -94,13 +110,14 @@ export function DatePicker({
           id={id}
           aria-haspopup="dialog"
           className={cn(
-            'flex h-11 w-full items-center justify-between gap-2 rounded-lg border bg-surface px-3 text-sm text-ink transition-colors',
+            'flex w-full items-center justify-between gap-2 rounded-lg border bg-surface px-3 text-sm text-ink transition-colors',
+            size === 'sm' ? 'h-9' : 'h-11',
             'hover:border-line-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:border-accent',
             invalid ? 'border-negative' : 'border-line',
           )}
         >
           <span className={cn('truncate', !selected && 'text-ink-subtle')}>
-            {selected ? formatFr(selected) : placeholder}
+            {selected ? formatFr(selected, compact) : placeholder}
           </span>
           <CalendarDays className="h-4 w-4 shrink-0 text-ink-subtle" aria-hidden />
         </button>

@@ -174,10 +174,12 @@ only records.
   confirm, record. Scoped to *results*, not schedules.
 - This is the slice that makes the module usable by our actual first user.
 
-### 4.3 — Generation, single competition *(~4 days)* — **shipped**
+### 4.3 — Generation, single competition *(~4 days)* — **shipped, then deliberately parked**
 Output is a **draft**, never written. Existing games respected as §2.6. Insight panel v1.
 See §7 for what actually landed, which differs from this line in one place: the endpoint is
 `POST /calendar/draft`, not a flag on the old generator. Reasons in §7.
+
+**It is now labelled experimental and is not on the critical path.** See §9.
 
 ### 4.4 — Multi-competition, ordered allocation *(~4 days)*
 `seasonIds[]` + priority order. The D1 → D1F → D2 pass. Venue placement in the same pass, optional
@@ -402,3 +404,95 @@ doors, because a season is better generated whole than typed in day by day.
   render slots rather than chips, which is a bigger change to the grid.
 - **Lineups and per-player stats** — Phase 3 item 12, and not calendar work.
 - **`/game/create` survives** as a full-page path, but nothing in the calendar needs it any more.
+
+
+---
+
+## 9. Generation is parked; the calendar is the product (2026-09-02)
+
+### The decision
+
+4.4 (multi-competition allocation) and 4.5 are **off the roadmap for at least two months.** The
+generator stays exactly as it is, framed as *bêta*, developed slowly, and improved only when a
+league asks.
+
+The reason is the one §0 has been making since the first line of this document, now applied one
+step further. §0 said the first operator does not decide the calendar. What follows from that,
+and had not been drawn out, is that **for a league's first season nobody will want a generator at
+all.** The committee that agrees the fixture list is doing administrative work it owns, and
+handing that to software is not a feature request — it is a change in who decides, which is
+political and slow. Generation is a thing a league adopts *after* it trusts the product, not a
+thing that earns the trust.
+
+It also has demo value out of proportion to its usage value: it is the feature that makes an
+audience lean forward. That is a reason to keep it working and presentable, not a reason to
+finish it.
+
+So the hours went into the calendar instead.
+
+### What that changed on screen
+
+- **Onboarding ends at the calendar, not at generation.** It had offered "Générer le calendrier"
+  as the headline to a league that has never used the product, which is exactly the wrong first
+  thing to hand them. One door now: *Ouvrir le calendrier*.
+- **Generation left the page header.** It sits in the toolbar beside the results spreadsheet —
+  the other batch tool — as a quiet link with a `bêta` tag. The two belong together: both are
+  ways of moving a whole season at once, and both are optional.
+- **Its own page says what it is**, rather than looking unfinished. A short notice names it
+  experimental and says plainly that most leagues decide their calendar elsewhere and type it in,
+  and that this remains the normal, faster path.
+
+### The toolbar
+
+The controls were three ragged rows that wrapped differently at every width, with the page's own
+primary action above them — outside the container that reserves room for the day panel, so opening
+a fixture hid "Nouveau match" behind it.
+
+They are one toolbar now, ordered the way office software orders one, because the people running
+these calendars spend their working lives in Word and Excel: **navigate, then view, then act** on
+the first row; **find, then filter, then tools** on the second. Groups are separated by hairlines
+rather than by rows, which is what lets them reflow as units at 390px instead of scattering.
+
+### Search, and matchups
+
+One box at the top filters every view. It used to live inside the list only — so a month grid
+could not be searched at all, and the phone, which shows an agenda, had no way to find a fixture.
+
+It understands a **matchup**, which is what a secretary is usually looking for: `virunga contre
+muungano`, `VIR vs MUU` and `virunga - muungano` all narrow to that pairing in both directions,
+rather than to every game either club plays. A single term still matches either club or the hall.
+Accent-folded, because nobody types Nyiragongo with the right diacritics.
+
+The team dropdown it replaces is gone. A search box does everything the dropdown did and the
+thing it could not.
+
+### Smaller things that were wrong
+
+- `PAGE_TITLES` had no `calendar` key — it still said `schedule`, a route that no longer exists —
+  so the breadcrumb rendered `LIBAGO ›` and stopped, chevron pointing at a page it could not name.
+  The trail is now collected across segments (`LIBAGO › Calendrier › Génération`) and the
+  separator renders *between* crumbs rather than after every one.
+- **The day panel held a copy of the fixture, not a pointer to it.** After saving a score or a new
+  time it went on showing what it had captured when it opened; the only way to see the change was
+  to close and reopen it. It holds an id now and re-reads from the fetched calendar. The *dialogs*
+  deliberately keep a snapshot — a live object there would re-run their reset effect and wipe an
+  edit in progress.
+- **"Déjà ce jour-là"** showed short codes where there was room for names, listed only the first
+  four of a nine-game Saturday, and named the rest in text the reader could not reach — so the
+  ninth fixture was invisible at the exact moment its editor was open. It now shows full names,
+  guarantees the fixture in hand a place (bolded, marked *ce match*), and the remainder is a
+  button.
+- **Errors were in English** on a French-only product: *"A game between these two teams already
+  exists on this day"* is not a message a Goma secretary can act on. Every message an organiser
+  can provoke is translated, including the season-status and transition refusals, which now name
+  the states in French rather than printing an enum.
+- **"Extérieur" is "Visiteur"** throughout.
+- The native `<input type="date">` is gone from the calendar; both the fixture editor and the
+  generator use the same `DatePicker` the season step uses, with a compact month format so two
+  of them fit a narrow rail.
+
+### Still to come
+
+Drag and drop, in two flavours that mean different things — dropping onto another day in the
+month, and reordering within a day, where a reorder is a reassignment of the day's start times.
+The design is agreed but unbuilt; see the questions recorded with it.

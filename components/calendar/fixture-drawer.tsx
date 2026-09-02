@@ -246,7 +246,7 @@ export function FixtureDrawer({
                       {focused.homeScore}
                     </p>
                   ) : (
-                    <span className="shrink-0 text-xs text-ink-subtle">dom.</span>
+                    <span className="shrink-0 text-xs text-ink-subtle">domicile</span>
                   )}
                 </div>
                 <div className="my-2 h-px bg-line" />
@@ -259,7 +259,7 @@ export function FixtureDrawer({
                       {focused.awayScore}
                     </p>
                   ) : (
-                    <span className="shrink-0 text-xs text-ink-subtle">ext.</span>
+                    <span className="shrink-0 text-xs text-ink-subtle">visiteur</span>
                   )}
                 </div>
               </div>
