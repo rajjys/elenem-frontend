@@ -491,8 +491,56 @@ thing it could not.
   generator use the same `DatePicker` the season step uses, with a compact month format so two
   of them fit a narrow rail.
 
-### Still to come
+### Still to come — drag and drop, designed 2026-09-02, unbuilt
 
-Drag and drop, in two flavours that mean different things — dropping onto another day in the
-month, and reordering within a day, where a reorder is a reassignment of the day's start times.
-The design is agreed but unbuilt; see the questions recorded with it.
+Two gestures that mean different things and must not be built as one.
+
+#### A stack is a hall, not a day
+
+The question that looked hardest — "if I drop game 3 above game 1, whose time does it take?" —
+dissolves once you ask what a start time actually belongs to. **Two fixtures in different rooms
+do not compete for the same hours**, so they are not in the same sequence and reordering one must
+not touch the other. A day therefore partitions into one stack per hall, and a reorder reassigns
+start times *within a stack*.
+
+Fixtures with no hall named form a single stack together. That is not a shortcut: it is the same
+reasoning `checkVenueConflict` already applies — when either game leaves the room unspecified we
+cannot prove they are in different ones, so we treat them as sharing a space.
+
+Both launch customers run one hall, so they get exactly one stack and the model is invisible to
+them. It simply does not break when a second hall arrives.
+
+**Stack, not swap.** Dropping C above A over `A@14:00, B@16:00, C@18:00` yields `C@14:00,
+A@16:00, B@18:00` — the day's existing set of start times is preserved exactly, including any
+deliberate gap, and only *which fixture holds which* changes. A swap would move two fixtures and
+leave the list in an order nobody asked for.
+
+#### Reordering is blocked while the view is filtered
+
+A reorder reassigns times among the fixtures on screen. With a competition hidden or a search
+active, the ones off screen keep theirs — and the collision is invisible to the person causing
+it. So the handles are disabled whenever the day panel is not showing everything on that day,
+with a line saying why and a way to clear the filter.
+
+#### One reason for the whole gesture
+
+A reorder is several moves. Asking per fixture would turn a one-second gesture into a form and be
+resented by the tenth reorder; asking for nothing loses the half people actually argue about. So
+the drop lands, and a small bar asks for one reason applied to every fixture that moved —
+*Enregistrer* or *Sans raison*. It also reads correctly in the audit trail: one decision moved
+them all.
+
+#### Dropping on another day keeps the hour, and falls to the back of the stack if it is taken
+
+The drop commits immediately at the same time of day, with a toast offering *Annuler*. Speed is
+the point of dragging, and undo carries the risk.
+
+When that hour is already taken in the destination — the hall is busy, or a club is committed —
+the fixture is **appended to the end of that day's stack** rather than refused: one slot after the
+day's last game, i.e. the last game of the day. A refusal at that moment tells the organiser their
+gesture failed and leaves them to work out where else it could go; appending answers the question
+they were asking ("this fixture, that day") and leaves the ordering to a second, cheaper gesture.
+The toast says which happened.
+
+The free slot is computed client-side from the day's fixtures, which the grid already holds, so
+the common case costs no extra round trip; a 409 from the server is still handled as the backstop.
