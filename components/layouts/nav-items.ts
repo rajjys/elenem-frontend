@@ -87,6 +87,10 @@ export const tenantNavItems: NavGroup[] = [
     { label: 'Équipes', basePath: '/tenant/teams', icon: Shield },
     { label: 'Joueurs', basePath: '/tenant/players', icon: UserSquare2 },
     { label: 'Calendrier', basePath: '/tenant/calendar', icon: CalendarDays },
+    // The table is what the organisation publishes every matchday, and it had no entry point
+    // here at all — it lived under /league and was reachable only by drilling into a competition
+    // first. At LIPROBAKIN the person who publishes it is the tenant's community manager.
+    { label: 'Classement', basePath: '/tenant/standings', icon: ListOrdered },
     ],
   },
   {
@@ -113,7 +117,7 @@ export const leagueNavItems: NavGroup[] = [
     { label: 'Joueurs', basePath: '/league/players', icon: UserSquare2 },
     { label: 'Saisons', basePath: '/league/seasons', icon: CalendarDays },
     { label: 'Calendrier', basePath: '/league/calendar', icon: CalendarDays },
-    { label: 'Classement', basePath: '/league/standings', icon: Trophy },
+    { label: 'Classement', basePath: '/league/standings', icon: ListOrdered },
     ],
   },
   {
@@ -136,6 +140,10 @@ export const teamNavItems: NavGroup[] = [
     label: 'Mon club',
     items: [
     { label: 'Effectif', basePath: '/team/roster', icon: UserSquare2 },
+    // Where the club stands is the single fact a club administrator opens the product for, and
+    // it was the one screen their sidebar did not have. `StandingsView` reads the competition
+    // from the team, and the row for their own club is marked.
+    { label: 'Classement', basePath: '/team/standings', icon: ListOrdered },
     { label: 'Utilisateurs', basePath: '/team/users', icon: Users },
     ],
   },
