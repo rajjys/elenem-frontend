@@ -136,10 +136,18 @@ export default function GamePage() {
   }
 
   if (game.isError || !game.data) {
+    // Not the axios message: "Request failed with status code 404" is English, on a French-only
+    // product, and tells the reader nothing they can act on. The commonest way to land here is a
+    // stale link — a fixture that was deleted, or a bookmark of a route that no longer exists.
     return (
       <ErrorState
         title="Match introuvable"
-        error={game.error as Error}
+        error={
+          {
+            message:
+              'Ce match n’existe plus, ou vous n’avez pas accès à la compétition à laquelle il appartient.',
+          } as Error
+        }
         reset={() => game.refetch()}
       />
     );
