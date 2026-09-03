@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { useSearchParams } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { api } from '@/services/api';
 import { useCurrentUser } from './useAuth';
 
@@ -49,15 +49,29 @@ const ENTITY_STALE_MS = 5 * 60 * 1000;
 
 export function useScopeContext(): ScopeContext {
   const params = useSearchParams();
+  const pathname = usePathname() ?? '';
   const user = useCurrentUser();
 
   const ctxTenantId = params.get('ctxTenantId') ?? undefined;
   const ctxLeagueId = params.get('ctxLeagueId') ?? undefined;
   const ctxTeamId = params.get('ctxTeamId') ?? undefined;
-  const gameId = params.get('ctxGameId') ?? undefined;
+
+  // A match is the one resource whose id lives in the path rather than in a query parameter, and
+  // deliberately so: `ctx*Id` exists to carry one scope across a *set* of pages, and a game has a
+  // single page. It names its own league and organisation in its payload, so reading it here is
+  // what lets `/game/abc123` — a link that survives being pasted into a message — produce the
+  // same breadcrumb as any scoped screen, with nothing appended to the URL.
+  const gameId = pathname.match(/^\/game\/([^/]+)/)?.[1];
+
+  const game = useQuery({
+    queryKey: ['scope', 'game', gameId],
+    queryFn: async () => (await api.get(`/games/${gameId}`)).data,
+    enabled: !!gameId,
+    staleTime: ENTITY_STALE_MS,
+  });
 
   const teamId = ctxTeamId ?? user?.managingTeamId ?? undefined;
-  const leagueId = ctxLeagueId ?? user?.managingLeagueId ?? undefined;
+  const leagueId = ctxLeagueId ?? game.data?.leagueId ?? user?.managingLeagueId ?? undefined;
 
   const team = useQuery({
     queryKey: ['scope', 'team', teamId],
@@ -78,7 +92,12 @@ export function useScopeContext(): ScopeContext {
   });
 
   const effectiveTenantId =
-    ctxTenantId ?? league.data?.tenantId ?? team.data?.tenantId ?? user?.tenantId ?? undefined;
+    ctxTenantId ??
+    league.data?.tenantId ??
+    team.data?.tenantId ??
+    game.data?.tenantId ??
+    user?.tenantId ??
+    undefined;
 
   const tenant = useQuery({
     queryKey: ['scope', 'tenant', effectiveTenantId],
@@ -118,6 +137,6 @@ export function useScopeContext(): ScopeContext {
           short: team.data.shortCode ?? team.data.name,
         }
       : undefined,
-    isLoading: team.isLoading || league.isLoading || tenant.isLoading,
+    isLoading: team.isLoading || league.isLoading || tenant.isLoading || game.isLoading,
   };
 }

@@ -53,6 +53,67 @@ export function useTeamOptions(leagueId?: string) {
   });
 }
 
+/**
+ * One fixture, in full.
+ *
+ * The calendar reads a month at a time and gets a deliberately thin entry per fixture; this is the
+ * other shape — everything about one match, for the page that is about one match. It carries its
+ * own league, season, venue and tenant, which is what lets `/game/[gameId]` stand on its own with
+ * no context in the URL: the resource names its own ancestors.
+ */
+const GameDetailSchema = z.object({
+  id: z.string(),
+  slug: z.string().optional(),
+  dateTime: z.string(),
+  status: z.string(),
+  location: z.string().nullable().optional(),
+  notes: z.string().nullable().optional(),
+  homeScore: z.number().nullable().optional(),
+  awayScore: z.number().nullable().optional(),
+  isForfeit: z.boolean().optional(),
+  leagueId: z.string(),
+  tenantId: z.string(),
+  homeTeamId: z.string(),
+  awayTeamId: z.string(),
+  homeVenueId: z.string().nullable().optional(),
+  homeTeam: z.object({
+    id: z.string(),
+    name: z.string(),
+    slug: z.string().optional(),
+    shortCode: z.string().nullable().optional(),
+    logoUrl: z.string().nullable().optional(),
+  }),
+  awayTeam: z.object({
+    id: z.string(),
+    name: z.string(),
+    slug: z.string().optional(),
+    shortCode: z.string().nullable().optional(),
+    logoUrl: z.string().nullable().optional(),
+  }),
+  league: z.object({ id: z.string(), name: z.string(), slug: z.string().optional() }),
+  season: z.object({ id: z.string(), name: z.string() }).nullable().optional(),
+  homeVenue: z
+    .object({ id: z.string(), name: z.string(), address: z.string().nullable().optional() })
+    .nullable()
+    .optional(),
+  tenant: z
+    .object({ id: z.string(), name: z.string(), tenantCode: z.string().optional() })
+    .optional(),
+});
+
+export type GameDetail = z.infer<typeof GameDetailSchema>;
+
+export function useGame(gameId?: string) {
+  return useQuery({
+    queryKey: ['game', gameId, 'detail'],
+    queryFn: async () => {
+      const res = await api.get(`/games/${gameId}`);
+      return parseResponse(GameDetailSchema, res.data);
+    },
+    enabled: !!gameId,
+  });
+}
+
 const AuditEntrySchema = z.object({
   id: z.string(),
   action: z.string(),

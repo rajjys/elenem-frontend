@@ -245,7 +245,7 @@ export default function TenantDashboard() {
                     </div>
                 </div>
                 <div className="flex flex-wrap gap-2 md:gap-3 text-sm">
-                    <Link href={buildLink("/game/create")}
+                    <Link href={buildLink("/tenant/calendar")}
                         className="flex items-center gap-2 px-3 py-2 rounded-md transition-all duration-150 soft-theme-gradient">
                         <CalendarPlus className="h-4 w-4" />
                         <span className="">Nouveau Match</span>
@@ -325,7 +325,7 @@ export default function TenantDashboard() {
                                     !loadingGames ?
                                         gamesByDate.length > 0 ? (
                                             gamesByDate.map( game => (
-                                                <Link key={game.id} href={buildLink(`/game/${game.id}/dashboard`)} >
+                                                <Link key={game.id} href={`/game/${game.id}`} >
                                                     <div className="flex items-center justify-between gap-4 px-3 py-2 my-1 border border-line rounded-md bg-surface hover:bg-surface-sunk transition-colors shadow-sm">
                                                         {/* Game Status Badge */}
                                                         <div className="shrink-0 ">

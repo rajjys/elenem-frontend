@@ -281,15 +281,21 @@ export function FixtureDrawer({
                 )}
                 {/* The sheet, when he has it. Second and quieter than the score, because most
                     results arrive as two numbers in a message and only some arrive as a
-                    photograph of the officials' paper. */}
-                {onBoxScore && (
+                    photograph of the officials' paper.
+
+                    Only on a played match. Typing up a scoresheet is administrative work done
+                    after the final whistle — often days after — and offering it on a fixture
+                    nobody has played invites a number that means nothing. The server refuses it
+                    too; this is the button not pretending otherwise. */}
+                {onBoxScore && focused.status === 'COMPLETED' && (
                   <button
                     type="button"
                     onClick={() => onBoxScore(focused)}
                     className="flex w-full items-center justify-center gap-1.5 rounded-lg border border-line px-3 py-2 text-sm text-ink-muted transition-colors hover:border-line-strong hover:text-ink"
                   >
-                    <ClipboardList className="h-3.5 w-3.5" aria-hidden />
+                    <ClipboardList className="h-3.5 w-3.5 shrink-0" aria-hidden />
                     Feuille de match
+                    <span className="text-xs text-ink-subtle">points par joueur</span>
                   </button>
                 )}
                 {onEdit && (
@@ -302,11 +308,16 @@ export function FixtureDrawer({
                     Déplacer, reporter, supprimer…
                   </button>
                 )}
+                {/* "Fiche complète du match" sat directly under "Feuille de match" — two
+                    near-identical French phrases, one of which opened a dialog and the other of
+                    which left the calendar entirely. The sheet keeps its name, because it is the
+                    name of the paper in the operator's hand; this one says where it goes instead
+                    of what it is. */}
                 <Link
                   href={`/game/${focused.id}`}
                   className="flex w-full items-center justify-center gap-1 rounded-lg px-3 py-1.5 text-xs text-ink-subtle transition-colors hover:text-ink"
                 >
-                  Fiche complète du match
+                  Ouvrir la page du match
                   <ArrowRight size={13} />
                 </Link>
               </div>

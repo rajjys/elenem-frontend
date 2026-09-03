@@ -125,12 +125,16 @@ export function ContextBreadcrumb() {
   const isTenantSurface = pathname.startsWith('/tenant');
   const isLeagueSurface = pathname.startsWith('/league');
   const isTeamSurface = pathname.startsWith('/team');
+  // A match is a leaf, not a surface: it is below its organisation and its competition, so both
+  // stay links and neither offers a switcher — there are no sibling leagues to move between while
+  // you are looking at one fixture.
+  const isGameSurface = pathname.startsWith('/game');
   const canManageTenant =
     (user?.roles ?? []).some((r) => r === Roles.SYSTEM_ADMIN || r === Roles.TENANT_ADMIN);
 
   // The deepest entity for the surface you are on is the one you may switch between; everything
   // above it stays a link. Managing a team is not the moment to change organisation.
-  if (scope.tenant && (isTenantSurface || isLeagueSurface || isTeamSurface)) {
+  if (scope.tenant && (isTenantSurface || isLeagueSurface || isTeamSurface || isGameSurface)) {
     crumbs.push({
       label: scope.tenant.short,
       title: scope.tenant.name,
@@ -145,7 +149,7 @@ export function ContextBreadcrumb() {
     });
   }
 
-  if (scope.league && (isLeagueSurface || isTeamSurface)) {
+  if (scope.league && (isLeagueSurface || isTeamSurface || isGameSurface)) {
     crumbs.push({
       label: scope.league.short,
       title: scope.league.name,

@@ -120,9 +120,6 @@ export default function AdminGamesPage() {
             onPageSizeChange={handlePageSizeChange}
             // No fixed IDs for System Admin page
           />
-          <Link href="/game/create" passHref>
-            <Button variant="primary" className='whitespace-nowrap'>Create New Game</Button>
-          </Link>
         </div>
       </div>
 

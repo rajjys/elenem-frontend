@@ -209,7 +209,7 @@ export default function LeagueDashboard() {
                 <div className="flex flex-wrap gap-2 md:gap-3 text-sm">
                   {
                     metrics && metrics?.activeTeamCount > 1 &&
-                    <Link href={buildLink("/game/create", { ctxLeagueId: league.id })}
+                    <Link href={buildLink("/league/calendar", { ctxLeagueId: league.id })}
                       className="flex items-center gap-2 px-3 py-2 rounded-md transition-all duration-150 soft-theme-gradient">
                       <CalendarPlus className="h-4 w-4" />
                       <span>Nouveau Match</span>
@@ -453,7 +453,7 @@ export default function LeagueDashboard() {
 
 const MinimalGameCard = ({ game }: { game: GameDetails }) => {
   return (
-    <Link href={`/game/${game.id}/dashboard`} key={game.id} className="block">
+    <Link href={`/game/${game.id}`} key={game.id} className="block">
       <div className="bg-surface rounded-lg shadow-sm hover:shadow-md hover:bg-surface-sunk transition p-2 my-2 space-y-3">
         {/* Date & Status */}
         <div className="flex items-center justify-between text-xs text-ink-muted font-semibold">

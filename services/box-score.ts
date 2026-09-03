@@ -6,15 +6,31 @@ import { parseResponse } from './parse-response';
 /**
  * The box score: who scored, and how.
  *
- * Shaped like the paper it is copied from. At LIPROBAKIN the officials fill in a FIBA scoresheet
- * during the game and the community manager types it up afterwards, usually from a photograph of
- * it — so what a row holds is baskets by kind, and nothing else. Assists, rebounds and minutes are
- * not on that sheet, and a field for a number nobody is holding is a field that gets left empty
- * or guessed at.
+ * **The columns come from the server, not from here.** An earlier version of this file named
+ * `threePointers`, `twoPointers` and `freeThrows` in its schema, its types and its dialog — which
+ * was right for LIPROBAKIN and made the screen unusable for the football and volleyball leagues
+ * the product is meant to serve. What a sheet holds is a property of the sport, so the sport
+ * declares it (`sport-rules/utils/sport-stat-columns.ts`) and it arrives beside the rosters.
+ * Nothing on this side of the wire knows what a three-pointer is.
  *
- * Points are never sent. `3·three + 2·two + free` is computed on both sides from the same rule,
- * because a stored total is a number that can end up disagreeing with the shots it came from.
+ * Totals are never sent and never stored: `Σ value × weight`, computed from the same column list
+ * on both sides, because a persisted total is a number that can end up disagreeing with the shots
+ * it came from.
  */
+
+const StatColumnSchema = z.object({
+  /** Stable key into a line's `stats` map. */
+  code: z.string(),
+  /** Short head that fits a table column. */
+  abbr: z.string(),
+  /** Full meaning, for the tooltip and the aria-label. */
+  label: z.string(),
+  /** Points one unit is worth. 0 records without scoring — fouls, cards, assists. */
+  weight: z.number(),
+  /** Ceiling for one player in one game: 5 fouls, not 99. */
+  max: z.number(),
+  group: z.enum(['SCORING', 'DISCIPLINE', 'OTHER']),
+});
 
 const BoxScorePlayerSchema = z.object({
   playerId: z.string(),
@@ -22,10 +38,8 @@ const BoxScorePlayerSchema = z.object({
   lastName: z.string(),
   jerseyNumber: z.number().nullable().optional(),
   position: z.string().nullable().optional(),
-  threePointers: z.number(),
-  twoPointers: z.number(),
-  freeThrows: z.number(),
-  points: z.number(),
+  stats: z.record(z.string(), z.number()).default({}),
+  total: z.number(),
 });
 
 const BoxScoreSideSchema = z.object({
@@ -42,20 +56,30 @@ const BoxScoreSchema = z.object({
   status: z.string(),
   dateTime: z.string(),
   recorded: z.boolean(),
+  columns: z.array(StatColumnSchema),
+  totalAbbr: z.string(),
+  totalLabel: z.string(),
+  /** False in volleyball, where the result is sets and the sheet can never equal it. */
+  reconcilesWithFinalScore: z.boolean(),
+  /** A sheet is typed up after the final whistle; before that there is nothing to copy. */
+  editable: z.boolean(),
+  notEditableReason: z.string().nullable(),
   home: BoxScoreSideSchema,
   away: BoxScoreSideSchema,
 });
 
+export type StatColumn = z.infer<typeof StatColumnSchema>;
 export type BoxScore = z.infer<typeof BoxScoreSchema>;
 export type BoxScoreSide = z.infer<typeof BoxScoreSideSchema>;
 export type BoxScorePlayer = z.infer<typeof BoxScorePlayerSchema>;
 
-/** Points from baskets. The same rule the server applies, so the two can never disagree. */
-export const pointsOf = (s: {
-  threePointers: number;
-  twoPointers: number;
-  freeThrows: number;
-}) => s.threePointers * 3 + s.twoPointers * 2 + s.freeThrows;
+/**
+ * A player's total from their line, by the sport's own weights. The same rule the server applies,
+ * so the two can never disagree.
+ */
+export function totalOf(columns: StatColumn[], stats: Record<string, number>): number {
+  return columns.reduce((sum, c) => sum + (stats[c.code] || 0) * c.weight, 0);
+}
 
 export function useBoxScore(gameId?: string, enabled = true) {
   return useQuery({
@@ -66,16 +90,14 @@ export function useBoxScore(gameId?: string, enabled = true) {
     },
     enabled: !!gameId && enabled,
     // Re-read on open: the sheet is typed from paper, and a stale roster would offer names that
-    // are no longer in the squad.
+    // are no longer in the squad — or miss the one added ten minutes ago on another screen.
     staleTime: 0,
   });
 }
 
 export interface BoxScoreLine {
   playerId: string;
-  threePointers: number;
-  twoPointers: number;
-  freeThrows: number;
+  stats: Record<string, number>;
 }
 
 export function useSaveBoxScore() {
@@ -99,6 +121,61 @@ export function useSaveBoxScore() {
     onSuccess: (_data, vars) => {
       queryClient.invalidateQueries({ queryKey: ['game', vars.gameId, 'box-score'] });
       queryClient.invalidateQueries({ queryKey: ['game'] });
+    },
+  });
+}
+
+const AddedPlayerSchema = z.object({
+  id: z.string(),
+  firstName: z.string(),
+  lastName: z.string(),
+  jerseyNumber: z.number().nullable().optional(),
+  position: z.string().nullable().optional(),
+});
+
+/**
+ * Adds a name to a roster without leaving the sheet.
+ *
+ * Rosters here are not finished when the season starts. Clubs are still recruiting in the opening
+ * weeks, and in youth competitions the squad is known on the morning of the game — so a sheet that
+ * can only name players registered in advance is a sheet that does not get typed up. Sending the
+ * operator to the roster screen and back, for a name he is reading off a piece of paper, is where
+ * the entry stops.
+ *
+ * The game supplies the league, the tenant and the sport; the endpoint bounds the team to the two
+ * playing. All that is asked for is what the paper actually carries.
+ */
+export function useAddBoxScorePlayer() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      gameId,
+      teamId,
+      lastName,
+      firstName,
+      jerseyNumber,
+      position,
+    }: {
+      gameId: string;
+      teamId: string;
+      lastName: string;
+      firstName?: string;
+      jerseyNumber?: number;
+      position?: string;
+    }) => {
+      const res = await api.post(`/games/${gameId}/box-score/players`, {
+        teamId,
+        lastName,
+        ...(firstName ? { firstName } : {}),
+        ...(jerseyNumber != null ? { jerseyNumber } : {}),
+        ...(position ? { position } : {}),
+      });
+      return parseResponse(AddedPlayerSchema, res.data);
+    },
+    onSuccess: (_data, vars) => {
+      queryClient.invalidateQueries({ queryKey: ['game', vars.gameId, 'box-score'] });
+      // The club's own roster screens are now out of date by one name.
+      queryClient.invalidateQueries({ queryKey: ['players'] });
     },
   });
 }
