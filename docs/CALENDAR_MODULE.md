@@ -449,9 +449,28 @@ primary action above them — outside the container that reserves room for the d
 a fixture hid "Nouveau match" behind it.
 
 They are one toolbar now, ordered the way office software orders one, because the people running
-these calendars spend their working lives in Word and Excel: **navigate, then view, then act** on
-the first row; **find, then filter, then tools** on the second. Groups are separated by hairlines
-rather than by rows, which is what lets them reflow as units at 390px instead of scattering.
+these calendars spend their working lives in Word and Excel.
+
+**Revised 2026-09-03**, because the first attempt still spent too much room. The page title owned a
+whole row with the entire right-hand side empty while five controls of similar weight competed
+underneath it, and the arrangement changed at every width. Now:
+
+- **The title shares its row with the actions.** That is where the blank space was, and the
+  controls that had nowhere to go now live in it: the view menu, the primary action, and the two
+  occasional tools.
+- **The view scale is a dropdown**, not three segments. `Mois ▾` is one box instead of three, and
+  it is what every calendar application uses.
+- **The spreadsheet and the generator are icons with tooltips.** Both are reached at the end of a
+  matchday, not while reading the calendar, and a label on each was two more boxes competing with
+  the controls used constantly.
+- **The period navigation is `‹ Septembre 2026 ›` again**, arrows around the label rather than
+  beside each other. It is the shape of "step back from here", and it is what the label is for.
+- **The count closes the toolbar row** instead of owning a line.
+
+Header and toolbar are 56px + 69px — one row each — from 1024px up, and below that they wrap in a
+fixed order (identity, then actions, then period, then search, then filters) rather than
+rearranging. Measured at 390, 640, 820, 1024, 1280, 1440 and 1920: no horizontal overflow at any
+of them.
 
 ### Search, and matchups
 

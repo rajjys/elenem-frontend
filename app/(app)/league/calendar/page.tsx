@@ -1,7 +1,6 @@
 'use client';
 
 import { CalendarView } from '@/components/calendar';
-import { PageHeader } from '@/components/ui';
 
 /**
  * One competition's calendar. Same component as the organisation's, narrowed by scope.
@@ -10,12 +9,5 @@ import { PageHeader } from '@/components/ui';
  * them — what changes here is what the reader is shown and can act on, not what the system knows.
  */
 export default function LeagueCalendarPage() {
-  return (
-    <>
-      <PageHeader title="Calendrier" description="Les matchs de votre compétition." />
-      <div className="mt-5">
-        <CalendarView />
-      </div>
-    </>
-  );
+  return <CalendarView title="Calendrier" description="Les matchs de votre compétition." />;
 }

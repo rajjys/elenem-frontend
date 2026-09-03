@@ -20,7 +20,21 @@ import { ImportResultsDialog } from './import-results-dialog';
  * It is also something we can hand a league before Elenem does anything else for them, which is
  * why it exists before the importer that reads it.
  */
-export function ResultsSheetButton({ leagueId }: { leagueId?: string }) {
+export function ResultsSheetButton({
+  leagueId,
+  compact = false,
+}: {
+  leagueId?: string;
+  /**
+   * Icon only, with a tooltip.
+   *
+   * The spreadsheet round trip is occasional — you reach for it at the end of a matchday, not
+   * while reading the calendar — and a labelled button was a third box competing with the two
+   * controls that are used constantly. The icon keeps it one click away without spending the
+   * width on it.
+   */
+  compact?: boolean;
+}) {
   const [open, setOpen] = useState(false);
   // Rendered only after mount. Radix derives the popover's aria-controls id from the tree, and
   // the server's tree does not match the client's here — the seasons query has no data during
@@ -50,10 +64,22 @@ export function ResultsSheetButton({ leagueId }: { leagueId?: string }) {
     <>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
-          <Button variant="ghost" disabled={seasons.isPending || rows.length === 0}>
-            <FileSpreadsheet className="mr-1.5 h-4 w-4" aria-hidden />
-            Feuille de résultats
-          </Button>
+          {compact ? (
+            <button
+              type="button"
+              disabled={seasons.isPending || rows.length === 0}
+              aria-label="Feuille de résultats"
+              title="Feuille de résultats"
+              className="flex h-9 w-9 items-center justify-center rounded-lg text-ink-muted transition-colors hover:bg-surface-sunk hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:opacity-40"
+            >
+              <FileSpreadsheet className="h-4 w-4" aria-hidden />
+            </button>
+          ) : (
+            <Button variant="ghost" disabled={seasons.isPending || rows.length === 0}>
+              <FileSpreadsheet className="mr-1.5 h-4 w-4" aria-hidden />
+              Feuille de résultats
+            </Button>
+          )}
         </PopoverTrigger>
         <PopoverContent align="end" className="w-80 border-line p-1">
           <p className="px-2 py-1.5 text-xs text-ink-subtle">
