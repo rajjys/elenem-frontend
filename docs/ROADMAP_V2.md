@@ -329,3 +329,52 @@ season table is derived from the games rather than accumulated.
 **What this pushes back:** 4.4's multi-competition ordered allocation and 4.5's draft persistence.
 The planner already reports its free slots, so the D1 → D1F → D2 pass remains a loop over
 competitions in priority order whenever it is wanted.
+
+
+---
+
+## 9. The box score, and what the documents settled (2026-09-03)
+
+### A1 is answered, and the formula is confirmed on real data
+
+The published standings image is the artefact §1.4 exists to replace, and it settles the scoring
+rule beyond argument. Columns: `MJ · MG · MP · FI · P.M · P.E · +/- · PTS`, and
+
+```
+PTS = 2·MG + (MP − FI)
+```
+
+Checked against every row of both published tables. DCMP/K — 6 wins, 12 losses, 1 forfeit —
+scores 12 + 11 = 23, exactly as published. **Forfeits are real and they cost a point**, which is
+why `isForfeit` now feeds `FORFEIT_LOSS` in the standings engine.
+
+One row does not fit: the women's Héritage — 2 wins, 14 losses, 3 forfeits — should be 15 and is
+published as 13. Every other row in both tables checks out. Either it is a deduction applied by
+hand or it is an arithmetic slip, and it is worth asking them which, because it is a precise
+little example of the thing this product exists to end.
+
+The artefact also fixes the export's shape: the league's logo and name, the season and phase, a
+"journée N" badge, the qualification and relegation bands with their legend, and a footer reading
+*Fait à Kinshasa, le … · Pour la LIPROBAKIN · Le Secrétaire Provincial — <name>* beside the seal.
+
+### The scoresheet fixes the box score's shape
+
+FIBA official layout. Per player: shirt number, name, licence, fouls. The scoring lives in the
+running-score column down the right, not per player — so the per-player breakdown the community
+manager types up is what he counts off that column, which is baskets by kind.
+
+**Built:** `PlayerGameStat` gained `threePointers / twoPointers / freeThrows`; points are derived,
+never stored. `GET/PUT /games/:id/box-score` return both rosters and replace the sheet. The dialog
+opens from the calendar's fixture panel, lays the roster out in shirt-number order with three
+columns, and — the point of it — **reconciles the sum against the final score on record**, which
+is the officials' own last check. It never silently rewrites the final score: a box score that
+disagrees is the signal that something was mistyped.
+
+### Where that leaves Phase 3
+
+- Item 11, **mobile score entry** — done, in two halves: the fast final score (two fields, one
+  sitting, A3's shape) and the sheet for the evenings he has the paper.
+- Item 12, **player ↔ game data** — the shooting half is done. Lineups and appearances remain, and
+  remain unasked-for.
+- Item 13, **standings export** — now has a pixel-accurate target. This is the next thing worth
+  building.

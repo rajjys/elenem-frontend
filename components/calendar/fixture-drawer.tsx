@@ -2,7 +2,16 @@
 
 import { useEffect } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, ArrowRight, CalendarDays, MapPin, Pencil, Plus, X } from 'lucide-react';
+import {
+  ArrowLeft,
+  ArrowRight,
+  CalendarDays,
+  ClipboardList,
+  MapPin,
+  Pencil,
+  Plus,
+  X,
+} from 'lucide-react';
 import { Button } from '@/components/ui';
 import type { CalendarCompetition, CalendarEntry, CalendarVenue } from '@/services/calendar';
 import { cn } from '@/utils';
@@ -71,6 +80,7 @@ export function FixtureDrawer({
   onAdd,
   onEdit,
   onScore,
+  onBoxScore,
   onReorder,
   reorderBlockedReason,
   reasonBar,
@@ -94,6 +104,8 @@ export function FixtureDrawer({
   onEdit?: (entry: CalendarEntry) => void;
   /** Opens the score dialog. */
   onScore?: (entry: CalendarEntry) => void;
+  /** Opens the box score. Absent where the calendar is read-only. */
+  onBoxScore?: (entry: CalendarEntry) => void;
   /** Commits a reordering of one stack. Absent where the calendar is read-only. */
   onReorder?: (assignments: { gameId: string; dateTime: string }[]) => void;
   /** Why the handles are off, when they are. */
@@ -266,6 +278,19 @@ export function FixtureDrawer({
                       ? 'Corriger le score'
                       : 'Saisir le score'}
                   </Button>
+                )}
+                {/* The sheet, when he has it. Second and quieter than the score, because most
+                    results arrive as two numbers in a message and only some arrive as a
+                    photograph of the officials' paper. */}
+                {onBoxScore && (
+                  <button
+                    type="button"
+                    onClick={() => onBoxScore(focused)}
+                    className="flex w-full items-center justify-center gap-1.5 rounded-lg border border-line px-3 py-2 text-sm text-ink-muted transition-colors hover:border-line-strong hover:text-ink"
+                  >
+                    <ClipboardList className="h-3.5 w-3.5" aria-hidden />
+                    Feuille de match
+                  </button>
                 )}
                 {onEdit && (
                   <button

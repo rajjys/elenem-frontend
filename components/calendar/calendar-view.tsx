@@ -48,6 +48,7 @@ import { YearGrid } from './year-grid';
 import { FixtureDialog } from './fixture-dialog';
 import { ScoreDialog } from './score-dialog';
 import { ReasonBar } from './reason-bar';
+import { BoxScoreDialog } from './box-score-dialog';
 
 /**
  * The organisation's calendar, read-only.
@@ -281,6 +282,7 @@ export function CalendarView({
    */
   const [editing, setEditing] = useState<{ day: string; entry: CalendarEntry | null } | null>(null);
   const [scoring, setScoring] = useState<CalendarEntry | null>(null);
+  const [boxScoring, setBoxScoring] = useState<CalendarEntry | null>(null);
 
   const moveMut = useMoveGame();
   const reorderMut = useReorderStack();
@@ -1156,6 +1158,7 @@ export function CalendarView({
           writable ? (entry) => setEditing({ day: isoDay(new Date(entry.dateTime)), entry }) : undefined
         }
         onScore={writable ? (entry) => setScoring(entry) : undefined}
+        onBoxScore={writable ? (entry) => setBoxScoring(entry) : undefined}
         onReorder={writable ? handleReorder : undefined}
         /* A reorder reassigns times among the fixtures on screen. With a competition hidden or a
            search active, the ones off screen keep theirs — and the collision is invisible to the
@@ -1199,6 +1202,11 @@ export function CalendarView({
             durationMinutes={data?.entries[0]?.durationMinutes ?? 100}
           />
           <ScoreDialog open={scoring !== null} onClose={() => setScoring(null)} entry={scoring} />
+          <BoxScoreDialog
+            open={boxScoring !== null}
+            onClose={() => setBoxScoring(null)}
+            entry={boxScoring}
+          />
         </>
       )}
     </div>

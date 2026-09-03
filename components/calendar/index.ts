@@ -9,3 +9,4 @@ export * from './calendar-generate';
 export * from './draft-insights';
 export * from './day-stacks';
 export * from './reason-bar';
+export * from './box-score-dialog';
