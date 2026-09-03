@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
 import { MapPin } from 'lucide-react';
+import { Tooltip } from '@/components/ui';
 import type { CalendarCompetition, CalendarEntry, CalendarVenue } from '@/services/calendar';
 import { cn } from '@/utils';
 
@@ -47,21 +47,58 @@ export function FixtureChip({
   /** A fixture that does not exist yet. Drawn as an outline, because it is a proposal. */
   draft?: boolean;
 }) {
-  const [hovered, setHovered] = useState(false);
   const competition = competitions.find((c) => c.id === entry.leagueId);
   const venue = venues.find((v) => v.id === entry.venueId);
   const played = entry.status === 'COMPLETED' && entry.homeScore != null;
   const live = entry.status === 'LIVE';
 
+  const card = (
+    <div className="w-56 p-2.5">
+      <p className="text-xs font-medium leading-snug text-ink">
+        {entry.home.name} <span className="text-ink-subtle">—</span> {entry.away.name}
+      </p>
+
+      {(played || live) && (
+        <p className="mt-1 text-base font-bold tabular-nums text-ink">
+          {played ? `${entry.homeScore} – ${entry.awayScore}` : 'En direct'}
+        </p>
+      )}
+
+      <dl className="mt-1.5 space-y-0.5 text-[0.6875rem] text-ink-muted">
+        <div className="flex gap-1.5">
+          <dt className="text-ink-subtle">Heure</dt>
+          <dd className="tabular-nums">{timeOf(entry.dateTime)}</dd>
+          <dd className="text-ink-subtle">· {entry.durationMinutes} min</dd>
+        </div>
+        {competition && (
+          <div className="flex gap-1.5">
+            <dt className="text-ink-subtle">Compétition</dt>
+            <dd className="truncate">{competition.shortLabel}</dd>
+          </div>
+        )}
+        <div className="flex gap-1.5">
+          <dt className="text-ink-subtle">État</dt>
+          <dd>{STATUS_LABELS[entry.status] ?? entry.status}</dd>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <MapPin className="h-3 w-3 shrink-0 text-ink-subtle" aria-hidden />
+          <dd className={cn('truncate', !venue && 'text-ink-subtle')}>
+            {venue ? venue.name : 'Salle non attribuée'}
+          </dd>
+        </div>
+      </dl>
+    </div>
+  );
+
   return (
-    <div className="relative">
+    /* The card used to be absolutely positioned inside the day cell, always above the chip and
+       aligned to its left edge — so against the right-hand column it was cut off by the grid, and
+       on the top row it was cut off by the window. It is a real tooltip now: portalled, measured,
+       flipped to whichever side has room, and slid along the other axis to stay on screen. */
+    <Tooltip label={card} side="top" contentClassName="p-0" delay={90}>
       <button
         type="button"
         onClick={onOpen}
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={() => setHovered(false)}
-        onFocus={() => setHovered(true)}
-        onBlur={() => setHovered(false)}
         className={cn(
           'flex w-full items-center gap-1.5 rounded px-1.5 py-1 text-[0.6875rem] leading-tight ring-1',
           'transition-[transform,box-shadow] hover:z-10 hover:shadow-e1 hover:-translate-y-px',
@@ -88,47 +125,6 @@ export function FixtureChip({
           </span>
         )}
       </button>
-
-      {hovered && (
-        <div
-          role="tooltip"
-          className="pointer-events-none absolute bottom-full left-0 z-30 mb-1 w-56 rounded-lg border border-line bg-elevated p-2.5 shadow-e2"
-        >
-          <p className="text-xs font-medium leading-snug text-ink">
-            {entry.home.name} <span className="text-ink-subtle">—</span> {entry.away.name}
-          </p>
-
-          {(played || live) && (
-            <p className="mt-1 text-base font-bold tabular-nums text-ink">
-              {played ? `${entry.homeScore} – ${entry.awayScore}` : 'En direct'}
-            </p>
-          )}
-
-          <dl className="mt-1.5 space-y-0.5 text-[0.6875rem] text-ink-muted">
-            <div className="flex gap-1.5">
-              <dt className="text-ink-subtle">Heure</dt>
-              <dd className="tabular-nums">{timeOf(entry.dateTime)}</dd>
-              <dd className="text-ink-subtle">· {entry.durationMinutes} min</dd>
-            </div>
-            {competition && (
-              <div className="flex gap-1.5">
-                <dt className="text-ink-subtle">Compétition</dt>
-                <dd className="truncate">{competition.shortLabel}</dd>
-              </div>
-            )}
-            <div className="flex gap-1.5">
-              <dt className="text-ink-subtle">État</dt>
-              <dd>{STATUS_LABELS[entry.status] ?? entry.status}</dd>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <MapPin className="h-3 w-3 shrink-0 text-ink-subtle" aria-hidden />
-              <dd className={cn('truncate', !venue && 'text-ink-subtle')}>
-                {venue ? venue.name : 'Salle non attribuée'}
-              </dd>
-            </div>
-          </dl>
-        </div>
-      )}
-    </div>
+    </Tooltip>
   );
 }

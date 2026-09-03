@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Download, FileSpreadsheet, Loader2, Upload } from 'lucide-react';
 import { toast } from 'sonner';
-import { Button } from '@/components/ui';
+import { Button, Tooltip } from '@/components/ui';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useDownloadResultsSheet, useSeasonsForDownload } from '@/services/calendar';
 import { getApiErrorMessage } from '@/services/api';
@@ -63,24 +63,31 @@ export function ResultsSheetButton({
   return (
     <>
       <Popover open={open} onOpenChange={setOpen}>
-        <PopoverTrigger asChild>
-          {compact ? (
-            <button
-              type="button"
-              disabled={seasons.isPending || rows.length === 0}
-              aria-label="Feuille de résultats"
-              title="Feuille de résultats"
-              className="flex h-9 w-9 items-center justify-center rounded-lg text-ink-muted transition-colors hover:bg-surface-sunk hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:opacity-40"
-            >
-              <FileSpreadsheet className="h-4 w-4" aria-hidden />
-            </button>
-          ) : (
+        {/* The tooltip wraps the trigger rather than its button: `asChild` hands the ref to a
+            single element, and a tooltip renders its bubble alongside the trigger. Our own
+            tooltip and not `title`, which waits a second and arrives as operating-system chrome —
+            the one thing on a row of our own icons that looks borrowed. */}
+        {compact ? (
+          <Tooltip label="Feuille de résultats — télécharger ou importer" side="bottom">
+            <PopoverTrigger asChild>
+              <button
+                type="button"
+                disabled={seasons.isPending || rows.length === 0}
+                aria-label="Feuille de résultats"
+                className="flex h-9 w-9 items-center justify-center rounded-lg text-ink-muted transition-colors hover:bg-surface-sunk hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:opacity-40"
+              >
+                <FileSpreadsheet className="h-4 w-4" aria-hidden />
+              </button>
+            </PopoverTrigger>
+          </Tooltip>
+        ) : (
+          <PopoverTrigger asChild>
             <Button variant="ghost" disabled={seasons.isPending || rows.length === 0}>
               <FileSpreadsheet className="mr-1.5 h-4 w-4" aria-hidden />
               Feuille de résultats
             </Button>
-          )}
-        </PopoverTrigger>
+          </PopoverTrigger>
+        )}
         <PopoverContent align="end" className="w-80 border-line p-1">
           <p className="px-2 py-1.5 text-xs text-ink-subtle">
             Téléchargez la feuille, remplissez les scores, renvoyez-la.

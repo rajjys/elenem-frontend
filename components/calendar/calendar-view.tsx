@@ -8,6 +8,8 @@ import {
   ChevronDown,
   ChevronLeft,
   ChevronRight,
+  Eye,
+  Layers,
   MapPin,
   Plus,
   Search,
@@ -363,6 +365,17 @@ export function CalendarView({
    * the opposite case: thirty-five silent boxes whose only way in was guessing that the date
    * number opened a panel with a link inside it. That is the moment to say so plainly.
    */
+  const competitionCount = data?.competitions.length ?? 0;
+
+  function toggleCompetition(id: string) {
+    setHidden((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
   /**
    * Genuinely empty, as opposed to filtered empty.
    *
@@ -512,7 +525,7 @@ export function CalendarView({
 
           The title lives here rather than in `PageHeader` for exactly that reason — it is part of
           the toolbar. The typography is the template's, so it reads as the same header. */}
-      <header className="mb-4 flex flex-wrap items-start justify-between gap-x-4 gap-y-3">
+      <header className="mb-2 flex flex-wrap items-start justify-between gap-x-4 gap-y-3">
         {/* Absent when the calendar is embedded — the draft workspace has its own heading, and a
             second "Calendrier" inside it would name the wrong thing. */}
         {title ? (
@@ -552,6 +565,9 @@ export function CalendarView({
                 aria-label={`Affichage : ${SCALES.find((sc) => sc.key === scale)?.label}`}
                 className="flex h-9 items-center gap-1.5 rounded-lg border border-line bg-surface px-3 text-sm font-medium text-ink transition-colors hover:border-line-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
               >
+                {/* The eye says "this changes what you see", which is the one thing a bare
+                    "Mois ▾" beside a month label does not make obvious. */}
+                <Eye className="h-4 w-4 text-ink-subtle" aria-hidden />
                 {SCALES.find((sc) => sc.key === scale)?.label}
                 <ChevronDown className="h-3.5 w-3.5 text-ink-subtle" aria-hidden />
               </button>
@@ -578,8 +594,12 @@ export function CalendarView({
               variant="primary"
               onClick={() => setEditing({ day: isoDay(cursor), entry: null })}
             >
+              {/* Labelled at every width. On a phone this is the only way into a new fixture
+                  once the month has something in it — the day cells fall back to a bare `+` on
+                  hover, and there is no hover — so a lone icon here would be the whole feature
+                  hiding behind a glyph. */}
               <Plus className="h-4 w-4" aria-hidden />
-              <span className="hidden sm:inline">Nouveau match</span>
+              Nouveau match
             </Button>
           )}
         </div>
@@ -612,13 +632,15 @@ export function CalendarView({
           >
             <ChevronRight className="h-4 w-4" aria-hidden />
           </button>
-          <button
-            type="button"
-            onClick={() => setCursor(new Date())}
-            className="ml-1 h-8 rounded-md px-2.5 text-sm text-ink-muted transition-colors hover:bg-surface-sunk hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-          >
-            Aujourd&apos;hui
-          </button>
+          <Tooltip label="Revenir au mois en cours" side="bottom">
+            <button
+              type="button"
+              onClick={() => setCursor(new Date())}
+              className="ml-1 h-8 rounded-md px-2.5 text-sm text-ink-muted transition-colors hover:bg-surface-sunk hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            >
+              Aujourd&apos;hui
+            </button>
+          </Tooltip>
         </div>
 
         {/* One box for every view, and it understands a matchup: "virunga contre vita" narrows to
@@ -648,39 +670,99 @@ export function CalendarView({
           )}
         </div>
 
-        {/* Chips rather than a dropdown: they are the grid's colour key as well as its filter, and
-            a menu would hide the legend the fixtures are read against. */}
-        {(data?.competitions.length ?? 0) > 1 && (
+        {/*
+          Chips up to four competitions, a dropdown past that.
+
+          The chips are the grid's colour key as much as its filter, so replacing them with a menu
+          everywhere would hide the legend the fixtures are read against. But there are exactly
+          four category tones, which means the fifth competition reuses the first one's colour —
+          the chips stop being a legend at precisely the point they start eating the row. One
+          threshold, for one reason.
+
+          It also settles the only unpredictable width in the toolbar. Ten chips would squeeze the
+          search box to its minimum and then push it onto a line of its own; a dropdown is the same
+          size whether the organisation runs two competitions or twenty.
+        */}
+        {competitionCount > 1 && competitionCount <= COMPETITION_TONES.length && (
           <div className="flex shrink-0 flex-wrap items-center gap-1">
             {(data?.competitions ?? []).map((c: CalendarCompetition) => {
               const tone = toneFor(c.id);
               const off = hidden.has(c.id);
               return (
-                <button
+                <Tooltip
                   key={c.id}
-                  type="button"
-                  onClick={() =>
-                    setHidden((prev) => {
-                      const next = new Set(prev);
-                      if (next.has(c.id)) next.delete(c.id);
-                      else next.add(c.id);
-                      return next;
-                    })
-                  }
-                  aria-pressed={!off}
-                  title={c.name}
-                  className={cn(
-                    'flex h-8 items-center gap-1.5 rounded-lg px-2 text-xs font-medium ring-1 transition-colors',
-                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent',
-                    off ? 'bg-surface text-ink-subtle ring-line' : tone.chip,
-                  )}
+                  label={`${c.name} — ${off ? 'afficher' : 'masquer'}`}
+                  side="bottom"
                 >
-                  <span className={cn('h-2 w-2 rounded-full', off ? 'bg-line-strong' : tone.dot)} />
-                  {c.shortLabel}
-                </button>
+                  <button
+                    type="button"
+                    onClick={() => toggleCompetition(c.id)}
+                    aria-pressed={!off}
+                    className={cn(
+                      'flex h-8 items-center gap-1.5 rounded-lg px-2 text-xs font-medium ring-1 transition-colors',
+                      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent',
+                      off ? 'bg-surface text-ink-subtle ring-line' : tone.chip,
+                    )}
+                  >
+                    <span
+                      className={cn('h-2 w-2 rounded-full', off ? 'bg-line-strong' : tone.dot)}
+                    />
+                    {c.shortLabel}
+                  </button>
+                </Tooltip>
               );
             })}
           </div>
+        )}
+
+        {competitionCount > COMPETITION_TONES.length && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                type="button"
+                className={cn(
+                  'flex h-8 shrink-0 items-center gap-1.5 rounded-lg border px-2.5 text-xs font-medium transition-colors',
+                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent',
+                  hidden.size > 0
+                    ? 'border-accent/40 bg-accent-soft text-accent-text'
+                    : 'border-line bg-surface text-ink-muted hover:border-line-strong hover:text-ink',
+                )}
+              >
+                <Layers className="h-3.5 w-3.5" aria-hidden />
+                {hidden.size > 0
+                  ? `${competitionCount - hidden.size} / ${competitionCount} compétitions`
+                  : 'Compétitions'}
+                <ChevronDown className="h-3 w-3 opacity-60" aria-hidden />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              align="end"
+              className="max-h-80 overflow-y-auto border-line bg-elevated"
+            >
+              {(data?.competitions ?? []).map((c: CalendarCompetition) => {
+                const tone = toneFor(c.id);
+                const off = hidden.has(c.id);
+                return (
+                  <DropdownMenuItem
+                    key={c.id}
+                    // Kept open: toggling five competitions should not cost five trips back in.
+                    onSelect={(e) => {
+                      e.preventDefault();
+                      toggleCompetition(c.id);
+                    }}
+                    className="gap-2"
+                  >
+                    <Check
+                      className={cn('h-3.5 w-3.5 shrink-0', off ? 'opacity-0' : 'opacity-100')}
+                      aria-hidden
+                    />
+                    <span className={cn('h-2 w-2 shrink-0 rounded-full', tone.dot)} aria-hidden />
+                    <span className={cn('truncate', off && 'text-ink-subtle')}>{c.name}</span>
+                  </DropdownMenuItem>
+                );
+              })}
+            </DropdownMenuContent>
+          </DropdownMenu>
         )}
 
         {(data?.venues.length ?? 0) > 1 && (
@@ -932,10 +1014,13 @@ export function CalendarView({
                           thirty-five silent boxes whose only way in was guessing that the date
                           number opened a panel with a link on it. */}
                       {writable && (
+                        <Tooltip
+                          label={`Ajouter un match — ${day.getDate()} ${MONTHS[day.getMonth()]}`}
+                          side="top"
+                        >
                         <button
                           type="button"
                           onClick={() => setEditing({ day: key, entry: null })}
-                          title={`Ajouter un match — ${day.getDate()} ${MONTHS[day.getMonth()]}`}
                           aria-label={`Ajouter un match le ${day.getDate()} ${MONTHS[day.getMonth()]}`}
                           className={cn(
                             'flex w-full items-center justify-center gap-1 rounded py-1',
@@ -950,6 +1035,7 @@ export function CalendarView({
                           <Plus className="h-3 w-3" aria-hidden />
                           {monthIsEmpty && 'Ajouter'}
                         </button>
+                        </Tooltip>
                       )}
                     </div>
                   </div>

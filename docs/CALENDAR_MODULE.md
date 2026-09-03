@@ -599,3 +599,57 @@ Refused: mixed halls, mixed days, and any played fixture. Verified against the s
   reorder was tested.
 - **Dragging between halls.** Moving a fixture from one room to another is a *placement*, not a
   reorder, and belongs to the editor until someone asks for it.
+
+
+---
+
+## 10. Toolbar, second pass (2026-09-03)
+
+### The verification banner is a dashboard thing
+
+It followed the reader onto every screen, which is how a reminder becomes furniture — after the
+third page it is not read, it is a yellow band above the content, and on the calendar it pushed
+the grid down a hundred pixels on every visit. It renders on dashboards only now.
+
+Worth stating because it is easy to lose: **verification gates one thing, inviting other people**
+(`users.service.ts:222`), and nothing else. The calendar, the results, the standings and the
+public tenant site all work unverified, which is correct — a league whose season has started must
+never be stopped by an email.
+
+### Many competitions
+
+There are exactly four category tones, so the fifth competition reuses the first one's colour.
+That gives the threshold for free: **chips up to four, a dropdown past that.** The chips are the
+grid's colour key as well as its filter, so a menu everywhere would hide the legend the fixtures
+are read against — but past four the legend is already ambiguous, and the chips have become the
+only unpredictable width in the toolbar.
+
+Verified against a throwaway organisation with ten competitions: the search box keeps 612px at
+1440 instead of being squeezed to its 176px minimum, the toolbar stays one row, and the menu holds
+its ground while several are toggled. The trigger reads `9 / 10 compétitions`.
+
+### Tooltips, and the one that was cut off
+
+Every tooltip on the calendar is the design system's — the results sheet, the generator, the
+competition chips, *Aujourd'hui*, and the day cell's add affordance. `title` waits about a second
+and arrives as operating-system chrome, which on a row of our own icons is the only thing that
+looks borrowed.
+
+`Tooltip` itself gained the thing it was missing: **it measures itself and picks a side.** The old
+version always drew above the trigger at its left edge, which is fine in the middle of a page and
+wrong at every boundary — the month grid's fixture cards were cut off against the right column and
+the top row, showing half a sentence. It now flips to the opposite side when the preferred one has
+no room and slides along the other axis to stay inside the window.
+
+The fixture card is the same component, with a panel for its label instead of a string. It used to
+be absolutely positioned inside the day cell, which is why the grid clipped it; it is portalled
+now, like every other tooltip.
+
+### Smaller
+
+- The view menu carries an eye. `Mois ▾` beside a month label does not otherwise say it changes
+  what you see.
+- `Nouveau match` keeps its label at every width. On a phone it is the only way into a new fixture
+  once the month has something in it — the day cells fall back to a bare `+` on hover, and a phone
+  has no hover — so an icon alone would be the whole feature hiding behind a glyph.
+- Half the gap between the title row and the toolbar.

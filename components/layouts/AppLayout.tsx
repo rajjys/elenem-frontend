@@ -243,9 +243,9 @@ export default function AppLayout({ children, navItems }: AppLayoutProps) {
         <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
           <AppLayoutHeader onMobileMenuToggle={toggleMobileMenu} handleLogout={handleLogout} />
           <main className="flex-1 overflow-y-auto bg-canvas p-6">
-            {/* Renders nothing once the address is verified. It lives here rather than on one
-                dashboard because verification now gates inviting people, which can be attempted
-                from several surfaces. */}
+            {/* Renders nothing once the address is verified, and nothing outside a dashboard.
+                It stays mounted here so no dashboard has to remember it, but it decides for
+                itself where it belongs — a reminder shown on every screen stops being read. */}
             <VerifyEmailBanner />
             {children}
           </main>

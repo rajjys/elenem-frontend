@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { usePathname } from 'next/navigation';
 import { MailWarning, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button, OtpInput } from '@/components/ui';
@@ -12,12 +13,21 @@ import { isAxiosError } from '@/services/api';
  * The reminder that replaces the wall.
  *
  * Verification used to block organisation creation, which put an inbox round-trip in the middle
- * of sign-up. It now blocks inviting other people instead — later, and for a reason the
- * organiser can see. That trade only works if the reminder is actually present and actionable,
- * so this sits at the top of the admin surfaces with the code field in it: nobody has to
- * navigate anywhere to finish the job.
+ * of sign-up. It now blocks inviting other people instead — later, and for a reason the organiser
+ * can see. Nothing else is gated: the calendar, the results and the public site all work
+ * unverified, because a league whose season has started should never be stopped by an email.
+ *
+ * **Dashboards only.** It followed the reader onto every screen, which is how a reminder becomes
+ * furniture — after the third page it is no longer read, it is just a yellow band above the
+ * content, and on the calendar it pushed the whole grid down a hundred pixels on every visit. A
+ * dashboard is where you look to see what needs doing, so it is where an unfinished setup
+ * belongs.
  */
+
+/** The surfaces where "here is what still needs doing" is the point of the page. */
+const DASHBOARDS = ['/tenant/dashboard', '/league/dashboard', '/team/dashboard', '/admin/dashboard'];
 export function VerifyEmailBanner() {
+  const pathname = usePathname() ?? '';
   const user = useAuthStore((s) => s.user);
   const fetchUser = useAuthStore((s) => s.fetchUser);
   const [open, setOpen] = useState(false);
@@ -28,6 +38,7 @@ export function VerifyEmailBanner() {
 
   // Nothing to nag about — and nothing to render before the user is loaded.
   if (!user || user.isEmailVerified) return null;
+  if (!DASHBOARDS.some((d) => pathname.startsWith(d))) return null;
 
   const email = user.email;
 
