@@ -41,6 +41,8 @@ export interface ScopeContext {
   tenant?: ScopeEntity;
   league?: ScopeEntity;
   team?: ScopeEntity;
+  /** The match itself, when one is open. `short` is the matchup: "VIR – MUU". */
+  game?: ScopeEntity;
   isLoading: boolean;
 }
 
@@ -135,6 +137,18 @@ export function useScopeContext(): ScopeContext {
           id: team.data.id,
           name: team.data.name,
           short: team.data.shortCode ?? team.data.name,
+        }
+      : undefined,
+    // "Match" as the last crumb names the *kind* of thing you are looking at, which the reader
+    // already knows — they clicked it. The matchup is the one label that distinguishes this page
+    // from every other page of the same kind, which is what a trail is for.
+    game: game.data
+      ? {
+          id: game.data.id,
+          name: `${game.data.homeTeam?.name ?? ''} – ${game.data.awayTeam?.name ?? ''}`.trim(),
+          short: `${game.data.homeTeam?.shortCode ?? game.data.homeTeam?.name ?? ''} – ${
+            game.data.awayTeam?.shortCode ?? game.data.awayTeam?.name ?? ''
+          }`.trim(),
         }
       : undefined,
     isLoading: team.isLoading || league.isLoading || tenant.isLoading || game.isLoading,

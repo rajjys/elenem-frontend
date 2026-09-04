@@ -132,6 +132,19 @@ export function ContextBreadcrumb() {
   const canManageTenant =
     (user?.roles ?? []).some((r) => r === Roles.SYSTEM_ADMIN || r === Roles.TENANT_ADMIN);
 
+  /**
+   * A ctx param is only worth putting in a link when it says something the destination could not
+   * work out for itself.
+   *
+   * `LIBAGO` in the trail of a LIBAGO tenant admin linked to
+   * `/tenant/dashboard?ctxTenantId=cmtjmh69m…` — twenty-five characters of identifier stating what
+   * the reader's own token already says. It matters for a system admin, who has no organisation of
+   * their own and is genuinely drilling into someone else's; for everybody else it is noise in a
+   * link they may well copy and send.
+   */
+  const own = (id: string | undefined, mine: string | null | undefined, base: string, key: string) =>
+    id && id !== mine ? `${base}?${key}=${id}` : base;
+
   // The deepest entity for the surface you are on is the one you may switch between; everything
   // above it stays a link. Managing a team is not the moment to change organisation.
   if (scope.tenant && (isTenantSurface || isLeagueSurface || isTeamSurface || isGameSurface)) {
@@ -140,7 +153,7 @@ export function ContextBreadcrumb() {
       title: scope.tenant.name,
       href: isTenantSurface || !canManageTenant
         ? undefined
-        : `/tenant/dashboard?ctxTenantId=${scope.tenant.id}`,
+        : own(scope.tenant.id, user?.tenantId, '/tenant/dashboard', 'ctxTenantId'),
       // Only a system admin has sibling organisations to move between.
       switcher:
         isTenantSurface && (user?.roles ?? []).includes(Roles.SYSTEM_ADMIN)
@@ -153,7 +166,9 @@ export function ContextBreadcrumb() {
     crumbs.push({
       label: scope.league.short,
       title: scope.league.name,
-      href: isLeagueSurface ? undefined : `/league/dashboard?ctxLeagueId=${scope.league.id}`,
+      href: isLeagueSurface
+        ? undefined
+        : own(scope.league.id, user?.managingLeagueId, '/league/dashboard', 'ctxLeagueId'),
       switcher: isLeagueSurface
         ? { kind: 'league', id: scope.league.id, parentId: scope.tenantId }
         : undefined,
@@ -169,6 +184,13 @@ export function ContextBreadcrumb() {
   }
 
   const trail = pageTrail(pathname);
+
+  // `LIBAGO › D1 M › Match` said what kind of page this is, which the reader knows because they
+  // clicked it. `LIBAGO › D1 M › VIR – MUU` says which one, and is the only crumb on the page that
+  // distinguishes it from any other match.
+  if (scope.game && isGameSurface && trail[0] === PAGE_TITLES.game) {
+    trail[0] = scope.game.short;
+  }
 
   // Nothing to orient by: a system admin on their own dashboard just gets the page name.
   if (crumbs.length === 0 && trail.length === 0) return null;

@@ -1,16 +1,19 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
-import { AlertTriangle, Check, Info, Loader2, Lock, Plus, X } from 'lucide-react';
+import { AlertTriangle, ArrowRightLeft, Check, Info, Loader2, Lock, Plus, X } from 'lucide-react';
 import { Button, Label } from '@/components/ui';
 import { toastApiError, cn } from '@/utils';
 import {
+  existingPlayersFrom,
   totalOf,
   useAddBoxScorePlayer,
   useBoxScore,
   useSaveBoxScore,
+  useTransferPlayer,
   type BoxScoreLine,
+  type ExistingPlayerMatch,
   type StatColumn,
 } from '@/services/box-score';
 import { useReportScore } from '@/services/games';
@@ -27,23 +30,30 @@ import { useReportScore } from '@/services/games';
  * shirt-number order, a column per thing the paper records, and the total computed. He works down
  * the paper and across the screen, and never has to search for a name.
  *
- * Three things it is careful about:
+ * Four things it is careful about:
  *
  * **The columns are the sport's, not basketball's.** They arrive with the rosters. This file does
  * not contain the string "three-pointer", which is what lets a volleyball league use the same
  * screen without a second implementation growing beside this one.
  *
  * **It opens after the final whistle.** Typing up a scoresheet is administrative work done days
- * later; a sheet offered on a fixture nobody has played invites a number that means nothing. The
- * server decides, and says why, so the rule lives in one place.
+ * later; a sheet offered on a fixture nobody has played invites a number that means nothing.
  *
- * **The reconciliation is the point** — where the sport has one. The paper has a running score
- * down its side and a final score at the bottom, and the officials' last act is checking the two
- * agree. Saving never silently rewrites the final score: a sheet that disagrees is the signal that
- * something was mistyped, and quietly reconciling it would destroy the only evidence.
+ * **Who played is a fact in its own right.** A squad of twenty turns up eight strong, and a player
+ * who took the floor and neither scored nor fouled used to be indistinguishable from one who
+ * stayed at home. The tick is that distinction.
+ *
+ * **The work in progress is never thrown away.** Adding a player refetches the sheet, and the
+ * first version of this file reseeded its draft from every response — so the act of adding a name
+ * silently erased everything typed so far. The draft is now seeded once and *reconciled* against
+ * later responses: new players appear, nothing already on screen is touched.
  */
 
-type Draft = Record<string, Record<string, number>>;
+interface Line {
+  played: boolean;
+  stats: Record<string, number>;
+}
+type Draft = Record<string, Line>;
 
 /** A new name being typed in. Only the family name is required — it is what the paper carries. */
 interface NewPlayer {
@@ -54,57 +64,191 @@ interface NewPlayer {
 }
 
 const EMPTY_NEW: NewPlayer = { lastName: '', firstName: '', jerseyNumber: '', position: '' };
+const EMPTY_LINE: Line = { played: false, stats: {} };
 
 export function BoxScoreSheet({
   gameId,
   active = true,
   onSaved,
-  /** Rendered at the foot of the sheet; the dialog puts its Fermer button here. */
+  /** Rendered beside the save button. The dialog puts its Fermer button here. */
   footerSlot,
+  /** Lets a dialog pin the action row instead of letting it scroll away. */
+  renderFooter,
 }: {
   gameId: string;
   /** False while the containing dialog is closed, so the roster is not re-read behind it. */
   active?: boolean;
   onSaved?: () => void;
   footerSlot?: React.ReactNode;
+  renderFooter?: (footer: React.ReactNode) => void;
 }) {
   const [side, setSide] = useState<'home' | 'away'>('home');
   const [draft, setDraft] = useState<Draft>({});
   const [reason, setReason] = useState('');
   const [adding, setAdding] = useState(false);
   const [newPlayer, setNewPlayer] = useState<NewPlayer>(EMPTY_NEW);
+  const [duplicates, setDuplicates] = useState<ExistingPlayerMatch[] | null>(null);
 
   const box = useBoxScore(gameId, active);
   const saveMut = useSaveBoxScore();
   const scoreMut = useReportScore();
   const addMut = useAddBoxScorePlayer();
+  const transferMut = useTransferPlayer();
 
   const data = box.data;
   const columns: StatColumn[] = useMemo(() => data?.columns ?? [], [data]);
 
-  // Seeded from the server each time it opens, so a sheet corrected elsewhere is not overwritten
-  // by whatever this component was last holding.
+  /**
+   * What the sheet looked like when it was opened. Everything "has anything changed" is measured
+   * against this rather than against the server, so a sheet opened and closed is not a change —
+   * which is what stops *Enregistrer* firing a write and a success toast for nothing.
+   */
+  const baseline = useRef<Draft>({});
+  /** The load the draft was seeded from. A later response reconciles; it does not replace. */
+  const seededFor = useRef<string | null>(null);
+
   useEffect(() => {
     if (!active || !data) return;
-    const next: Draft = {};
+
+    const fromServer: Draft = {};
     for (const s of [data.home, data.away]) {
-      for (const p of s.players) next[p.playerId] = { ...p.stats };
+      for (const p of s.players) fromServer[p.playerId] = { played: p.played, stats: { ...p.stats } };
     }
-    setDraft(next);
-    setReason('');
-    setAdding(false);
-    setNewPlayer(EMPTY_NEW);
-  }, [active, data]);
+
+    // First load of this game: seed, and remember it as the baseline.
+    if (seededFor.current !== gameId) {
+      seededFor.current = gameId;
+      // A sheet nobody has filled in starts with the whole roster ticked. The list *is* the squad
+      // that was submitted, so "everyone played" is the right first guess and the operator
+      // unticks the absentees — which is fewer touches than ticking eight of twelve. It is the
+      // baseline too, so opening the sheet and closing it still counts as no change.
+      const seeded: Draft = data.recorded
+        ? fromServer
+        : Object.fromEntries(
+            Object.entries(fromServer).map(([id, l]) => [id, { ...l, played: true }]),
+          );
+      setDraft(seeded);
+      baseline.current = seeded;
+      setReason('');
+      return;
+    }
+
+    // A later response — almost always a player having just been added. Take the names that are
+    // new and leave every line already on screen exactly as the operator left it.
+    setDraft((prev) => {
+      const next = { ...prev };
+      let changed = false;
+      for (const [id, line] of Object.entries(fromServer)) {
+        if (!(id in next)) {
+          next[id] = data.recorded ? line : { ...line, played: true };
+          baseline.current = { ...baseline.current, [id]: next[id] };
+          changed = true;
+        }
+      }
+      return changed ? next : prev;
+    });
+  }, [active, data, gameId]);
 
   /** Totals from the draft, not from the server: the reconciliation has to move as you type. */
   const totals = useMemo(() => {
     const sum = (players: { playerId: string }[]) =>
-      players.reduce((t, p) => t + totalOf(columns, draft[p.playerId] ?? {}), 0);
+      players.reduce((t, p) => t + totalOf(columns, draft[p.playerId]?.stats ?? {}), 0);
     return {
       home: data ? sum(data.home.players) : 0,
       away: data ? sum(data.away.players) : 0,
     };
   }, [draft, data, columns]);
+
+  const appearances = useMemo(
+    () => Object.values(draft).filter((l) => l.played).length,
+    [draft],
+  );
+
+  /** Whether anything on the sheet differs from the state it was opened in. */
+  const dirty = useMemo(() => {
+    const keys = new Set([...Object.keys(baseline.current), ...Object.keys(draft)]);
+    for (const k of keys) {
+      const a = baseline.current[k] ?? EMPTY_LINE;
+      const b = draft[k] ?? EMPTY_LINE;
+      if (a.played !== b.played) return true;
+      for (const c of columns) {
+        if ((a.stats[c.code] || 0) !== (b.stats[c.code] || 0)) return true;
+      }
+    }
+    return false;
+  }, [draft, columns]);
+
+  const linesToSave = useCallback(
+    (): BoxScoreLine[] =>
+      Object.entries(draft).map(([playerId, l]) => ({
+        playerId,
+        played: l.played,
+        stats: Object.fromEntries(Object.entries(l.stats).filter(([, v]) => v > 0)),
+      })),
+    [draft],
+  );
+
+  const save = useCallback(() => {
+    const lines = linesToSave();
+    saveMut.mutate(
+      { gameId, lines, ...(data?.recorded && reason.trim() ? { reason: reason.trim() } : {}) },
+      {
+        onSuccess: (fresh) => {
+          toast.success(
+            lines.some((l) => l.played)
+              ? 'Feuille de match enregistrée.'
+              : 'Feuille de match vidée.',
+          );
+          // What was just written becomes the new baseline, so the button goes quiet again
+          // instead of staying lit over a sheet that now matches the server.
+          const next: Draft = {};
+          for (const s of [fresh.home, fresh.away]) {
+            for (const p of s.players) next[p.playerId] = { played: p.played, stats: { ...p.stats } };
+          }
+          baseline.current = next;
+          setDraft(next);
+          setReason('');
+          onSaved?.();
+        },
+        onError: (e) => toastApiError(e),
+      },
+    );
+  }, [linesToSave, saveMut, gameId, data?.recorded, reason, onSaved]);
+
+  const busy = saveMut.isPending || scoreMut.isPending || addMut.isPending || transferMut.isPending;
+  const readOnly = !data?.editable;
+
+  /**
+   * The action row, hoisted so a dialog can pin it.
+   *
+   * On a twelve-player roster the buttons sat below the fold and the operator had to scroll past
+   * the whole sheet to find them, which on a screen whose entire job is data entry is the one
+   * control that must never move.
+   */
+  const footer = (
+    <div className="flex items-center justify-end gap-2">
+      {footerSlot}
+      {!readOnly && (
+        <Button
+          variant="primary"
+          onClick={save}
+          isLoading={saveMut.isPending}
+          disabled={busy || !dirty}
+          // A disabled button with no explanation reads as broken. This is the same rule the
+          // fixture editor already applies.
+          title={dirty ? undefined : 'Rien n’a été modifié'}
+        >
+          Enregistrer
+        </Button>
+      )}
+    </div>
+  );
+
+  useEffect(() => {
+    renderFooter?.(footer);
+    // The footer closes over `dirty` and `busy`, so it has to be re-sent when they move.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dirty, busy, saveMut.isPending, readOnly, footerSlot]);
 
   if (box.isPending) {
     return (
@@ -133,7 +277,6 @@ export function BoxScoreSheet({
   }
 
   const current = data[side];
-  const readOnly = !data.editable;
   const finalHome = data.home.finalScore;
   const finalAway = data.away.finalScore;
   const hasFinal = finalHome !== null && finalAway !== null;
@@ -145,33 +288,31 @@ export function BoxScoreSheet({
     // Digits only, capped by the column's own ceiling: five fouls, not ninety-nine, and a slipped
     // keystroke should never become a four-thousand-point game.
     const value = Math.max(0, Math.min(column.max, Number(raw.replace(/\D/g, '')) || 0));
-    setDraft((prev) => ({
-      ...prev,
-      [playerId]: { ...(prev[playerId] ?? {}), [column.code]: value },
-    }));
-  }
-
-  function save() {
-    const lines: BoxScoreLine[] = Object.entries(draft)
-      .map(([playerId, stats]) => ({
-        playerId,
-        stats: Object.fromEntries(Object.entries(stats).filter(([, v]) => v > 0)),
-      }))
-      .filter((l) => Object.keys(l.stats).length > 0);
-
-    saveMut.mutate(
-      { gameId, lines, ...(data!.recorded && reason.trim() ? { reason: reason.trim() } : {}) },
-      {
-        onSuccess: () => {
-          toast.success(lines.length ? 'Feuille de match enregistrée.' : 'Feuille de match vidée.');
-          onSaved?.();
+    setDraft((prev) => {
+      const line = prev[playerId] ?? EMPTY_LINE;
+      // A number is a statement that they were on the floor, so it ticks the box. The reverse
+      // does not hold, which is why unticking clears the numbers.
+      return {
+        ...prev,
+        [playerId]: {
+          played: value > 0 ? true : line.played,
+          stats: { ...line.stats, [column.code]: value },
         },
-        onError: (e) => toastApiError(e),
-      },
-    );
+      };
+    });
   }
 
-  function submitNewPlayer() {
+  function togglePlayed(playerId: string) {
+    setDraft((prev) => {
+      const line = prev[playerId] ?? EMPTY_LINE;
+      const played = !line.played;
+      // Unticking throws the numbers away, because keeping them would leave the sheet holding
+      // figures for a player it also says was not there.
+      return { ...prev, [playerId]: { played, stats: played ? line.stats : {} } };
+    });
+  }
+
+  function submitNewPlayer(force = false) {
     const lastName = newPlayer.lastName.trim();
     if (!lastName) return;
     addMut.mutate(
@@ -182,6 +323,7 @@ export function BoxScoreSheet({
         firstName: newPlayer.firstName.trim() || undefined,
         jerseyNumber: newPlayer.jerseyNumber ? Number(newPlayer.jerseyNumber) : undefined,
         position: newPlayer.position.trim() || undefined,
+        ...(force ? { force: true } : {}),
       },
       {
         onSuccess: (p) => {
@@ -189,6 +331,28 @@ export function BoxScoreSheet({
           // Stays open and clears: a squad handed over on the morning of the game arrives as a
           // list, not as one name.
           setNewPlayer(EMPTY_NEW);
+          setDuplicates(null);
+        },
+        onError: (e) => {
+          const existing = existingPlayersFrom(e);
+          if (existing) {
+            setDuplicates(existing);
+            return;
+          }
+          toastApiError(e);
+        },
+      },
+    );
+  }
+
+  function transferHere(playerId: string) {
+    transferMut.mutate(
+      { gameId, playerId, teamId: current.teamId },
+      {
+        onSuccess: () => {
+          toast.success(`Joueur transféré à ${current.name}.`);
+          setNewPlayer(EMPTY_NEW);
+          setDuplicates(null);
         },
         onError: (e) => toastApiError(e),
       },
@@ -206,12 +370,10 @@ export function BoxScoreSheet({
     );
   }
 
-  const busy = saveMut.isPending || scoreMut.isPending || addMut.isPending;
-
   const field =
     'h-9 w-9 sm:w-11 rounded-md border border-line bg-surface text-center text-sm tabular-nums text-ink ' +
     'transition-colors focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent ' +
-    'disabled:cursor-default disabled:border-transparent disabled:bg-transparent ' +
+    'disabled:cursor-default disabled:border-transparent disabled:bg-transparent disabled:text-ink-subtle ' +
     '[appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none';
 
   const newField =
@@ -239,6 +401,7 @@ export function BoxScoreSheet({
             onClick={() => {
               setSide(s);
               setAdding(false);
+              setDuplicates(null);
             }}
             aria-pressed={side === s}
             className={cn(
@@ -254,8 +417,11 @@ export function BoxScoreSheet({
 
       <div className="overflow-hidden rounded-lg border border-line">
         <div className="overflow-x-auto">
-          <div className="min-w-[19rem]">
+          <div className="min-w-[21rem]">
             <div className="flex items-center gap-1 border-b border-line bg-surface-sunk px-2 py-1.5 text-[0.6875rem] font-medium uppercase tracking-wide text-ink-subtle sm:gap-2">
+              <span className="w-6 shrink-0 text-center" title="A joué">
+                Joué
+              </span>
               <span className="w-7 shrink-0 text-center">N°</span>
               <span className="min-w-0 flex-1">Joueur</span>
               {columns.map((c) => (
@@ -282,17 +448,40 @@ export function BoxScoreSheet({
                 </li>
               )}
               {current.players.map((p) => {
-                const line = draft[p.playerId] ?? {};
-                const total = totalOf(columns, line);
+                const line = draft[p.playerId] ?? EMPTY_LINE;
+                const total = totalOf(columns, line.stats);
                 return (
                   <li
                     key={p.playerId}
-                    className="flex items-center gap-1 bg-surface px-2 py-1.5 sm:gap-2"
+                    className={cn(
+                      'flex items-center gap-1 px-2 py-1.5 transition-colors sm:gap-2',
+                      line.played ? 'bg-surface' : 'bg-surface-sunk/40',
+                    )}
                   >
-                    <span className="w-7 shrink-0 text-center text-xs tabular-nums text-ink-subtle">
+                    <span className="flex w-6 shrink-0 justify-center">
+                      <input
+                        type="checkbox"
+                        checked={line.played}
+                        disabled={readOnly}
+                        onChange={() => togglePlayed(p.playerId)}
+                        aria-label={`${p.lastName} a joué`}
+                        className="h-4 w-4 accent-accent"
+                      />
+                    </span>
+                    <span
+                      className={cn(
+                        'w-7 shrink-0 text-center text-xs tabular-nums',
+                        line.played ? 'text-ink-subtle' : 'text-ink-subtle/60',
+                      )}
+                    >
                       {p.jerseyNumber ?? '—'}
                     </span>
-                    <span className="min-w-0 flex-1 truncate text-sm text-ink">
+                    <span
+                      className={cn(
+                        'min-w-0 flex-1 truncate text-sm',
+                        line.played ? 'text-ink' : 'text-ink-subtle',
+                      )}
+                    >
                       {p.lastName} <span className="text-ink-muted">{p.firstName}</span>
                     </span>
                     {columns.map((c) => (
@@ -300,9 +489,9 @@ export function BoxScoreSheet({
                         key={c.code}
                         type="text"
                         inputMode="numeric"
-                        value={line[c.code] || ''}
-                        placeholder={readOnly ? '' : '0'}
-                        disabled={readOnly}
+                        value={line.stats[c.code] || ''}
+                        placeholder={readOnly || !line.played ? '' : '0'}
+                        disabled={readOnly || !line.played}
                         onChange={(e) => set(p.playerId, c, e.target.value)}
                         onFocus={(e) => e.target.select()}
                         aria-label={`${c.label} — ${p.lastName}`}
@@ -357,7 +546,10 @@ export function BoxScoreSheet({
                     type="text"
                     autoFocus
                     value={newPlayer.lastName}
-                    onChange={(e) => setNewPlayer((n) => ({ ...n, lastName: e.target.value }))}
+                    onChange={(e) => {
+                      setNewPlayer((n) => ({ ...n, lastName: e.target.value }));
+                      setDuplicates(null);
+                    }}
                     placeholder="Nom"
                     aria-label="Nom du joueur"
                     className={cn(newField, 'min-w-0 flex-1')}
@@ -365,7 +557,10 @@ export function BoxScoreSheet({
                   <input
                     type="text"
                     value={newPlayer.firstName}
-                    onChange={(e) => setNewPlayer((n) => ({ ...n, firstName: e.target.value }))}
+                    onChange={(e) => {
+                      setNewPlayer((n) => ({ ...n, firstName: e.target.value }));
+                      setDuplicates(null);
+                    }}
                     placeholder="Prénom"
                     aria-label="Prénom du joueur"
                     className={cn(newField, 'min-w-0 flex-1')}
@@ -379,6 +574,62 @@ export function BoxScoreSheet({
                     className={cn(newField, 'w-20')}
                   />
                 </div>
+
+                {/* Somebody of this name is already here. The two cases that actually happen —
+                    already on this team, or transferred from another one — both have a better
+                    answer than a second record, so both are offered before "create anyway". */}
+                {duplicates && (
+                  <div className="rounded-md border border-caution/40 bg-caution-soft p-2.5">
+                    <p className="flex items-start gap-1.5 text-xs text-ink">
+                      <AlertTriangle className="mt-px h-3.5 w-3.5 shrink-0 text-caution" aria-hidden />
+                      Ce nom existe déjà dans l&apos;organisation.
+                    </p>
+                    <ul className="mt-2 space-y-1.5">
+                      {duplicates.map((d) => (
+                        <li
+                          key={d.playerId}
+                          className="flex flex-wrap items-center gap-2 rounded bg-surface px-2 py-1.5 text-sm"
+                        >
+                          <span className="min-w-0 flex-1 truncate text-ink">
+                            {d.jerseyNumber != null && (
+                              <span className="mr-1.5 tabular-nums text-ink-subtle">
+                                {d.jerseyNumber}
+                              </span>
+                            )}
+                            {d.lastName} <span className="text-ink-muted">{d.firstName}</span>
+                            <span className="ml-1.5 text-xs text-ink-subtle">
+                              {d.sameTeam
+                                ? '· déjà dans cette équipe'
+                                : d.teamName
+                                  ? `· ${d.teamName}`
+                                  : '· sans équipe'}
+                            </span>
+                          </span>
+                          {!d.sameTeam && (
+                            <button
+                              type="button"
+                              onClick={() => transferHere(d.playerId)}
+                              disabled={busy}
+                              className="flex shrink-0 items-center gap-1 rounded-md border border-line px-2 py-1 text-xs text-ink-muted transition-colors hover:border-accent hover:text-accent-text disabled:opacity-50"
+                            >
+                              <ArrowRightLeft className="h-3 w-3" aria-hidden />
+                              Transférer ici
+                            </button>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                    <button
+                      type="button"
+                      onClick={() => submitNewPlayer(true)}
+                      disabled={busy}
+                      className="mt-2 text-xs text-ink-subtle underline underline-offset-2 transition-colors hover:text-ink disabled:opacity-50"
+                    >
+                      Ce n&apos;est pas la même personne — créer quand même
+                    </button>
+                  </div>
+                )}
+
                 <div className="flex items-center justify-between gap-2">
                   <p className="text-xs text-ink-subtle">
                     Ajouté à l&apos;effectif de {current.name}. Seul le nom est obligatoire.
@@ -389,6 +640,7 @@ export function BoxScoreSheet({
                       onClick={() => {
                         setAdding(false);
                         setNewPlayer(EMPTY_NEW);
+                        setDuplicates(null);
                       }}
                       className="flex h-8 items-center gap-1 rounded-md px-2 text-sm text-ink-muted transition-colors hover:bg-surface hover:text-ink"
                     >
@@ -399,7 +651,7 @@ export function BoxScoreSheet({
                       type="submit"
                       variant="primary"
                       className="h-8 px-3 text-sm"
-                      disabled={!newPlayer.lastName.trim() || addMut.isPending}
+                      disabled={!newPlayer.lastName.trim() || busy || !!duplicates}
                       isLoading={addMut.isPending}
                     >
                       Ajouter
@@ -430,7 +682,7 @@ export function BoxScoreSheet({
             'rounded-lg border px-3.5 py-3',
             !hasFinal
               ? 'border-line bg-surface-sunk'
-              : matches
+              : matches && anyRecorded
                 ? 'border-positive/30 bg-positive-soft'
                 : anyRecorded
                   ? 'border-caution/40 bg-caution-soft'
@@ -458,6 +710,9 @@ export function BoxScoreSheet({
                 concordant
               </span>
             )}
+            <span className="text-xs text-ink-subtle">
+              {appearances} joueur{appearances > 1 ? 's' : ''} sur la feuille
+            </span>
           </div>
 
           {hasFinal && !matches && anyRecorded && (
@@ -517,19 +772,14 @@ export function BoxScoreSheet({
       {!readOnly && (
         <p className="flex items-start gap-1.5 text-xs text-ink-subtle">
           <Info className="mt-px h-3.5 w-3.5 shrink-0" aria-hidden />
-          {describeTotal(columns, data.totalLabel)} Un joueur laissé à zéro n&apos;apparaît pas dans
-          la feuille.
+          {describeTotal(columns, data.totalLabel)} Décochez un joueur qui n&apos;a pas pris part au
+          match ; ceux qui restent cochés figurent sur la feuille même sans statistique.
         </p>
       )}
 
-      <div className="flex justify-end gap-2 border-t border-line pt-4">
-        {footerSlot}
-        {!readOnly && (
-          <Button variant="primary" onClick={save} isLoading={saveMut.isPending} disabled={busy}>
-            Enregistrer
-          </Button>
-        )}
-      </div>
+      {/* Pinned by the containing dialog when it can; rendered here otherwise, which is the case
+          on the match page where the sheet is simply part of the page. */}
+      {!renderFooter && <div className="border-t border-line pt-4">{footer}</div>}
     </div>
   );
 }

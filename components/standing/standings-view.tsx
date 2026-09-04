@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { toast } from 'sonner';
 import { AlertTriangle, Loader2, RefreshCw, Trophy } from 'lucide-react';
 import { SelectField, Tooltip } from '@/components/ui';
@@ -82,6 +83,10 @@ export function StandingsView({
 
   const data = standings.data;
   const columns = data?.columns ?? [];
+  // Where the missing scores are entered. The banner says a number is incomplete; without this it
+  // does not say what to do about it.
+  const calendarHref =
+    scope === 'tenant' ? '/tenant/calendar' : `/league/calendar?ctxLeagueId=${leagueId}`;
   // Null rather than undefined: `undefined === undefined` would highlight every row for a reader
   // who administers no club.
   const myTeamId = user?.managingTeamId ?? ctx.teamId ?? null;
@@ -148,12 +153,23 @@ export function StandingsView({
           {/* Played but not entered. This is the difference between a table that is wrong and a
               table that is incomplete, and only one of those is anybody's fault. */}
           {data.pendingResults > 0 && (
-            <p className="mb-3 flex items-start gap-2 rounded-lg border border-caution/40 bg-caution-soft px-3.5 py-2.5 text-sm text-ink">
-              <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-caution" aria-hidden />
-              {data.pendingResults} match{data.pendingResults > 1 ? 's' : ''} déjà joué
-              {data.pendingResults > 1 ? 's' : ''} sans résultat enregistré. Ce classement ne
-              {data.pendingResults > 1 ? ' les' : ' le'} compte pas encore.
-            </p>
+            <div className="mb-3 flex flex-wrap items-center gap-x-3 gap-y-1.5 rounded-lg border border-caution/40 bg-caution-soft px-3.5 py-2.5 text-sm text-ink">
+              <AlertTriangle className="h-4 w-4 shrink-0 text-caution" aria-hidden />
+              <span className="min-w-0 flex-1">
+                <span className="font-medium">
+                  {data.pendingResults} match{data.pendingResults > 1 ? 's' : ''} dont la date est
+                  passée {data.pendingResults > 1 ? 'n’ont' : 'n’a'} pas encore de score.
+                </span>{' '}
+                Ce classement est à jour des résultats saisis, mais il sera différent une fois{' '}
+                {data.pendingResults > 1 ? 'ceux-ci entrés' : 'celui-ci entré'}.
+              </span>
+              <Link
+                href={calendarHref}
+                className="shrink-0 rounded-md bg-surface px-2.5 py-1 text-xs font-medium text-ink transition-colors hover:bg-surface-sunk"
+              >
+                Saisir les scores
+              </Link>
+            </div>
           )}
 
           <div className="overflow-hidden rounded-xl border border-line bg-surface">
@@ -211,14 +227,17 @@ export function StandingsView({
                                 />
                               )}
                             </div>
-                            <span
+                            {/* The most obvious thing to want from a league table is the club
+                                you just read, and the name was inert text. */}
+                            <Link
+                              href={`/team/dashboard?ctxTeamId=${row.teamId}&ctxLeagueId=${data.leagueId}`}
                               className={cn(
-                                'min-w-0 truncate',
+                                'min-w-0 truncate underline-offset-4 hover:underline',
                                 mine ? 'font-semibold text-ink' : 'text-ink',
                               )}
                             >
                               {row.teamName}
-                            </span>
+                            </Link>
                           </div>
                         </td>
                         {columns.map((c) => (

@@ -58,8 +58,22 @@ export function ScoreDialog({
 
   const valid = home !== '' && away !== '' && Number(home) >= 0 && Number(away) >= 0;
 
+  /**
+   * Whether anything actually differs from what is on record.
+   *
+   * "Corriger le score" fired a write and a success toast whether or not a digit had moved, which
+   * on a screen reached to *check* a result is a lie about what just happened — and an audit entry
+   * saying the score was corrected to the value it already had. Entering a score for the first
+   * time is always a change, so this only bites on the correction path.
+   */
+  const changed =
+    !correcting ||
+    Number(home) !== entry.homeScore ||
+    Number(away) !== entry.awayScore ||
+    forfeit;
+
   function submit() {
-    if (!valid || !entry) return;
+    if (!valid || !changed || !entry) return;
     scoreMut.mutate(
       {
         gameId: entry.id,
@@ -183,8 +197,9 @@ export function ScoreDialog({
           <Button
             type="submit"
             variant="primary"
-            disabled={!valid || scoreMut.isPending}
+            disabled={!valid || !changed || scoreMut.isPending}
             isLoading={scoreMut.isPending}
+            title={changed ? undefined : 'Le score n’a pas été modifié'}
           >
             {correcting ? 'Corriger' : 'Enregistrer'}
           </Button>

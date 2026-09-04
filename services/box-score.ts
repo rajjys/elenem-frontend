@@ -38,6 +38,8 @@ const BoxScorePlayerSchema = z.object({
   lastName: z.string(),
   jerseyNumber: z.number().nullable().optional(),
   position: z.string().nullable().optional(),
+  /** Whether this player appeared. The row's existence, not whether anything was scored. */
+  played: z.boolean(),
   stats: z.record(z.string(), z.number()).default({}),
   total: z.number(),
 });
@@ -64,6 +66,8 @@ const BoxScoreSchema = z.object({
   /** A sheet is typed up after the final whistle; before that there is nothing to copy. */
   editable: z.boolean(),
   notEditableReason: z.string().nullable(),
+  /** How many players are marked as having appeared, across both teams. */
+  appearances: z.number(),
   home: BoxScoreSideSchema,
   away: BoxScoreSideSchema,
 });
@@ -97,6 +101,8 @@ export function useBoxScore(gameId?: string, enabled = true) {
 
 export interface BoxScoreLine {
   playerId: string;
+  /** Sent for everyone on the sheet; the server writes a row for those it is true for. */
+  played: boolean;
   stats: Record<string, number>;
 }
 
@@ -155,6 +161,7 @@ export function useAddBoxScorePlayer() {
       firstName,
       jerseyNumber,
       position,
+      force,
     }: {
       gameId: string;
       teamId: string;
@@ -162,6 +169,8 @@ export function useAddBoxScorePlayer() {
       firstName?: string;
       jerseyNumber?: number;
       position?: string;
+      /** Create anyway, after the operator has seen the existing players of the same name. */
+      force?: boolean;
     }) => {
       const res = await api.post(`/games/${gameId}/box-score/players`, {
         teamId,
@@ -169,12 +178,53 @@ export function useAddBoxScorePlayer() {
         ...(firstName ? { firstName } : {}),
         ...(jerseyNumber != null ? { jerseyNumber } : {}),
         ...(position ? { position } : {}),
+        ...(force ? { force: true } : {}),
       });
       return parseResponse(AddedPlayerSchema, res.data);
     },
     onSuccess: (_data, vars) => {
       queryClient.invalidateQueries({ queryKey: ['game', vars.gameId, 'box-score'] });
       // The club's own roster screens are now out of date by one name.
+      queryClient.invalidateQueries({ queryKey: ['players'] });
+    },
+  });
+}
+
+/**
+ * Someone of this name is already in the organisation.
+ *
+ * Returned as a 409 body rather than swallowed, because the two cases that actually happen both
+ * have a better answer than "create a second record": the player is already on this team and
+ * somebody did not scroll, or they are on another team and have transferred without the product
+ * being told. Forking a human into two records is how a roster quietly becomes unusable.
+ */
+export interface ExistingPlayerMatch {
+  playerId: string;
+  firstName: string;
+  lastName: string;
+  jerseyNumber: number | null;
+  teamId: string | null;
+  teamName: string | null;
+  sameTeam: boolean;
+  inThisGame: boolean;
+}
+
+export function existingPlayersFrom(error: unknown): ExistingPlayerMatch[] | null {
+  const body = (error as { response?: { data?: { code?: string; existing?: ExistingPlayerMatch[] } } })
+    ?.response?.data;
+  if (body?.code !== 'PLAYER_EXISTS' || !Array.isArray(body.existing)) return null;
+  return body.existing;
+}
+
+/** Moves an existing player onto one of the two teams, instead of creating them again. */
+export function useTransferPlayer() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ playerId, teamId }: { gameId: string; playerId: string; teamId: string }) => {
+      await api.post('/players/assign-to-team', { playerId, teamId });
+    },
+    onSuccess: (_d, vars) => {
+      queryClient.invalidateQueries({ queryKey: ['game', vars.gameId, 'box-score'] });
       queryClient.invalidateQueries({ queryKey: ['players'] });
     },
   });
