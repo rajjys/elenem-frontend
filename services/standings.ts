@@ -28,6 +28,8 @@ const StandingsColumnSchema = z.object({
 
 const StandingsRowSchema = z.object({
   rank: z.number(),
+  /** Which coloured band the row falls in, if the competition has declared any. */
+  band: z.enum(['QUALIFICATION', 'RELEGATION']).nullable(),
   teamId: z.string(),
   teamName: z.string(),
   shortCode: z.string().nullable(),
@@ -61,6 +63,10 @@ const StandingsViewSchema = z.object({
     forfeitPoints: z.number(),
     tieBreakers: z.array(z.string()),
     formula: z.string(),
+    bands: z.object({
+      qualification: z.object({ count: z.number(), label: z.string() }).nullable(),
+      relegation: z.object({ count: z.number(), label: z.string() }).nullable(),
+    }),
   }),
   rows: z.array(StandingsRowSchema),
 });
@@ -177,3 +183,57 @@ export function useStandingsSeasons(leagueId?: string) {
     retry: false,
   });
 }
+
+// --- the only editable thing on a standings screen --------------------------------------------
+
+export interface StandingsRulesInput {
+  leagueId: string;
+  rankingMetric?: string;
+  winPoints?: number;
+  drawPoints?: number;
+  lossPoints?: number;
+  forfeitPoints?: number;
+  tieBreakerOrder?: string[];
+  qualificationCount?: number;
+  qualificationLabel?: string;
+  relegationCount?: number;
+  relegationLabel?: string;
+}
+
+/**
+ * Changes what a table is computed from: what a result is worth, how ties are broken, and which
+ * clubs it colours.
+ *
+ * Saving does **not** recalculate. Changing the points for a win invalidates every row of every
+ * season this competition has played, and quietly rewriting history because somebody opened a
+ * settings screen is the kind of thing this product exists not to do. The screen says the table is
+ * now stale and offers the button.
+ */
+export function useUpdateStandingsRules() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: StandingsRulesInput) => {
+      const res = await api.put('/games/standings/rules', input);
+      return parseResponse(StandingsViewSchema, res.data);
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['standings'] }),
+  });
+}
+
+/** Tie-breakers a league can pick from, in French, matching the server's own labels. */
+export const TIE_BREAKERS: { value: string; label: string }[] = [
+  { value: 'GOAL_DIFFERENCE', label: 'Différence de points' },
+  { value: 'HEAD_TO_HEAD_POINTS', label: 'Confrontation directe — points' },
+  { value: 'WINS', label: 'Nombre de victoires' },
+  { value: 'GOALS_FOR', label: 'Points marqués' },
+  { value: 'GOALS_AGAINST', label: 'Points encaissés' },
+  { value: 'WIN_PERCENTAGE', label: 'Pourcentage de victoires' },
+  { value: 'AWAY_WINS', label: 'Victoires à l’extérieur' },
+  { value: 'FAIR_PLAY_POINTS', label: 'Fair-play' },
+];
+
+export const RANKING_METRICS: { value: string; label: string; hint: string }[] = [
+  { value: 'POINTS', label: 'Points', hint: 'La convention du football. Correcte quand tout le monde a joué le même nombre de matchs.' },
+  { value: 'WIN_PERCENTAGE', label: 'Pourcentage de victoires', hint: 'La convention FIBA. Reste juste quand les équipes n’ont pas joué autant de matchs.' },
+  { value: 'POINTS_PER_GAME', label: 'Points par match', hint: 'Comme les points, mais insensible aux matchs en retard.' },
+];

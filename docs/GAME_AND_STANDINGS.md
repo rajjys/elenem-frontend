@@ -212,22 +212,128 @@ one" is what every caller means unless they are offering a season picker.
 
 ---
 
+## 3.6 Bands (2026-09-04)
+
+Off by default, and that is the decision rather than the omission. A green top eight is a promise
+the federation has made about its playoff, and LIPROBAKIN's number changes every season (§6, A4) —
+shipping a guessed default would put a promise on screen nobody had made.
+
+Stored as **counts, not ranks** (`qualificationCount`, `relegationCount` on `LeagueRules`), because
+that is how the rule is stated out loud — "the top eight qualify" — and because it stays correct
+when a club withdraws mid-season. Read against the table's own length, so four relegation places in
+a league of six colour the bottom four rather than everything below rank two. Where the two would
+meet in a short table, qualification wins: telling a club it is both through to the playoff and
+going down is worse than telling it neither.
+
+Rendered as a stripe on the rank cell, not a wash over the row — the row already carries the
+reader's own club, and two full-width tints fighting each other is how a table stops being
+readable. It is also how the published bulletin marks it. The legend appears only when a band
+exists; a coloured stripe with no key is decoration.
+
+## 3.7 The rules screen, and why saving does not recalculate
+
+`/league/settings/rules` was a stub rendering the words "Rules Settings Page". It now sets the
+ranking metric, the points per outcome, the tie-break order and the bands — with the points rule
+previewed live in the same words the table will state it.
+
+**Saving does not recalculate.** Changing what a win is worth invalidates every row of every season
+this competition has played, and quietly rewriting history because somebody opened a settings
+screen is precisely what this product exists not to do. The screen says the table is now stale and
+offers the rebuild as a second, deliberate act.
+
+The rules live on the standings surface rather than in `PUT /leagues/:id/settings`, which can also
+write `LeagueRules` as part of a blob no screen uses. Two writers is drift; if that endpoint ever
+gets a UI, its rules half should defer here rather than grow a second set of defaults.
+
+---
+
 ## 4. Not built, and why
 
-- **Qualification and relegation bands.** Needed for the export (roadmap 13), not for reading the
-  table. There is no configuration for them yet and inventing a default — "top 8 are green" — would
-  put a promise on screen that the competition has not made.
-- **The export itself.** Next. The two published images in `docs/` are the pixel target and the
-  table now produces every column and every caption they carry.
-- **Point system and tie-break editing.** `/league/settings/rules` is still a stub. The values are
-  now *displayed* under every table, which is the half that makes the other half safe to build:
-  there is somewhere for a change to become visible.
-- **Lineups and appearances** (Phase 3 item 12 remainder) — still unasked-for.
+- **The export itself.** Next, and now unblocked: the table produces every column, every caption
+  and both bands the two published images carry.
+- **Lineups submitted before a match.** Appearances are recorded (§1.5); a *lineup* — a club
+  declaring its squad in advance — is a different feature and nobody has asked for it.
+- **Long rosters.** A youth club with twenty-five registered players gets twenty-five ticked rows
+  and has to untick the seventeen who did not travel. Fine at LIPROBAKIN's roster sizes and wrong
+  at a youth league's; the fix when it is needed is probably to default the ticks off and let the
+  first typed number tick the row, which is already the behaviour.
 
-## 5. Still to ask the customer
+## 5. Answered
 
-**The women's Héritage row.** 2 wins, 14 losses, 3 forfeits scores 15 under `2·MG + (MP − FI)` and
-is published as 13. Every other row in both tables checks out. Either it is a two-point deduction
-applied by hand or it is an arithmetic slip, and the answer decides whether the export needs a
-manual adjustment column. **Worth asking before the export is built around the formula** — it is a
-precise little example of the thing this product exists to end.
+**The women's Héritage row** — 2W/14L/3FI published as 13 where the formula gives 15 — is an
+arithmetic slip in the hand calculation, not a deduction. The export does not need a manual
+adjustment column, and the row is a fair example of the thing this product exists to end.
+
+---
+
+## 6. The sheet, second pass (2026-09-04)
+
+### 6.1 The bug that mattered most
+
+Adding a player wiped everything typed so far. The sheet reseeded its whole draft from every server
+response, and adding a name refetches — so the one action a long entry session needs most often
+silently erased the entry session.
+
+The draft is seeded **once** now and *reconciled* against later responses: names that are new
+appear, and nothing already on screen is touched. Worth stating as a rule, because the same shape
+will recur wherever a form both reads and writes the same resource: **a refetch may add to a
+draft; it may never overwrite it.**
+
+### 6.2 Nothing is written when nothing changed
+
+`Enregistrer` and `Corriger le score` fired a write and a success toast whether or not a digit had
+moved — a lie about what just happened, and an audit entry saying the score was corrected to the
+value it already had. Both compare against the state the dialog *opened* in, which is also why
+opening a fresh sheet (where every player starts ticked) and closing it counts as no change.
+
+### 6.3 Who played
+
+A squad of twenty turns up eight strong, and a player who took the floor and neither scored nor
+fouled was indistinguishable from one who stayed at home: both produced no row. **The row is the
+appearance.** A line of zeroes is now a meaningful statement.
+
+Numbers imply presence, so typing one ticks the box; the reverse does not hold, so unticking clears
+the numbers rather than leaving the sheet holding figures for a player it also says was absent.
+
+The whole roster starts ticked on a sheet nobody has filled in — the list *is* the squad that was
+submitted, so "everyone played" is the right first guess at LIPROBAKIN's roster sizes and the
+operator unticks the absentees.
+
+### 6.4 A name typed twice is one person
+
+The sheet can add a player in four keystrokes, which is exactly why it needed a guard: the fastest
+way to enter a roster is the fastest way to acquire the same human twice. The two cases that
+actually happen are *already on this team* (somebody did not scroll) and *on another team* (a
+transfer nobody told the product about) — and both have a better answer than a second record. The
+add is refused with the matches and their clubs, offering **Transférer ici**; `force: true` is the
+deliberate override.
+
+Matched on accent- and case-folded names in JS rather than in SQL, because the database runs under
+C collation and `mode: 'insensitive'` is accent-blind there — Kasereka and Kaséréka would compare
+as two people.
+
+---
+
+## 7. The match page, second pass (2026-09-04)
+
+The first version was the calendar's parts on a wider background: a scoreboard, a sheet, a
+collapsible and a rail of buttons, in the order they were built.
+
+**Tabs**, because the questions arrive in three kinds: *Aperçu* (the facts, and once a sheet exists
+the top scorer and a column-by-column comparison), *Feuille de match*, *Historique*.
+
+**The history is sentences.** "Match déplacé — de samedi 3 octobre à 14:30 à dimanche 4 octobre à
+16:10", the actor, and the reason quoted. It is read by a secretary answering a club, and
+`SCORE_CORRECTED` over a JSON blob is not a sentence they can repeat. Game creation is audited now
+too — every other change was, so the trail on a match moved twice began mid-story.
+
+**The actions are separated.** Reporting, cancelling and deleting are three consequences: one keeps
+the match and loses its date, one voids it, one removes it from the season. The calendar stacks
+them behind one entry because it has room for one; here each is its own line with its consequence
+in four words, and each dialog asks for the reason the club is owed.
+
+**The breadcrumb names the match, not the kind.** `LIBAGO › D1 M › ASG – HIM` rather than
+`… › Match` — the last crumb should be the one thing that distinguishes this page from every other
+page of its kind. Ancestor links also drop a `ctx` parameter the reader's own token already
+implies: LIBAGO's own admin was being handed a twenty-five-character identifier in a link they
+might well copy and send.

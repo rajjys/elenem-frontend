@@ -4,10 +4,11 @@ import { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { toast } from 'sonner';
-import { AlertTriangle, Loader2, RefreshCw, Trophy } from 'lucide-react';
+import { AlertTriangle, Loader2, RefreshCw, SlidersHorizontal, Trophy } from 'lucide-react';
 import { SelectField, Tooltip } from '@/components/ui';
 import { cn, toastApiError } from '@/utils';
 import { useCurrentUser, useScopeContext } from '@/hooks';
+import { Roles } from '@/schemas';
 import {
   useRecalculateStandings,
   useStandings,
@@ -87,6 +88,10 @@ export function StandingsView({
   // does not say what to do about it.
   const calendarHref =
     scope === 'tenant' ? '/tenant/calendar' : `/league/calendar?ctxLeagueId=${leagueId}`;
+  // A club administrator reads this table; they do not set the rules that produced it.
+  const canEditRules = (user?.roles ?? []).some(
+    (r) => r === Roles.SYSTEM_ADMIN || r === Roles.TENANT_ADMIN || r === Roles.LEAGUE_ADMIN,
+  );
   // Null rather than undefined: `undefined === undefined` would highlight every row for a reader
   // who administers no club.
   const myTeamId = user?.managingTeamId ?? ctx.teamId ?? null;
@@ -211,7 +216,19 @@ export function StandingsView({
                           mine && 'bg-accent-soft',
                         )}
                       >
-                        <td className="px-2 py-2 text-center text-sm tabular-nums text-ink-muted">
+                        {/* The band is a stripe on the rank, not a wash over the row: the row
+                            already carries the reader's own club, and two full-width tints
+                            fighting each other is how a table stops being readable. It is also
+                            how the published bulletin marks it. */}
+                        <td
+                          className={cn(
+                            'relative px-2 py-2 text-center text-sm tabular-nums text-ink-muted',
+                            row.band === 'QUALIFICATION' &&
+                              'before:absolute before:inset-y-0 before:left-0 before:w-1 before:bg-positive',
+                            row.band === 'RELEGATION' &&
+                              'before:absolute before:inset-y-0 before:left-0 before:w-1 before:bg-negative',
+                          )}
+                        >
                           {row.rank}
                         </td>
                         <td className="px-2 py-2">
@@ -264,6 +281,31 @@ export function StandingsView({
             {/* The grounds for believing the table, at the foot of it — where a signed bulletin
                 puts them. */}
             <div className="space-y-1.5 border-t border-line bg-surface-sunk px-3.5 py-3 text-xs text-ink-muted">
+              {/* The legend, only when there is something to explain. A coloured stripe with no
+                  key is decoration; with one it is the competition's promise in writing. */}
+              {(data.rules.bands.qualification || data.rules.bands.relegation) && (
+                <p className="flex flex-wrap items-center gap-x-4 gap-y-1">
+                  {data.rules.bands.qualification && (
+                    <span className="flex items-center gap-1.5">
+                      <span className="h-3 w-1 shrink-0 rounded-sm bg-positive" aria-hidden />
+                      {data.rules.bands.qualification.label}
+                      <span className="text-ink-subtle">
+                        (1–{data.rules.bands.qualification.count})
+                      </span>
+                    </span>
+                  )}
+                  {data.rules.bands.relegation && (
+                    <span className="flex items-center gap-1.5">
+                      <span className="h-3 w-1 shrink-0 rounded-sm bg-negative" aria-hidden />
+                      {data.rules.bands.relegation.label}
+                      <span className="text-ink-subtle">
+                        ({data.rows.length - data.rules.bands.relegation.count + 1}–
+                        {data.rows.length})
+                      </span>
+                    </span>
+                  )}
+                </p>
+              )}
               <p>
                 <span className="font-medium text-ink">{data.rules.formula}</span>
                 {data.rules.tieBreakers.length > 0 && (
@@ -303,6 +345,15 @@ export function StandingsView({
                   />
                   Recalculer
                 </button>
+                {canEditRules && (
+                  <Link
+                    href={`/league/settings/rules?ctxLeagueId=${data.leagueId}`}
+                    className="inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-ink-subtle transition-colors hover:bg-surface hover:text-ink"
+                  >
+                    <SlidersHorizontal className="h-3 w-3" aria-hidden />
+                    Règles du classement
+                  </Link>
+                )}
               </p>
             </div>
           </div>
