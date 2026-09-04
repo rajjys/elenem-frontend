@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { toast } from 'sonner';
 import { ArrowLeft, GripVertical, Loader2, RefreshCw, X } from 'lucide-react';
-import { Button, Label } from '@/components/ui';
+import { Button } from '@/components/ui';
 import { cn, toastApiError } from '@/utils';
 import { useScopeContext } from '@/hooks';
 import {
@@ -426,8 +426,8 @@ function NumberField({
   onChange: (v: number) => void;
 }) {
   return (
-    <div>
-      <Label>{label}</Label>
+    <label className="block">
+      <span className="mb-1 block text-sm font-medium text-ink">{label}</span>
       <input
         type="text"
         inputMode="numeric"
@@ -436,9 +436,9 @@ function NumberField({
           onChange(Math.max(min, Math.min(max, Number(e.target.value.replace(/\D/g, '')) || 0)))
         }
         onFocus={(e) => e.target.select()}
-        className="mt-1 h-9 w-full rounded-lg border border-line bg-surface px-3 text-center text-sm tabular-nums text-ink transition-colors hover:border-line-strong focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+        className="h-9 w-full rounded-lg border border-line bg-surface px-3 text-center text-sm tabular-nums text-ink transition-colors hover:border-line-strong focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
       />
-    </div>
+    </label>
   );
 }
 
@@ -472,8 +472,8 @@ function BandField({
         )}
         aria-hidden
       />
-      <div className="w-28 shrink-0">
-        <Label>{countLabel}</Label>
+      <label className="block w-28 shrink-0">
+        <span className="mb-1 block text-sm font-medium text-ink">{countLabel}</span>
         <input
           type="text"
           inputMode="numeric"
@@ -482,11 +482,11 @@ function BandField({
             onCount(Math.max(0, Math.min(max, Number(e.target.value.replace(/\D/g, '')) || 0)))
           }
           onFocus={(e) => e.target.select()}
-          className="mt-1 h-9 w-full rounded-lg border border-line bg-surface px-3 text-center text-sm tabular-nums text-ink transition-colors hover:border-line-strong focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+          className="h-9 w-full rounded-lg border border-line bg-surface px-3 text-center text-sm tabular-nums text-ink transition-colors hover:border-line-strong focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
         />
-      </div>
-      <div className="min-w-0 flex-1">
-        <Label>Libellé de la légende</Label>
+      </label>
+      <label className="block min-w-0 flex-1">
+        <span className="mb-1 block text-sm font-medium text-ink">Libellé de la légende</span>
         <input
           type="text"
           value={label}
@@ -494,9 +494,9 @@ function BandField({
           maxLength={60}
           onChange={(e) => onLabel(e.target.value)}
           placeholder={placeholder}
-          className="mt-1 h-9 w-full rounded-lg border border-line bg-surface px-3 text-sm text-ink transition-colors hover:border-line-strong focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent disabled:bg-surface-sunk disabled:text-ink-subtle"
+          className="h-9 w-full rounded-lg border border-line bg-surface px-3 text-sm text-ink transition-colors hover:border-line-strong focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent disabled:bg-surface-sunk disabled:text-ink-subtle"
         />
-      </div>
+      </label>
       <p className="w-full text-xs text-ink-subtle">{summary}</p>
     </div>
   );

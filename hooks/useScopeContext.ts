@@ -145,8 +145,11 @@ export function useScopeContext(): ScopeContext {
     game: game.data
       ? {
           id: game.data.id,
-          name: `${game.data.homeTeam?.name ?? ''} – ${game.data.awayTeam?.name ?? ''}`.trim(),
-          short: `${game.data.homeTeam?.shortCode ?? game.data.homeTeam?.name ?? ''} – ${
+          name: `${game.data.homeTeam?.name ?? ''} vs ${game.data.awayTeam?.name ?? ''}`.trim(),
+          // "VIR – KAR" is how a results table writes a fixture, and it is the right thing there.
+          // In a breadcrumb the reader is not reading a score, they are identifying a page, and a
+          // dash between two capitalised codes reads as a range or a hyphenated name. "vs" cannot.
+          short: `${game.data.homeTeam?.shortCode ?? game.data.homeTeam?.name ?? ''} vs ${
             game.data.awayTeam?.shortCode ?? game.data.awayTeam?.name ?? ''
           }`.trim(),
         }

@@ -247,10 +247,63 @@ gets a UI, its rules half should defer here rather than grow a second set of def
 
 ---
 
+## 3.8 The export (2026-09-04)
+
+The artefact the module exists to replace. LIPROBAKIN's committee computes the table by hand,
+sends it to a designer, and the designer rebuilds it in Photoshop for social media — **every
+matchday**. Removing the hand calculation was the first half; this is the half that makes switching
+obvious rather than merely helpful.
+
+**Two outputs, because two different people want them.**
+
+- **PDF, through the browser's own print.** Not generated on the server, and the reason is the
+  requirement: what the operator adjusts has to be what comes out. A server-rendered PDF means
+  tuning fields blind and downloading to find out. The type also stays vector and selectable, which
+  a raster PDF (`html2canvas` + `jsPDF`) would lose on a document that gets signed — and it keeps
+  Chromium out of a deployment headed for Railway.
+- **Excel, from the server**, for whoever wants to *work* with the numbers: real numeric cells, one
+  row per club, nothing merged in the way of a sort. No formulas — working the table out is what
+  they are paying us to stop doing, and a workbook that recomputed it would drift from the product
+  the first time a rule changed.
+
+**One renderer.** `StandingsDocument` is both the preview and the print, so "customisable" means
+something: there is no second implementation to drift.
+
+### The document surface
+
+A printed bulletin is on white paper whatever the reader's screen is set to. Using tokens directly
+would have previewed dark and printed dark-on-white with inverted bands; using raw hex in the
+component would have put the palette back into a screen, against the standing rule.
+
+So `[data-surface="document"]` re-declares the light token values on itself, in `globals.css`. It is
+a **surface**, not an escape hatch — components inside it keep using tokens, which is the point.
+The print rules live beside it (`[data-print-target]`, `[data-print-hide]`), so the next printable
+document does not reinvent them.
+
+### Smaller decisions
+
+- The footer names the **organisation**, not the competition. The bulletin signs off "Pour la
+  LIPROBAKIN"; an earlier draft reached for the league's name and printed "Pour la Championnat Goma
+  D1 Messieurs", wrong about the body and wrong about the article. `getStandingsView` now carries
+  the organisation's name, crest and town.
+- The signature block sits at the **foot of the page**, with room for a signature and a seal
+  between the title and the name. A block with no gap makes a document look unsignable.
+- Alternate row tinting, because a fifteen-row table on paper without one gets read across the
+  wrong line — the commonest complaint about a printed standings sheet.
+- The fields are remembered **per competition in `localStorage`**. The same secretary signs the same
+  way every Saturday, and retyping their own name fifteen times a season is the friction that sends
+  somebody back to Photoshop. Server-side persistence belongs with export templates, later.
+
+---
+
 ## 4. Not built, and why
 
-- **The export itself.** Next, and now unblocked: the table produces every column, every caption
-  and both bands the two published images carry.
+- **PNG for WhatsApp.** The PDF is the signable artefact; what actually gets forwarded in Goma is
+  an image. The same component could be screenshotted server-side, but nobody has asked yet and a
+  PDF previews acceptably.
+- **Export templates on the server.** The signature and city live in the browser, which loses them
+  when the operator changes machine. One field's worth of retyping, and the right home is a
+  per-organisation template rather than a column bolted to `LeagueRules`.
 - **Lineups submitted before a match.** Appearances are recorded (§1.5); a *lineup* — a club
   declaring its squad in advance — is a different feature and nobody has asked for it.
 - **Long rosters.** A youth club with twenty-five registered players gets twenty-five ticked rows

@@ -32,6 +32,35 @@ const MONTHS = [
   'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre',
 ];
 
+/**
+ * An audit action as a short French headline.
+ *
+ * Exported because the fixture editor's own history list had a second, shorter copy of this map —
+ * which is why it rendered `BOX_SCORE_CORRECTED` in capitals to a French-speaking secretary: the
+ * box score arrived after that copy was written and nobody updated it. One map, and a new action
+ * can only be missing from every screen at once rather than from an arbitrary one.
+ */
+export function auditTitle(action: string): string {
+  if (action.startsWith('TRANSITION_')) {
+    const to = action.slice('TRANSITION_'.length);
+    return `Match ${STATUS_FR[to] ?? to.toLowerCase()}`;
+  }
+  return AUDIT_TITLES[action] ?? action.replaceAll('_', ' ').toLowerCase();
+}
+
+const AUDIT_TITLES: Record<string, string> = {
+  CREATED: 'Match créé',
+  MOVED: 'Match déplacé',
+  UPDATED: 'Match modifié',
+  INVERTED: 'Domicile et visiteur inversés',
+  DELETED: 'Match supprimé',
+  REORDERED: 'Horaire réattribué',
+  SCORE_REPORTED: 'Score enregistré',
+  SCORE_CORRECTED: 'Score corrigé',
+  BOX_SCORE_RECORDED: 'Feuille de match saisie',
+  BOX_SCORE_CORRECTED: 'Feuille de match corrigée',
+};
+
 const STATUS_FR: Record<string, string> = {
   SCHEDULED: 'programmé',
   CONFIRMED: 'confirmé',
@@ -75,7 +104,7 @@ function render(entry: AuditEntry, venueName: (id: string | null) => string | nu
     const at = str(after?.dateTime);
     return {
       icon: CalendarPlus,
-      title: 'Match créé',
+      title: auditTitle('CREATED'),
       detail: at ? `Programmé ${slot(at)}.` : undefined,
     };
   }
@@ -97,7 +126,7 @@ function render(entry: AuditEntry, venueName: (id: string | null) => string | nu
     }
     return {
       icon: parts.length && wasVenue !== nowVenue && wasAt === nowAt ? MapPin : Clock,
-      title: action === 'MOVED' ? 'Match déplacé' : 'Match modifié',
+      title: auditTitle(action),
       detail: parts.join(' ') || undefined,
     };
   }
@@ -105,7 +134,7 @@ function render(entry: AuditEntry, venueName: (id: string | null) => string | nu
   if (action === 'INVERTED') {
     return {
       icon: ArrowLeftRight,
-      title: 'Domicile et visiteur inversés',
+      title: auditTitle('INVERTED'),
       detail: 'Le match était saisi dans le mauvais sens.',
     };
   }
@@ -118,7 +147,7 @@ function render(entry: AuditEntry, venueName: (id: string | null) => string | nu
     const correction = action === 'SCORE_CORRECTED';
     return {
       icon: Trophy,
-      title: correction ? 'Score corrigé' : 'Score enregistré',
+      title: auditTitle(action),
       detail:
         correction && bh !== null && ba !== null && nh !== null && na !== null
           ? `De ${bh} – ${ba} à ${nh} – ${na}.`
@@ -136,7 +165,7 @@ function render(entry: AuditEntry, venueName: (id: string | null) => string | nu
       to === 'CANCELLED' ? 'negative' : to === 'POSTPONED' ? 'caution' : 'neutral';
     return {
       icon: to === 'CANCELLED' ? TriangleAlert : Clock,
-      title: `Match ${STATUS_FR[to] ?? to.toLowerCase()}`,
+      title: auditTitle(action),
       detail: from && STATUS_FR[from] ? `Auparavant ${STATUS_FR[from]}.` : undefined,
       tone,
     };
@@ -145,7 +174,7 @@ function render(entry: AuditEntry, venueName: (id: string | null) => string | nu
   if (action === 'REORDERED') {
     return {
       icon: Clock,
-      title: 'Horaire réattribué',
+      title: auditTitle('REORDERED'),
       detail: 'Les matchs de la journée ont été réordonnés dans cette salle.',
     };
   }
@@ -154,17 +183,16 @@ function render(entry: AuditEntry, venueName: (id: string | null) => string | nu
     const lines = num(after?.lines);
     return {
       icon: FileText,
-      title:
-        action === 'BOX_SCORE_CORRECTED' ? 'Feuille de match corrigée' : 'Feuille de match saisie',
+      title: auditTitle(action),
       detail: lines !== null ? `${lines} joueur${lines > 1 ? 's' : ''} sur la feuille.` : undefined,
     };
   }
 
   if (action === 'DELETED') {
-    return { icon: Trash2, title: 'Match supprimé', tone: 'negative' };
+    return { icon: Trash2, title: auditTitle('DELETED'), tone: 'negative' };
   }
 
-  return { icon: Pencil, title: action.replaceAll('_', ' ').toLowerCase() };
+  return { icon: Pencil, title: auditTitle(action) };
 }
 
 const TONE_RING: Record<NonNullable<Rendered['tone']>, string> = {

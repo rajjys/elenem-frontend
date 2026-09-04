@@ -48,6 +48,10 @@ const StandingsRowSchema = z.object({
 const StandingsViewSchema = z.object({
   leagueId: z.string(),
   leagueName: z.string(),
+  /** The federation. The bulletin signs off "Pour la LIPROBAKIN", not "pour la D1 Messieurs". */
+  organisationName: z.string(),
+  organisationLogoUrl: z.string().nullable(),
+  organisationCity: z.string().nullable(),
   seasonId: z.string(),
   seasonName: z.string(),
   lastCalculated: z.string().nullable(),
@@ -237,3 +241,57 @@ export const RANKING_METRICS: { value: string; label: string; hint: string }[] =
   { value: 'WIN_PERCENTAGE', label: 'Pourcentage de victoires', hint: 'La convention FIBA. Reste juste quand les équipes n’ont pas joué autant de matchs.' },
   { value: 'POINTS_PER_GAME', label: 'Points par match', hint: 'Comme les points, mais insensible aux matchs en retard.' },
 ];
+
+// --- the export --------------------------------------------------------------------------------
+
+export interface StandingsExportFields {
+  title?: string;
+  subtitle?: string;
+  matchday?: string;
+  city?: string;
+  date?: string;
+  organisation?: string;
+  signatoryRole?: string;
+  signatoryName?: string;
+  showBands?: boolean;
+}
+
+/**
+ * The spreadsheet half of the export.
+ *
+ * A blob rather than a link, because the endpoint is authenticated: an `<a href>` sends no bearer
+ * token, so the browser would be handed a 401 page named .xlsx. Same reasoning as the results
+ * template download.
+ */
+export function useDownloadStandingsXlsx() {
+  return useMutation({
+    mutationFn: async ({
+      leagueId,
+      seasonId,
+      ...fields
+    }: StandingsExportFields & { leagueId: string; seasonId?: string }) => {
+      const params: Record<string, string> = { leagueId };
+      if (seasonId) params.seasonId = seasonId;
+      for (const [k, v] of Object.entries(fields)) {
+        if (v !== undefined && v !== '') params[k] = String(v);
+      }
+      const res = await api.get('/games/standings/export.xlsx', {
+        params,
+        responseType: 'blob',
+      });
+
+      const disposition = String(res.headers?.['content-disposition'] ?? '');
+      const named = /filename="?([^"]+)"?/.exec(disposition)?.[1];
+
+      const url = URL.createObjectURL(res.data as Blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = named ?? 'classement.xlsx';
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      // Revoked on the next tick: releasing it synchronously cancels the download in Safari.
+      setTimeout(() => URL.revokeObjectURL(url), 0);
+    },
+  });
+}

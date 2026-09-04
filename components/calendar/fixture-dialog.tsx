@@ -25,6 +25,7 @@ import {
   type StateVerb,
 } from '@/services/games';
 import { cn } from '@/utils';
+import { auditTitle } from '@/components/game/game-timeline';
 
 /**
  * Adding and changing a fixture without leaving the calendar.
@@ -597,7 +598,7 @@ export function FixtureDialog({
                   <ul className="space-y-1.5">
                     {audit.data!.map((e) => (
                       <li key={e.id} className="text-xs text-ink-muted">
-                        <span className="font-medium text-ink">{ACTION_LABELS[e.action] ?? e.action}</span>
+                        <span className="font-medium text-ink">{auditTitle(e.action)}</span>
                         {e.by && <span className="text-ink-subtle"> · {e.by}</span>}
                         <span className="text-ink-subtle">
                           {' · '}
@@ -693,17 +694,3 @@ export function FixtureDialog({
   );
 }
 
-const ACTION_LABELS: Record<string, string> = {
-  MOVED: 'Déplacé',
-  UPDATED: 'Modifié',
-  INVERTED: 'Domicile inversé',
-  DELETED: 'Supprimé',
-  SCORE_REPORTED: 'Score saisi',
-  SCORE_CORRECTED: 'Score corrigé',
-  TRANSITION_SCHEDULED: 'Reprogrammé',
-  TRANSITION_CONFIRMED: 'Confirmé',
-  TRANSITION_POSTPONED: 'Reporté',
-  TRANSITION_CANCELLED: 'Annulé',
-  TRANSITION_COMPLETED: 'Terminé',
-  TRANSITION_LIVE: 'Coup d’envoi',
-};

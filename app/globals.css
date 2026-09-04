@@ -207,6 +207,54 @@
   --t-shadow-2: 0 4px 6px -2px rgb(15 23 42 / 0.08), 0 12px 28px -8px rgb(15 23 42 / 0.18);
 }
 
+/* =========================================================================
+   The document surface.
+
+   A printed bulletin is on white paper whatever the reader's screen is set
+   to, so anything destined for paper — the standings export, and whatever
+   follows it — re-declares the light values on itself rather than inheriting
+   the theme. Without this the export previews dark, prints as dark text on
+   white, and the coloured bands invert.
+
+   It is a *surface*, not an escape hatch: components inside it keep using
+   tokens, which is the whole point. Adding raw hex to the export component
+   instead would have put the palette back into a screen.
+   ========================================================================= */
+[data-surface="document"] {
+  color-scheme: light;
+
+  --t-canvas:        #ffffff;
+  --t-surface:       #ffffff;
+  --t-surface-sunk:  #eef2f7;
+  --t-elevated:      #ffffff;
+
+  --t-ink:           #0f172a;
+  --t-ink-muted:     #475569;
+  --t-ink-subtle:    #5f6e85;
+  --t-ink-inverted:  #ffffff;
+
+  --t-line:          #e2e8f0;
+  --t-line-strong:   #cbd5e1;
+
+  --t-accent:        #0a3a8d;
+  --t-accent-hover:  #082e6f;
+  --t-accent-ink:    #ffffff;
+  --t-accent-text:   #0a3a8d;
+  --t-accent-soft:   #e6edf9;
+  --t-accent-line:   #aec6ea;
+
+  --t-positive:      #15803d;
+  --t-positive-soft: #dcfce7;
+  --t-negative:      #b91c1c;
+  --t-negative-soft: #fee2e2;
+  --t-caution:       #8a5306;
+  --t-caution-soft:  #fef3c7;
+
+  /* Backgrounds are the point of this document, not decoration a printer may drop. */
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     color-scheme: dark;
@@ -460,4 +508,37 @@ body {
 }
 .animate-fadeIn {
   animation: fadeIn 0.15s ease-out forwards;
+}
+
+/* =========================================================================
+   Printing.
+
+   One element goes to paper and everything else steps aside. `visibility`
+   rather than `display: none`, because hiding the app's layout outright
+   collapses the document's own ancestors and it prints at the wrong width.
+   ========================================================================= */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  [data-print-target],
+  [data-print-target] * {
+    visibility: visible;
+  }
+  [data-print-target] {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    margin: 0;
+    box-shadow: none;
+    border: 0;
+  }
+  [data-print-hide] {
+    display: none !important;
+  }
+  @page {
+    size: A4 portrait;
+    margin: 12mm;
+  }
 }

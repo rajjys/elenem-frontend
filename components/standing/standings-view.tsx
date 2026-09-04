@@ -4,8 +4,8 @@ import { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { toast } from 'sonner';
-import { AlertTriangle, Loader2, RefreshCw, SlidersHorizontal, Trophy } from 'lucide-react';
-import { SelectField, Tooltip } from '@/components/ui';
+import { AlertTriangle, FileDown, Loader2, RefreshCw, SlidersHorizontal, Trophy } from 'lucide-react';
+import { Button, SelectField, Tooltip } from '@/components/ui';
 import { cn, toastApiError } from '@/utils';
 import { useCurrentUser, useScopeContext } from '@/hooks';
 import { Roles } from '@/schemas';
@@ -42,10 +42,18 @@ import {
  *    with a pencil. That is the thing a hand-made table has and a generated one usually loses.
  */
 export function StandingsView({
-  /** Fixed for a league-scoped screen; chosen by the reader on a tenant-scoped one. */
+  /**
+   * Which surface this is, and therefore what may be done on it.
+   *
+   * `team` is the club's own copy and is **read-only for everybody**, including the tenant admin
+   * who could edit the same table from `/league/standings`. A screen whose controls appear or
+   * disappear depending on who is looking at it is a screen nobody can be shown how to use — and
+   * on a club's page, the presence of "Recalculer" invites the reading that a club can move its
+   * own position.
+   */
   scope,
 }: {
-  scope: 'tenant' | 'league';
+  scope: 'tenant' | 'league' | 'team';
 }) {
   const ctx = useScopeContext();
   const user = useCurrentUser();
@@ -53,6 +61,13 @@ export function StandingsView({
   // Skipped entirely on a league-scoped screen whose competition is already known — which is also
   // what keeps this working for a club administrator, who is refused the list outright.
   const leagues = useStandingsLeagues(scope === 'tenant');
+  // Everything a reader can *do* to a table, decided once. The club's surface allows none of it,
+  // whoever is looking; elsewhere it follows the role.
+  const readOnly =
+    scope === 'team' ||
+    !(user?.roles ?? []).some(
+      (r) => r === Roles.SYSTEM_ADMIN || r === Roles.TENANT_ADMIN || r === Roles.LEAGUE_ADMIN,
+    );
   const options = useMemo(() => leagues.data?.data ?? [], [leagues.data]);
 
   const [leagueId, setLeagueId] = useState('');
@@ -62,7 +77,7 @@ export function StandingsView({
   // on the first — a table nobody asked to see beats an empty frame with two dropdowns on it.
   useEffect(() => {
     if (leagueId) return;
-    const fromScope = scope === 'league' ? ctx.leagueId : undefined;
+    const fromScope = scope === 'tenant' ? undefined : ctx.leagueId;
     const next = fromScope ?? options[0]?.id;
     if (next) setLeagueId(next);
   }, [leagueId, scope, ctx.leagueId, options]);
@@ -88,10 +103,7 @@ export function StandingsView({
   // does not say what to do about it.
   const calendarHref =
     scope === 'tenant' ? '/tenant/calendar' : `/league/calendar?ctxLeagueId=${leagueId}`;
-  // A club administrator reads this table; they do not set the rules that produced it.
-  const canEditRules = (user?.roles ?? []).some(
-    (r) => r === Roles.SYSTEM_ADMIN || r === Roles.TENANT_ADMIN || r === Roles.LEAGUE_ADMIN,
-  );
+
   // Null rather than undefined: `undefined === undefined` would highlight every row for a reader
   // who administers no club.
   const myTeamId = user?.managingTeamId ?? ctx.teamId ?? null;
@@ -107,6 +119,17 @@ export function StandingsView({
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
+          {/* The artefact this whole module exists to replace: the signed sheet a league publishes
+              after every matchday. It is the primary action here, because reading the table on
+              screen is not what the organisation is trying to do — publishing it is. */}
+          {!readOnly && data && (
+            <Button variant="primary" asChild>
+              <Link href={`/league/standings/export?ctxLeagueId=${data.leagueId}&seasonId=${data.seasonId}`}>
+                <FileDown className="mr-1.5 h-4 w-4" aria-hidden />
+                Publier
+              </Link>
+            </Button>
+          )}
           {/* A single competition is not a choice, and a dropdown offering one option is furniture
               that has to be read before it can be dismissed. */}
           {scope === 'tenant' && options.length > 1 && (
@@ -157,24 +180,23 @@ export function StandingsView({
         <>
           {/* Played but not entered. This is the difference between a table that is wrong and a
               table that is incomplete, and only one of those is anybody's fault. */}
-          {data.pendingResults > 0 && (
-            <div className="mb-3 flex flex-wrap items-center gap-x-3 gap-y-1.5 rounded-lg border border-caution/40 bg-caution-soft px-3.5 py-2.5 text-sm text-ink">
+          {/* Not on a club's page: it is a note to whoever enters results, and there is nothing
+              a club administrator can do about it but worry. */}
+          {data.pendingResults > 0 && !readOnly && (
+            <p className="mb-3 flex flex-wrap items-center gap-x-2 gap-y-1 rounded-lg border border-caution/40 bg-caution-soft px-3.5 py-2.5 text-sm text-ink">
               <AlertTriangle className="h-4 w-4 shrink-0 text-caution" aria-hidden />
-              <span className="min-w-0 flex-1">
-                <span className="font-medium">
-                  {data.pendingResults} match{data.pendingResults > 1 ? 's' : ''} dont la date est
-                  passée {data.pendingResults > 1 ? 'n’ont' : 'n’a'} pas encore de score.
-                </span>{' '}
-                Ce classement est à jour des résultats saisis, mais il sera différent une fois{' '}
-                {data.pendingResults > 1 ? 'ceux-ci entrés' : 'celui-ci entré'}.
-              </span>
+              {data.pendingResults} match{data.pendingResults > 1 ? 's' : ''} dont la date est
+              passée {data.pendingResults > 1 ? 'n’ont' : 'n’a'} pas encore de score.
+              {/* A link, not a button. A call to action promises something specific, and this
+                  cannot deliver it — the calendar is a month, not the four fixtures in question,
+                  so "Saisir les scores" was a promise the destination does not keep. */}
               <Link
                 href={calendarHref}
-                className="shrink-0 rounded-md bg-surface px-2.5 py-1 text-xs font-medium text-ink transition-colors hover:bg-surface-sunk"
+                className="font-medium text-accent-text underline underline-offset-2 transition-colors hover:text-ink"
               >
-                Saisir les scores
+                Ouvrir le calendrier
               </Link>
-            </div>
+            </p>
           )}
 
           <div className="overflow-hidden rounded-xl border border-line bg-surface">
@@ -244,17 +266,30 @@ export function StandingsView({
                                 />
                               )}
                             </div>
-                            {/* The most obvious thing to want from a league table is the club
-                                you just read, and the name was inert text. */}
-                            <Link
-                              href={`/team/dashboard?ctxTeamId=${row.teamId}&ctxLeagueId=${data.leagueId}`}
-                              className={cn(
-                                'min-w-0 truncate underline-offset-4 hover:underline',
-                                mine ? 'font-semibold text-ink' : 'text-ink',
-                              )}
-                            >
-                              {row.teamName}
-                            </Link>
+                            {/* The most obvious thing to want from a league table is the club you
+                                just read — but only where the reader may open it. A club
+                                administrator gets ten links to nine dashboards they are refused,
+                                which is worse than plain text. */}
+                            {readOnly ? (
+                              <span
+                                className={cn(
+                                  'min-w-0 truncate',
+                                  mine ? 'font-semibold text-ink' : 'text-ink',
+                                )}
+                              >
+                                {row.teamName}
+                              </span>
+                            ) : (
+                              <Link
+                                href={`/team/dashboard?ctxTeamId=${row.teamId}&ctxLeagueId=${data.leagueId}`}
+                                className={cn(
+                                  'min-w-0 truncate underline-offset-4 hover:underline',
+                                  mine ? 'font-semibold text-ink' : 'text-ink',
+                                )}
+                              >
+                                {row.teamName}
+                              </Link>
+                            )}
                           </div>
                         </td>
                         {columns.map((c) => (
@@ -320,39 +355,41 @@ export function StandingsView({
                   {data.gamesCounted} résultat{data.gamesCounted > 1 ? 's' : ''} pris en compte
                   {data.lastCalculated && ` · calculé le ${whenCalculated(data.lastCalculated)}`}
                 </span>
-                {/* Quiet on purpose: a result already rebuilds the table, so this is never the fix
-                    for a row that looks wrong. It is for a scoring rule that changed after the
-                    fact — rare, and invisible to the engine when it happens. */}
-                <button
-                  type="button"
-                  onClick={() =>
-                    recalc.mutate(
-                      // The table's own season, not the picker's — which is empty for a reader
-                      // who cannot list seasons.
-                      { leagueId, seasonId: data.seasonId },
-                      {
-                        onSuccess: () => toast.success('Classement recalculé.'),
-                        onError: (e) => toastApiError(e),
-                      },
-                    )
-                  }
-                  disabled={recalc.isPending}
-                  className="inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-ink-subtle transition-colors hover:bg-surface hover:text-ink disabled:opacity-50"
-                >
-                  <RefreshCw
-                    className={cn('h-3 w-3', recalc.isPending && 'animate-spin')}
-                    aria-hidden
-                  />
-                  Recalculer
-                </button>
-                {canEditRules && (
-                  <Link
-                    href={`/league/settings/rules?ctxLeagueId=${data.leagueId}`}
-                    className="inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-ink-subtle transition-colors hover:bg-surface hover:text-ink"
-                  >
-                    <SlidersHorizontal className="h-3 w-3" aria-hidden />
-                    Règles du classement
-                  </Link>
+                {!readOnly && (
+                  <>
+                    {/* Quiet on purpose: a result already rebuilds the table, so this is never the
+                        fix for a row that looks wrong. It is for a scoring rule that changed after
+                        the fact — rare, and invisible to the engine when it happens. */}
+                    <button
+                      type="button"
+                      onClick={() =>
+                        recalc.mutate(
+                          // The table's own season, not the picker's — which is empty for a
+                          // reader who cannot list seasons.
+                          { leagueId, seasonId: data.seasonId },
+                          {
+                            onSuccess: () => toast.success('Classement recalculé.'),
+                            onError: (e) => toastApiError(e),
+                          },
+                        )
+                      }
+                      disabled={recalc.isPending}
+                      className="inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-ink-subtle transition-colors hover:bg-surface hover:text-ink disabled:opacity-50"
+                    >
+                      <RefreshCw
+                        className={cn('h-3 w-3', recalc.isPending && 'animate-spin')}
+                        aria-hidden
+                      />
+                      Recalculer
+                    </button>
+                    <Link
+                      href={`/league/settings/rules?ctxLeagueId=${data.leagueId}`}
+                      className="inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-ink-subtle transition-colors hover:bg-surface hover:text-ink"
+                    >
+                      <SlidersHorizontal className="h-3 w-3" aria-hidden />
+                      Règles du classement
+                    </Link>
+                  </>
                 )}
               </p>
             </div>

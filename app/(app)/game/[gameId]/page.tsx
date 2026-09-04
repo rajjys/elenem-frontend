@@ -525,9 +525,12 @@ function Overview({
                           style={{ width: `${(h / max) * 100}%` }}
                         />
                       </div>
+                      {/* Fixed width, not intrinsic: "LF" is narrower than "FTES", so a label
+                          sized to its own text moved the bars a few pixels per row and the
+                          comparison stopped being a comparison. */}
                       <span
                         title={c.label}
-                        className="shrink-0 cursor-help text-xs uppercase tracking-wide text-ink-subtle"
+                        className="w-12 shrink-0 cursor-help text-center text-xs uppercase tracking-wide text-ink-subtle"
                       >
                         {c.abbr}
                       </span>

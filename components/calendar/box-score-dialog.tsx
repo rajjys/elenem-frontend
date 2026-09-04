@@ -39,7 +39,7 @@ export function BoxScoreDialog({
       className="max-w-3xl"
       footer={footer}
     >
-      <p className="-mt-2 mb-4 text-sm text-ink-muted">
+      <p className="mb-4 text-sm text-ink-muted">
         {entry.home.name} <span className="text-ink-subtle">—</span> {entry.away.name}
       </p>
 
