@@ -378,3 +378,62 @@ disagrees is the signal that something was mistyped.
   remain unasked-for.
 - Item 13, **standings export** — now has a pixel-accurate target. This is the next thing worth
   building.
+
+
+---
+
+## 10. Phase 3 closed, and the gap it exposed (2026-09-05)
+
+### Done
+
+Items **11** (mobile score entry), **12**'s shooting half, and **13** (standings export) are
+finished; `docs/GAME_AND_STANDINGS.md` carries their design. The export produces the signed
+notification in three formats — PDF to sign, PNG for WhatsApp, Excel to rework — from one renderer,
+and the bands and points rule it prints are the ones the engine used.
+
+Two Phase 3 items remain and both are the long kind: **7** (`Stage`) and **8** (the playoff
+composer), which A4 says must be a composer rather than a bracket because LIPROBAKIN's format
+changes every season.
+
+### 10.1 Season management is missing from this roadmap, and it should not be
+
+Nothing in Phases 2–5 owns the **season as a thing with a life**, and every screen that has needed
+one has quietly invented its own answer:
+
+- `SeasonStatus` has **nine values** — `UNKNOWN, PLANNING, SCHEDULED, ACTIVE, PAUSED, COMPLETED,
+  CANCELED, ARCHIVED, DELETED` — and no transition machine. Status is a plain field on
+  `PUT /seasons/:id`, freely settable to anything. Compare `Game`, which has an explicit transition
+  map, verbs, refusals in French and an audit trail behind every move.
+- Creation **defaults to `ACTIVE`** while the comment beside it says "Default to PLANNING". A season
+  is live the moment it exists, so "pre-season" is a state the product cannot currently be in.
+- `League.currentSeasonId` is a pointer **nothing maintains**. The standings service already had to
+  guard against it going stale (`currentSeasonOf` falls back to the latest by start date).
+- `/season/page.tsx` renders the words "Season Page" and `/season/[seasonId]/dashboard` renders
+  "Season Dashboard" — the same kind of stub `/game/manage` was before it was deleted.
+- Nothing anywhere answers **"which season am I in, and what phase of it"** in one place. The
+  calendar takes a set of seasons; standings resolves current-or-latest; the dashboards ignore the
+  question entirely.
+
+This is why it belongs **before** item 14 rather than after. A season-status-aware dashboard is the
+one thing item 14 promises, and a status nobody maintains cannot drive it: pre-season, in-season and
+post-season would all render the same counters, which is exactly the defect item 14 exists to fix.
+
+**New item — 14a. Season management.** Scheduled ahead of the dashboard redesign. Not yet designed;
+the questions to settle are in the handover note for that thread. At minimum it has to decide which
+of the nine statuses are real, what moves a season between them (and whether anything does so
+automatically), what `currentSeasonId` means and who keeps it true, and what a season's own screen
+is for — given that the calendar, standings and games are already tenant- or league-scoped and none
+of them wanted to be season-scoped.
+
+### 10.2 Still parked, deliberately
+
+- **Touch drag on the calendar.** Dragging a fixture works with a mouse and a keyboard; on a phone
+  the calendar shows an agenda rather than a grid, and reordering an agenda has not been designed.
+  `CALENDAR_MODULE.md` §8 has the argument. Nobody has asked.
+- **Long rosters on the scoresheet.** A youth club with twenty-five registered players gets
+  twenty-five ticked rows and unticks the seventeen who did not travel. Fine at LIPROBAKIN's roster
+  sizes, wrong at a youth league's. The fix when it is wanted is probably to default the ticks off
+  and let the first typed number tick the row, which is already the behaviour. **Revisit at the
+  end.**
+- **Lineups submitted before a match** (item 12's remainder). Appearances are recorded; a club
+  *declaring* its squad in advance is a different feature and remains unasked-for.
