@@ -554,6 +554,76 @@ each card.
 
 ---
 
+### Sprint 3 — item 14, the dashboards
+
+**Three screens, from four.** `OrganiserDashboard` with a `scope` serves `/tenant/dashboard` and
+`/league/dashboard`; `ClubDashboard` serves `/team/dashboard`; `PlatformDashboard` serves
+`/admin/dashboard`. All four pages are four-line wrappers. 2,000 lines of page component became
+three components and one service.
+
+**One endpoint each**, in a new `DashboardModule`, rather than five sequential list calls per
+screen. That is a change of kind: the old dashboards could not have shown the number this one leads
+with, because no response they made carried it.
+
+#### The number
+
+> **Résultats manquants** — fixtures whose date has passed with no score entered.
+
+It is the first thing on the organiser's screen, and only when it is not zero. On the seeded LIBAGO
+it reads **21**, across three competitions, with the eight oldest listed and a line saying the list
+is a sample. Oldest first: the fixture that has waited longest is the one a club is asking about,
+and it is the one distorting the table.
+
+`getStandingsView` has computed this per league since the standings work; no dashboard showed it.
+What they showed was *Ligues · Équipes · Athlètes* — three counts that do not change from one
+Saturday to the next — beside a ticket card whose value was the literal `0` and whose trend was the
+literal `3.6`.
+
+#### The three phases, on one screen
+
+Each competition is a card, and its season's state decides the body. Verified on the seed, which
+after Sprint 1's backfill carries all three at once:
+
+| | |
+|---|---|
+| **PLANNING** | *« 14 rencontres sont passées sans résultat. La saison s'ouvrira d'elle-même au premier score saisi. »* — plus any blocker: clubs with no players, no fixtures at all |
+| **ACTIVE** | played / total with a progress bar, missing results, and *Publier le classement* |
+| **COMPLETED** | who finished top, the final table, and one move forward: *Ouvrir la saison suivante* |
+| **CANCELED** | says the table does not stand |
+| no season | says a competition without one cannot receive a match, and offers to create it |
+
+The pre-season line is the state machine surfaced as a next action: the operator learns that one
+typed score starts the season, which is not otherwise discoverable.
+
+#### The club
+
+`ClubDashboard` is a separate component rather than the organiser's at a narrower scope, because a
+club asks different questions and administers nothing it can change here except its roster — so it
+carries almost no verbs. Rank out of N, points, played/won/lost, a five-match form guide read from
+the results themselves, next fixtures and last results. BC Virunga renders as 5th of 10 on 8 PTS,
+form V-D-V-V-D.
+
+What it replaces fetched nothing at all: a hardcoded English club called *Lightning Strikers*,
+"Premier League Division A · Founded 2018", four invented footballers with goals and assists.
+
+#### The platform
+
+`/admin/dashboard` reported "$89,230 monthly revenue", 324 tenants, four named support tickets and
+five services' uptime percentages — 659 lines of arrays written into the component. Elenem charges
+nobody, has no ticketing system and no uptime monitor. Not redesigned, per the decision, only made
+true: what exists, results recorded this week, and **organisations signed up with no fixture at
+all** — the one number on that screen that should make somebody pick up a phone.
+
+#### A seed bug the new screens exposed
+
+190 completed games were dated in the future, because the seed scored the first N rounds regardless
+of whether their dates had passed. Every one of them was a « Demain 16:10 · 78 – 67 » under a club's
+*Derniers résultats*, and none counted as an overdue result on the organiser's. `seed-dev.mjs` now
+scores only fixtures that have actually happened. **Not verified end to end** — reseeding would have
+destroyed data in use.
+
+---
+
 ## 7. Verified by running it
 
 - Six seeded seasons, all `ACTIVE`, one per league — the product has never been in another state.
