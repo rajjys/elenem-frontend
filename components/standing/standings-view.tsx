@@ -119,17 +119,6 @@ export function StandingsView({
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          {/* The artefact this whole module exists to replace: the signed sheet a league publishes
-              after every matchday. It is the primary action here, because reading the table on
-              screen is not what the organisation is trying to do — publishing it is. */}
-          {!readOnly && data && (
-            <Button variant="primary" asChild>
-              <Link href={`/league/standings/export?ctxLeagueId=${data.leagueId}&seasonId=${data.seasonId}`}>
-                <FileDown className="mr-1.5 h-4 w-4" aria-hidden />
-                Publier
-              </Link>
-            </Button>
-          )}
           {/* A single competition is not a choice, and a dropdown offering one option is furniture
               that has to be read before it can be dismissed. */}
           {scope === 'tenant' && options.length > 1 && (
@@ -151,6 +140,18 @@ export function StandingsView({
               className="w-44"
               options={seasonOptions.map((s) => ({ value: s.id, label: s.name }))}
             />
+          )}
+          {/* The artefact this whole module exists to replace: the signed sheet a league publishes
+              after every matchday. Last in the row, after the controls that decide *which* table is
+              being published — an action placed before its own inputs reads as applying to
+              whatever was on screen a moment ago. */}
+          {!readOnly && data && (
+            <Button variant="primary" asChild>
+              <Link href={`/league/standings/export?ctxLeagueId=${data.leagueId}&seasonId=${data.seasonId}`}>
+                <FileDown className="mr-1.5 h-4 w-4" aria-hidden />
+                Publier
+              </Link>
+            </Button>
           )}
         </div>
       </header>

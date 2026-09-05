@@ -371,8 +371,8 @@ export function UserForm({
           </div>
 
           <div>
-            <Label>Accès</Label>
-            <div className="mt-1 grid grid-cols-2 gap-2">
+            <Label id="user-access-label">Accès</Label>
+            <div role="group" aria-labelledby="user-access-label" className="mt-1 grid grid-cols-2 gap-2">
               <button
                 type="button"
                 onClick={() => setCreationMethod('invite')}

@@ -204,8 +204,11 @@ export function CalendarGenerate() {
           )}
         </div>
 
-        <div>
-          <Label>Format</Label>
+        {/* A caption over a *set* of controls is a group heading, not a label — a `<label>` that
+            names no single control is announced attached to nothing. `role="group"` and
+            `aria-labelledby` say what the eye already reads. */}
+        <div role="group" aria-labelledby="gen-format-label">
+          <Label id="gen-format-label">Format</Label>
           <div className="mt-1 grid grid-cols-2 gap-2">
             {(
               [
@@ -270,8 +273,8 @@ export function CalendarGenerate() {
           </div>
         </div>
 
-        <div>
-          <Label>Jours de match</Label>
+        <div role="group" aria-labelledby="gen-days-label">
+          <Label id="gen-days-label">Jours de match</Label>
           <div className="mt-1 flex flex-wrap gap-1.5">
             {WEEKDAYS.map((d) => (
               <button
@@ -297,8 +300,9 @@ export function CalendarGenerate() {
 
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <Label>Premier match</Label>
+            <Label htmlFor="gen-opening">Premier match</Label>
             <input
+              id="gen-opening"
               type="time"
               value={openingTime}
               onChange={(e) => {
@@ -309,8 +313,9 @@ export function CalendarGenerate() {
             />
           </div>
           <div>
-            <Label>Matchs / jour</Label>
+            <Label htmlFor="gen-per-day">Matchs / jour</Label>
             <input
+              id="gen-per-day"
               type="number"
               min={1}
               max={12}
@@ -352,8 +357,9 @@ export function CalendarGenerate() {
               className="w-full"
             />
             <div>
-              <Label>Durée d&apos;un match (min)</Label>
+              <Label htmlFor="gen-duration">Durée d&apos;un match (min)</Label>
               <input
+                id="gen-duration"
                 type="number"
                 min={30}
                 max={360}

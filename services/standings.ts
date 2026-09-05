@@ -251,8 +251,12 @@ export interface StandingsExportFields {
   city?: string;
   date?: string;
   organisation?: string;
+  letterhead?: string;
+  reference?: string;
   signatoryRole?: string;
   signatoryName?: string;
+  signatory2Role?: string;
+  signatory2Name?: string;
   showBands?: boolean;
 }
 

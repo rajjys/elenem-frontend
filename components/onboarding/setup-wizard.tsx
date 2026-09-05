@@ -276,8 +276,8 @@ export function SetupWizard() {
 
           <div className="grid grid-cols-[1fr_6rem] gap-3">
             <div className="space-y-1.5">
-              <Label>Catégorie</Label>
-              <div className="grid grid-cols-3 gap-1.5">
+              <Label id="league-gender-label">Catégorie</Label>
+              <div role="group" aria-labelledby="league-gender-label" className="grid grid-cols-3 gap-1.5">
                 {GENDERS.map((g) => {
                   const selected = leagueForm.watch('gender') === g.value;
                   return (

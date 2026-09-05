@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useId, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '@/services/api';
 import { useCurrentUser } from '@/hooks';
@@ -69,12 +69,15 @@ export function LeaguePicker({
     if (!value && leagues.length === 1) onChange(leagues[0].id);
   }, [leagues, value, onChange]);
 
+  const fieldId = useId();
+
   if (!isLoading && leagues.length <= 1) return null;
 
   return (
     <div>
-      <Label>{label}{required && ' *'}</Label>
+      <Label htmlFor={fieldId}>{label}{required && ' *'}</Label>
       <select
+        id={fieldId}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         className="mt-1 w-full rounded-md border border-line px-3 py-2 text-sm focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
@@ -108,11 +111,13 @@ export function TeamPicker({
     enabled: !!leagueId,
   });
   const teams: { id: string; name: string }[] = data?.data ?? [];
+  const fieldId = useId();
 
   return (
     <div>
-      <Label>{label}{required && ' *'}</Label>
+      <Label htmlFor={fieldId}>{label}{required && ' *'}</Label>
       <select
+        id={fieldId}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         disabled={!leagueId}
@@ -147,10 +152,12 @@ export function Field({
 }) {
   const [touched, setTouched] = useState(false);
   const invalid = required && touched && !value.trim();
+  const fieldId = useId();
   return (
     <div>
-      <Label>{label}{required && ' *'}</Label>
+      <Label htmlFor={fieldId}>{label}{required && ' *'}</Label>
       <input
+        id={fieldId}
         type={type}
         value={value}
         onChange={(e) => onChange(e.target.value)}

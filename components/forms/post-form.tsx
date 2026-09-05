@@ -145,8 +145,8 @@ export function PostForm({ initialData, onSuccess, onCancel }: PostFormProps) {
       </div>
       
       {/* Rich Content Editor */}
-      <div>
-        <Label>Contenu</Label>
+      <div role="group" aria-labelledby="post-content-label">
+        <Label id="post-content-label">Contenu</Label>
         {/* 🚨 IMPORTANT: Using richContent field now */}
         <PostRichTextEditor
           initialContent={form.watch("richContent") || undefined} 
@@ -203,12 +203,12 @@ export function PostForm({ initialData, onSuccess, onCancel }: PostFormProps) {
       {/* Type & Status */}
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <Label>Type</Label>
+          <Label htmlFor="type">Type</Label>
           <Select
             value={form.watch("type")}
             onValueChange={(val) => form.setValue("type", val as PostType)}
           >
-            <SelectTrigger>
+            <SelectTrigger id="type">
               <SelectValue placeholder="Select type" />
             </SelectTrigger>
             <SelectContent>
@@ -222,12 +222,12 @@ export function PostForm({ initialData, onSuccess, onCancel }: PostFormProps) {
         </div>
         
         <div>
-          <Label>Status</Label>
+          <Label htmlFor="status">Status</Label>
           <Select
             value={form.watch("status")}
             onValueChange={(val) => form.setValue("status", val as PostStatus)}
           >
-            <SelectTrigger>
+            <SelectTrigger id="status">
               <SelectValue placeholder="Select status" />
             </SelectTrigger>
             <SelectContent>
@@ -251,12 +251,12 @@ export function PostForm({ initialData, onSuccess, onCancel }: PostFormProps) {
       {/* Target Type & ID */}
       <div className="grid grid-cols-2 gap-4">
         <div>
-            <Label>Target Scope</Label>
+            <Label htmlFor="target-scope">Target Scope</Label>
             <Select
                 value={form.watch("targetType")}
                 onValueChange={(val: PostTargetType) => form.setValue("targetType", val)}
             >
-                <SelectTrigger>
+                <SelectTrigger id="target-scope">
                     <SelectValue placeholder="Select scope" />
                 </SelectTrigger>
                 <SelectContent>

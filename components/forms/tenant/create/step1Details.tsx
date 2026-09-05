@@ -26,7 +26,7 @@ export function Step1TenantDetails({ form }: Step1Props) {
       <div className="space-y-2">
         <Label htmlFor="tenantCode">Code d&apos;Orgnisation</Label>
         <Input id="tenantCode" {...register("tenantCode")} restrict="alphanumeric" alphaFirst={true}  transform="uppercase" maxCharacters={12} placeholder="ex: LIGUE2" />
-        <Label className="text-ink-subtle">https://<span className="text-positive">{watch("tenantCode").toLowerCase()}</span>.elenem.site</Label>
+        <Label htmlFor="https-watch-tenantcode-tolowercase-elenem-site" className="text-ink-subtle">https://<span className="text-positive">{watch("tenantCode").toLowerCase()}</span>.elenem.site</Label>
         {errors.tenantCode && <p className="text-negative text-xs">{errors.tenantCode.message}</p>}
       </div>
       <div className="border-b border-line col-span-1 md:col-span-2"/>
@@ -37,7 +37,7 @@ export function Step1TenantDetails({ form }: Step1Props) {
           onValueChange={(value) => setValue("sportType", value as SportType)}
           value={watch("sportType")}
         >
-          <SelectTrigger>
+          <SelectTrigger id="https-watch-tenantcode-tolowercase-elenem-site">
             <SelectValue placeholder="Selectionnez le sport" />
           </SelectTrigger>
           <SelectContent>

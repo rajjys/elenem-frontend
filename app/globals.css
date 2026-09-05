@@ -516,8 +516,28 @@ body {
    One element goes to paper and everything else steps aside. `visibility`
    rather than `display: none`, because hiding the app's layout outright
    collapses the document's own ancestors and it prints at the wrong width.
+
+   `@page` sits at the top level, not nested inside the `@media print` block.
+   Tailwind v4 parses this file with Lightning CSS, which drops the *entire*
+   media block when it meets a nested `@page` — so the first version of this
+   compiled away silently and the app printed its own form. Nothing warned;
+   the rule simply was not in `document.styleSheets`.
    ========================================================================= */
+@page {
+  size: A4 portrait;
+  /* No page margin: the document carries its own 14mm padding, so the printed sheet and the
+     on-screen preview are the same object at the same size. A margin here would add to that
+     padding and quietly make the print narrower than what was approved. */
+  margin: 0;
+}
+
 @media print {
+  /* The app's canvas is a grey; left painting, it prints as a grey block filling the rest of the
+     sheet under a short table. Paper is white. */
+  html,
+  body {
+    background: #ffffff;
+  }
   body * {
     visibility: hidden;
   }
@@ -529,16 +549,14 @@ body {
     position: absolute;
     left: 0;
     top: 0;
-    width: 100%;
+    /* Its own width, not the viewport's: stretching it to 100% reflowed the table wider than the
+       preview, which breaks the one promise this screen makes. */
+    width: 210mm;
     margin: 0;
     box-shadow: none;
     border: 0;
   }
   [data-print-hide] {
     display: none !important;
-  }
-  @page {
-    size: A4 portrait;
-    margin: 12mm;
   }
 }

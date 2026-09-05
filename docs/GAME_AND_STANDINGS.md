@@ -280,6 +280,42 @@ a **surface**, not an escape hatch — components inside it keep using tokens, w
 The print rules live beside it (`[data-print-target]`, `[data-print-hide]`), so the next printable
 document does not reinvent them.
 
+### What the reference bulletins changed (2026-09-05)
+
+`docs/Homologation, classement et calendrier.pdf` is EUBAGO's own notification, and it is not "a
+table with a title" — it is a **formal act of a committee**:
+
+- a **letterhead** naming the chain of bodies, Republic down to urban entente;
+- a **reference number** (`NOTIFICATION N° 006/EUBAGO/10-1/CE/2026`), because it is filed and cited;
+- an **object** line and a **preamble** citing the articles of the regulation the ranking is made
+  under;
+- the table;
+- **two signatures** side by side, over stamps.
+
+None of that is decoration. It is what makes the sheet an official document rather than a
+screenshot, and reproducing it is the reason a league would stop sending the numbers to a designer.
+Each is a field the organisation fills in once.
+
+Not reproduced: the per-matchday breakdown of PM and PE (columns 1…5 under each). It is the same
+information our `P.M`/`P.E` totals carry, spread across five columns, and we do not store results
+by round. Worth revisiting if they ask.
+
+### Three bugs the first version shipped with
+
+- **The print printed the form.** `@page` nested inside `@media print` makes Lightning CSS — which
+  Tailwind v4 parses this file with — drop the *entire* media block. Silently: nothing warned, and
+  the rule simply was not in `document.styleSheets`. `@page` sits at the top level now. The lesson
+  is narrower than it looks: *verifying that an element renders is not verifying that printing
+  works*, and only `page.pdf()` or `emulateMedia('print')` tells you.
+- **The signature was pinned to the foot of an A4 sheet**, so a ten-row table printed with a hand's
+  width of nothing in the middle. The document's height is its content's.
+- **The app's canvas printed as a grey block** filling the rest of the page below a short document.
+  Paper is white; `@media print` says so.
+
+`@page` also carries `margin: 0`, because the document has its own 14mm padding. A page margin on
+top of it would quietly print narrower than what was approved on screen, which breaks the only
+promise this screen makes.
+
 ### Smaller decisions
 
 - The footer names the **organisation**, not the competition. The bulletin signs off "Pour la
@@ -298,9 +334,9 @@ document does not reinvent them.
 
 ## 4. Not built, and why
 
-- **PNG for WhatsApp.** The PDF is the signable artefact; what actually gets forwarded in Goma is
-  an image. The same component could be screenshotted server-side, but nobody has asked yet and a
-  PDF previews acceptably.
+- ~~PNG for WhatsApp~~ — **built.** One tall image rather than paginated pages, because the
+  destination is a phone: a photo scrolls and a two-page attachment does not get opened. Rasterised
+  by `html-to-image` from the very node on screen, at 2× so it survives being zoomed into.
 - **Export templates on the server.** The signature and city live in the browser, which loses them
   when the operator changes machine. One field's worth of retyping, and the right home is a
   per-organisation template rather than a column bolted to `LeagueRules`.

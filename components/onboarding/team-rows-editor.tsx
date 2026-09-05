@@ -107,9 +107,9 @@ export function TeamRowsEditor({
   const named = rows.filter((r) => r.name.trim()).length;
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-3" role="group" aria-labelledby="team-rows-label">
       <div className="flex items-baseline justify-between gap-3">
-        <Label>Équipes</Label>
+        <Label id="team-rows-label">Équipes</Label>
         <button
           type="button"
           onClick={() => setPasting((v) => !v)}

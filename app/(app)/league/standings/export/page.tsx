@@ -1,59 +1,63 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
-import { ArrowLeft, FileSpreadsheet, Loader2, Printer } from 'lucide-react';
+import {
+  ArrowLeft,
+  ChevronDown,
+  FileImage,
+  FileSpreadsheet,
+  Loader2,
+  Printer,
+} from 'lucide-react';
 import { Button } from '@/components/ui';
 import { cn, toastApiError } from '@/utils';
-import { useScopeContext } from '@/hooks';
+import { useClickAway, useScopeContext } from '@/hooks';
 import {
   StandingsDocument,
   type DocumentFields,
 } from '@/components/standing/standings-document';
-import { useDownloadStandingsXlsx, useStandings } from '@/services/standings';
+import { useDownloadStandingsXlsx, useStandings, type StandingsView } from '@/services/standings';
 
 /**
  * Publishing the table.
  *
- * This is the artefact the whole module exists to replace. LIPROBAKIN's committee computes the
- * standings by hand, sends them to a designer, and the designer rebuilds them in Photoshop for
- * social media — **every matchday**. Removing the hand calculation was the first half; this is the
- * second, and it is the half that makes switching obvious rather than merely helpful.
+ * The artefact the whole module exists to replace. LIPROBAKIN's committee computes the standings by
+ * hand, sends them to a designer, and the designer rebuilds them in Photoshop for social media —
+ * every matchday. Removing the hand calculation was the first half; this is the half that makes
+ * switching obvious rather than merely helpful.
  *
- * Two outputs, because they are used by different people:
+ * **Three formats, because three different things happen to this sheet.** It is printed and signed
+ * (PDF), it is forwarded on WhatsApp (PNG — which is what actually circulates in Goma), and it is
+ * sent to somebody who wants to sort the numbers (Excel). One document, one renderer; only the way
+ * out differs.
  *
- *  - **PDF**, through the browser's own print. The type stays vector and selectable, the colours
- *    are the ones on screen, and — the reason it is not generated on the server — what the
- *    operator adjusts is literally what comes out. A server-rendered PDF would mean tuning fields
- *    blind and downloading to find out. (It also keeps Chromium out of the deployment, which for
- *    a product shipping to Railway is not a small thing.)
- *  - **Excel**, from the server, for the person who wants to *work* with the numbers rather than
- *    look at them.
- *
- * The fields are remembered per competition, because the same secretary signs the same way every
- * Saturday and retyping their own name fifteen times a season is the kind of friction that sends
- * somebody back to Photoshop.
+ * The fields come from the federation's own bulletins rather than from what a table needs: a
+ * letterhead, a reference number, an object line, the regulation it is issued under, two officers.
+ * They are grouped in the order the document reads, so the panel can be understood by scrolling it
+ * once beside the preview.
  */
 
 const STORAGE_PREFIX = 'elenem.standings-export.';
 
-function defaultsFor(
-  leagueName: string,
-  organisationName: string,
-  seasonName: string,
-  city: string | null,
-): DocumentFields {
+function defaultsFor(data: StandingsView): DocumentFields {
   return {
-    title: `CLASSEMENT ${leagueName.toUpperCase()}`,
-    subtitle: seasonName,
-    organisation: organisationName,
+    letterhead: data.organisationName,
+    organ: 'COMITÉ EXÉCUTIF',
+    reference: '',
+    title: `CLASSEMENT ${data.leagueName.toUpperCase()}`,
+    subtitle: data.seasonName,
     matchday: '',
-    city: city ?? '',
+    preamble: '',
+    city: data.organisationCity ?? '',
     date: new Date().toISOString().slice(0, 10),
+    organisation: data.organisationName,
     signatoryRole: 'Le Secrétaire Provincial',
     signatoryName: '',
+    signatory2Role: '',
+    signatory2Name: '',
     showBands: true,
     showLogo: true,
   };
@@ -69,18 +73,15 @@ export default function StandingsExportPage() {
   const xlsx = useDownloadStandingsXlsx();
 
   const [fields, setFields] = useState<DocumentFields | null>(null);
+  const [rendering, setRendering] = useState(false);
+  const previewRef = useRef<HTMLDivElement>(null);
 
   // Seeded from the competition, then from whatever was last published for it. Remembered in the
-  // browser rather than on the server: it is one operator's habit, not the league's record, and
-  // the values are all one field's worth of retyping if it is lost.
+  // browser rather than on the server: it is one operator's habit, not the league's record, and it
+  // is all one sitting's worth of retyping if it is lost.
   useEffect(() => {
     if (!standings.data || fields) return;
-    const base = defaultsFor(
-      standings.data.leagueName,
-      standings.data.organisationName,
-      standings.data.seasonName,
-      standings.data.organisationCity,
-    );
+    const base = defaultsFor(standings.data);
     let saved: Partial<DocumentFields> = {};
     try {
       saved = JSON.parse(localStorage.getItem(STORAGE_PREFIX + standings.data.leagueId) ?? '{}');
@@ -91,19 +92,47 @@ export default function StandingsExportPage() {
     setFields({ ...base, ...saved, date: base.date });
   }, [standings.data, fields]);
 
-  const documentFields = fields;
-
   useEffect(() => {
-    if (!documentFields || !standings.data) return;
+    if (!fields || !standings.data) return;
     try {
-      localStorage.setItem(
-        STORAGE_PREFIX + standings.data.leagueId,
-        JSON.stringify(documentFields),
-      );
+      localStorage.setItem(STORAGE_PREFIX + standings.data.leagueId, JSON.stringify(fields));
     } catch {
       // Same.
     }
-  }, [documentFields, standings.data]);
+  }, [fields, standings.data]);
+
+  /**
+   * The PNG.
+   *
+   * A tall single image rather than paginated pages, because the destination is WhatsApp: a photo
+   * scrolls and a two-page attachment does not get looked at. Rasterised from the very node on
+   * screen, so it cannot disagree with the print.
+   */
+  const downloadPng = useCallback(async () => {
+    const node = previewRef.current?.querySelector<HTMLElement>('[data-print-target]');
+    if (!node || !standings.data) return;
+    setRendering(true);
+    try {
+      const { toPng } = await import('html-to-image');
+      const url = await toPng(node, {
+        // Twice the CSS size: a bulletin gets zoomed into on a phone, and 1× text goes soft.
+        pixelRatio: 2,
+        backgroundColor: '#ffffff',
+        cacheBust: true,
+      });
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `classement-${slugify(standings.data.leagueName)}-${fields?.date ?? ''}.png`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      toast.success('Image enregistrée.');
+    } catch (e) {
+      toastApiError(e);
+    } finally {
+      setRendering(false);
+    }
+  }, [standings.data, fields?.date]);
 
   const backHref = useMemo(
     () => (leagueId ? `/league/standings?ctxLeagueId=${leagueId}` : '/league/standings'),
@@ -151,62 +180,95 @@ export default function StandingsExportPage() {
               qui sort.
             </p>
           </div>
-          <div className="flex flex-wrap items-center gap-2">
-            <Button
-              variant="outline"
-              onClick={() =>
-                xlsx.mutate(
-                  {
-                    leagueId,
-                    seasonId: data.seasonId,
-                    title: fields.title,
-                    subtitle: fields.subtitle,
-                    matchday: fields.matchday,
-                    city: fields.city,
-                    date: fields.date,
-                    organisation: fields.organisation,
-                    signatoryRole: fields.signatoryRole,
-                    signatoryName: fields.signatoryName,
-                    showBands: fields.showBands,
-                  },
-                  { onError: (e) => toastApiError(e) },
-                )
-              }
-              isLoading={xlsx.isPending}
-            >
-              <FileSpreadsheet className="mr-1.5 h-4 w-4" aria-hidden />
-              Excel
-            </Button>
-            <Button
-              variant="primary"
-              onClick={() => {
-                // The browser's own print, which is also its "save as PDF". Named plainly, because
-                // an organiser who wants a file and is offered "Imprimer" will find it, and one who
-                // wants paper and is offered "PDF" will not.
-                toast.message('Choisissez « Enregistrer au format PDF » dans la boîte d’impression.');
-                setTimeout(() => window.print(), 250);
-              }}
-            >
-              <Printer className="mr-1.5 h-4 w-4" aria-hidden />
-              PDF / Imprimer
-            </Button>
-          </div>
+          <DownloadMenu
+            busy={rendering || xlsx.isPending}
+            onPdf={() => {
+              // The browser's own print, which is also its "save as PDF".
+              toast.message('Choisissez « Enregistrer au format PDF » dans la boîte d’impression.');
+              setTimeout(() => window.print(), 250);
+            }}
+            onPng={downloadPng}
+            onXlsx={() =>
+              xlsx.mutate(
+                {
+                  leagueId,
+                  seasonId: data.seasonId,
+                  title: fields.title,
+                  subtitle: fields.subtitle,
+                  matchday: fields.matchday,
+                  city: fields.city,
+                  date: fields.date,
+                  organisation: fields.organisation,
+                  signatoryRole: fields.signatoryRole,
+                  signatoryName: fields.signatoryName,
+                  showBands: fields.showBands,
+                },
+                { onError: (e) => toastApiError(e) },
+              )
+            }
+          />
         </header>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[19rem_1fr]">
-        {/* The controls. Deliberately few: everything here is something the published sheet says
-            and the database cannot know — which matchday it covers, who signs it, where. */}
+      <div className="grid gap-6 lg:grid-cols-[20rem_1fr]">
+        {/* The controls, in the order the document reads them. Everything here is something the
+            published sheet says and the database cannot know. */}
         <aside data-print-hide className="space-y-4 lg:sticky lg:top-6 lg:self-start">
-          <Panel title="En-tête">
-            <Field label="Titre">
+          <Panel title="En-tête" hint="Les instances, telles qu’elles sont imprimées sur le papier.">
+            <Field label="Institutions" hint="Une par ligne, de la plus générale à la vôtre.">
+              <textarea
+                className={cn(INPUT, 'h-24 resize-y py-2 leading-snug')}
+                value={fields.letterhead}
+                maxLength={400}
+                onChange={(e) => set('letterhead', e.target.value)}
+              />
+            </Field>
+            <Toggle
+              label="Logo de l’organisation"
+              checked={fields.showLogo}
+              onChange={(v) => set('showLogo', v)}
+            />
+          </Panel>
+
+          <Panel title="Objet" hint="Ce que la notification annonce, et sous quelle règle.">
+            <Field label="Organe">
+              <input
+                className={INPUT}
+                value={fields.organ}
+                maxLength={80}
+                placeholder="COMITÉ EXÉCUTIF"
+                onChange={(e) => set('organ', e.target.value)}
+              />
+            </Field>
+            <Field label="Référence">
+              <input
+                className={INPUT}
+                value={fields.reference}
+                maxLength={120}
+                placeholder="NOTIFICATION N° 006/EUBAGO/10-1/CE/2026"
+                onChange={(e) => set('reference', e.target.value)}
+              />
+            </Field>
+            <Field label="Objet">
               <input
                 className={INPUT}
                 value={fields.title}
-                maxLength={120}
+                maxLength={160}
                 onChange={(e) => set('title', e.target.value)}
               />
             </Field>
+            <Field label="Préambule" hint="La disposition sous laquelle le classement est arrêté.">
+              <textarea
+                className={cn(INPUT, 'h-20 resize-y py-2 leading-snug')}
+                value={fields.preamble}
+                maxLength={400}
+                placeholder="Conformément aux dispositions des articles 377, 378 et 379 du RGS, le classement se présente de la manière suivante :"
+                onChange={(e) => set('preamble', e.target.value)}
+              />
+            </Field>
+          </Panel>
+
+          <Panel title="Tableau">
             <Field label="Sous-titre">
               <input
                 className={INPUT}
@@ -226,60 +288,7 @@ export default function StandingsExportPage() {
               />
             </Field>
             <Toggle
-              label="Logo de l’organisation"
-              checked={fields.showLogo}
-              onChange={(v) => set('showLogo', v)}
-            />
-          </Panel>
-
-          <Panel title="Signature">
-            <Field label="Organisation" hint="Le corps qui publie : « Pour la … »">
-              <input
-                className={INPUT}
-                value={fields.organisation}
-                maxLength={120}
-                placeholder={data.organisationName}
-                onChange={(e) => set('organisation', e.target.value)}
-              />
-            </Field>
-            <Field label="Ville">
-              <input
-                className={INPUT}
-                value={fields.city}
-                maxLength={80}
-                placeholder={data.organisationCity ?? 'Goma'}
-                onChange={(e) => set('city', e.target.value)}
-              />
-            </Field>
-            <Field label="Date">
-              <input
-                type="date"
-                className={INPUT}
-                value={fields.date}
-                onChange={(e) => set('date', e.target.value)}
-              />
-            </Field>
-            <Field label="Fonction">
-              <input
-                className={INPUT}
-                value={fields.signatoryRole}
-                maxLength={80}
-                onChange={(e) => set('signatoryRole', e.target.value)}
-              />
-            </Field>
-            <Field label="Nom du signataire">
-              <input
-                className={INPUT}
-                value={fields.signatoryName}
-                maxLength={80}
-                onChange={(e) => set('signatoryName', e.target.value)}
-              />
-            </Field>
-          </Panel>
-
-          <Panel title="Bandes">
-            <Toggle
-              label="Afficher les places qualificatives et relégables"
+              label="Places qualificatives et relégables"
               checked={fields.showBands}
               onChange={(v) => set('showBands', v)}
             />
@@ -295,17 +304,165 @@ export default function StandingsExportPage() {
               </p>
             )}
           </Panel>
+
+          <Panel title="Signature">
+            <div className="flex gap-3">
+              <Field label="Ville" className="min-w-0 flex-1">
+                <input
+                  className={INPUT}
+                  value={fields.city}
+                  maxLength={80}
+                  placeholder={data.organisationCity ?? 'Goma'}
+                  onChange={(e) => set('city', e.target.value)}
+                />
+              </Field>
+              <Field label="Date" className="min-w-0 flex-1">
+                <input
+                  type="date"
+                  className={INPUT}
+                  value={fields.date}
+                  onChange={(e) => set('date', e.target.value)}
+                />
+              </Field>
+            </div>
+            <Field label="Pour le compte de" hint="Rendu « Pour la … » au-dessus des signatures.">
+              <input
+                className={INPUT}
+                value={fields.organisation}
+                maxLength={120}
+                placeholder={data.organisationName}
+                onChange={(e) => set('organisation', e.target.value)}
+              />
+            </Field>
+
+            <fieldset className="rounded-lg border border-line p-3">
+              <legend className="px-1 text-xs font-medium text-ink-subtle">Signataire</legend>
+              <Field label="Fonction">
+                <input
+                  className={INPUT}
+                  value={fields.signatoryRole}
+                  maxLength={80}
+                  onChange={(e) => set('signatoryRole', e.target.value)}
+                />
+              </Field>
+              <Field label="Nom" className="mt-2">
+                <input
+                  className={INPUT}
+                  value={fields.signatoryName}
+                  maxLength={80}
+                  onChange={(e) => set('signatoryName', e.target.value)}
+                />
+              </Field>
+            </fieldset>
+
+            <fieldset className="rounded-lg border border-line p-3">
+              <legend className="px-1 text-xs font-medium text-ink-subtle">
+                Second signataire (facultatif)
+              </legend>
+              <Field label="Fonction">
+                <input
+                  className={INPUT}
+                  value={fields.signatory2Role}
+                  maxLength={80}
+                  placeholder="Président"
+                  onChange={(e) => set('signatory2Role', e.target.value)}
+                />
+              </Field>
+              <Field label="Nom" className="mt-2">
+                <input
+                  className={INPUT}
+                  value={fields.signatory2Name}
+                  maxLength={80}
+                  onChange={(e) => set('signatory2Name', e.target.value)}
+                />
+              </Field>
+            </fieldset>
+          </Panel>
         </aside>
 
         {/* The preview *is* the document — one renderer, so there is nothing to drift. */}
-        <div className="min-w-0 overflow-x-auto pb-4">
-          <StandingsDocument
-            data={data}
-            fields={fields}
-            logoUrl={data.organisationLogoUrl}
-          />
+        <div ref={previewRef} className="min-w-0 overflow-x-auto pb-4">
+          <StandingsDocument data={data} fields={fields} logoUrl={data.organisationLogoUrl} />
         </div>
       </div>
+    </div>
+  );
+}
+
+/**
+ * One control, three ways out.
+ *
+ * Three buttons in a row would have given equal weight to three things that are not equally used —
+ * and would have said nothing about their being the same document. A split menu says "publish, in
+ * this format", which is the actual decision.
+ */
+function DownloadMenu({
+  busy,
+  onPdf,
+  onPng,
+  onXlsx,
+}: {
+  busy: boolean;
+  onPdf: () => void;
+  onPng: () => void;
+  onXlsx: () => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  useClickAway(ref, () => setOpen(false));
+
+  // A menu that only closes on a click elsewhere is a trap for anybody navigating by keyboard.
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false);
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [open]);
+
+  const items = [
+    { icon: Printer, label: 'PDF', hint: 'À imprimer et signer', run: onPdf },
+    { icon: FileImage, label: 'Image PNG', hint: 'À partager sur WhatsApp', run: onPng },
+    { icon: FileSpreadsheet, label: 'Excel', hint: 'Pour retravailler les chiffres', run: onXlsx },
+  ];
+
+  return (
+    <div ref={ref} className="relative">
+      <Button
+        variant="primary"
+        onClick={() => setOpen((v) => !v)}
+        isLoading={busy}
+        disabled={busy}
+        aria-haspopup="menu"
+        aria-expanded={open}
+      >
+        Publier
+        <ChevronDown className="ml-1.5 h-4 w-4" aria-hidden />
+      </Button>
+      {open && (
+        <div
+          role="menu"
+          className="absolute right-0 z-20 mt-1 w-64 overflow-hidden rounded-lg border border-line bg-elevated shadow-e2"
+        >
+          {items.map((it) => (
+            <button
+              key={it.label}
+              type="button"
+              role="menuitem"
+              onClick={() => {
+                setOpen(false);
+                it.run();
+              }}
+              className="flex w-full items-start gap-2.5 px-3 py-2.5 text-left transition-colors hover:bg-surface-sunk"
+            >
+              <it.icon className="mt-0.5 h-4 w-4 shrink-0 text-ink-subtle" aria-hidden />
+              <span className="min-w-0">
+                <span className="block text-sm font-medium text-ink">{it.label}</span>
+                <span className="block text-xs text-ink-subtle">{it.hint}</span>
+              </span>
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -314,26 +471,49 @@ const INPUT =
   'h-9 w-full rounded-lg border border-line bg-surface px-3 text-sm text-ink transition-colors ' +
   'hover:border-line-strong focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent';
 
-function Panel({ title, children }: { title: string; children: React.ReactNode }) {
+function slugify(s: string): string {
+  return s
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+}
+
+function Panel({
+  title,
+  hint,
+  children,
+}: {
+  title: string;
+  hint?: string;
+  children: React.ReactNode;
+}) {
   return (
     <section className="space-y-3 rounded-xl border border-line bg-surface p-4">
-      <h2 className="text-sm font-semibold text-ink">{title}</h2>
+      <div>
+        <h2 className="text-sm font-semibold text-ink">{title}</h2>
+        {hint && <p className="mt-0.5 text-xs text-ink-subtle">{hint}</p>}
+      </div>
       {children}
     </section>
   );
 }
 
+/** The control is nested inside the label, which is what associates the two. */
 function Field({
   label,
   hint,
+  className,
   children,
 }: {
   label: string;
   hint?: string;
+  className?: string;
   children: React.ReactNode;
 }) {
   return (
-    <label className="block">
+    <label className={cn('block', className)}>
       <span className="mb-1 block text-sm font-medium text-ink">{label}</span>
       {children}
       {hint && <p className="mt-1 text-xs text-ink-subtle">{hint}</p>}

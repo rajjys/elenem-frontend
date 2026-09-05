@@ -215,8 +215,9 @@ export function BusinessProfileForm({
       {/* Exposed fields: Region, City, EstablishedYear */}
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2 col-span-2 md:col-span-1">
-          <Label>Région (facultatif)</Label>
+          <Label htmlFor="bp-region">Région (facultatif)</Label>
           <RegionDropdown
+            id="bp-region"
             country={country || ""}
             value={regionValue ?? ""}
             onChange={(value) => setValue("businessProfile.region", value)}
@@ -225,13 +226,14 @@ export function BusinessProfileForm({
         </div>
 
         <div className="space-y-2 col-span-2 md:col-span-1">
-          <Label>Ville (facultatif)</Label>
-          <Input {...register("businessProfile.city")} />
+          <Label htmlFor="bp-city">Ville (facultatif)</Label>
+          <Input id="bp-city" {...register("businessProfile.city")} />
         </div>
 
         <div className="space-y-2 col-span-2 md:col-span-1">
-          <Label>Année de création (facultatif)</Label>
+          <Label htmlFor="bp-year">Année de création (facultatif)</Label>
           <Input
+            id="bp-year"
             type="number"
             {...register("businessProfile.establishedYear")}
             placeholder="e.g. 2019"
@@ -240,13 +242,13 @@ export function BusinessProfileForm({
 
         {canSelectOwner && (
           <div className="space-y-2 col-span-2">
-            <Label>Propriétaire (facultatif)</Label>
+            <Label htmlFor="bp-owner">Propriétaire (facultatif)</Label>
             <Select
               onValueChange={(value) => setValue("ownerId", value === "null" ? undefined : value)}
               value={ownerValue}
               disabled={ownersLoading}
             >
-              <SelectTrigger>
+              <SelectTrigger id="bp-owner">
                 <SelectValue placeholder="Sélectionner un propriétaire" />
               </SelectTrigger>
               <SelectContent>
@@ -273,18 +275,18 @@ export function BusinessProfileForm({
         </CollapsibleTrigger>
         <CollapsibleContent>
           <div className="space-y-2 md:col-span-2 mt-4">
-            <Label>Adresse</Label>
-            <Input {...register("businessProfile.physicalAddress")} />
+            <Label htmlFor="bp-address">Adresse</Label>
+            <Input id="bp-address" {...register("businessProfile.physicalAddress")} />
           </div>
 
           <div className="space-y-2 md:col-span-2">
-            <Label>Description</Label>
-            <Input {...register("businessProfile.description")} />
+            <Label htmlFor="bp-description">Description</Label>
+            <Input id="bp-description" {...register("businessProfile.description")} />
           </div>
 
           <div className="space-y-2 md:col-span-2">
-            <Label>Site Web</Label>
-            <Input {...register("businessProfile.website")} />
+            <Label htmlFor="bp-website">Site Web</Label>
+            <Input id="bp-website" {...register("businessProfile.website")} />
           </div>
         </CollapsibleContent>
       </Collapsible>

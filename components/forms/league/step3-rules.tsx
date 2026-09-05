@@ -164,8 +164,11 @@ export default function Step3Rules({ form } : Step3Props ) {
         {pointRuleFields.length === 0 && <p className="text-sm text-ink-muted">No point rules found. Select one to add below.</p>}
         {pointRuleFields.map((field, index) => (
           <div key={field.id} className="flex items-center space-x-2">
-            <Label className="w-1/4">{field.outcome}</Label>
+            <Label className="w-1/4" htmlFor={`point-rule-${field.id}`}>
+              {field.outcome}
+            </Label>
             <Input
+              id={`point-rule-${field.id}`}
               type="number"
               {...register(`pointSystemConfig.rules.${index}.points`, { valueAsNumber: true })}
               className="w-1/4"
@@ -185,9 +188,9 @@ export default function Step3Rules({ form } : Step3Props ) {
       {availablePointRules.length > 0 && (
           <div className="flex items-end gap-2 mt-4 pt-4 border-t">
               <div className="flex-grow">
-                  <Label>Add New Point Rule</Label>
+                  <Label htmlFor="add-new-point-rule">Add New Point Rule</Label>
                   <Select value={nextPointRule} onValueChange={setNextPointRule}>
-                      <SelectTrigger><SelectValue placeholder="Select a point rule..." /></SelectTrigger>
+                      <SelectTrigger id="add-new-point-rule"><SelectValue placeholder="Select a point rule..." /></SelectTrigger>
                       <SelectContent>
                           {availablePointRules.map(rule => <SelectItem key={rule.outcome} value={rule.outcome}>{rule.outcome.replace(/_/g, ' ')}</SelectItem>)}
                       </SelectContent>
@@ -249,9 +252,9 @@ export default function Step3Rules({ form } : Step3Props ) {
       {availableTiebreakers.length > 0 && (
           <div className="flex items-end gap-2 mt-4 pt-4 border-t">
               <div className="flex-grow">
-                  <Label>Add New Tiebreaker</Label>
+                  <Label htmlFor="add-new-tiebreaker">Add New Tiebreaker</Label>
                   <Select value={nextTiebreaker} onValueChange={setNextTiebreaker}>
-                      <SelectTrigger><SelectValue placeholder="Select a tiebreaker rule..." /></SelectTrigger>
+                      <SelectTrigger id="add-new-tiebreaker"><SelectValue placeholder="Select a tiebreaker rule..." /></SelectTrigger>
                       <SelectContent>
                           {availableTiebreakers.map(tb => <SelectItem key={tb.rule} value={tb.rule}>{tb.rule.replace(/_/g, ' ')}</SelectItem>)}
                       </SelectContent>

@@ -174,7 +174,7 @@ export function Step2TenantBusinessProfile({
       {/* Other fields */}
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2 col-span-2 md:col-span-1">
-          <Label>Region (Optional)</Label>
+          <Label htmlFor="businessProfile.city">Region (Optional)</Label>
           <RegionDropdown
             country={country}
             value={watch("businessProfile.region") || ""}
@@ -183,19 +183,19 @@ export function Step2TenantBusinessProfile({
           />
         </div>
         <div className="space-y-2 relative col-span-2 md:col-span-1">
-          <Label>City (Optional)</Label>
+          <Label htmlFor="businessProfile.city">City (Optional)</Label>
           <Input {...register("businessProfile.city")} />
         </div>
 
         {isSystemAdmin && (
           <div className="space-y-2 col-span-2">
-            <Label>Tenant Owner (Optional)</Label>
+            <Label htmlFor="tenant-owner-optional">Tenant Owner (Optional)</Label>
             <Select
               onValueChange={(value) => setValue("ownerId", value === "null" ? undefined : value)}
               value={watch("ownerId") || "null"}
               disabled={ownersLoading}
             >
-              <SelectTrigger>
+              <SelectTrigger id="tenant-owner-optional">
                 <SelectValue placeholder="Select an owner (optional)" />
               </SelectTrigger>
               <SelectContent>
@@ -221,11 +221,11 @@ export function Step2TenantBusinessProfile({
         </CollapsibleTrigger>
         <CollapsibleContent>
           <div className="space-y-2 md:col-span-2">
-            <Label>Description (Optional)</Label>
+            <Label htmlFor="businessProfile.description">Description (Optional)</Label>
             <Input {...register("businessProfile.description")} />
           </div>
           <div className="space-y-2 md:col-span-2">
-            <Label>Street Address (Optional)</Label>
+            <Label htmlFor="businessProfile.physicalAddress">Street Address (Optional)</Label>
             <Input {...register("businessProfile.physicalAddress")} />
           </div>
         </CollapsibleContent>

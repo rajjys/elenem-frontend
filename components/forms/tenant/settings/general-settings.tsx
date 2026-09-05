@@ -178,7 +178,7 @@ export default function TenantGeneralSettings({ tenant, onSuccess  }: TenantGene
               />
             )}
           />
-          <Label className="text-ink-subtle">https://<span className="text-positive">{tenantCode?.toLowerCase()}</span>.elenem.site</Label>
+          <Label htmlFor="sportType" className="text-ink-subtle">https://<span className="text-positive">{tenantCode?.toLowerCase()}</span>.elenem.site</Label>
           {errors.tenantCode && <p className="text-negative text-xs">{errors.tenantCode.message}</p>}
         </div>
 

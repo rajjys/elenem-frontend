@@ -493,8 +493,8 @@ export function SignUpFlow() {
               )}
             </div>
 
-            <div className="space-y-1.5">
-              <Label>Sport</Label>
+            <div className="space-y-1.5" role="group" aria-labelledby="sport-label">
+              <Label id="sport-label">Sport</Label>
               <SportPicker
                 value={sportType}
                 onChange={(value) => setValue('sportType', value, { shouldValidate: true })}

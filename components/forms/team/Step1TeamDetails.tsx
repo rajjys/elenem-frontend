@@ -31,9 +31,9 @@ export default function Step1TeamDetails({ form, tenants, leagues, venues, isSys
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {isSystemAdmin && (
           <div className="space-y-2">
-            <Label>Organisation</Label>
+            <Label htmlFor="organisation">Organisation</Label>
             <Select value={selectedTenantId || ""} onValueChange={(v) => setValue("tenantId", v)}>
-              <SelectTrigger><SelectValue placeholder="Selectionnez l'Organisation" /></SelectTrigger>
+              <SelectTrigger id="organisation"><SelectValue placeholder="Selectionnez l'Organisation" /></SelectTrigger>
               <SelectContent>
                 {tenants.map(t => <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>)}
               </SelectContent>
@@ -43,9 +43,9 @@ export default function Step1TeamDetails({ form, tenants, leagues, venues, isSys
 
         {!isLeagueAdmin && (
           <div className="space-y-2">
-            <Label>Ligue</Label>
+            <Label htmlFor="ligue">Ligue</Label>
             <Select value={selectedLeagueId || ""} onValueChange={(v) => setValue("leagueId", v)} disabled={isSystemAdmin && !selectedTenantId}>
-              <SelectTrigger><SelectValue placeholder="Selectionnez une ligue" /></SelectTrigger>
+              <SelectTrigger id="ligue"><SelectValue placeholder="Selectionnez une ligue" /></SelectTrigger>
               <SelectContent>
                 {leagues.map(l => <SelectItem key={l.id} value={l.id}>{l.name}</SelectItem>)}
               </SelectContent>
@@ -54,21 +54,21 @@ export default function Step1TeamDetails({ form, tenants, leagues, venues, isSys
           </div>
         )}
         <div className="space-y-2">
-          <Label>Equipe</Label>
+          <Label htmlFor="name">Equipe</Label>
           <Input {...register("name")} placeholder="ex: Real Madrid F.C" />
           {errors.name && <p className="text-xs text-negative">{errors.name.message}</p>}
         </div>
 
         <div className="space-y-2">
-          <Label>Code</Label>
+          <Label htmlFor="shortCode">Code</Label>
           <Input {...register("shortCode")} placeholder="ex: FCB" />
           {errors.shortCode && <p className="text-xs text-negative">{errors.shortCode.message}</p>}
         </div>
 
         <div className="space-y-2">
-          <Label>Visibilite</Label>
+          <Label htmlFor="visibilite">Visibilite</Label>
           <Select value={String(watch("visibility"))} onValueChange={(v) => setValue("visibility", v as unknown as VisibilityLevel)}>
-            <SelectTrigger><SelectValue placeholder="Type de visibilite" /></SelectTrigger>
+            <SelectTrigger id="visibilite"><SelectValue placeholder="Type de visibilite" /></SelectTrigger>
             <SelectContent>
               {Object.values(VisibilityLevel).map(v => <SelectItem key={v} value={v}>{v.replace(/_/g, " ")}</SelectItem>)}
             </SelectContent>
@@ -77,9 +77,9 @@ export default function Step1TeamDetails({ form, tenants, leagues, venues, isSys
 
         {/* Home Venue placeholder moved here */}
         <div className="space-y-2">
-          <Label>Stade</Label>
+          <Label htmlFor="stade">Stade</Label>
           <Select value={watch("homeVenueId") ?? ""} onValueChange={(v) => setValue("homeVenueId", v)}>
-            <SelectTrigger><SelectValue placeholder="Stade domicile" /></SelectTrigger>
+            <SelectTrigger id="stade"><SelectValue placeholder="Stade domicile" /></SelectTrigger>
             <SelectContent>
               {venues.length ? venues.map(v => <SelectItem key={v.id} value={v.id}>{v.name}</SelectItem>) : <SelectItem value="null" disabled>Aucun stade disponible</SelectItem>}
             </SelectContent>

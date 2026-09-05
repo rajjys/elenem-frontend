@@ -421,8 +421,8 @@ export default function GeneralLeagueSettingsPage() {
           {/* Parent League ID: Ignored as requested, but you might want to display it as read-only */}
           {league.parentLeagueId && (
             <div className="space-y-2">
-              <Label>Ligue Parent</Label>
-              <Input disabled value={league.parentLeague?.name || league.parentLeagueId} className="bg-surface-sunk"/>
+              <Label htmlFor="lg-parent">Ligue Parent</Label>
+              <Input id="lg-parent" disabled value={league.parentLeague?.name || league.parentLeagueId} className="bg-surface-sunk"/>
             </div>
           )}
 
