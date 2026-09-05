@@ -12,6 +12,8 @@ import { useAuthStore } from "@/store/auth.store";
 import { useForm, Controller } from "react-hook-form"; // Added react-hook-form imports
 import { zodResolver } from "@hookform/resolvers/zod"; // Added zod resolver
 import { Loader2 } from "lucide-react"; // Added Loader2 for loading indicator
+import Link from "next/link";
+import { useContextualLink } from "@/hooks";
 
 // Define the schema for the form. We will use a modified version of UpdateLeagueSchema
 // to include the currentSeasonId for submission.
@@ -85,6 +87,8 @@ export default function GeneralLeagueSettingsPage() {
 
   const [league, setLeague] = useState<LeagueDetails | null>(null); // Initialize as null
   const [seasons, setSeasons] = useState<SeasonDetails[]>([]);
+  const { buildLink } = useContextualLink();
+  const currentSeasonName = seasons.find((s) => s.id === league?.currentSeasonId)?.name ?? null;
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -164,81 +168,24 @@ export default function GeneralLeagueSettingsPage() {
   }, [currentLeagueId, fetchLeagueDetails, fetchSeasons]);
 
 
-  const onSubmit = async (data: FormValues) => {
+  const onSubmit = async () => {
     if (!currentLeagueId || !league || !initialRef.current) return;
-    
-    // 1. Compute delta for the league details (excluding currentSeasonId)
+
     const currentValues = getValues();
     const leagueUpdatePayload = computeDelta(initialRef.current, currentValues);
 
-    // 2. Check if the selected season has changed
-    const initialSeasonId = initialRef.current.currentSeasonId;
-    const currentSeasonId = data.currentSeasonId;
-    const seasonChanged = !isEqual(initialSeasonId, currentSeasonId);
-
-    // 3. Determine overall changes
-    const noChanges = Object.keys(leagueUpdatePayload).length === 0 && !seasonChanged;
+    const noChanges = Object.keys(leagueUpdatePayload).length === 0;
 
     if (noChanges) {
-      toast.info("No changes detected to save.");
+      toast.info("Aucune modification à enregistrer.");
       return;
     }
 
     try {
-      // Start submitting state
-      // Note: isSubmitting from useForm controls the button, setSaving is not strictly needed here
-      
-      const updatePromises: Promise<unknown>[] = [];
+      const updatePromises: Promise<unknown>[] = [
+        api.put(`/leagues/${currentLeagueId}`, leagueUpdatePayload),
+      ];
 
-      // A. Update League General Details (name, division, gender, etc.)
-      if (Object.keys(leagueUpdatePayload).length > 0) {
-        updatePromises.push(
-          api.put(`/leagues/${currentLeagueId}`, leagueUpdatePayload)
-        );
-      }
-
-      // B. Update Current Season separately if it changed
-      // This often requires a separate endpoint or field logic on the backend
-      if (seasonChanged) {
-        // Assuming the backend accepts currentSeasonId directly on the league update endpoint
-        // You can combine the payload if the backend accepts it, but if you want to ensure
-        // the form data is clean and only sends the delta, you need a different approach.
-        // For simplicity and to use the same PUT endpoint, we'll send it if it's the only change, 
-        // or ensure it's included in the main payload if we are not doing a delta-only update.
-        // For now, let's stick to the delta approach and handle the season ID as a special case 
-        // since it might not be in the UpdateLeagueSchema's core fields (though it is in LeagueDetails).
-        if (Object.keys(leagueUpdatePayload).length === 0) {
-           // If only the season changed, send the season ID only
-           updatePromises.push(
-             api.put(`/leagues/${currentLeagueId}`, {
-               currentSeasonId: currentSeasonId || null,
-             })
-           );
-        } else {
-            // If other fields changed, ensure currentSeasonId is included in the payload 
-            // if it changed (or always, if your PUT is not partial). 
-            // For a clean delta, let's keep it simple: 
-            // 1. Send delta for general fields. 
-            // 2. Send separate update for season if needed.
-            // REFACTOR: Since the initial delta logic *excludes* currentSeasonId, we must 
-            // send a separate update if the season changed and the other fields did not.
-            // If other fields *did* change, the update for the season ID should be *part* // of the main league update, so it should be included in the delta logic 
-            // if your backend accepts it in the main league update endpoint.
-            // Let's modify computeDelta to *include* currentSeasonId for the PUT call:
-
-            const fullPayload = computeDelta(initialRef.current, currentValues);
-            updatePromises.push(
-              api.put(`/leagues/${currentLeagueId}`, fullPayload)
-            );
-        }
-      } else if (Object.keys(leagueUpdatePayload).length > 0) {
-        // If there are general changes but the season didn't change, we already queued the update.
-        // Do nothing here.
-      } else {
-        // Should not happen due to 'noChanges' check, but for robustness:
-        return; 
-      }
-      
       // Execute all necessary updates
       await Promise.all(updatePromises);
 
@@ -390,34 +337,30 @@ export default function GeneralLeagueSettingsPage() {
             />
           </div>
 
-          {/* Current Season Select (Refactored to custom Select component) */}
+          {/* The current season is not settable here any more.
+              It names the season being played, and that is decided by opening and closing seasons
+              rather than by pointing a field at one — it is also the write target for every new
+              fixture and the season the standings fall back to for a club administrator, who
+              cannot name one. A dropdown here could aim all of that at a season that finished last
+              year. See docs/SEASON_AND_DASHBOARDS.md §3. */}
           <div className="space-y-2">
-            <Label htmlFor="currentSeasonId">Saison Actuelle</Label>
-            <Controller
-              name="currentSeasonId"
-              control={control}
-              render={({ field }) => (
-                <Select
-                  onValueChange={(value) => field.onChange(value || null)} // Pass null for the "None" option
-                  value={field.value || ""} // Set value to "" for "None" option
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selectionnez la saison actuelle" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="null">— Aucune Saison —</SelectItem>
-                    {seasons.map((season) => (
-                      <SelectItem key={season.id} value={season.id}>
-                        {season.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              )}
-            />
-            {errors.currentSeasonId && <p className="text-negative text-xs">{errors.currentSeasonId.message}</p>}
+            <Label>Saison en cours</Label>
+            <div className="flex flex-wrap items-center gap-2 rounded-md border border-line bg-surface-sunk px-3 py-2">
+              <span className="text-sm text-ink">
+                {currentSeasonName ?? 'Aucune saison'}
+              </span>
+              <Link
+                href={buildLink('/league/seasons', currentLeagueId ? { ctxLeagueId: currentLeagueId } : undefined)}
+                className="ml-auto text-sm font-medium text-accent-text nav-hover"
+              >
+                Gérer les saisons
+              </Link>
+            </div>
+            <p className="text-xs text-ink-muted">
+              Elle change quand vous ouvrez ou terminez une saison, pas depuis ce formulaire.
+            </p>
           </div>
-          
+
           {/* Parent League ID: Ignored as requested, but you might want to display it as read-only */}
           {league.parentLeagueId && (
             <div className="space-y-2">

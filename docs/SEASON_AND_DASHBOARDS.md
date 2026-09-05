@@ -493,6 +493,67 @@ been run end to end since the change, because reseeding would have destroyed dat
 
 ---
 
+### Sprint 2 — the season's life, on screen
+
+**`/season`, `/season/[seasonId]/dashboard`, `/season/layout.tsx` and `/season/create` are gone**,
+along with `SeasonForm`, `SeasonsTable` and `SeasonsFilters`. `/season/create`'s success handler had
+redirected a tenant administrator to `/tenant/seasons`, a route that has never existed;
+`SeasonsTable` linked to `/season/dashboard` and `/season/edit/:id`, neither of which existed
+either. Four screens' worth of navigation pointing at nothing.
+
+**`SeasonsView`**, one component with a `scope`, serves `/league/seasons` and `/admin/seasons` —
+the shape `CalendarView` and `StandingsView` settled on. Both pages are now four-line wrappers.
+Creation is offered only in the league scope: a season belongs to a competition, and the
+platform-wide list is not standing in one.
+
+A season is a **card**, not a table row, because what the screen is *for* is the verbs, and each
+one carries its consequence in a few words before you commit to it — the same shape the match
+page's actions took (`GAME_AND_STANDINGS` §7):
+
+- *Ouvrir la saison* — « Les résultats comptent à partir de maintenant. »
+- *Terminer la saison* — « Le classement devient définitif. La saison suivante peut s'ouvrir. »
+- *Annuler la saison* — « Plus aucun match ni résultat, et le classement ne veut plus rien dire. »
+- *Rouvrir la saison* — « Pour corriger un résultat homologué en retard. Le classement peut changer. »
+
+Every move except opening asks for a reason, and the submit stays disabled until there is one. The
+client offers verbs and the server is the authority — the same split the calendar's fixture dialog
+uses, so a stale screen cannot make an illegal move stick.
+
+**The card carries what the season holds**: fixtures on record and how many have a result, each
+linking to the screen that owns it. When they are equal and non-zero the card says so and promotes
+the close — *offering* it, never performing it, because the playoff fixtures LIPROBAKIN agree a
+week later have to be able to land.
+
+**Two more writers of `currentSeasonId` turned up and are gone.** `/league/settings/general` had a
+« Saison Actuelle » dropdown that PUT the field to `/leagues/:id` — a picker that could aim the
+write target for every new fixture at a season that finished last year. It now states which season
+is being played and links to where seasons are moved. (Sprint 1 had removed the field from
+`UpdateLeagueDto`, so this screen would have started 400ing; it was found by grepping for the
+retired routes rather than by the screen being visited.) The league dashboard's inline
+create-season dialog went the same way — both of its branches led to the stub.
+
+`SeasonRow` and the mutations live in `services/seasons.ts` on React Query, and the create, update,
+filter and pagination Zod schemas that used to sit in `schemas/season-schemas.ts` are deleted: a
+second set of shapes beside the service is how `isActive` came to disagree with `status`.
+
+### Verified through the browser, on a throwaway competition
+
+| | |
+|---|---|
+| a season with every fixture scored | « Toutes les rencontres ont un résultat », close promoted |
+| creating a second season while one runs | allowed, lands *En préparation* |
+| opening it while the first is running | refused; the server's French sentence reaches the operator as a toast |
+| closing with no reason | submit disabled; enabled once a reason is typed |
+| after closing | *Terminée*, and the only verb offered is *Rouvrir la saison* |
+| reopening | « ZZ Saison A est rouverte », back to *En cours* |
+| deleting an empty season | removed; a season with fixtures has no bin at all |
+
+Also checked on the seeded data: Goma D2, which the Sprint 1 backfill put in `PLANNING`, renders as
+pre-season with no close offered; the platform-wide list names the organisation and competition on
+each card.
+
+---
+
 ## 7. Verified by running it
 
 - Six seeded seasons, all `ACTIVE`, one per league — the product has never been in another state.

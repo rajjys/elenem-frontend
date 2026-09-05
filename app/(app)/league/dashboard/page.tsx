@@ -3,20 +3,18 @@ import Head from 'next/head';
 import { useRouter, useSearchParams } from 'next/navigation'; // Or useNavigation from next/navigation for App Router
 import React, { useCallback, useEffect, useState } from 'react';
 import { useAuthStore } from '@/store/auth.store';
-import { GameDetails, GameStatus, Gender, LeagueDetails, LeagueDetailsSchema, LeagueMetrics, LeagueMetricsSchema, Roles, SeasonDetails, SeasonStatus, StandingsBasic } from '@/schemas';
+import { GameDetails, GameStatus, Gender, LeagueDetails, LeagueDetailsSchema, LeagueMetrics, LeagueMetricsSchema, Roles, StandingsBasic } from '@/schemas';
 import { api } from '@/services/api';
 import { parseResponse } from '@/services/parse-response';
-import { toast } from 'sonner';
 import { useContextualLink } from '@/hooks';
 import { toastApiError } from '@/utils';
 import { StatsCard } from '@/components/ui/stats-card';
 import { Award, Building2, Calendar, CalendarPlus, Clock, Clock1, Settings, Ticket, Trophy,  User2,  Users } from 'lucide-react';
-import { Avatar, Card, CardContent, CardFooter, CardHeader, CardTitle, Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, LoadingSpinner, SeasonStatusBadge, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui';
+import { Avatar, Card, CardContent, CardFooter, CardHeader, CardTitle, LoadingSpinner, SeasonStatusBadge, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui';
 import Image from 'next/image';
 import Link from 'next/link';
 import { formatDateFr } from '@/utils';
 import qs from 'qs';
-import { SeasonForm } from '@/components/forms';
 
 export default function LeagueDashboard() {
     const userAuth = useAuthStore((state) => state.user);
@@ -29,8 +27,6 @@ export default function LeagueDashboard() {
     const [Standings, setStandings] = useState<StandingsBasic[]>([]);
     const [recentGames, setRecentGames] = useState<GameDetails[]>([]);
     const [error, setError] = useState<string | null>(null);
-    // 2. State for the season creation Dialog
-    const [isCreateSeasonDialogOpen, setIsCreateSeasonDialogOpen] = useState(false);
 
     const { buildLink } = useContextualLink();
 
@@ -137,20 +133,6 @@ export default function LeagueDashboard() {
       }
     }, [currentLeagueId, league?.currentSeasonId]);
 
-    // 4. Success Handler after season creation
-    const handleSeasonCreated = (newSeason: SeasonDetails) => {
-        toast.success("Saison créée avec succès!", {
-            description: `La saison ${newSeason.name} a été créée et est active.`,
-        });
-        setIsCreateSeasonDialogOpen(false);
-        // Important: Re-fetch data to update the dashboard with the new season info
-        fetchLeagueDetails(); 
-        fetchLeagueMetrics();
-    };
-
-    // Handler to close the dialog
-    const handleCloseDialog = () => setIsCreateSeasonDialogOpen(false);
-
     useEffect(() => {
         // Fetch tenant-specific data if needed, e.g., tenant name, logo, etc.
         if (currentLeagueId) {
@@ -160,9 +142,10 @@ export default function LeagueDashboard() {
           fetchUpcomingGames()
           fetchLeagueStandings();
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps -- keyed on the ids on purpose:
-        // depending on the callbacks re-ran this whole block whenever setLeague produced a new
-        // object, firing a second round of five requests on every scope switch.
+        // Keyed on the ids on purpose: depending on the callbacks re-ran this whole block whenever
+        // setLeague produced a new object, firing a second round of five requests on every scope
+        // switch.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [currentLeagueId, league?.currentSeasonId]);
     if(detailsLoading) return <LoadingSpinner />
     if(error) return <div className='text-negative text-center mt-8'>Error: {error}</div>;
@@ -220,41 +203,16 @@ export default function LeagueDashboard() {
                       <Users className="h-4 w-4" />
                       <span>Nouvelle Équipe</span>
                   </Link>
-                  {
-                    league.currentSeasonId ?
-                    <Link href={buildLink(`/season/${league.currentSeasonId}/dashboard`)}
-                      className="flex items-center gap-2 px-3 py-2 rounded-md transition-all duration-150 soft-theme-gradient">
-                        <Settings className="h-4 w-4" />
-                        {
-                          league.currentSeason?.status == SeasonStatus.ACTIVE ?
-                          <span>Gérer la Saison</span> :
-                          <span>Activer la saison</span>
-                        }
-                    </Link> :
-                    <Dialog open={isCreateSeasonDialogOpen} onOpenChange={setIsCreateSeasonDialogOpen}>
-                      <DialogTrigger asChild>
-                          <div // Use a div or Button for the trigger
-                              className="flex items-center gap-2 px-3 py-2 rounded-md transition-all duration-150 soft-theme-gradient cursor-pointer">
-                              <Settings className="h-4 w-4" />
-                              <span>Nouvelle Saison</span>
-                          </div>
-                      </DialogTrigger>
-                      <DialogContent className="sm:max-w-[425px] p-0">
-                          <DialogHeader>
-                              <DialogTitle>Assigner une Nouvelle Saison</DialogTitle>
-                          </DialogHeader>
-                          {/* 5. Render SeasonForm in DialogContent */}
-                          <SeasonForm
-                              onSuccess={handleSeasonCreated}
-                              onCancel={handleCloseDialog}
-                              currentLeagueId={currentLeagueId}
-                              currentLeagueName={league.name}
-                              currentTenantId={league.tenantId}
-                              currentTenantName={league.tenant.name}
-                          />
-                      </DialogContent>
-                    </Dialog>
-                  }
+                  {/* Seasons live on their own list now, which is the only screen that shows
+                      more than one — and the acts on a season are about *which* one. This link
+                      replaced two things that both led nowhere: `/season/:id/dashboard`, a stub
+                      rendering the words "Season Dashboard", and an inline create-season dialog
+                      that duplicated the form. */}
+                  <Link href={buildLink("/league/seasons", { ctxLeagueId: league.id })}
+                    className="flex items-center gap-2 px-3 py-2 rounded-md transition-all duration-150 soft-theme-gradient">
+                      <Settings className="h-4 w-4" />
+                      <span>{league.currentSeasonId ? 'Saisons' : 'Créer une saison'}</span>
+                  </Link>
                 </div>
               }
             </section>

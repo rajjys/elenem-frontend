@@ -399,12 +399,19 @@ export default function TenantDashboard() {
                         <CardTitle className="text-lg font-semibold">Quick Actions</CardTitle>
                     </CardHeader>
                     <CardContent className='pb-4 grid grid-cols-2 md:grid-cols-4 gap-4'>
-                            <Link href="/season/create"
+                            {/* A season belongs to a competition, so the organisation cannot create
+                                one without first naming which — the competitions list is that
+                                choice, and each carries its own seasons. This used to point at
+                                `/season/create`, whose success handler redirected a tenant admin to
+                                `/tenant/seasons`, a route that has never existed. */}
+                            <Link href="/tenant/leagues"
                                 className="h-20 w-full flex flex-col items-center justify-center gap-2 rounded-md border border-line bg-surface-sunk hover:bg-line text-ink text-sm font-medium transition-colors">
                                 <Trophy className="h-6 w-6" />
-                                <span>Créer Une Nouvelle Saison</span>
+                                <span>Compétitions et saisons</span>
                             </Link>
-                            <Link href="/tenant/admin/add"
+                            {/* `/tenant/admin/add` is a 404 and always was. Inviting a colleague is
+                                what the users screen does. */}
+                            <Link href="/tenant/users"
                                 className="h-20 w-full flex flex-col items-center justify-center gap-2 rounded-md border border-line bg-surface-sunk hover:bg-line text-ink text-sm font-medium transition-colors">
                                 <UserPlus className="h-6 w-6" />
                                 <span>Ajouter un Admin</span>
