@@ -199,8 +199,15 @@ export default function StandingsExportPage() {
                   city: fields.city,
                   date: fields.date,
                   organisation: fields.organisation,
+                  // The workbook reproduces the letterhead and the signatures too: the two
+                  // circulate together, and a spreadsheet opening on a bare grid does not read as
+                  // the same act the signed sheet is.
+                  letterhead: fields.letterhead,
+                  reference: fields.reference,
                   signatoryRole: fields.signatoryRole,
                   signatoryName: fields.signatoryName,
+                  signatory2Role: fields.signatory2Role,
+                  signatory2Name: fields.signatory2Name,
                   showBands: fields.showBands,
                 },
                 { onError: (e) => toastApiError(e) },
