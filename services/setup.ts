@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { z } from 'zod';
 import { api, getApiErrorMessage } from './api';
 import { parseResponse } from './parse-response';
-import { Gender, SeasonStatus } from '@/schemas';
+import { Gender } from '@/schemas';
 import { toProperName } from '@/utils';
 
 /**
@@ -203,10 +203,11 @@ export function useCreateSeason() {
         leagueId: values.leagueId,
         startDate: values.startDate,
         endDate: values.endDate,
-        // A season whose start has passed is already running — which is the ordinary case for a
-        // league adopting Elenem in February, and the one the onboarding has to survive.
-        status:
-          new Date(values.startDate) <= new Date() ? SeasonStatus.ACTIVE : SeasonStatus.SCHEDULED,
+        // Onboarding used to derive a status here — ACTIVE if the start date had passed, else
+        // SCHEDULED — which was this screen inventing its own answer to a question the product had
+        // no owner for. It has one now: a season is created in PLANNING and opens itself on its
+        // first result, which is the fact that actually decides it in a market where the calendar
+        // slips. The server refuses a `status` outright rather than ignoring one.
       });
       return parseResponse(CreatedSeasonSchema, res.data);
     },

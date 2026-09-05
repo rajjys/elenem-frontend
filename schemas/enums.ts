@@ -75,16 +75,23 @@ export enum VisibilityLevel {
   PRIVATE = "PRIVATE",// Requires invitation or approval to view
   ARCHIVED = "ARCHIVED" // Old entities, viewable but inactive for new operations
 }
-// Enum for Season Status
+/**
+ * A season's life, in the four states that each forbid something the others allow.
+ *
+ * Nine values used to sit here (eight, in fact — the frontend never knew about the backend's
+ * `DELETED`), and between them they gated four things: `PAUSED` gated nothing, `ARCHIVED` and
+ * `COMPLETED` gated the same pair, `SCHEDULED` and `PLANNING` likewise. See
+ * docs/SEASON_AND_DASHBOARDS.md §1.
+ */
 export enum SeasonStatus {
-  UNKNOWN = 'UNKNOWN',
-  PLANNING = 'PLANNING',   
-  SCHEDULED = 'SCHEDULED',
+  /** Being set up. Fixtures may be added and moved freely; nothing has been played. */
+  PLANNING = 'PLANNING',
+  /** Being played. Opens itself on the first result recorded. */
   ACTIVE = 'ACTIVE',
-  PAUSED = 'PAUSED',
+  /** Over, and the table is final. */
   COMPLETED = 'COMPLETED',
+  /** Abandoned. */
   CANCELED = 'CANCELED',
-  ARCHIVED = 'ARCHIVED',
 }
 
 // src/enums/posts.ts

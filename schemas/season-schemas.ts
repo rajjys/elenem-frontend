@@ -4,15 +4,17 @@ import { LeagueDetailsSchema } from './league-schemas';
 import { TenantDetailsSchema } from './tenant-schemas';
 import { SeasonStatus } from './enums';
 
-// Zod schema for creating a new season
+// Zod schema for creating a new season.
+//
+// No `status` and no `isActive`: a season is created in preparation and moves through
+// `POST /seasons/:id/transitions`. The server refuses either field outright rather than ignoring
+// it, so a form that still sent one would 400.
 export const CreateSeasonSchema = z.object({
-  name: z.string().min(2, 'Season name must be at least 2 characters long.'),
+  name: z.string().min(2, 'Le nom de la saison doit faire au moins 2 caractères.'),
   startDate: z.string(),
   endDate: z.string(),
-  isActive: z.boolean(),
   description: z.string().optional(),
-  status: z.nativeEnum(SeasonStatus),
-  leagueId: z.string().min(1, 'League is required.'),
+  leagueId: z.string().min(1, 'La compétition est obligatoire.'),
   tenantId: z.string().optional()
 }).refine((data) => data.endDate >= data.startDate, {
   message: "End date cannot be before start date.",
@@ -25,9 +27,7 @@ export const UpdateSeasonSchema = z.object({
   startDate: z.string().refine((val) => !isNaN(new Date(val).getTime()), 'Invalid start date').transform((val) => new Date(val)).optional(),
   endDate: z.string().refine((val) => !isNaN(new Date(val).getTime()), 'Invalid end date').transform((val) => new Date(val)).optional(),
   description: z.string().optional(),
-  isActive: z.boolean().optional(),
-  status: z.nativeEnum(SeasonStatus).optional(),
-  leagueId: z.string().min(1, 'League is required.').optional(),
+  leagueId: z.string().min(1, 'La compétition est obligatoire.').optional(),
   tenantId: z.string().min(1, 'Tenant is required.').optional(),
 }).refine((data) => {
   if (data.startDate && data.endDate) {
@@ -62,7 +62,6 @@ export const SeasonFilterParamsSchema = z.object({
   search: z.string().optional(),
   tenantId: z.string().optional().nullable(),
   leagueId: z.string().optional().nullable(),
-  isActive: z.boolean().optional(),
   status: z.nativeEnum(SeasonStatus).optional(),
   startDateAfter: z.string().optional(), // Filter seasons starting after this date
   startDateBefore: z.string().optional(), // Filter seasons starting before this date
@@ -84,7 +83,6 @@ export const SeasonDetailsSchema = z.object({
   slug: z.string(),
   startDate: z.string().datetime(), // ISO string
   endDate: z.string().datetime(),   // ISO string
-  isActive: z.boolean(),
   description: z.string().optional(),
   status: z.nativeEnum(SeasonStatus),
   leagueId: z.string(),

@@ -400,6 +400,99 @@ built from real data; `/admin/dashboard` de-fictionalised.
 
 ---
 
+## 6bis. Built — Sprint 0 and Sprint 1 (2026-09-05)
+
+### Sprint 0 — the two live breakages
+
+- `GetGamesParamsDto.status` normalises to an array and validates with `each: true`. The league
+  dashboard's *Prochains Matchs* panel returns fixtures for the first time.
+- `useSidebarEligibility` reads the club administrator's competition from `managingTeam.leagueId`.
+  `UserSchema` gained the field its own `BasicTeam` interface had always declared.
+
+### Sprint 1 — the season's life, server side
+
+**The enum is four values.** `20260905090000_season_four_states` rebuilds the Postgres type and
+maps the five removed values losslessly. It also drops `Season.isActive`, which was a second
+vocabulary for the same fact — `games.service` required `isActive: true` while the standings read
+`status`, and nothing kept them agreeing.
+
+The backfill is *honest* rather than merely valid: an `ACTIVE` season with no completed game becomes
+`PLANNING`, which is the same rule the state machine applies forwards. On the seeded database that
+correctly moved Championnat Goma D2 Messieurs — 15 fixtures, no results — into pre-season, so the
+case the dashboards need is now present in dev data for free.
+
+**`SeasonStateService`** is `GameStateService`'s shape for the larger object: a transition map,
+verbs at `POST /seasons/:id/transitions`, refusals in French naming both states, and an `AuditLog`
+row with the `reason` column behind every move. `status` is gone from `UpdateSeasonDto` and from
+`CreateSeasonDto` — and because the API runs `forbidNonWhitelisted`, a caller that still sends one
+is **refused rather than silently ignored**, which is the right failure for a field that used to
+decide something.
+
+The transitions:
+
+```
+PLANNING  → ACTIVE | CANCELED
+ACTIVE    → COMPLETED | CANCELED
+COMPLETED → ACTIVE          (reopening, deliberately legal)
+CANCELED  → PLANNING
+```
+
+`COMPLETED → ACTIVE` is there because the federation's *Homologation des résultats* bulletin ratifies
+five days of results after the fact — a result corrected a fortnight late is the ordinary case here.
+Before this, a league admin who closed a season could neither edit it nor reopen it.
+
+**One automatic move**, in `processGameResult`, which is the single point every result passes
+through: a `PLANNING` season becomes `ACTIVE` on its first result. Audited with
+*« Premier résultat enregistré »*. It refuses rather than throws if the competition already has an
+`ACTIVE` season, because saving a score must never fail over a pointer.
+
+**`currentSeasonId` has one author.** `SeasonStateService.syncCurrentSeason` derives it — the
+`ACTIVE` season, else the oldest `PLANNING` one, else nothing — and creation, deletion and every
+transition call it. Creation no longer claims the pointer, `PUT /leagues/:id` no longer accepts it
+(a second writer that could aim it at a completed season), and the create-time refusal is gone
+entirely: a season is always created in `PLANNING`, so creating one cannot break the one invariant
+that matters, which is enforced on the move to `ACTIVE` instead.
+
+**The write target and the read default are now different questions**, which is what the whole §0
+failure came down to:
+
+- *Where does a new fixture go?* `league.currentSeasonId` — and `CreateGameDto` finally has a
+  `seasonId` to override it with, which `POST /calendar/publish` now passes, so a draft studied for
+  one season can no longer be published into another.
+- *Whose table is "the standings"?* `currentSeasonOf` — the `ACTIVE` season, else **the most recent
+  season that actually produced a result**. The two answers differ in exactly one case and it is the
+  case that mattered: the day a league closes 2026-27 and plans 2027-28, the pointer moves (rightly,
+  that is where the next fixture belongs) and a table read through it would have gone blank for every
+  club that cannot name a season.
+
+Every message an organiser can provoke from the seasons module is now French.
+
+### Verified on a throwaway organisation, created and destroyed
+
+| | |
+|---|---|
+| creation with `status` in the body | `400 property status should not exist` — refused, not ignored |
+| creation without it | `PLANNING`, and the league's pointer follows |
+| `PUT /seasons/:id { status }` | `400` — the field no longer exists |
+| `PLANNING → COMPLETED` | `409 « Une saison en préparation ne peut pas devenir terminée. »` |
+| a move with no reason | `400 « Indiquez la raison — ce changement touche un classement déjà publié. »` |
+| first result recorded | season opened itself, `PLANNING → ACTIVE`, audited |
+| planning next season while one runs | allowed; pointer stays on the season being played; new fixtures still land there; the table survives |
+| `POST /calendar/publish { seasonId: S2 }` | the fixture lands in **S2** |
+| closing the season | pointer hands over to the planned season; fixtures into the closed one are refused in French; the default table stays on the last season that was played |
+| editing a closed season | `409 « Cette saison est terminée. Rouvrez-la pour la modifier. »` |
+| reopening it | allowed, audited with its reason |
+| opening a second season | `409 « … est déjà en cours dans cette compétition. »` |
+
+Migration baseline verified clean (`prisma migrate diff --from-migrations --to-schema --exit-code`
+→ 0). The seeded data was checked unchanged afterwards apart from the intended D2 backfill.
+
+`scripts/seed-dev.mjs` no longer sends a status. The path it takes — create, publish fixtures,
+record results, season opens itself — is the one covered by the table above, but the script has not
+been run end to end since the change, because reseeding would have destroyed data in use.
+
+---
+
 ## 7. Verified by running it
 
 - Six seeded seasons, all `ACTIVE`, one per league — the product has never been in another state.

@@ -7,7 +7,6 @@ import {
   Settings,
   Building2,
   Crown,
-  TrendingUp,
   Trash,
 } from 'lucide-react';
 import Link from 'next/link';
@@ -46,7 +45,7 @@ export const LeagueCard: React.FC<LeagueCardProps> = ({ league, tenant, onDelete
               <div className="flex items-center gap-2 text-xs text-ink-muted">
                 <span>{capitalize(tenant?.sportType || '')}</span>
                 <span>•</span>
-                <span>{league.currentSeason && league.currentSeason.status !== "UNKNOWN" ? league.currentSeason.name : "Non definie"}</span>
+                <span>{league.currentSeason?.name ?? 'Aucune saison'}</span>
               </div>
             </div>
           </div>
@@ -91,7 +90,10 @@ export const LeagueCard: React.FC<LeagueCardProps> = ({ league, tenant, onDelete
 
         {/* Stats – Hidden on XS */}
       <Link href={buildLink('/league/dashboard', { ctxLeagueId: league.id })} key={league.id}>
-        <div className="hidden sm:grid grid-cols-3 gap-4 text-xs text-ink-muted">
+        {/* Two facts, not three. The third was a green `$0` under a rising-trend arrow — a
+            revenue figure, on a free product, for leagues in Goma. A number nobody computed,
+            printed in a currency nobody uses, styled as good news. */}
+        <div className="hidden sm:grid grid-cols-2 gap-4 text-xs text-ink-muted">
           <div className="flex items-center gap-1">
             <Building2 className="h-3 w-3" />
             <span>{league.teams?.length || 0} Équipes</span>
@@ -99,10 +101,6 @@ export const LeagueCard: React.FC<LeagueCardProps> = ({ league, tenant, onDelete
           <div className="flex items-center gap-1">
             <Crown className="h-3 w-3" />
             <span>{league.managingUsers?.length || 0} Managers</span>
-          </div>
-          <div className="flex items-center gap-1 text-positive font-semibold">
-            <TrendingUp className="h-3 w-3" />
-            <span>$0</span>
           </div>
         </div>
       </Link>

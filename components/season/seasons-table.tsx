@@ -16,6 +16,7 @@ import {
 import { SeasonStatus, Roles, SeasonSortableColumn, SeasonDetails } from '@/schemas'; // Your Season DTO
 
 import { ArrowUpDown, Pencil, Trash, MoreVertical } from 'lucide-react';
+import { SeasonStatusBadge } from '@/components/ui';
 
 //type SortableColumn = 'name' | 'startDate' | 'endDate' | 'status' | 'createdAt' | 'updatedAt' | 'leagueName' | 'tenantName';
 
@@ -134,12 +135,10 @@ export function SeasonsTable({ seasons, onSort, sortBy, sortOrder, onDelete, cur
         <TableBody className="bg-surface divide-y divide-line">
           {seasons.map((season) => (
             <TableRow key={season.id}>
+              {/* One column said Active/Inactive from `isActive` and another said the status;
+                  they were two names for one fact and could disagree. `isActive` is gone. */}
               <TableCell className="px-6 py-4 whitespace-nowrap">
-                <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                  season.isActive ? 'bg-positive-soft text-positive' : 'bg-negative-soft text-negative'
-                }`}>
-                  {season.isActive ? 'Active' : 'Inactive'}
-                </span>
+                <SeasonStatusBadge status={season.status} />
               </TableCell>
               <TableCell className="px-6 py-4 whitespace-nowrap">
                 <div className="text-sm font-medium text-ink">

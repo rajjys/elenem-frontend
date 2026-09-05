@@ -15,9 +15,8 @@ import { toast } from "sonner";
 import { api, isAxiosError } from '@/services/api';
 import { useAuthStore } from "@/store/auth.store";
 import { LeagueDetails, Roles, SeasonDetails, TenantDetails } from "@/schemas";
-import { CreateSeasonSchema, SeasonStatus, CreateSeasonDto } from "@/schemas/";
+import { CreateSeasonSchema, CreateSeasonDto } from "@/schemas/";
 import { Button, Input, Label, TextArea } from "../ui";
-import { capitalizeFirst } from "@/utils";
 
 interface SeasonFormProps {
   onSuccess: (season: SeasonDetails) => void;
@@ -59,8 +58,6 @@ export function SeasonForm({ onSuccess, onCancel, currentLeagueId, currentTenant
       startDate: today,
       endDate: tomorrow,
       description: "",
-      isActive: true,
-      status: SeasonStatus.ACTIVE,
       // leagueId is the only ID field submitted
       leagueId: currentLeagueId ? currentLeagueId : 
         isLeagueAdmin && userAuth?.managingLeagueId ? userAuth.managingLeagueId : ""
@@ -156,16 +153,14 @@ export function SeasonForm({ onSuccess, onCancel, currentLeagueId, currentTenant
         startDate: data.startDate,
         endDate: data.endDate,
         description: data.description,
-        isActive: data.isActive,
-        status: data.status,
         leagueId: data.leagueId, // Backend will derive tenantId from this
       };
 
       const res = await api.post<SeasonDetails>("/seasons", payload);
-      toast.success("Season created successfully!");
+      toast.success(`Saison « ${res.data.name} » créée.`);
       onSuccess(res.data);
     } catch (error) {
-      let errorMessage = "Failed to create season.";
+      let errorMessage = "La saison n’a pas pu être créée.";
       if (isAxiosError(error)) {
           errorMessage = error.response?.data?.message || errorMessage;
       }
@@ -322,36 +317,17 @@ export function SeasonForm({ onSuccess, onCancel, currentLeagueId, currentTenant
           <TextArea id="description" placeholder="Description" {...register("description")} rows={3} disabled={isSubmitting} />
         </div>
         
-        {/* Status */}
-        <div>
-          <Label htmlFor="status">Status</Label>
-          <Controller
-            name="status"
-            control={control}
-            render={({ field }) => (
-              <Select onValueChange={field.onChange} value={field.value} disabled={isSubmitting}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select status" />
-                </SelectTrigger>
-                <SelectContent>
-                  {Object.values(SeasonStatus).map((status) => (
-                    <SelectItem key={status} value={status}>
-                      {capitalizeFirst(status.replace(/_/g, " "))}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
-          />
-        </div>
+        {/* No status field. A season is created in preparation and opens itself on its first
+            result; there was never a choice to make here, and the dropdown offered eight values of
+            which three were refused by the server the moment they were submitted. */}
 
         {/* Form Actions */}
         <div className="flex justify-between space-x-4">
           <Button type="button" variant="secondary" onClick={onCancel} disabled={isSubmitting}>
-            Cancel
+            Annuler
           </Button>
           <Button type="submit" disabled={isSubmitting || (isSystemAdmin && !selectedTenantId)}>
-            {isSubmitting ? "Creating..." : "Create Season"}
+            {isSubmitting ? "Création…" : "Créer la saison"}
           </Button>
         </div>
       </form>

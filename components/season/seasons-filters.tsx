@@ -6,7 +6,6 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Switch } from '@/components/ui/switch';
 import { useDebounce } from 'use-debounce';
 
 import {
@@ -45,7 +44,6 @@ export function SeasonsFilters({ filters, onFilterChange, onPageSizeChange, fixe
   const [search, setSearch] = useState(filters.search || '');
   const [selectedTenantId, setSelectedTenantId] = useState(fixedTenantId || filters.tenantId || '');
   const [selectedLeagueId, setSelectedLeagueId] = useState(fixedLeagueId || filters.leagueId || '');
-  const [isActive, setIsActive] = useState<boolean | undefined>(filters.isActive);
   const [selectedStatus, setSelectedStatus] = useState<SeasonStatus | undefined>(filters.status);
   const [startDateAfter, setStartDateAfter] = useState(filters.startDateAfter || '');
   const [startDateBefore, setStartDateBefore] = useState(filters.startDateBefore || '');
@@ -128,7 +126,6 @@ export function SeasonsFilters({ filters, onFilterChange, onPageSizeChange, fixe
       search: debouncedSearch === '' ? undefined : debouncedSearch,
       tenantId: selectedTenantId === '' ? undefined : selectedTenantId,
       leagueId: selectedLeagueId === '' ? undefined : selectedLeagueId,
-      isActive: isActive,
       status: selectedStatus,
       startDateAfter: debouncedStartDateAfter === '' ? undefined : debouncedStartDateAfter,
       startDateBefore: debouncedStartDateBefore === '' ? undefined : debouncedStartDateBefore,
@@ -145,7 +142,7 @@ export function SeasonsFilters({ filters, onFilterChange, onPageSizeChange, fixe
       onFilterChange(newFilters);
     }
   }, [
-    debouncedSearch, selectedTenantId, selectedLeagueId, isActive, selectedStatus,
+    debouncedSearch, selectedTenantId, selectedLeagueId, selectedStatus,
     debouncedStartDateAfter, debouncedStartDateBefore, debouncedEndDateAfter, debouncedEndDateBefore,
     filters, onFilterChange, fixedTenantId, fixedLeagueId
   ]);
@@ -163,7 +160,6 @@ export function SeasonsFilters({ filters, onFilterChange, onPageSizeChange, fixe
     setSearch('');
     setSelectedTenantId(fixedTenantId || '');
     setSelectedLeagueId(fixedLeagueId || '');
-    setIsActive(undefined);
     setSelectedStatus(undefined);
     setStartDateAfter('');
     setStartDateBefore('');
@@ -176,7 +172,6 @@ export function SeasonsFilters({ filters, onFilterChange, onPageSizeChange, fixe
       search: undefined,
       tenantId: fixedTenantId || undefined,
       leagueId: fixedLeagueId || undefined,
-      isActive: undefined,
       status: undefined,
       startDateAfter: undefined,
       startDateBefore: undefined,
@@ -264,24 +259,8 @@ export function SeasonsFilters({ filters, onFilterChange, onPageSizeChange, fixe
               </div>
             )}
 
-            {/* Status Switch (isActive) */}
-            <div className="flex items-center space-x-2 mt-2">
-              <Switch
-                id="seasonStatusActive"
-                checked={isActive || false}
-                onCheckedChange={setIsActive}
-              />
-              <Label htmlFor="seasonStatusActive" className="text-sm font-medium text-ink">Active Seasons</Label>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setIsActive(undefined)}
-                className="ml-2 text-ink-muted hover:bg-surface-sunk rounded-md px-2 py-1"
-                disabled={isActive === undefined}
-              >
-                Clear
-              </Button>
-            </div>
+            {/* The "Active Seasons" switch sat directly above the status dropdown and filtered on
+                a second field that meant the same thing. One control now: the status. */}
 
             {/* Season Status Select */}
             <div>
