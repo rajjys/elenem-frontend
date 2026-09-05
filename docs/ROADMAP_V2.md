@@ -437,3 +437,70 @@ of them wanted to be season-scoped.
   end.**
 - **Lineups submitted before a match** (item 12's remainder). Appearances are recorded; a club
   *declaring* its squad in advance is a different feature and remains unasked-for.
+
+
+---
+
+## 11. Items 14a and 14 are closed (2026-09-05)
+
+`docs/SEASON_AND_DASHBOARDS.md` carries the argument, the four decisions and the verification. The
+headlines for this roadmap:
+
+### 14a — season management
+
+**Four states**, not nine: `PLANNING · ACTIVE · COMPLETED · CANCELED`, each forbidding something
+the others allow. Of the nine, `PAUSED` gated nothing, `ARCHIVED`/`COMPLETED` and
+`SCHEDULED`/`PLANNING` were each one state under two names, and `DELETED` was settable by PUT on a
+season that then stayed current and went on accepting fixtures.
+
+**A machine, not a field.** `SeasonStateService` in `GameStateService`'s shape — transition map,
+verbs, French refusals naming both states, an audit row with a reason. `status` is out of both
+DTOs and *refused* rather than ignored. One automatic move: a season opens itself on its first
+result. Closing is always a person, because "every fixture has a result" would fire on the regular
+phase before §6 A4's playoff format has been decided.
+
+**`currentSeasonId` was not stale — it was an ambient global.** `CreateGameDto` had no `seasonId`
+at all, so the pointer was the only possible answer, and creating a season claimed it
+unconditionally. Together those two produced a `POST /calendar/publish` that reported success
+while writing the fixture into a different season, and a club's standings screen that would have
+gone blank the day their league planned next season. Three writers of that pointer are now one.
+
+**The season's own screen is retired.** `/season`, `/season/[seasonId]/dashboard`,
+`/season/layout.tsx` and `/season/create` are deleted — every job they might have held has a
+better home, and what was left over is four verbs, which belong on `/league/seasons` beside the
+seasons themselves. §10.1's question is answered: there is no season screen, and there should not
+be one.
+
+### 14 — the dashboards
+
+**Three, not four.** `OrganiserDashboard` with a scope for tenant and league, `ClubDashboard`, and
+`/admin/dashboard` de-fictionalised. One purpose-built endpoint each instead of five sequential
+list calls.
+
+**The number the whole item was for**: *résultats manquants* — fixtures whose date has passed with
+no score. It leads the organiser's screen and reads 21 on the seeded organisation. The standings
+engine has computed it per league for months and no dashboard showed it.
+
+Two of the four screens turned out to be fiction rather than "season-blind counters":
+`/team/dashboard` fetched nothing and rendered an invented English club, and `/admin/dashboard`
+reported invented revenue and support tickets.
+
+### Found and fixed on the way
+
+- The league dashboard's *Prochains Matchs* panel had **never worked** — `@IsEnum` with no
+  `each: true` refused the status array it sends, so it always read "Aucun match programmé".
+- **Club administrators had no sidebar at all**, on every page: `useSidebarEligibility` read
+  `managingLeagueId`, which is null for them. `getPostAuthRedirect` sends every one of them to
+  `/team/dashboard`, so that fake club was the whole product they could see.
+- `/league/settings/general` was a third writer of `currentSeasonId`, and `/tenant/admin/add` and
+  `/tenant/seasons` were linked 404s.
+- The seed scored 190 fixtures dated in the future, which made every new screen look broken.
+
+### What Phase 3 still owes
+
+Items **7** (`Stage`) and **8** (the playoff composer) remain, and remain the long ones. The
+federation's own bulletin (`docs/Homologation…pdf`) is the argument for both: its calendar prints
+`PLAYOFFS 2026`, `BARRAGE 2026` and `FINALE 2026` as named phases with conditional fixtures
+(*SI NECESSITE*) and unseeded placeholders (`GAME 1 / GAME 2 / GAME 3`), and its classement
+publishes the men's table as *phase de 6* while the women's is *général* — two competitions in the
+same organisation in different phases on the same signed sheet.
