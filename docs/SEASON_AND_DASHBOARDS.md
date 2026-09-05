@@ -1,0 +1,421 @@
+# The season's life, and the four dashboards
+
+> Written 2026-09-05, before any code. Companion to `ROADMAP_V2.md` §10.1, which opened item 14a,
+> and to item 14. Where this and the roadmap disagree, this wins for these two items.
+>
+> Everything below was checked by running it: against the seeded database, against a throwaway
+> organisation created and destroyed for the purpose, and through the real app in a browser. The
+> commands are named so the claims can be re-verified.
+
+---
+
+## 0. The thing the roadmap got slightly wrong, and why it matters
+
+`ROADMAP_V2` §10.1 says `League.currentSeasonId` is "a pointer nothing maintains". That reads as a
+tidiness complaint, and it is not one. Two things are actually true:
+
+- **It is maintained** — `createSeasonScoped` sets it, `deleteSeasonScoped` clears it
+  (`seasons.service.ts:460`, `:618`).
+- **It is the write target for every fixture in the product.** `CreateGameDto` has no `seasonId`
+  field at all. `_validateScopeAndInputs` reads `league.currentSeasonId` and uses it
+  (`games.service.ts:668`). There is no way, anywhere, to put a fixture in any other season.
+
+So the defect is not staleness. It is that **creating a season silently redirects every write in
+the competition**, and that a caller who names a season is not obeyed. Proved on a throwaway league:
+
+```
+POST /calendar/publish { seasonId: S1, fixtures: [...] }
+  → 201 { createdCount: 1 }
+  → the created game's seasonId is S2
+```
+
+S1 was `COMPLETED` and would have refused the fixture. S2 accepted it, the caller was told
+`createdCount: 1`, and nothing anywhere says the fixture went somewhere else. The same run showed
+the second half of it:
+
+```
+GET /games/standings/view?leagueId=…     (no seasonId — what every screen sends)
+  → S2's table: empty
+```
+
+A club administrator cannot pass a `seasonId` — `GET /seasons` refuses them by design
+(`GAME_AND_STANDINGS` §3.5). So **the day a league creates next season, every club's standings
+screen goes blank**, and the table they came for is unreachable from their surface.
+
+None of this can happen today because every league has exactly one season and nobody has made a
+second. All six seeded seasons are `ACTIVE`. The product has never been in any other state.
+
+---
+
+## 1. Which of the nine statuses are real
+
+`SeasonStatus` has nine values in Prisma and **eight** in `schemas/enums.ts` — the frontend has
+never known about `DELETED`. Here is every place a season's status changes what may happen,
+found by reading, not by grepping for the word:
+
+| Gate | Where | States |
+|---|---|---|
+| Refuse a new fixture | `games.service.ts:675` | `ARCHIVED · CANCELED · COMPLETED` |
+| Refuse creating a second season | `seasons.service.ts:393` | `PLANNING · SCHEDULED · ACTIVE · PAUSED` |
+| Refuse a league admin editing it | `seasons.service.ts:522` | `COMPLETED · ARCHIVED` |
+| Refuse creation | `seasons.service.ts:391` | `UNKNOWN` |
+
+That is the whole list. Which means:
+
+- **`PAUSED` gates nothing.** It is not in the refusal list for fixtures, so a paused season behaves
+  exactly like an active one.
+- **`ARCHIVED` and `COMPLETED` gate the same two things.** They are one state with two names.
+- **`SCHEDULED` and `PLANNING` gate the same one thing.** Also one state with two names.
+- **`DELETED` is a decoy.** It is written by the soft-delete path, and it is also freely settable by
+  `PUT /seasons/:id`, where it does nothing. Verified: a season set to `DELETED` by PUT is still
+  returned by `GET /seasons/:id`, is still the league's `currentSeasonId`, and **still accepts new
+  fixtures** — because `DELETED` is not in the refusal list. Deletion is `deleted_at`. The enum
+  value is a trap wearing the name of a destructive act.
+- **`UNKNOWN`** is a Prisma-default artefact that creation already refuses.
+
+### There is no transition machine, and the field is a free-text choice
+
+`UpdateSeasonDto` carries `status` and `PUT /seasons/:id` writes it. Ten arbitrary jumps in a row,
+every one a 200:
+
+```
+SCHEDULED → ACTIVE → PAUSED → COMPLETED → ACTIVE → CANCELED → ARCHIVED → PLANNING → UNKNOWN → DELETED
+```
+
+`COMPLETED → ACTIVE` and `ARCHIVED → PLANNING` are un-completing a season by typing a word into a
+dropdown, with no audit entry and no reason asked. Compare `Game`, which for the same nine-value
+problem has an explicit transition map, verbs rather than a field, refusals in French naming both
+states, an optimistic-locking `version` column, and an `AuditLog` row behind every move
+(`game-state.service.ts:128`). A season is a bigger object than a game and has none of it.
+
+`season-form.tsx` renders all eight frontend values in a raw dropdown with English labels
+(`Unknown`, `Planning`, `Scheduled`…). Several of the choices it offers are guaranteed 400s:
+creation refuses `UNKNOWN` outright, refuses a running status on a season that already ended, and
+refuses a finished status on a season that has not started.
+
+### Two more fields say the same thing
+
+`Season.isActive` is a second truth source — `games.service.ts:672` requires `isActive: true`
+independently of `status` — and `deleted_at` is a third. Three fields, overlapping, none of them
+derived from the others.
+
+### Recommendation: four states
+
+Each one has to forbid something the others allow, or it is a label.
+
+| State | What it means | What it forbids | What it enables |
+|---|---|---|---|
+| **`PLANNING`** | being set up; nothing has been played | nothing | fixtures may be added and moved freely |
+| **`ACTIVE`** | being played | — | results, the live table, the published bulletin |
+| **`COMPLETED`** | over, and the table is final | new fixtures, new results | the next season may open |
+| **`CANCELED`** | abandoned | new fixtures, new results | the table means nothing and says so |
+
+**Cut, with the reason so it is not relitigated:**
+
+- **`SCHEDULED`** — "dates are finalised" is a fact about the calendar, and the calendar module
+  already has a publish step that means exactly that (`POST /calendar/publish`). A second
+  published-flag on the season is two writers on one fact, which `GAME_AND_STANDINGS` §3.7 already
+  ruled against for `LeagueRules`.
+- **`PAUSED`** — it forbids nothing today and I cannot name what it should forbid. A season halting
+  in Goma is real; what actually happens is that individual fixtures are `POSTPONED`, which the game
+  machine already handles with a reason and an audit row. A season-wide pause changes what the
+  dashboard *says*, and that is a note, not a state.
+- **`ARCHIVED`** — its only distinct meaning would be "keep it out of the pickers", which needs a
+  league with ten seasons. LIPROBAKIN has one. Revisit when a picker is actually crowded.
+- **`UNKNOWN`** — a season always has a state.
+- **`DELETED`** — removed from the enum. Deletion is `deleted_at`.
+- **`isActive`** — dropped or derived. One field decides.
+
+Migration is lossless: `SCHEDULED → PLANNING`, `PAUSED → ACTIVE`, `ARCHIVED → COMPLETED`,
+`UNKNOWN → PLANNING`, `DELETED` rows already carry `deleted_at`.
+
+---
+
+## 2. What moves a season between them
+
+The roadmap asks whether anything happens automatically, and what breaks the first time it fires on
+a league mid-correction. That second half is the whole answer.
+
+**`PLANNING → ACTIVE` — automatic, on the first result recorded.**
+
+Not on a date. A season whose start date has passed with no game played is still pre-season, and
+that is LIPROBAKIN's ordinary shape: their published calendar (`docs/Homologation…pdf`, p.6) ends
+with a `BARRAGE` whose fixtures are marked *SI NECESSITE* and a `FINALE` whose teams are `GAME 1 /
+GAME 2 / GAME 3` placeholders. Dates in this competition are the plan; results are the fact. The
+transition is safe to automate because it is monotonic and only *opens* things — nothing that was
+allowed in `PLANNING` becomes forbidden in `ACTIVE`.
+
+**`ACTIVE → COMPLETED` — never automatic.**
+
+This is the one that would break. The obvious trigger is "every fixture has a result" — and it would
+fire on LIPROBAKIN's regular phase the moment the last regular fixture is scored, because §6 A4 says
+the playoff format is decided *after* they see how much calendar is left. The season would close
+itself, refuse the playoff fixtures the committee then agrees, and the operator would meet a French
+refusal with no idea what changed. A league mid-correction is worse: a result entered wrongly and
+fixed a week later would close and reopen the season on its own.
+
+So the product **offers** it — when every fixture on record has a result, the league's screen says
+so and puts the verb next to it — and a person commits it, with a reason, audited. That is also what
+the federation does: page 6 of the bulletin ends with a signed line reading *FIN DE LA SAISON
+SPORTIVE 2025-2026*. Closing a season is an act of a committee, not the expiry of a date.
+
+**`COMPLETED → ACTIVE` — allowed, deliberate, audited.**
+
+Today a league admin who closes a season cannot reopen it: `seasons.service.ts:522` refuses a
+`LEAGUE_ADMIN` any update to a `COMPLETED` season. That is a one-way trap on the role that runs the
+competition. And reopening is a real event — page 1 of the same bulletin is *Notification 005:
+Homologation des résultats*, a committee ratifying five days of results after the fact under
+articles 371 and 372 of the RGS. Results in this domain are corrected weeks later by design.
+
+**`→ CANCELED` — deliberate, with a reason.**
+
+**Nothing else is automatic. No cron, no date-triggered job.** A date-triggered job in Goma fires on
+a calendar that has already slipped, and the first thing the operator learns is that the software
+has an opinion they cannot override. That is the opposite of `CALENDAR_MODULE` §0.
+
+The mechanism is `GameStateService`'s, copied deliberately: a transition map, verbs not a field,
+refusals in French naming both states, an `AuditLog` row with a `reason` column. `status` comes out
+of `UpdateSeasonDto` entirely — it is not a property of a season any more than a game's status is a
+property of a game.
+
+---
+
+## 3. `currentSeasonId` — keep it, and invert who decides it
+
+The tempting answer is "derive it and delete the column". That is wrong, and the reason is precise.
+
+Derived as *the latest by start date*, or *the one whose dates contain today*, it breaks the first
+time somebody plans ahead — which is exactly what a season-management screen is for. Create the
+2027-28 season in April while 2026-27's playoffs are still running and the derived answer flips to
+next season: every club's standings screen goes blank, and they cannot pass a `seasonId` to argue.
+That is the same failure as §0, arrived at from the other direction.
+
+Derived as *the one that is `ACTIVE`* is closer, but it is a query dressed as a rule, and it has no
+answer during pre-season, when there is exactly one season and nothing has been played.
+
+**Keep the column. Change three things:**
+
+1. **Creation stops stealing it.** A new season takes the pointer only if the league has none.
+   Today `createSeasonScoped` assigns it unconditionally.
+2. **The state machine maintains it.** Closing the current season hands the pointer to the league's
+   `ACTIVE` season, or to its only `PLANNING` one, or clears it. Opening a season takes it.
+3. **The create rule relaxes.** Today you cannot create next season until you close this one —
+   `seasons.service.ts:393` refuses while any of `PLANNING · SCHEDULED · ACTIVE · PAUSED` exists.
+   That is backwards: planning next season while the current one finishes is the normal thing. The
+   rule becomes **at most one `ACTIVE` season per league**, any number `PLANNING`.
+
+And the writes must honour it rather than working around it:
+
+- `CreateGameDto` gains `seasonId`, optional, defaulting to the current one and **validated against
+  the league** when supplied.
+- `POST /calendar/publish` passes the `seasonId` it was given, so a draft studied for one season
+  cannot be published into another.
+
+Those two are a bug fix, not a refactor. They are the difference between `currentSeasonId` being a
+default and being an ambient global.
+
+---
+
+## 4. The season's own screen should not exist
+
+`ROADMAP_V2` §10.1 asks what a season's screen is for, given that the calendar, the standings and
+the games are already tenant- or league-scoped and none of them wanted to be season-scoped. Argued
+honestly, the answer is: nothing.
+
+Every job a season screen might hold already has a home, and a better one:
+
+| Job | Where it lives, and why that is right |
+|---|---|
+| fixtures | the calendar — tenant-level, because one hall on one Saturday is one resource (`CALENDAR_MODULE` §1) |
+| the table | `/league/standings`, which already carries a season picker when there is more than one |
+| the points rule, the bands | `/league/settings/rules` (`GAME_AND_STANDINGS` §3.7) |
+| the clubs, the rosters | `/league/teams`, `/league/players` |
+| a result | the calendar's day panel, or `/game/[id]` |
+
+What is left with no home is **the four acts on the season itself** — open it, close it, reopen it,
+cancel it — plus its name, its dates, and its history. That is three buttons and a timeline. It is
+the same shape as a game's verbs, and `CALENDAR_MODULE` §8.1 already decided where those go: beside
+the thing, not on a page of their own.
+
+`/season/page.tsx` renders the words "Season Page" and `/season/[seasonId]/dashboard` renders
+"Season Dashboard" — the same stubs `/game/manage` and `/game/dashboard` were before
+`GAME_AND_STANDINGS` §2.4 retired them. `/season/layout.tsx` is worse: a one-item sidebar naming
+itself, which is exactly the pattern §2.3 of that document condemned for stranding a reader on a
+leaf. And `/season/create` redirects a tenant admin to `/tenant/seasons`, which is a 404.
+
+**Retire `/season`, `/season/[seasonId]/dashboard`, `/season/layout.tsx` and `/season/create`.**
+
+Season management becomes **`/league/seasons`, rebuilt** — the competition's *editions*, which is
+the customer's own word for them: the published calendar is headed *31ème ÉDITION*. One row per
+season with its state, its dates, how many fixtures it holds and how many have results, the verbs
+that are legal from where it is, and creation in a dialog on the same page. The list is where the
+acts belong because the acts are about *which* season, and the list is the only place that shows
+more than one.
+
+This is not "we ran out of time for the season screen". It is the same conclusion the calendar
+reached about `/season/fixtures` and the match page reached about `/game/dashboard`, for the same
+reason: a screen has to earn its address.
+
+---
+
+## 5. The dashboards
+
+`ROADMAP_V2` item 14 describes four screens showing "the same season-blind counter grids". That
+understates it in two places and overstates it in one.
+
+### What is actually on screen
+
+**`/team/dashboard` (373 lines) is not season-blind — it is fiction.** It fetches nothing. It
+renders a hardcoded English club called *Lightning Strikers*, "Premier League Division A · Founded
+2018", four players named Marcus Johnson, Alex Rivera, David Chen and Sarah Williams, their goals
+and assists, three fake results against Thunder Bolts and Fire Dragons, and three fake
+announcements. Logged in as `coach.vir@libago.cd`, the breadcrumb says `VIR › Tableau de bord` above
+a club that does not exist.
+
+**And that club administrator has no sidebar at all.** `useSidebarEligibility` requires
+`ctxTenantId && ctxLeagueId && ctxTeamId` on a `/team/*` route, and reads the league from
+`user.managingLeagueId`, which is `null` for a team admin — their league is on
+`user.managingTeam.leagueId`. Verified against `/auth/me` and in the browser on all three team
+pages: zero navigation links. `getPostAuthRedirect` sends every team admin to `/team/dashboard`, so
+a club's entire experience of the product is one fake page with no way off it. The `/team/standings`
+entry added for them in the standings work is in `nav-items.ts` and has never been reachable.
+
+**`/admin/dashboard` (659 lines) is also entirely fabricated** — "$89,230 monthly revenue", 324
+tenants, four named support tickets, five services' uptime percentages. `/admin` is only ever the
+founder (`ANALYSIS_2026-08` §8 Q3), so it is not a launch blocker, but a screen invented for a demo
+is worse than an empty one on the surface where you check whether something is wrong.
+
+**`/league/dashboard` (540 lines) is real data with four defects**, all confirmed in the browser:
+
+- **"Prochains Matchs" 400s on every load** and is permanently empty. It sends
+  `status=SCHEDULED&status=LIVE` as a repeated parameter; `GetGamesParamsDto` declares
+  `status?: GameStatus | GameStatus[]` but validates with `@IsEnum(GameStatus)` and no
+  `{ each: true }`, so an array is always rejected. Reproduced directly:
+  `GET /games?status=SCHEDULED` → 200, `GET /games?status=SCHEDULED&status=LIVE` → 400. It is the
+  only caller in the frontend that sends an array. On a competition with 63 unplayed fixtures the
+  panel reads *Aucun match programmé*.
+- **"Billets vendus (Aujourd'hui) · 0 · +3.6% from last season"** — the value is a literal `0`, the
+  trend is a literal `3.6`, and half the card is in English.
+- **"0.0% from last season"** on Équipes and Athlètes: `getLeagueMetricsScoped` only computes a
+  delta when `compareTo` is passed, and the page never passes it. And "Matchs Joués · +30.0%" is
+  `gamesPlayedRatio` — a completion ratio — rendered green with a plus sign as though it were growth.
+- **An `N` column** for draws on a basketball table, all zeroes for ever. `GAME_AND_STANDINGS` §3.4
+  removed it from the standings screen and it survived here. Every team's avatar also renders the
+  letter **L**, because the card passes `name="logo"` and the fallback takes the initial.
+
+It also holds ~90 lines of `hidden` English dead markup ("Quick Actions / Manage Teams / Schedule
+Game"), and it is `useState + useEffect + axios` throughout — five sequential fetches — against the
+React Query convention that is supposed to be mandatory.
+
+**`/tenant/dashboard` (428 lines) is the healthiest** and still has: `TenantDetailsSchema.parse()`
+and `PaginatedLeaguesResponseSchema.parse()` instead of `parseResponse`; the same fabricated
+ticket-sales card; **`$0` printed on every league card**, in Goma; English toasts and error strings;
+an English "Quick Actions" heading; and a quick action pointing at `/tenant/admin/add`, which does
+not exist.
+
+### Which of the four are genuinely different screens
+
+The precedent is `CalendarView` (one component, two scopes) and `StandingsView` (one component,
+three). Applied here by asking what each reader opens the product to find out:
+
+- **Tenant admin** — our actual first user, the community manager: *what do I owe this weekend,
+  across all three competitions?* Results missing, this weekend's fixtures, which tables are ready to
+  publish. Cross-competition by nature: LIPROBAKIN publish men's, women's and D2 together (§6 A5),
+  and the EUBAGO bulletin proves it — one signed page, `(M)`, `(F)` and `(D2)` fixtures interleaved.
+- **League admin** — the same question with the fan-out removed, plus the things only they own: the
+  rules, the season's state, roster completeness.
+- **Team admin** — *where do we stand, when do we play next, who is on the sheet.* They administer
+  nothing they can change except their roster. Different questions, different verbs, one club.
+
+So **three screens, not four**:
+
+- **`OrganiserDashboard`, `scope: 'tenant' | 'league'`** — one component. The tenant scope fans out
+  over competitions; the league scope is the same panels with one row.
+- **`ClubDashboard`** — genuinely different, and genuinely absent. It has to be built, not redesigned.
+- **`/admin/dashboard`** — out of scope for launch. Delete the fiction, keep real counts, leave the
+  design alone.
+
+### What each shows in each phase
+
+The point of item 14a is that this table can finally be written, because the state is now trustworthy
+and the tenant scope can show competitions in *different* states — which is the real case. The
+EUBAGO bulletin publishes the men's table as *phase de 6* and the women's as *général* on the same
+sheet on the same day.
+
+**Pre-season (`PLANNING`)** — what is missing, each line linking to the thing that fixes it.
+Competitions with no clubs; clubs under the roster minimum; a season with no fixtures; the calendar
+as the single primary action, per `CALENDAR_MODULE` §9.
+
+**In-season (`ACTIVE`)** — what needs attention, and one number first:
+
+> **Résultats manquants** — fixtures whose date has passed with no score entered.
+
+`getStandingsView` already computes exactly this and states it on the standings screen; no dashboard
+shows it. For a community manager entering a weekend of results in one sitting it is *the* number,
+and it is the honest answer to "why is my club's record wrong" (`GAME_AND_STANDINGS` §3.3). Then:
+this weekend's fixtures per competition; whether the table is ready to publish and when it last was;
+halls blacked out in the next fortnight.
+
+**Post-season (`COMPLETED`)** — the outcome. Champion, the final table, the export, and exactly one
+forward action: open the next season.
+
+---
+
+## 5bis. Decisions taken (2026-09-05)
+
+All four settled with the user after the argument above. Recorded here so they are not relitigated.
+
+| Question | Decision |
+|---|---|
+| How many statuses | **Four** — `PLANNING · ACTIVE · COMPLETED · CANCELED`. `SCHEDULED`, `PAUSED`, `ARCHIVED`, `UNKNOWN` and `DELETED` are cut, for the reasons in §1. |
+| The season's own screen | **Retired.** `/season`, `/season/[seasonId]/dashboard`, `/season/layout.tsx` and `/season/create` are deleted; the verbs live on a rebuilt `/league/seasons`. |
+| Automatic transitions | **One.** `PLANNING → ACTIVE` on the first result. Closing is always a person, with a reason, audited. No cron. |
+| The dashboards | **Three.** `OrganiserDashboard` with a `scope` prop for tenant and league, a `ClubDashboard` built from real data, and `/admin/dashboard` de-fictionalised but not redesigned. |
+
+---
+
+## 6. Order of work
+
+Two sprints for 14a, one for 14. Two one-line fixes come first because they are live breakage on
+screens item 14 is about to rebuild.
+
+**Sprint 0 — the two live breakages** (an hour)
+`@IsEnum(GameStatus, { each: true })` so the league dashboard's fixture panel returns data, and
+`useSidebarEligibility` reading `managingTeam.leagueId` so a club administrator can navigate.
+
+**Sprint 1 — the season's life, server side**
+The four-value enum and its migration; a `SeasonStateService` shaped like `GameStateService`
+(transition map, verbs, French refusals, audit with a reason); `status` out of `UpdateSeasonDto`;
+`currentSeasonId` owned by the machine and the create rule relaxed to one `ACTIVE`; `seasonId`
+honoured by `createGameScoped` and passed through by `publish`; the automatic `PLANNING → ACTIVE` on
+first result; every season refusal translated.
+
+**Sprint 2 — the season's life, on screen**
+`/league/seasons` rebuilt as the editions list with the verbs and creation in a dialog; `/season/*`
+retired; the status badge and `SeasonForm` down to four states with no status dropdown.
+
+**Sprint 3 — item 14**
+`OrganiserDashboard` phase-aware over React Query and a `services/dashboard.ts`; `ClubDashboard`
+built from real data; `/admin/dashboard` de-fictionalised.
+
+---
+
+## 7. Verified by running it
+
+- Six seeded seasons, all `ACTIVE`, one per league — the product has never been in another state.
+- Every status reachable from every other by `PUT /seasons/:id`: ten jumps, ten 200s.
+- A season set to `DELETED` by PUT still returns from `GET`, is still `currentSeasonId`, and still
+  accepts fixtures.
+- Creating a second season moves `currentSeasonId` to it; new fixtures land there; the default
+  standings view returns the new season's empty table.
+- `POST /calendar/publish { seasonId: <a COMPLETED season> }` returned `createdCount: 1` and wrote
+  the fixture into a different season.
+- Season refusals come back in English: *"Cannot create a new season. The league already has an
+  active season (PLANNING, SCHEDULED, ACTIVE, or PAUSED)."*
+- `GET /games?status=SCHEDULED&status=LIVE` → 400; the league dashboard's fixture panel is
+  permanently empty.
+- A team admin has zero sidebar links on `/team/dashboard`, `/team/standings` and `/team/roster`.
+- `/tenant/admin/add` and `/tenant/seasons` are linked from live screens and do not exist.
+
+Done on a throwaway organisation created for the purpose and deleted afterwards; the seeded data was
+verified unchanged (6 seasons, 90/136/300 fixtures, pointers intact).

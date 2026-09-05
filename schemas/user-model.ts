@@ -103,6 +103,10 @@ export const UserSchema = z.object({
     id: z.string().cuid(),
     externalId: z.string().uuid(),
     name: z.string(),
+    // The club's competition. `BasicTeam` has always promised it and the API has always sent it;
+    // the schema dropped it, so anything parsed through here lost the only route a club
+    // administrator has to their own league id.
+    leagueId: z.string().cuid(),
   }).nullable().optional(),
 
   dateOfBirth: z.string().datetime().nullable().optional(), // Expects ISO 8601 date string

@@ -9,7 +9,15 @@ export function useSidebarEligibility() {
   const searchParams = useSearchParams()
 
   const ctxTenantId = searchParams.get('ctxTenantId') || user?.tenantId;
-  const ctxLeagueId = searchParams.get('ctxLeagueId') || user?.managingLeagueId || user?.managingLeague?.id;
+  // A club administrator's competition is on their club, not on them: `managingLeagueId` names the
+  // league you *administer*, and they administer a team. Reading only that field meant every
+  // `/team/*` route failed the check below and rendered with no navigation at all — on the one
+  // surface whose reader is never also a competition admin, and who is sent there at login.
+  const ctxLeagueId =
+    searchParams.get('ctxLeagueId') ||
+    user?.managingLeagueId ||
+    user?.managingLeague?.id ||
+    user?.managingTeam?.leagueId;
   const ctxTeamId = searchParams.get('ctxTeamId') || user?.managingTeamId;
 
   const routeSection = pathname.split('/')[1] // 'tenant', 'league', 'team', etc.
