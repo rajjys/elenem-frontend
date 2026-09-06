@@ -232,11 +232,37 @@ better home, and we deleted it. That argument was **"nothing needs one today"**,
 about the four verbs. A season's *shape* — its stages, in order, with how many advance from each —
 is a genuinely season-scoped thing, and it is bigger than a verb on a card.
 
-I would not reopen the route yet. The first version can be a panel on the season card in
-`/league/seasons`, where a season's other acts already live: a stage is added, named, ordered and
-given a format, and that is four fields. If the composer outgrows a card — and a two-legged bracket
-with seeding rules might — then a season screen has earned its address on the same test every other
-screen in this product has had to pass, and we open it deliberately rather than by drift.
+I proposed starting on the season card and reopening the route only if the composer outgrew it.
+**That was overruled, and on reflection the overrule is better.** Composing a season's format is not
+a verb — it is a workspace: several stages, each with a name, an order, a format, a leg count and a
+qualification rule, read and rearranged as a set. `CALENDAR_MODULE` §7 already drew this line for
+the draft workspace — *"under the section, not flat: a workspace is a page, and only an identifiable
+resource earns a flat route"* — and a composer is the same kind of thing.
+
+So `/league/seasons/[seasonId]/format` opens, deliberately, and it is the first screen in the
+product that is genuinely season-scoped. Two rules from the screens we retired come with it, and
+they are the reason this is not a reversal:
+
+- **It renders the reader's own chrome**, never a one-item sidebar naming itself. That was the
+  actual defect in `/season/layout.tsx` — `GAME_AND_STANDINGS` §2.3 — and it is what stranded a
+  reader on a leaf.
+- **It lives under its section**, not at a flat `/season/[id]`. The retired route's other sin was
+  claiming a top-level address for a page nobody could reach; this one is reached from the season
+  it belongs to.
+
+---
+
+## 4bis. Decisions taken (2026-09-06)
+
+Settled with the user after the argument above.
+
+| Question | Decision |
+|---|---|
+| Placeholder fixtures | **Nullable teams, bounded to knockout stages.** A fixture with an unknown side holds a slot so the hall is booked, is named by bracket position, takes no result and is invisible to standings. §5.2(c). |
+| The playoff's home | **A stage switcher on `/league/standings`**, rendering a bracket when the stage is a `KNOCKOUT`. No new nav item. §4. |
+| Where stages are composed | **`/league/seasons/[seasonId]/format`** — a real season-scoped page, against my recommendation of a card panel. §4.1, rewritten. |
+| Does a stage have a status | **No.** Which stage is being played is derived. §1. |
+| Sequencing | **Migration first, composer second.** Sprint A lands the tables, the re-key and the backfill with no visible change; Sprint B builds the composer, the bracket and the switcher. |
 
 ---
 
