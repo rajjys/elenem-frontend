@@ -140,6 +140,9 @@ export const teamNavItems: NavGroup[] = [
     label: 'Mon club',
     items: [
     { label: 'Effectif', basePath: '/team/roster', icon: UserSquare2 },
+    // When the club plays is the other half of what a club opens the product for, beside where it
+    // stands — and it was the half with no screen.
+    { label: 'Calendrier', basePath: '/team/calendar', icon: CalendarDays },
     // Where the club stands is the single fact a club administrator opens the product for, and
     // it was the one screen their sidebar did not have. `StandingsView` reads the competition
     // from the team, and the row for their own club is marked.

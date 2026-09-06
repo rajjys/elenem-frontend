@@ -62,14 +62,25 @@ export type CalendarEntry = z.infer<typeof CalendarEntrySchema>;
 export type CalendarCompetition = Calendar['competitions'][number];
 export type CalendarVenue = Calendar['venues'][number];
 
-export function useCalendar(params: { from: string; to: string; leagueIds?: string[] }) {
+export function useCalendar(params: {
+  from: string;
+  to: string;
+  leagueIds?: string[];
+  /** A club's own fixtures, home and away. */
+  teamId?: string;
+}) {
   const leagueIds = params.leagueIds?.length ? params.leagueIds.join(',') : undefined;
 
   return useQuery({
-    queryKey: ['calendar', params.from, params.to, leagueIds ?? 'all'],
+    queryKey: ['calendar', params.from, params.to, leagueIds ?? 'all', params.teamId ?? 'all'],
     queryFn: async () => {
       const res = await api.get('/calendar', {
-        params: { from: params.from, to: params.to, ...(leagueIds ? { leagueIds } : {}) },
+        params: {
+          from: params.from,
+          to: params.to,
+          ...(leagueIds ? { leagueIds } : {}),
+          ...(params.teamId ? { teamId: params.teamId } : {}),
+        },
       });
       return parseResponse(CalendarSchema, res.data);
     },

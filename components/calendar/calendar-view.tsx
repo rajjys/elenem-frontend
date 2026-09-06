@@ -244,6 +244,19 @@ export interface CalendarViewProps {
    */
   title?: string;
   description?: string;
+  /**
+   * A club's own calendar: its fixtures, home and away, and nothing editable.
+   *
+   * Not a fourth screen. A club administrator's question is the same one — *when do we play* — and
+   * the grid, the day panel, the year map and the phone agenda all answer it already; what differs
+   * is which fixtures are on it and that a club schedules nothing. Both of those are one filter and
+   * one flag, which is the test the calendar's other two scopes already passed.
+   *
+   * They keep the read-only half of the day panel, so a fixture still opens onto its detail and
+   * the link to its match page — that is where a club goes to see the scoresheet of a game it has
+   * played.
+   */
+  club?: boolean;
 }
 
 export function CalendarView({
@@ -251,6 +264,7 @@ export function CalendarView({
   initialMonth,
   title,
   description,
+  club = false,
 }: CalendarViewProps = {}) {
   /**
    * Scope, resolved the way every other surface resolves it: the URL wins, the JWT is the floor.
@@ -288,8 +302,13 @@ export function CalendarView({
   const reorderMut = useReorderStack();
   const annotateMut = useAnnotate();
 
-  /** Read-only surfaces stay read-only: a draft workspace is not where you edit real fixtures. */
-  const writable = !draftEntries;
+  /**
+   * Read-only surfaces stay read-only: a draft workspace is not where you edit real fixtures, and
+   * a club does not schedule its own matches — the fixture list is agreed by a committee and the
+   * club is told (`CALENDAR_MODULE` §0). A club that could move its own fixture would be a
+   * different product.
+   */
+  const writable = !draftEntries && !club;
 
   const cells = useMemo(() => monthGrid(cursor), [cursor]);
 
@@ -312,6 +331,7 @@ export function CalendarView({
     ...range,
     // A league admin, or anyone who drilled into a league, sees that league only.
     leagueIds: scope.leagueId ? [scope.leagueId] : undefined,
+    teamId: club ? (scope.teamId ?? undefined) : undefined,
   });
 
   /** How long a fixture holds its hall — the gap between one slot and the next. */
