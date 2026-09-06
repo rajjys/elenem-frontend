@@ -258,11 +258,11 @@ Settled with the user after the argument above.
 
 | Question | Decision |
 |---|---|
-| Placeholder fixtures | **Nullable teams, bounded to knockout stages.** A fixture with an unknown side holds a slot so the hall is booked, is named by bracket position, takes no result and is invisible to standings. §5.2(c). |
+| Placeholder fixtures | ~~Nullable teams, bounded to knockout stages~~ — **superseded by §9.** A separate `PlannedFixture` model whose sole verb is to become a `Game`. The reasoning that overturned this is worth reading before the section it replaces. |
 | The playoff's home | **A stage switcher on `/league/standings`**, rendering a bracket when the stage is a `KNOCKOUT`. No new nav item. §4. |
 | Where stages are composed | **`/league/seasons/[seasonId]/format`** — a real season-scoped page, against my recommendation of a card panel. §4.1, rewritten. |
 | Does a stage have a status | **No.** Which stage is being played is derived. §1. |
-| Sequencing | **Migration first, composer second.** Sprint A lands the tables, the re-key and the backfill with no visible change; Sprint B builds the composer, the bracket and the switcher. |
+| Sequencing | **Migration first, composer second** — refined to three sprints in §12, since placeholders and the bracket separated from the composer once they stopped being a column on `Game`. |
 
 ---
 
@@ -318,9 +318,14 @@ booked, its name comes from the bracket position (« Finale · Match 1 ») rathe
 it cannot take a result, and the standings never see it. The moment the feeding result arrives, the
 teams are filled in and it becomes an ordinary fixture with an ordinary slug.
 
-**I recommend (c)**, and the reason is that (b) is cheaper only because it declines to model
-something the customer demonstrably does. But it is genuinely a decision, because (c) costs a
-nullable pair of columns and a rule that six call sites have to respect.
+**I recommended (c)** on the grounds that (b) is cheaper only because it declines to model
+something the customer demonstrably does.
+
+> **Superseded — see §9.** A fourth option was put to me and it is better than all three: a
+> *separate model* that occupies a calendar slot and whose only verb is to become a `Game`. It
+> keeps (c)'s ability to book the hall for an undetermined final while making the teamless state
+> unrepresentable on `Game` at all. The reasoning is in §9; this section is left standing because
+> the three options are the argument that the fourth one answers.
 
 ---
 
@@ -390,3 +395,359 @@ Found by reading, not by guessing. None of it is hard; all of it is invisible un
 
 Items 7 and 8 should then split roughly as: the migration and the standings re-key first, shipped
 with a one-stage backfill that changes nothing on screen; the composer and the bracket second.
+
+---
+
+# Part II — Integration impact, and the placeholder question re-opened
+
+> Added 2026-09-06 after the analysis above was read. Two things prompted it: a request for the
+> impact on the rest of the product, and a counter-proposal on placeholder fixtures that is better
+> than what §5.2 recommended.
+
+---
+
+## 9. Placeholders: I was wrong, and here is what changed my mind
+
+§5.2 recommended nullable teams bounded to knockout stages, and that was taken as a decision. The
+counter-proposal — **a separate model that behaves like a fixture but is not a `Game`, whose sole
+job is to become one** — is better. Three of the four arguments for it hold up under inspection,
+and the third is decisive.
+
+### 9.1 "The frontend is not prepared to have a game with less than 2 teams" — verified, and worse than stated
+
+`calendar-view.tsx:196` decides whether a dropped fixture's hour is free:
+
+```ts
+const sharedClub =
+  o.home.id === entry.home.id || o.home.id === entry.away.id ||
+  o.away.id === entry.home.id || o.away.id === entry.away.id;
+```
+
+Two teamless fixtures both carrying an empty or null side id would compare **equal**, and the grid
+would report a club clash between two matches that have no clubs. That is not a null check somebody
+forgot; it is a correct piece of code that a nullable team silently invalidates. `fixture-dialog`
+reads `entry.home.id` to seed its selects, the chip renders `home.name — away.name`, and the delete
+confirmation reads `home.shortCode — away.shortCode`. Every one of them is fine today and becomes a
+place a null can leak.
+
+### 9.2 "They don't even have the same actions" — the strongest argument, and it is arithmetic
+
+| | `Game` | placeholder |
+|---|---|---|
+| move on the calendar | ✓ | ✓ |
+| reorder in a day | ✓ | ✓ |
+| cancel / delete | ✓ | ✓ |
+| enter a score | ✓ | — |
+| correct a score | ✓ | — |
+| box score, per-player stats | ✓ | — |
+| lineups | ✓ | — |
+| invert home and away | ✓ | — |
+| state machine (confirm, live, complete, postpone) | ✓ | — |
+| **become a `Game`** | — | ✓ |
+
+Three of ten actions overlap, and the one action that matters most to the placeholder does not
+exist on a `Game` at all. Two objects whose verbs disagree that completely are two objects. Forcing
+them into one row means every one of those seven `Game` actions grows a guard clause saying "not
+if the teams are unknown" — seven places where the guard can be forgotten, on the object that
+carries the results.
+
+### 9.3 "I'm afraid of people creating games without teams and breaking the system" — the decisive one
+
+This is the argument that changes the answer, and it is a design principle rather than a fear:
+
+> **Make the invalid state unrepresentable, rather than representable-but-forbidden.**
+
+Nullable columns on `Game` make "a match with no teams" expressible *everywhere in the product* —
+in the fixture dialog, in the results importer, in a league stage, through `POST /games`, for ever.
+What keeps it out of those places is discipline in six call sites. A separate table makes it
+expressible **nowhere except a knockout bracket**, because there is no column to put it in.
+
+That is the same reasoning `CALENDAR_MODULE` §7 used to reject `dryRun` in favour of two endpoints:
+*"a boolean that decides whether a request is a preview or a permanent act cannot enforce that; two
+endpoints with two names can."* The identical shape, one level down.
+
+### 9.4 Where the framing needs adjusting
+
+Two corrections, neither of them fatal to the proposal.
+
+**"Probable game" is the wrong name, because it conflates two different things.** EUBAGO's calendar
+prints both:
+
+- `FINALE 2026 · GAME 1` on Saturday 10 July — **certain to happen, teams undetermined.**
+- `BARRAGE 2026 · SI NECESSITE` — **may never happen at all.**
+
+Those are different properties and the model should carry both: sides that are *labels* rather than
+teams (« Vainqueur demi-finale 1 »), and a `conditional` flag for the fixtures that exist only if
+the results require them. "Probable" describes the second and misdescribes the first.
+
+**It is not free, and the costs should be named before agreeing.** A placeholder that occupies the
+hall must be visible to the code that protects the hall:
+
+| Cost | Size |
+|---|---|
+| `checkVenueConflict` must union the second table | one function, one file |
+| `getCalendar` must return placeholders as entries | one query, one mapper |
+| `CalendarSideSchema.id` becomes nullable, and §9.1's comparison guards it | one schema field, one line |
+| the calendar needs a `PLANNED` branch beside the six existing `DRAFT` branches | six small sites |
+| reorder within a day needs a rule | see §9.6 |
+| the promote transaction | new, ~40 lines |
+
+Against nullable teams, which costs guard clauses in seven `Game` actions plus the six calendar
+sites plus the standings, the box score, the state machine, the match page and the public site —
+and leaves the invalid state representable for ever.
+
+**Verdict: the twin model, and §5.2's decision is superseded.**
+
+### 9.5 What it looks like
+
+```prisma
+model PlannedFixture {
+  id          String    @id @default(cuid())
+  tenantId    String
+  leagueId    String
+  seasonId    String
+  stageId     String    // KNOCKOUT stages only — refused elsewhere by the service
+  round       Int?      // 1 = quarter-final, 2 = semi-final, …
+  bracketSlot Int?      // position within the round
+
+  /// What the two sides are before they are teams. « Vainqueur DF1 », « 2e du Groupe B ».
+  /// This is the fixture's name, and it is what the calendar chip renders.
+  homeLabel   String
+  awayLabel   String
+
+  dateTime    DateTime
+  homeVenueId String?
+  courtId     String?
+
+  /// EUBAGO print « SI NECESSITE ». A fixture that exists only if the results require it, and
+  /// which holds its hall until it is known either way.
+  conditional Boolean   @default(false)
+  notes       String?
+  // …tenant, audit and soft-delete columns as everywhere else
+}
+```
+
+**No `gameId` back-reference, and the row does not survive promotion.** Its sole purpose is to
+become a fixture; once it has, it is gone, and the `AuditLog` carries the act — which is where this
+product already keeps history. A promoted placeholder kept alongside its `Game` would be a second
+row on the same Saturday that every query then has to exclude.
+
+### 9.6 The one place it is genuinely awkward
+
+`POST /calendar/reorder`'s invariant is that the requested times are **a permutation of the times
+those fixtures already hold** — which is what makes "reorder" a meaningful word rather than a bulk
+edit (`CALENDAR_MODULE` §8). Permuting times across two tables is doable but it doubles the
+transaction and the refusal messages.
+
+**First version: a placeholder sits in the day's stack and is not draggable**, exactly as a played
+fixture is pinned there today with *joué — horaire figé*. Its label is « à définir — se déplace
+depuis sa fiche », and its time is changed from its own editor. Reading the day in order still
+works, which is what the stack is for; only the gesture is unavailable. Revisit if anyone asks.
+
+---
+
+## 10. Integration impact across the product
+
+The sweep that was asked for. Ordered by how much each surface actually changes, and honest about
+the ones that change not at all.
+
+### 10.1 Onboarding — no new step, and that is the recommendation
+
+The wizard is `league → season → teams`. The temptation is a fourth question — *what format is this
+competition?* — and it should be resisted, for the reason `CALENDAR_MODULE` §9 already gave when
+onboarding was trimmed to end at the calendar rather than at generation: **a league setting up for
+the first time does not yet know, and asking makes them decide something they cannot.** LIPROBAKIN
+decide their playoff format mid-season, based on how much calendar is left (§6, A4).
+
+But the Champions League / World Cup case is real and dismissing it would be wrong. Someone setting
+up a group competition should not have to create a `LEAGUE` stage and then convert it. The answer
+is not a wizard question, it is **templates on the composer**, offered at the moment the organiser
+is actually thinking about format:
+
+- *Championnat simple* — one `LEAGUE` stage (the default; what every existing season gets)
+- *Championnat + play-offs* — `LEAGUE(advancing: N)` → `KNOCKOUT`
+- *Poules + phase finale* — `GROUPS(M pools, advancing: N)` → `KNOCKOUT`
+
+The season is still created with one `LEAGUE` stage, and the onboarding's final step gains one
+sentence pointing at the composer for anyone who needs something else. A default that is right for
+ninety-nine seasons in a hundred, and a door for the hundredth.
+
+### 10.2 Dashboards — the biggest change, and it is not cosmetic
+
+> *"a dashboard should lead and not just inform"*
+
+Right, and stages give it three new things to lead with. The first is the most valuable thing in
+this entire document.
+
+**Between stages is a state the product cannot currently be in, and it is the moment the organiser
+must act.** The regular phase is complete, every result is in, and the playoff has not been
+composed. Nothing else in the product will tell them. The card should say so and link to the
+composer:
+
+> **Phase régulière terminée.** Les 8 premiers sont connus. Composez la suite.
+
+**In a knockout, a missing result is a blocker, not an incompleteness.** Today the dashboard says
+*1 résultat manquant* and explains that the table is incomplete. In a knockout the same missing
+result stops the next round from being drawn at all, and the sentence should say that instead:
+
+> **Les demi-finales ne peuvent pas être composées** — 1 quart de finale sans résultat.
+
+That is a materially stronger call to action, and it comes free from knowing the stage's format.
+
+**In a group stage, progress is per group.** One bar per pool rather than one for the stage, because
+"53% played" across four pools tells an organiser nothing about whether Groupe A can be settled.
+
+And a fourth, smaller: **placeholders are a to-do.** « 3 rencontres à définir » — finals whose halls
+are booked and whose teams are not yet known — belongs beside the missing results.
+
+One thing that must **not** change: `missingResults`, `fixtureCount` and `playedCount` stay
+season-wide on the organiser's screen. An organiser owes results across every phase, and narrowing
+them to the current stage would hide the regular-season fixture nobody ever entered. Worth writing
+down so nobody "fixes" it later.
+
+### 10.3 The club surface — one real question
+
+`/team/standings` shows the club's competition table with their row marked. In a `GROUPS` stage
+there are M tables and the club is in one of them. The screen must resolve **the club's own group**,
+not the first one — which the server can do, because it knows the team.
+
+`/team/calendar` needs nothing: a club's fixtures are its fixtures whatever phase they are in. The
+club dashboard's `standing` block needs the same group resolution, and its *rank out of N* becomes
+rank within the group — which is what a club means anyway.
+
+### 10.4 The published bulletin — the phase stops being typed
+
+`StandingsDocument` has a free-text `subtitle` and a hand-typed `matchday`. With stages, *phase de
+6* becomes something the document derives rather than something the secretary retypes every
+Saturday — the same argument §3.3 of `GAME_AND_STANDINGS` made about the points rule.
+
+A `GROUPS` stage means **several tables on one sheet**, which is not new: EUBAGO already publish
+*VERSION MASCULINE* and *VERSION FEMININE* as two tables on one notification. The renderer takes a
+list of tables rather than one, and the existing single-table case is a list of one.
+
+### 10.5 Results import — a real ambiguity, already half-guarded
+
+`results-import.service` builds `existingPairs` as a map keyed on the pairing across the whole
+season. **Two clubs meeting twice — once in the regular phase, once in the final — collapse to one
+entry**, and a row could be matched to the wrong fixture.
+
+It is half-guarded already: the downloadable template's first column is `ID`, and a sheet filled in
+from the template disambiguates itself. The exposure is a hand-built sheet, which is exactly what a
+league that has not discovered the template will send. The template gains a **Phase** column and
+the importer prefers `ID`, then `phase + pairing`, then refuses rather than guessing.
+
+### 10.6 Fixture generation — one line, already identified
+
+`existingPairings` becomes stage-scoped (§3). Worth restating that the *recording* path needs
+nothing: the duplicate-matchup guard is same-day scoped, so two clubs meeting again in a playoff is
+already legal today.
+
+### 10.7 Surfaces that change nothing at all
+
+Worth listing, because a migration this size invites the assumption that everything is affected.
+
+- **The scoresheet and box score.** Per-player stats belong to a game, and a game belongs to a
+  stage; nothing in the sheet reads either.
+- **The match page.** It resolves one fixture and its audit trail. It gains a line naming the phase
+  and nothing else.
+- **Roster, players, teams, users, venues, blackouts.** A stage is not a scope.
+- **`useScopeContext` and the breadcrumb.** A stage is a filter within a competition, not a level of
+  the hierarchy — the same reason a season never became a scope.
+- **Permissions.** No new axis: whoever may edit a competition may compose its stages.
+- **The season state machine.** Auto-open on first result stays stage-blind: a result in any phase
+  means the season is running.
+- **The tenant calendar's conflict detection.** A hall does not know what phase is played in it.
+
+---
+
+## 11. Revised decisions
+
+Superseding the table in §4bis where they differ.
+
+| Question | Decision | Changed? |
+|---|---|---|
+| Placeholder fixtures | **A separate `PlannedFixture` model**, knockout-only, whose sole verb is to become a `Game`. Nullable teams on `Game` is rejected. | **Yes — §5.2(c) is superseded by §9** |
+| The playoff's home | A stage switcher on `/league/standings`, rendering a bracket for `KNOCKOUT`. | no |
+| Where stages are composed | `/league/seasons/[seasonId]/format` | no |
+| Stage status | None. Derived. | no |
+| Onboarding | **No new step.** Templates on the composer instead. | new |
+| Dashboard | **Leads on the between-stages gap and on knockout blockers**, not just counts. Season-wide totals stay season-wide. | new |
+| Sequencing | Migration → composer → placeholders and bracket. **Three sprints, not two.** | **Yes — §4bis said two** |
+
+---
+
+## 12. Implementation plan
+
+Three sprints. Each one ends somewhere testable, and the first two are invisible to a league that
+never composes a second stage — which is the property that makes this safe to start.
+
+### Sprint A — the structure. No visible change.
+
+**A1. Schema and migration.**
+`Stage` and `Group` tables. `Game` gains `stageId` (required), `groupId?`, `round?`, `matchday?`,
+and loses the dead `stage` enum column. `LeagueStanding` and `TeamSeasonStat` re-key from
+`@@unique([teamId, seasonId])` to `@@unique([teamId, stageId, groupId])`.
+Backfill: one `{ name: "Saison régulière", order: 1, format: LEAGUE }` per existing season; every
+game and every standing points at it.
+
+**A2. `StagesService`.** CRUD scoped like every other resource, plus a derived
+`currentStageOf(seasonId)` — the highest-`order` stage holding a completed game, else `order: 1`.
+No status, no pointer.
+
+**A3. Standings goes stage-scoped.** `recomputeTeamSeasonStats` and `recalculateLeagueStandings`
+select by `stageId`. `getStandingsView` resolves the stage the way it resolves the season, and
+returns the stage's name and format alongside. A `KNOCKOUT` stage returns no table.
+
+**A4. `Game` creation takes a stage.** `CreateGameDto` gains `stageId?`, defaulting to the season's
+current stage and validated to belong to it — the same shape `seasonId` took last sprint.
+
+**A5. The draft's pairing read goes stage-scoped**, and `matchday` is persisted at publication
+instead of being computed and thrown away.
+
+**A6. Dashboard correction.** `champion` reads the last stage's table, not the season's.
+
+*How to test:* the migration diff is clean; the seeded standings are **byte-identical before and
+after** (six competitions, same ranks, same points); every existing screen renders unchanged;
+`missingResults` on the seeded organisation still reads the same number. Then, on a throwaway: add a
+second `LEAGUE` stage by hand, move one completed fixture into it, and confirm the two tables
+separate and neither counts the other's game.
+
+### Sprint B — the composer.
+
+**B1. `/league/seasons/[seasonId]/format`.** A real season-scoped page under its section, rendering
+the reader's own chrome. Stages listed in order; each with a name, a format, a leg count and how
+many advance. Add, rename, reorder, remove.
+
+**B2. Templates.** *Championnat simple*, *Championnat + play-offs*, *Poules + phase finale*.
+
+**B3. The season card names the shape** — « Saison régulière → Play-offs » — and links here.
+
+**B4. The stage switcher on `/league/standings`**, appearing only past one stage, and the export's
+phase line derived rather than typed.
+
+*How to test:* on a throwaway, compose LIPROBAKIN's actual 2026 shape — a regular phase, then a
+*phase de 6* — score fixtures in both, and confirm each table counts only its own; confirm the
+published bulletin names the phase without anyone typing it; confirm a one-stage competition sees no
+switcher and no change anywhere.
+
+### Sprint C — placeholders and the bracket.
+
+**C1. `PlannedFixture`** — model, service, `POST /planned-fixtures/:id/promote`, refused outside a
+`KNOCKOUT` stage.
+
+**C2. The calendar carries them.** `getCalendar` returns them as entries with `status: 'PLANNED'`
+and labelled sides; `CalendarSideSchema.id` becomes nullable and §9.1's comparison guards it;
+`checkVenueConflict` unions the second table; the day panel offers *Confirmer les équipes*; the
+stack pins them undraggable (§9.6).
+
+**C3. The bracket view** on `/league/standings` when the stage is a `KNOCKOUT`.
+
+**C4. The dashboard leads.** Between-stages prompt, knockout blockers, group-wise progress,
+placeholders as a to-do.
+
+*How to test:* reproduce page 6 of `docs/Homologation, classement et calendrier.pdf` end to end —
+`PLAYOFFS`, a conditional `BARRAGE`, and a best-of-three `FINALE` with `GAME 1/2/3` booked into ISC
+before the teams are known; confirm the hall refuses a second booking at that hour; confirm a
+placeholder cannot be scored; promote one and confirm it becomes an ordinary fixture with an
+ordinary slug and disappears from the placeholder table.
+
