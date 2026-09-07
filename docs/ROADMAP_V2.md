@@ -504,3 +504,48 @@ federation's own bulletin (`docs/Homologation…pdf`) is the argument for both: 
 (*SI NECESSITE*) and unseeded placeholders (`GAME 1 / GAME 2 / GAME 3`), and its classement
 publishes the men's table as *phase de 6* while the women's is *général* — two competitions in the
 same organisation in different phases on the same signed sheet.
+
+
+---
+
+## 12. Known and deliberately unfixed (2026-09-07)
+
+The running list, so none of it is rediscovered as a surprise. Everything here is a decision, not
+an oversight — and the MVP is a free launch, so "good enough for Goma this season" is the bar.
+
+### Closed since this list was last written
+
+| Was | Now |
+|---|---|
+| 8 backend tests failing in 3 suites | **0.** 115 pass. Six were stale mocks; two were real bugs — a permission filter that guessed a `leagueId` onto models that have none, and a club's games scoped by a `teamId` a game does not have |
+| 32 eslint problems | **0.** Mostly dead code, including an unfinished sidebar flyout; two were `?? []` arrays defeating a `useMemo` and a `useEffect` |
+| A league admin 403s on `GET /tenants/:id` on every page | Fixed. The breadcrumb reads the organisation from the token; `/leagues/:id/identity` answers the smaller question a crumb has |
+| A system admin cannot open any calendar | Fixed — `useCalendar` never sent `tenantId` |
+
+### Still open, and why
+
+**Accent-blind text matching.** The database runs under `C` collation, so 52
+`mode: 'insensitive'` comparisons do not fold accents: *Kasereka* and *Kaséréka* compare as two
+people. The box score already works around it in JS for the one place it matters
+(`GAME_AND_STANDINGS` §6.4). The real fix is a deploy-time decision — a collation on the production
+database — and it belongs with **Phase 5**, not before.
+
+**A club administrator is refused `GET /seasons` and `GET /leagues/:id`.** By design: they
+administer a team, not a competition. Their screens no longer ask.
+
+### Phase 3 shipped without these, deliberately
+
+Items 7 and 8 are closed (§11) and `docs/STAGES_AND_PLAYOFFS.md` §16 has the detail. What a play-off
+does *not* do yet:
+
+- **Seeding.** A bracket's ties are entered, not drawn from the qualifying table. `Stage.advancing`
+  records how many go through and nothing reads it. LIPROBAKIN agree their play-off in a committee
+  and hand over a fixture list — the same reason generation was parked (`CALENDAR_MODULE` §9).
+- **Two-legged ties and series.** `Stage.legs` covers a league phase. Best-of-three is three
+  fixtures, which is how the bulletin prints it: `GAME 1 / GAME 2 / GAME 3`.
+- **Automatic promotion.** When a semi-final is decided, nothing fills in the final's teams — the
+  operator names them. Revisit once a league has run one play-off in the product.
+- **The public bracket.** `app/public/.../playoff/page.tsx` still renders the words `PlayoffPage`.
+  Phase 5, with the rest of the public site.
+- **Touch drag on the calendar**, and **long rosters on the scoresheet** — both parked since
+  Phase 3 opened (§10.2), both still unasked-for.
