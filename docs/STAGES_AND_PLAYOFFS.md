@@ -717,7 +717,10 @@ after** (six competitions, same ranks, same points); every existing screen rende
 second `LEAGUE` stage by hand, move one completed fixture into it, and confirm the two tables
 separate and neither counts the other's game.
 
-### Sprint B — the composer.
+### Sprint B — the composer. ✅ **Shipped 2026-09-07**
+
+What actually happened is in §14.
+
 
 **B1. `/league/seasons/[seasonId]/format`.** A real season-scoped page under its section, rendering
 the reader's own chrome. Stages listed in order; each with a name, a format, a leg count and how
@@ -840,3 +843,76 @@ A competition whose current phase is a `KNOCKOUT` returns a table with no rows f
 `GET /games/standings/view`, so its standings screen would render empty. Unreachable today —
 nothing can compose a knockout phase — and it is exactly what the stage switcher and the bracket
 view exist to fix.
+
+---
+
+## 14. Sprint B, as built
+
+### The proof
+
+A throwaway competition composed as *Poules + phase finale*, four clubs split two and two, one
+result in each pool:
+
+```
+Groupe A — « Phase de poules »        Groupe B — « Phase de poules »
+  1. ZZA  J=1 PTS=2                     1. ZZD  J=1 PTS=2
+  2. ZZB  J=1 PTS=1                     2. ZZG  J=1 PTS=1
+```
+
+Two tables, neither containing the other's clubs. Before `StageGroupTeam` a rebuild would have put
+all four clubs in both.
+
+### A pool needs members, and it is not optional
+
+This was the one thing Sprint B added that the plan had not costed. Membership looks derivable from
+a pool's fixtures, and derived it is wrong twice: a club that has not played yet would vanish from
+its own pool's table — exactly the club that most needs to see itself at the bottom on zero — and
+`recalculateSeason` rebuilds a table by looping over the competition's clubs, which without
+membership puts every club into every pool.
+
+Setting a pool's clubs **moves** one that already sits in a sibling pool rather than doubling it.
+The unique index is on `(group, team)` and would not have caught that.
+
+### The rules a season's shape obeys
+
+| Rule | Why |
+|---|---|
+| A phase's **format locks once it has a result** | A LEAGUE phase with a table, turned into a KNOCKOUT, would silently orphan it |
+| A phase **cannot be removed while it holds fixtures** | It is not a folder |
+| Nor when it is **the last one** | A season with no phase has nowhere to put a fixture |
+| Reordering takes **the whole sequence, as a permutation** | The same invariant the calendar's reorder holds; nothing invented, nothing dropped |
+| Removing one **closes the gap** | Positions never read « 1, 3 » |
+| Templates are **refused once anything is scheduled or played** | A season with results has a shape it was played under |
+
+Reordering writes through a negative offset first, because `@@unique([seasonId, order])` refuses two
+phases sharing a position even for the instant it takes to swap them.
+
+### The composer earned its page, and I was wrong about that too
+
+I proposed a panel on the season card and was overruled in §4bis. Building it settled the argument:
+a phase carries a name, a format, a leg count, a qualification number and — in a `GROUPS` phase —
+its pools and their members, all read and rearranged as a set. That is a workspace, and
+`CALENDAR_MODULE` §7 already ruled on workspaces.
+
+### A bug found by using it
+
+`getStandingsView` hardcoded `groupId: null`, so a pool's table could be written and never read —
+the pools rendered empty on the first run and the data was correct all along. It resolves a pool
+now, defaulting to the first, and returns the phase's pools so the screen can offer the choice.
+
+### Verified
+
+| | |
+|---|---|
+| migration baseline | **0** |
+| two pools, two tables, no cross-contamination | ✓ |
+| a club moved between pools rather than doubling | ✓ |
+| format locked on a phase with results | ✓ |
+| the seeded single-phase competitions, as all three roles | **no phase control anywhere, no change** |
+| your seeded standings | identical, throwaway destroyed |
+| backend suite | the known 8 pre-existing failures |
+
+### Sprint C, unchanged
+
+`PlannedFixture`, the calendar carrying them, the bracket view, and the dashboard leading on the
+between-stages gap. §12.
