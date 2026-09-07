@@ -681,7 +681,12 @@ Superseding the table in §4bis where they differ.
 Three sprints. Each one ends somewhere testable, and the first two are invisible to a league that
 never composes a second stage — which is the property that makes this safe to start.
 
-### Sprint A — the structure. No visible change.
+### Sprint A — the structure. No visible change. ✅ **Shipped 2026-09-07**
+
+Everything below landed as planned, plus three things found on the way. What actually happened is
+recorded in §13.
+
+
 
 **A1. Schema and migration.**
 `Stage` and `Group` tables. `Game` gains `stageId` (required), `groupId?`, `round?`, `matchday?`,
@@ -751,3 +756,87 @@ before the teams are known; confirm the hall refuses a second booking at that ho
 placeholder cannot be scored; promote one and confirm it becomes an ordinary fixture with an
 ordinary slug and disappears from the placeholder table.
 
+---
+
+## 13. Sprint A, as built
+
+### The proof it was worth doing
+
+On a throwaway competition: two clubs play twice in the regular phase, then meet again in a
+`KNOCKOUT` phase and that result is entered.
+
+```
+régulière → « Saison régulière » (LEAGUE) — 2 résultats
+    1. ZZA  J=2 G=2 P=0 PTS=4
+    2. ZZB  J=2 G=0 P=2 PTS=2
+play-offs → « Play-offs » (KNOCKOUT) — 1 résultat
+    (aucune ligne — un bracket ne produit pas de tableau)
+```
+
+`J=2`. Before this migration the regular table would have read `J=3` for both clubs and given one
+of them two more points, silently, and the published classement would have been wrong in a way only
+a hand recount could find.
+
+### The migration, and the one that corrects it
+
+`20260906090000_stages` creates `Stage` and `StageGroup`, gives `Game` its `stageId`, `groupId`,
+`round` and `matchday`, drops the dead `GameStage` enum, and re-keys `LeagueStanding` and
+`TeamSeasonStat`. Every existing season gets one `Saison régulière` LEAGUE stage carrying all its
+games and standings.
+
+`20260906093000_standings_key_by_stage` corrects the key, and the reason is worth keeping:
+`@@unique([teamId, stageId, groupId])` **reads correctly and enforces nothing**, because Postgres
+treats NULLs as distinct in a unique index. Every LEAGUE phase — where `groupId` is null — could
+have accumulated duplicate rows for the same club and shown a team twice in its own table. A club
+plays in exactly one pool of a phase, so `(teamId, stageId)` is the identity and the pool is a
+column on it.
+
+### Verified
+
+| | |
+|---|---|
+| migration baseline (`migrate diff --from-migrations --to-schema --exit-code`) | **0** |
+| the 64 seeded standings rows, before vs after the migration | **byte-identical** |
+| …and after forcing a full recompute of all six competitions through the new engine | **byte-identical** |
+| a knockout result's effect on the regular table | **none** |
+| every screen, as three roles (organisation, competition, club) | unchanged, no new 4xx/5xx |
+| backend suite | back to its known 8 pre-existing failures |
+
+One observation worth recording rather than fixing: `recalculateSeason` creates zero-rows for every
+team in a competition that has never had a result, so running it on a pre-season league adds a
+table of zeros. That was true before stages too; the seeded data was restored afterwards.
+
+### Three things found on the way
+
+**Season creation had to make its first stage.** The migration backfilled the existing ones, so
+nothing failed until a season was created *after* it — which then had no phase, and `POST /games`
+returned 404. Found by creating one. `createSeasonScoped` now creates the season and its
+`Saison régulière` in the same transaction, which is what keeps the invariant true rather than
+merely established.
+
+**`round` was a phantom field.** Declared on `GameResponseDto`, `GamePublicResponseDto`,
+`UpdateGameDto` and `CreateGameDto` as a free-text `string`, backed by no column — so it accepted
+anything, stored nothing, and was always `undefined` on the wire. It is `Game.round` now, and a
+number, because a round is counted rather than named. `matchday` arrives beside it.
+
+**The dashboard would have crowned the wrong club.** `champion` read rank 1 of the *season's*
+table, which before stages happened to be right because there was one. With a regular phase
+followed by a play-off it would crown whoever topped the regular table — precisely the club a
+play-off exists to stop crowning. It reads the last phase's table now.
+
+### What Sprint A deliberately did not do
+
+- **No HTTP surface for stages.** `StagesService` is internal; the controller arrives with the
+  composer, because nothing can compose a second phase yet and an endpoint nobody calls is a
+  promise nobody asked for.
+- **No frontend changes at all.** The standings response gained `stageId`, `stageName` and
+  `stageFormat`; Zod strips unknown keys, so every screen reads exactly what it read before.
+- **`League.competitionType` still exists.** Format lives per stage now, and its only defensible
+  remaining job is seeding the composer's first suggestion. Decide in Sprint B, delete if not.
+
+### Known, and Sprint B's job
+
+A competition whose current phase is a `KNOCKOUT` returns a table with no rows from
+`GET /games/standings/view`, so its standings screen would render empty. Unreachable today —
+nothing can compose a knockout phase — and it is exactly what the stage switcher and the bracket
+view exist to fix.
