@@ -738,7 +738,10 @@ phase line derived rather than typed.
 published bulletin names the phase without anyone typing it; confirm a one-stage competition sees no
 switcher and no change anywhere.
 
-### Sprint C — placeholders and the bracket.
+### Sprint C — placeholders and the bracket. ✅ **Shipped 2026-09-07**
+
+What actually happened is in §15.
+
 
 **C1. `PlannedFixture`** — model, service, `POST /planned-fixtures/:id/promote`, refused outside a
 `KNOCKOUT` stage.
@@ -916,3 +919,94 @@ now, defaulting to the first, and returns the phase's pools so the screen can of
 
 `PlannedFixture`, the calendar carrying them, the bracket view, and the dashboard leading on the
 between-stages gap. §12.
+
+---
+
+## 15. Sprint C, as built — and Phase 3 closed
+
+### The test was the bulletin, and it passed
+
+A throwaway organisation composed as `Saison régulière → Play-offs → Barrage → Finale`, with the
+ISC hall and four clubs:
+
+| | |
+|---|---|
+| a placeholder in a LEAGUE phase | **400**, in French, naming the phase |
+| a fixture into a reserved hour | **409** « Cette salle est réservée pour GAME 3 … à 16:00. » |
+| the same hall two hours later | **201** |
+| a second placeholder at the same hour | **409** |
+| scoring a placeholder | **404** — it is not a game, and there is no endpoint that could |
+| promoting into its own reserved slot | **201**, `cyc-vs-vir-2026-07-10`, in the Finale phase |
+| the placeholder afterwards | gone — 2 became 1 |
+
+### The costs landed where §9.4 predicted, and one was cheaper
+
+`checkVenueConflict` covers both tables and builds its own refusal, since only it knows which table
+the clash is in. `CalendarSideDto.id` is nullable and the grid's comparison guards it. The calendar
+gained a `PLANNED` branch beside its six `DRAFT` ones. Promotion passes `ignorePlannedFixtureId` so
+a placeholder does not clash with itself.
+
+The one that came in **under** estimate: there is no team-clash check for a placeholder, because it
+has no teams and therefore commits no club to anything. Under nullable columns that same query
+would have needed null guards. It is the one place the twin model is cheaper rather than dearer.
+
+Reorder was resolved as §9.6 proposed: placeholders sit in the day's stack pinned, and move from
+their own editor.
+
+### Two things found by using it
+
+**A system administrator has never been able to load a calendar.** `useCalendar` sends no
+`tenantId`, and the calendar requires one from a reader who has no organisation of their own. It
+predates all of this work and is left alone; noted so it is not rediscovered.
+
+**A bracket cannot be read from the calendar.** It asks "this phase's ties", and the calendar caps
+its range at 400 days precisely because it is answering "what is on this month". `GET /games` takes
+a `stageId` now, and the bracket asks the question it actually has.
+
+### The dashboard says three things it could not say before
+
+- « **Saison régulière est terminée.** La phase suivante n'a encore aucune rencontre. » — the state
+  the product could not be in, and the moment the organiser must act.
+- « **Le tour suivant ne peut pas être composé** — 1 rencontre sans résultat » in a knockout,
+  instead of "1 résultat manquant". A missing result there does not leave a table incomplete, it
+  stops the draw.
+- Per-pool progress in a `GROUPS` phase.
+
+### Verified
+
+Migration baseline **0**; the seeded standings identical to the baseline taken before Sprint A; all
+three throwaway organisations destroyed; backend suite at its known 8 pre-existing failures;
+typecheck and lint clean on everything touched.
+
+The `venue-logistics` spec gained the second table's mock — moving message-building into the
+checker made both reads its responsibility, which is the change that spec exists to catch.
+
+---
+
+## 16. Phase 3 is closed
+
+Items **7** and **8** were the last two, and the roadmap has called them the long ones since it was
+written. What shipped across three sprints:
+
+- A season is a sequence of phases; a table belongs to a phase, not a season. The defect this
+  closed was live: the first play-off fixture ever played would have polluted the regular table.
+- Pools are real — with membership, because derived from fixtures they drop the club that has not
+  played and duplicate every other one across every pool.
+- A composer at `/league/seasons/[seasonId]/format`, with templates, on the first genuinely
+  season-scoped page in the product.
+- A bracket where a table would be, because `StageFormat` declares what a phase produces.
+- Fixtures that hold a hall before they have teams — as a model of their own, which was the user's
+  call and the right one.
+
+**What Phase 3 still does not do**, deliberately:
+
+- **Seeding.** A bracket's ties are entered, not drawn from the qualifying table. `Stage.advancing`
+  records how many go through and nothing reads it yet. LIPROBAKIN agree their play-off in a
+  committee and hand it over as a fixture list, which is the same reason generation was parked
+  (`CALENDAR_MODULE` §9).
+- **Two-legged ties and series.** `Stage.legs` covers a league phase. Best-of-three is three
+  fixtures today, which is how the bulletin prints it — `GAME 1 / GAME 2 / GAME 3`.
+- **Automatic promotion.** When a semi-final is decided, nothing fills in the final's teams. The
+  operator names them. Worth revisiting once a league has run one play-off in the product.
+- **The public bracket.** `app/public/.../playoff/page.tsx` still renders the words `PlayoffPage`.
+  It is Phase 5 with the rest of the public site.
