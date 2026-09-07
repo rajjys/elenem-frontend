@@ -179,8 +179,10 @@ export function FixtureDialog({
     if (!open) return;
     if (entry) {
       setLeagueId(entry.leagueId);
-      setHomeTeamId(entry.home.id);
-      setAwayTeamId(entry.away.id);
+      // A bracket fixture's sides are labels, not clubs. The dialog only ever opens on a real
+      // fixture — `PLANNED` entries open their own editor — so this is a guard rather than a case.
+      setHomeTeamId(entry.home.id ?? '');
+      setAwayTeamId(entry.away.id ?? '');
       setDate(isoDay(new Date(entry.dateTime)));
       setTime(timeOf(entry.dateTime));
       setVenueId(entry.venueId ?? '');

@@ -22,6 +22,7 @@ const STATUS_LABELS: Record<string, string> = {
   POSTPONED: 'Reporté',
   CANCELLED: 'Annulé',
   DRAFT: 'Brouillon',
+  PLANNED: 'À définir',
 };
 
 function timeOf(iso: string): string {

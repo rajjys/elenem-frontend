@@ -12,7 +12,15 @@ import { parseResponse } from './parse-response';
  */
 
 const CalendarSideSchema = z.object({
-  id: z.string(),
+  /**
+   * The club, or `null` when the side is a *label* — « Vainqueur DF1 » on a bracket fixture whose
+   * hall is booked and whose teams are not yet known.
+   *
+   * Load-bearing rather than incidental: the grid decides whether a dropped fixture's hour is free
+   * by comparing side ids, and two placeholders sharing an empty-string id would report a club
+   * clash between two matches that have no clubs.
+   */
+  id: z.string().nullable(),
   name: z.string(),
   shortCode: z.string(),
 });
@@ -29,6 +37,8 @@ const CalendarEntrySchema = z.object({
   away: CalendarSideSchema,
   homeScore: z.number().nullable().optional(),
   awayScore: z.number().nullable().optional(),
+  /** « SI NECESSITE » — a fixture that exists only if the results require it. */
+  conditional: z.boolean().optional(),
 });
 
 const CalendarSchema = z.object({

@@ -8,7 +8,7 @@ import {
   type DraggableProvidedDragHandleProps,
   type DropResult,
 } from '@hello-pangea/dnd';
-import { GripVertical, Lock, MapPin, SquarePen } from 'lucide-react';
+import { GripVertical, Lock, MapPin, SquarePen, Users } from 'lucide-react';
 import type { CalendarCompetition, CalendarEntry, CalendarVenue } from '@/services/calendar';
 import { cn } from '@/utils';
 
@@ -41,7 +41,8 @@ function timeOf(iso: string): string {
 }
 
 /** Fixtures a drag may touch. Anything played is a fixed point in its stack. */
-const isMovable = (e: CalendarEntry) => e.status !== 'COMPLETED' && e.status !== 'DRAFT';
+const isMovable = (e: CalendarEntry) =>
+  e.status !== 'COMPLETED' && e.status !== 'DRAFT' && e.status !== 'PLANNED';
 
 /**
  * The stack holding fixtures with no hall named.
@@ -83,6 +84,7 @@ export function DayStacks({
   toneFor,
   onOpen,
   onScore,
+  onPromote,
   onReorder,
   /**
    * Reordering reassigns times among the fixtures on screen. With a competition hidden or a
@@ -97,6 +99,8 @@ export function DayStacks({
   toneFor: (leagueId: string) => { dot: string; chip: string };
   onOpen: (entry: CalendarEntry) => void;
   onScore?: (entry: CalendarEntry) => void;
+  /** A bracket fixture whose teams have become known. */
+  onPromote?: (entry: CalendarEntry) => void;
   /** Absent where the calendar is read-only. */
   onReorder?: (assignments: { gameId: string; dateTime: string }[]) => void;
   reorderBlockedReason?: string;
@@ -186,6 +190,7 @@ export function DayStacks({
                               tone={toneFor(entry.leagueId)}
                               onOpen={() => onOpen(entry)}
                               onScore={onScore}
+                              onPromote={onPromote}
                               handleProps={null}
                               pinned={draggable}
                               quiet={dragging}
@@ -217,6 +222,7 @@ export function DayStacks({
                                 tone={toneFor(entry.leagueId)}
                                 onOpen={() => onOpen(entry)}
                                 onScore={onScore}
+                                onPromote={onPromote}
                                 handleProps={draggable ? dragProvided.dragHandleProps : null}
                                 quiet={dragging}
                               />
@@ -250,6 +256,7 @@ function Row({
   tone,
   onOpen,
   onScore,
+  onPromote,
   handleProps,
   pinned = false,
   quiet = false,
@@ -260,6 +267,8 @@ function Row({
   tone: { dot: string; chip: string };
   onOpen: () => void;
   onScore?: (entry: CalendarEntry) => void;
+  /** A bracket fixture whose teams have become known. */
+  onPromote?: (entry: CalendarEntry) => void;
   handleProps: DraggableProvidedDragHandleProps | null | undefined;
   pinned?: boolean;
   /** While something is being dragged, the hover affordances stay out of the way. */
@@ -306,7 +315,14 @@ function Row({
                 {venue.name}
               </span>
             )}
-            {pinned && <span className="text-ink-subtle">joué — horaire figé</span>}
+            {pinned && entry.status !== 'PLANNED' && (
+              <span className="text-ink-subtle">joué — horaire figé</span>
+            )}
+            {entry.status === 'PLANNED' && (
+              <span className="text-caution">
+                {entry.conditional ? 'si nécessaire' : 'équipes à définir'}
+              </span>
+            )}
           </span>
         </span>
         {played && (
@@ -316,7 +332,25 @@ function Row({
         )}
       </button>
 
-      {onScore && entry.status !== 'DRAFT' && (
+      {/* The one verb a placeholder has, and it replaces the one it does not: a fixture whose
+          teams are unknown cannot be scored, it can only be drawn. */}
+      {onPromote && entry.status === 'PLANNED' && (
+        <button
+          type="button"
+          onClick={() => onPromote(entry)}
+          aria-label={`Désigner les équipes de ${entry.home.name} contre ${entry.away.name}`}
+          title="Désigner les équipes"
+          className={cn(
+            'flex w-10 shrink-0 items-center justify-center text-ink-subtle transition-opacity',
+            'hover:bg-accent-soft hover:text-accent-text focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent',
+            quiet ? 'opacity-0' : 'opacity-0 group-hover/row:opacity-100',
+          )}
+        >
+          <Users className="h-4 w-4" aria-hidden />
+        </button>
+      )}
+
+      {onScore && entry.status !== 'DRAFT' && entry.status !== 'PLANNED' && (
         <button
           type="button"
           onClick={() => onScore(entry)}

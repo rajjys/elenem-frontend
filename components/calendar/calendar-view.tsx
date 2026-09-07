@@ -47,6 +47,7 @@ import { ResultsSheetButton } from './results-sheet-button';
 import { YearGrid } from './year-grid';
 import { FixtureDialog } from './fixture-dialog';
 import { ScoreDialog } from './score-dialog';
+import { PromoteDialog } from './promote-dialog';
 import { ReasonBar } from './reason-bar';
 import { BoxScoreDialog } from './box-score-dialog';
 
@@ -157,7 +158,16 @@ function matchesQuery(entry: CalendarEntry, raw: string, venues: CalendarVenue[]
  * played fixture keeps its hour and its day — the date can still be corrected deliberately from
  * the editor, where the correction is an act rather than a slip of the wrist.
  */
-const isPlannable = (e: CalendarEntry) => e.status !== 'COMPLETED' && e.status !== 'DRAFT';
+/**
+ * Whether a fixture can be picked up and dropped.
+ *
+ * A played one is history, a draft is not real yet, and a bracket fixture whose teams are unknown
+ * is pinned for a narrower reason: `POST /calendar/reorder`'s invariant is that the requested times
+ * are a permutation of the ones those fixtures already hold, and permuting across two tables
+ * doubles the transaction for a gesture nobody has asked for. It moves from its own editor.
+ */
+const isPlannable = (e: CalendarEntry) =>
+  e.status !== 'COMPLETED' && e.status !== 'DRAFT' && e.status !== 'PLANNED';
 
 /** The local wall-clock minutes of an instant. */
 function minutesOf(iso: string): number {
@@ -198,11 +208,10 @@ function landingSlot(
     // Same hall is a clash; so is a club being in two places. Two fixtures in different rooms
     // with no club in common are simply two fixtures at the same hour, which is normal.
     const sameHall = (o.venueId ?? null) === (entry.venueId ?? null);
-    const sharedClub =
-      o.home.id === entry.home.id ||
-      o.home.id === entry.away.id ||
-      o.away.id === entry.home.id ||
-      o.away.id === entry.away.id;
+    // Guarded against nulls: a bracket fixture's sides are labels, not clubs, so two of them can
+    // never share one — and comparing two nulls would say they do.
+    const ids = [entry.home.id, entry.away.id].filter(Boolean);
+    const sharedClub = [o.home.id, o.away.id].some((id) => !!id && ids.includes(id));
     return sameHall || sharedClub;
   });
 
@@ -297,6 +306,8 @@ export function CalendarView({
   const [editing, setEditing] = useState<{ day: string; entry: CalendarEntry | null } | null>(null);
   const [scoring, setScoring] = useState<CalendarEntry | null>(null);
   const [boxScoring, setBoxScoring] = useState<CalendarEntry | null>(null);
+  /** A bracket fixture whose teams have become known. Its own dialog: two selects, no form. */
+  const [promoting, setPromoting] = useState<CalendarEntry | null>(null);
 
   const moveMut = useMoveGame();
   const reorderMut = useReorderStack();
@@ -1178,6 +1189,7 @@ export function CalendarView({
           writable ? (entry) => setEditing({ day: isoDay(new Date(entry.dateTime)), entry }) : undefined
         }
         onScore={writable ? (entry) => setScoring(entry) : undefined}
+        onPromote={writable ? (entry) => setPromoting(entry) : undefined}
         onBoxScore={writable ? (entry) => setBoxScoring(entry) : undefined}
         onReorder={writable ? handleReorder : undefined}
         /* A reorder reassigns times among the fixtures on screen. With a competition hidden or a
@@ -1222,6 +1234,12 @@ export function CalendarView({
             durationMinutes={data?.entries[0]?.durationMinutes ?? 100}
           />
           <ScoreDialog open={scoring !== null} onClose={() => setScoring(null)} entry={scoring} />
+          <PromoteDialog
+            open={promoting !== null}
+            onClose={() => setPromoting(null)}
+            entry={promoting}
+            leagueId={promoting?.leagueId}
+          />
           <BoxScoreDialog
             open={boxScoring !== null}
             onClose={() => setBoxScoring(null)}

@@ -14,3 +14,4 @@ export * from './box-score-dialog';
 // wherever the organiser found it.
 export * from './score-dialog';
 export * from './fixture-dialog';
+export * from './promote-dialog';

@@ -9,6 +9,7 @@ import { Button, SelectField, Tooltip } from '@/components/ui';
 import { cn, toastApiError } from '@/utils';
 import { useCurrentUser, useScopeContext } from '@/hooks';
 import { useStages } from '@/services/stages';
+import { BracketView } from './bracket-view';
 import { Roles } from '@/schemas';
 import {
   useRecalculateStandings,
@@ -197,7 +198,9 @@ export function StandingsView({
               after every matchday. Last in the row, after the controls that decide *which* table is
               being published — an action placed before its own inputs reads as applying to
               whatever was on screen a moment ago. */}
-          {!readOnly && data && (
+          {/* The export renders a table. A knockout has a bracket, and offering to publish a
+              classement that does not exist is the screen promising something it cannot do. */}
+          {!readOnly && data && data.stageFormat !== 'KNOCKOUT' && (
             <Button variant="primary" asChild>
               <Link href={`/league/standings/export?ctxLeagueId=${data.leagueId}&seasonId=${data.seasonId}`}>
                 <FileDown className="mr-1.5 h-4 w-4" aria-hidden />
@@ -224,6 +227,10 @@ export function StandingsView({
         <p className="rounded-lg border border-dashed border-line px-4 py-16 text-center text-sm text-ink-muted">
           Aucune compétition à classer pour le moment.
         </p>
+      ) : data.stageFormat === 'KNOCKOUT' ? (
+        /* A knockout produces a bracket, not a table — `StageFormat` says so and this obeys it,
+           rather than any screen having to ask "is this a play-off". */
+        <BracketView stageId={data.stageId} stageName={data.stageName} />
       ) : data.rows.length === 0 ? (
         <p className="rounded-lg border border-dashed border-line px-4 py-16 text-center text-sm text-ink-muted">
           Aucun match n&apos;a encore été joué dans cette saison. Le classement apparaîtra dès le

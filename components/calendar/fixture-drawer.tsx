@@ -39,6 +39,7 @@ const STATUS_LABELS: Record<string, string> = {
   POSTPONED: 'Reporté',
   CANCELLED: 'Annulé',
   DRAFT: 'Brouillon',
+  PLANNED: 'À définir',
 };
 
 /** Only three states earn a colour: in progress, played, and needing attention. */
@@ -80,6 +81,7 @@ export function FixtureDrawer({
   onAdd,
   onEdit,
   onScore,
+  onPromote,
   onBoxScore,
   onReorder,
   reorderBlockedReason,
@@ -104,6 +106,8 @@ export function FixtureDrawer({
   onEdit?: (entry: CalendarEntry) => void;
   /** Opens the score dialog. */
   onScore?: (entry: CalendarEntry) => void;
+  /** A bracket fixture whose teams have become known. */
+  onPromote?: (entry: CalendarEntry) => void;
   /** Opens the box score. Absent where the calendar is read-only. */
   onBoxScore?: (entry: CalendarEntry) => void;
   /** Commits a reordering of one stack. Absent where the calendar is read-only. */
@@ -261,7 +265,23 @@ export function FixtureDrawer({
               {/* A draft has no game to open and no score to enter — it does not exist yet. The
                   buttons were still rendered, pointing at `/game/undefined`. What it does have is
                   the one fact worth knowing about it here: which matchday it belongs to. */}
-              {focused.status === 'DRAFT' ? (
+              {/* A bracket fixture whose teams are unknown has one action, and it replaces the
+                  ones it cannot have: it cannot be scored, it can only be drawn. Its date, hour
+                  and hall are already reserved — which is why it exists at all. */}
+              {focused.status === 'PLANNED' ? (
+                <div className="space-y-2 pt-1">
+                  <p className="rounded-lg border border-dashed border-caution bg-caution-soft px-3 py-2.5 text-center text-xs text-ink">
+                    {focused.conditional
+                      ? 'Cette rencontre ne se jouera que si les résultats l’exigent. La salle reste réservée.'
+                      : 'La salle et l’heure sont réservées. Les équipes restent à désigner.'}
+                  </p>
+                  {onPromote && (
+                    <Button variant="primary" className="w-full" onClick={() => onPromote(focused)}>
+                      Désigner les équipes
+                    </Button>
+                  )}
+                </div>
+              ) : focused.status === 'DRAFT' ? (
                 <p className="rounded-lg border border-dashed border-line px-3 py-2.5 text-center text-xs text-ink-muted">
                   Ce match n&apos;est pas encore enregistré. Publiez le projet de calendrier pour
                   le créer.
@@ -336,6 +356,7 @@ export function FixtureDrawer({
                 toneFor={toneFor}
                 onOpen={onFocus}
                 onScore={onScore}
+                onPromote={onPromote}
                 onReorder={onReorder}
                 reorderBlockedReason={reorderBlockedReason}
               />

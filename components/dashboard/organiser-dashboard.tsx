@@ -240,6 +240,28 @@ function CompetitionCard({
       </div>
 
       <div className="mt-3">
+        {/* The state the product could not previously be in, and the one that most needs saying:
+            the phase is over, the next has no fixtures, and nothing else would have told them.
+            Above the phase content because it supersedes it — there is nothing left to report
+            about a phase that has finished. */}
+        {c.awaitingNextStage && c.stage && (
+          <div className="mb-3 rounded-md border border-accent bg-accent-soft px-3 py-2.5">
+            <p className="text-sm font-medium text-ink">
+              « {c.stage.name} » est terminée. Toutes les rencontres ont un résultat.
+            </p>
+            <p className="mt-0.5 text-sm text-ink-muted">
+              La phase suivante n’a encore aucune rencontre. C’est le moment de la composer.
+            </p>
+            <div className="mt-2 flex flex-wrap gap-2">
+              <Button variant="primary" size="sm" asChild>
+                <Link href={link('/league/calendar')}>Programmer la suite</Link>
+              </Button>
+              <Button variant="outline" size="sm" asChild>
+                <Link href={link('/league/seasons')}>Revoir le format</Link>
+              </Button>
+            </div>
+          </div>
+        )}
         {!c.season && <NoSeason href={link('/league/seasons')} />}
         {c.season?.status === SeasonStatus.PLANNING && <PreSeason competition={c} link={link} />}
         {c.season?.status === SeasonStatus.ACTIVE && (
@@ -326,6 +348,28 @@ function InSeason({
 
   return (
     <div className="space-y-3">
+      {/* Per pool in a GROUPS phase: one bar across four pools says nothing about whether any of
+          them can be settled. */}
+      {c.pools.length > 1 ? (
+        <div className="space-y-2">
+          {c.pools.map((p) => {
+            const pp = p.fixtureCount ? Math.round((p.playedCount / p.fixtureCount) * 100) : 0;
+            return (
+              <div key={p.id}>
+                <div className="flex items-baseline justify-between text-sm">
+                  <span className="text-ink">{p.name}</span>
+                  <span className="text-ink-muted">
+                    {p.playedCount} / {p.fixtureCount}
+                  </span>
+                </div>
+                <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-surface-sunk">
+                  <div className="h-full rounded-full bg-positive" style={{ width: `${pp}%` }} />
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      ) : (
       <div>
         <div className="flex items-baseline justify-between text-sm">
           <span className="text-ink">
@@ -343,11 +387,30 @@ function InSeason({
           <div className="h-full rounded-full bg-positive" style={{ width: `${pct}%` }} />
         </div>
       </div>
+      )}
 
-      {c.missingResults > 0 && !standalone && (
+      {/* In a knockout a missing result is not an incomplete table — it stops the next round
+          being drawn at all, which is a materially stronger thing to say. */}
+      {c.missingResults > 0 && c.stage?.format === 'KNOCKOUT' ? (
         <p className="text-sm text-caution">
-          {c.missingResults}{' '}
-          {c.missingResults === 1 ? 'résultat manquant' : 'résultats manquants'}
+          Le tour suivant ne peut pas être composé — {c.missingResults}{' '}
+          {c.missingResults === 1 ? 'rencontre sans résultat' : 'rencontres sans résultat'}.
+        </p>
+      ) : (
+        c.missingResults > 0 &&
+        !standalone && (
+          <p className="text-sm text-caution">
+            {c.missingResults}{' '}
+            {c.missingResults === 1 ? 'résultat manquant' : 'résultats manquants'}
+          </p>
+        )
+      )}
+
+      {c.plannedCount > 0 && (
+        <p className="text-sm text-ink-muted">
+          {c.plannedCount}{' '}
+          {c.plannedCount === 1 ? 'rencontre à définir' : 'rencontres à définir'} — salle réservée,
+          équipes à désigner.
         </p>
       )}
 

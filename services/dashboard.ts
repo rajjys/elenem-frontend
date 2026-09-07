@@ -51,6 +51,28 @@ const CompetitionSchema = z.object({
   champion: z
     .object({ teamId: z.string(), name: z.string(), shortCode: z.string().nullable() })
     .nullable(),
+  /** The phase being played, and what it produces. */
+  stage: z
+    .object({
+      id: z.string(),
+      name: z.string(),
+      format: z.enum(['LEAGUE', 'GROUPS', 'KNOCKOUT']),
+      order: z.number(),
+      total: z.number(),
+    })
+    .nullable(),
+  /** The phase is finished and the next has no fixtures. The moment the organiser must act. */
+  awaitingNextStage: z.boolean(),
+  /** Bracket fixtures with a hall but no teams yet. */
+  plannedCount: z.number(),
+  pools: z.array(
+    z.object({
+      id: z.string(),
+      name: z.string(),
+      fixtureCount: z.number(),
+      playedCount: z.number(),
+    }),
+  ),
 });
 
 const OrganiserDashboardSchema = z.object({
