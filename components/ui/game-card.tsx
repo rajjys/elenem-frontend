@@ -8,7 +8,7 @@ interface GameCardProps {
   buildLink: (path: string) => string;
 }
 
-export const GameCard: React.FC<GameCardProps> = ({ game, buildLink }) => {
+export const GameCard: React.FC<GameCardProps> = ({ game }) => {
   const formatDate = new Date(game.dateTime).toLocaleDateString("en-US", {
     weekday: "short",
     month: "short",

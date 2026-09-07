@@ -5,11 +5,8 @@ import {
   Activity, 
   Globe, 
   ShieldCheck, 
-  Database, 
   TrendingUp,
-  ArrowRight,
   CheckCircle2,
-  UserCircle,
   Users,
   Menu,
   ShieldUser,
@@ -23,16 +20,12 @@ import {
   Users2,
   ShieldAlert,
   Settings,
-  Terminal,
   MonitorCheck,
   UserPlus,
   Palette,
   CloudDownload,
   RefreshCcw,
   DatabaseZap,
-  Layers,
-  PlusCircle,
-  Zap,
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -53,7 +46,7 @@ export default function FeaturesPage() {
               <span className="text-primary">successful seasons.</span>
             </h1>
             <p className="mt-8 text-xl text-ink-muted leading-relaxed max-w-2xl mx-auto">
-              Elenem isn't just a website—it’s an operating system for sports 
+              Elenem isn&apos;t just a website—it’s an operating system for sports 
               organizations. From the first registration to the final trophy, 
               we ensure your data stays authoritative and undisputed.
             </p>
@@ -276,7 +269,7 @@ export default function FeaturesPage() {
               </h2>
               
               <p className="text-lg text-ink-muted mb-8 leading-relaxed">
-                Elenem centralizes your entire season into one <strong>"source of truth."</strong> 
+                Elenem centralizes your entire season into one <strong>&ldquo;source of truth.&rdquo;</strong> 
                 Reschedule games, enter results, or track live stats in seconds — 
                 every club, official, and fan stays synced automatically.
               </p>
@@ -367,7 +360,7 @@ export default function FeaturesPage() {
                       <div className="p-2.5 rounded-lg border border-line bg-surface-sunk shadow-sm">
                         <div className="flex justify-between items-center mb-1">
                           <div className="h-1 w-10 bg-line rounded-full" />
-                          <div className="px-1.5 py-0.5 rounded bg-positive/20 text-positive/60 text-[8px] font-bold tracking-widest italic">82'</div>
+                          <div className="px-1.5 py-0.5 rounded bg-positive/20 text-positive/60 text-[8px] font-bold tracking-widest italic">82&apos;</div>
                         </div>
                         <div className="flex items-center justify-between gap-2">
                           <div className="flex-1 flex items-center gap-2">

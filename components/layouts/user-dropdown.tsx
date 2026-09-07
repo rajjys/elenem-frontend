@@ -1,7 +1,7 @@
 // components/layouts/UserDropdown.tsx
 'use client'
 
-import React, { useState, useRef, useEffect, FC } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { LogOut, Settings, User, Shield, LayoutDashboard } from 'lucide-react';

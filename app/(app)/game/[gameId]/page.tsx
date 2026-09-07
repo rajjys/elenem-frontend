@@ -112,7 +112,9 @@ export default function GamePage() {
   // Read on every tab, not just the sheet's: the overview's comparison is built from it.
   const box = useBoxScore(gameId, !!game.data && game.data.status === 'COMPLETED');
 
-  const entriesThatDay = dayCalendar.data?.entries ?? [];
+  // Memoised because it feeds a `useMemo` below: `?? []` builds a fresh array on every render, so
+  // the dependency changed every time and the memo never held.
+  const entriesThatDay = useMemo(() => dayCalendar.data?.entries ?? [], [dayCalendar.data]);
   const entry: CalendarEntry | null = useMemo(() => {
     const found = entriesThatDay.find((e) => e.id === gameId);
     if (found) return found;

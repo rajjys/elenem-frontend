@@ -2,12 +2,11 @@
 "use client";
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { api } from '@/services/api'; // Your actual API instance
 import { GameDetails, GameFilterParams, PaginatedGamesResponseSchema, GameFilterParamsSchema } from '@/schemas'; // Your Game DTOs and schemas
 import { GamesFilters } from '@/components/game/games-filters'; // Your new GamesFilters component
-import { Pagination, LoadingSpinner, Button } from '@/components/ui/'; // Your Pagination components
+import { Pagination, LoadingSpinner } from '@/components/ui/'; // Your Pagination components
 import { GameCard } from '@/components/ui'; // Your existing GameCard component
 import { toast } from 'sonner'; // Your toast notification library (e.g., Sonner)
 import { Roles } from '@/schemas'; // Assuming Role enum is here

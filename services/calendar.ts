@@ -78,11 +78,23 @@ export function useCalendar(params: {
   leagueIds?: string[];
   /** A club's own fixtures, home and away. */
   teamId?: string;
+  /**
+   * Whose calendar. Only a system administrator has to say — everybody else has one organisation
+   * and the server takes it from their token.
+   *
+   * It was never sent, and the endpoint refuses a system administrator without it: « Specify
+   * tenantId — a system admin has no organisation of their own. » So the founder's own account
+   * could not open any calendar, on any surface, and had not been able to since the module shipped.
+   */
+  tenantId?: string;
 }) {
   const leagueIds = params.leagueIds?.length ? params.leagueIds.join(',') : undefined;
 
   return useQuery({
-    queryKey: ['calendar', params.from, params.to, leagueIds ?? 'all', params.teamId ?? 'all'],
+    queryKey: [
+      'calendar', params.from, params.to,
+      leagueIds ?? 'all', params.teamId ?? 'all', params.tenantId ?? 'own',
+    ],
     queryFn: async () => {
       const res = await api.get('/calendar', {
         params: {
@@ -90,6 +102,7 @@ export function useCalendar(params: {
           to: params.to,
           ...(leagueIds ? { leagueIds } : {}),
           ...(params.teamId ? { teamId: params.teamId } : {}),
+          ...(params.tenantId ? { tenantId: params.tenantId } : {}),
         },
       });
       return parseResponse(CalendarSchema, res.data);

@@ -12,7 +12,6 @@ import { ThemeToggle } from "@/components/ui/theme-toggle";
 import UserDropdown from "./user-dropdown";
 
 export default function PublicHeader() {
-  const pathname = usePathname();
   const { user } = useAuthStore();
   const { locale, setLocale } = useI18n();
   const [open, setOpen] = useState(false);

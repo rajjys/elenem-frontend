@@ -92,7 +92,10 @@ const translations: Record<Locale, Record<string, string | string[]>> = {
 
 export function getBrowserLocale(): Locale {
   if (typeof navigator === 'undefined') return DEFAULT;
-  const nav = navigator.language || (navigator as any).userLanguage || DEFAULT;
+  // `userLanguage` is IE's spelling of `language`. Narrowed rather than cast to `any`, so the
+  // shape of the fallback is stated instead of waved through.
+  const legacy = navigator as Navigator & { userLanguage?: string };
+  const nav = navigator.language || legacy.userLanguage || DEFAULT;
   if (nav.startsWith('fr')) return 'fr';
   return 'en';
 }

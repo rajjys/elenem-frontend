@@ -1,3 +1,7 @@
+// A presigned S3 PUT goes straight to storage and must NOT carry our Authorization header —
+// signing the URL is the authorisation, and an extra header invalidates the signature. This is the
+// exception the lint rule describes, taken deliberately rather than by accident.
+// eslint-disable-next-line no-restricted-imports
 import axios from "axios";
 import { api } from "@/services/api";
 import { toast } from "sonner";

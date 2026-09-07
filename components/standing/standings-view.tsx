@@ -84,7 +84,15 @@ export function StandingsView({
     if (next) setLeagueId(next);
   }, [leagueId, scope, ctx.leagueId, options]);
 
-  const seasons = useStandingsSeasons(leagueId || undefined);
+  /**
+   * Only a competition's administrator can list its seasons, and only they are offered the picker.
+   *
+   * A club administrator was asking anyway and being refused on every visit — a 403 in their
+   * console, a wasted request on a connection that pays by the megabyte, and the answer was never
+   * going to change. Not asking is the fix; the refusal itself is correct (`GAME_AND_STANDINGS`
+   * §3.5 — they administer a team, not a competition).
+   */
+  const seasons = useStandingsSeasons(readOnly ? undefined : leagueId || undefined);
   const seasonOptions = useMemo(() => seasons.data?.data ?? [], [seasons.data]);
 
   // Only ever to *change* season. Left empty, the server answers with the current one — so a

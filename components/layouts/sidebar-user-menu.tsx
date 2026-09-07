@@ -20,7 +20,6 @@ export function SidebarUserMenu({
   email,
   isSidebarOpen,
   onLogout,
-  buildLink,
   publicSiteHref = '/',
   onNavigate,
 }: {

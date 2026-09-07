@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useId, useState } from 'react';
+import { useEffect, useId, useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '@/services/api';
 import { useCurrentUser } from '@/hooks';
@@ -62,7 +62,9 @@ export function LeaguePicker({
     queryKey: ['leagues-picker'],
     queryFn: async () => (await api.get('/leagues?pageSize=100')).data,
   });
-  const leagues: { id: string; name: string }[] = data?.data ?? [];
+  // Memoised because it is a dependency of the effect below: `?? []` is a new array each render,
+  // so the effect re-ran on every one.
+  const leagues: { id: string; name: string }[] = useMemo(() => data?.data ?? [], [data]);
 
   // A single option is not a choice — select it and stay out of the way.
   useEffect(() => {

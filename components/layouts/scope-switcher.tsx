@@ -47,6 +47,9 @@ const HOME: Record<ScopeKind, string> = {
 const INITIAL_VISIBLE = 5;
 const SEARCH_THRESHOLD = 10;
 
+/** A row from any of the scope lists: enough to name it and to abbreviate it. */
+type ScopeRow = { id: string; name: string; tenantCode?: string | null; shortCode?: string | null };
+
 export function ScopeSwitcher({
   kind,
   current,
@@ -71,7 +74,7 @@ export function ScopeSwitcher({
     queryFn: async (): Promise<Sibling[]> => {
       if (kind === 'tenant') {
         const r = await api.get('/tenants?pageSize=100');
-        return (r.data?.data ?? []).map((t: any) => ({
+        return (r.data?.data ?? []).map((t: ScopeRow) => ({
           id: t.id,
           name: t.name,
           short: t.tenantCode ?? t.name,
@@ -104,7 +107,7 @@ export function ScopeSwitcher({
         });
       }
       const r = await api.get(`/teams?pageSize=100${parentId ? `&leagueId=${parentId}` : ''}`);
-      return (r.data?.data ?? []).map((t: any) => ({
+      return (r.data?.data ?? []).map((t: ScopeRow) => ({
         id: t.id,
         name: t.name,
         short: t.shortCode ?? t.name,

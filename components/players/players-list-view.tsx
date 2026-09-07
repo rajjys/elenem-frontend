@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
-import { Plus, Search, Trash2, Pencil, Users } from 'lucide-react';
+import { Search, Trash2, Pencil, Users } from 'lucide-react';
 import { Button, Input, ConfirmDialog, ListPage } from '@/components/ui';
 import { usePlayers, useDeletePlayer } from '@/services/players';
 import { useDebounce } from 'use-debounce';

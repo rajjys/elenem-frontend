@@ -86,9 +86,17 @@ export function useScopeContext(): ScopeContext {
   // even when only the deepest id was passed.
   const effectiveLeagueId = leagueId ?? team.data?.leagueId ?? undefined;
 
+  /**
+   * The competition's identity, not its details.
+   *
+   * `GET /leagues/:id` returns the owner, the business profile, every team and every player with
+   * their email address, and is refused to a club administrator — so the crumb naming the
+   * competition their own club plays in 403'd on every page they opened. `/identity` answers the
+   * smaller question, and answers it for anyone in the organisation.
+   */
   const league = useQuery({
     queryKey: ['scope', 'league', effectiveLeagueId],
-    queryFn: async () => (await api.get(`/leagues/${effectiveLeagueId}`)).data,
+    queryFn: async () => (await api.get(`/leagues/${effectiveLeagueId}/identity`)).data,
     enabled: !!effectiveLeagueId,
     staleTime: ENTITY_STALE_MS,
   });
@@ -101,23 +109,42 @@ export function useScopeContext(): ScopeContext {
     user?.tenantId ??
     undefined;
 
+  /**
+   * The reader's own organisation is already in their token — name, code and all — so the
+   * breadcrumb has no reason to ask the server for it.
+   *
+   * It was asking, and `GET /tenants/:id` is `@Roles(SYSTEM_ADMIN, TENANT_ADMIN)`: a league
+   * administrator and a club administrator belong to the organisation and may not read it, so the
+   * crumb naming their own federation 403'd on **every page they opened**. The endpoint is right to
+   * be narrow — it returns the owner, the business profile and the subscription, none of which a
+   * breadcrumb wants — and the fix is not to widen it but to stop asking.
+   *
+   * The request survives for the one case that needs it: a system administrator looking at somebody
+   * else's organisation through `ctxTenantId`, where the token says nothing useful.
+   */
+  const ownTenant = user?.tenant;
+  const needsTenantFetch = !!effectiveTenantId && effectiveTenantId !== ownTenant?.id;
+
   const tenant = useQuery({
     queryKey: ['scope', 'tenant', effectiveTenantId],
     queryFn: async () => (await api.get(`/tenants/${effectiveTenantId}`)).data,
-    enabled: !!effectiveTenantId,
+    enabled: needsTenantFetch,
     staleTime: ENTITY_STALE_MS,
   });
+
+  const tenantIdentity =
+    !needsTenantFetch && ownTenant?.id === effectiveTenantId ? ownTenant : tenant.data;
 
   return {
     tenantId: effectiveTenantId,
     leagueId: effectiveLeagueId,
     teamId,
     gameId,
-    tenant: tenant.data
+    tenant: tenantIdentity
       ? {
-          id: tenant.data.id,
-          name: tenant.data.name,
-          short: tenant.data.tenantCode ?? tenant.data.name,
+          id: tenantIdentity.id,
+          name: tenantIdentity.name,
+          short: tenantIdentity.tenantCode ?? tenantIdentity.name,
         }
       : undefined,
     league: league.data

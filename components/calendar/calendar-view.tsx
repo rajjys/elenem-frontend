@@ -343,6 +343,9 @@ export function CalendarView({
     // A league admin, or anyone who drilled into a league, sees that league only.
     leagueIds: scope.leagueId ? [scope.leagueId] : undefined,
     teamId: club ? (scope.teamId ?? undefined) : undefined,
+    // A system administrator has no organisation of their own, so the server cannot infer one and
+    // refuses without it. Everybody else's token already says which.
+    tenantId: scope.tenantId ?? undefined,
   });
 
   /** How long a fixture holds its hall — the gap between one slot and the next. */

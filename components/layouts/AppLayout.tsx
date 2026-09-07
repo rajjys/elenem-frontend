@@ -1,31 +1,23 @@
 'use client'
-import React, { useState, ReactNode, RefObject } from 'react';
+import React, { useState, ReactNode } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { FiLogOut, FiX } from 'react-icons/fi';
+import { FiX } from 'react-icons/fi';
 import { useAuthStore } from '@/store/auth.store'; // Assuming this path is correct
 // Import your existing components. Replace these with your actual paths.
 import { NavLink } from '.';
 import { SidebarBrand } from './sidebar-brand';
 import type { NavGroup } from './nav-items';
 import { SidebarUserMenu } from './sidebar-user-menu';
-import { useContextualLink, useDashboardLinkEligibillity, useSidebarEligibility } from '@/hooks';
+import { useContextualLink, useSidebarEligibility } from '@/hooks';
 import { Roles } from '@/schemas'; // Assuming Role enum is here
 import { AppLayoutHeader } from './AppLayoutHeader'; // Import the updated Navbar
 import { ArrowLeft } from 'lucide-react';
 import { VerifyEmailBanner } from '@/components/onboarding';
 
 // Type for a React Icon component
-type IconType = React.ComponentType<React.SVGProps<SVGSVGElement>>;
 
 // Type for a single navigation item (e.g., a direct link)
-interface NavLinkItem {
-  label: string;
-  basePath: string; // The base path for the link
-  icon: IconType;   // React icon component (e.g., FiHome)
-  onClick?: () => void; // Optional click handler for mobile menu links
-}
-
 interface AppLayoutProps {
   children: ReactNode;
   /** Silent groups: a hairline and a quiet caption, never a collapsible. */
@@ -83,9 +75,6 @@ export default function AppLayout({ children, navItems }: AppLayoutProps) {
   const { buildLink } = useContextualLink();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [activeFlyoutLabel, setActiveFlyoutLabel] = useState<string | null>(null);
-  const [flyoutPosition, setFlyoutPosition] = useState<{ top: number; left: number } | null>(null);
-  const [currentFlyoutTriggerRef, setCurrentFlyoutTriggerRef] = useState<RefObject<HTMLElement> | null>(null);
 
   const isSystemAdmin = userAuth?.roles.includes(Roles.SYSTEM_ADMIN);
   const isTenantAdmin = userAuth?.roles.includes(Roles.TENANT_ADMIN);
@@ -105,40 +94,13 @@ export default function AppLayout({ children, navItems }: AppLayoutProps) {
                     isReferee     ? { label: "Profil Arbitre", link: '/referee/dashboard'} :
                                     {label: "Tableau de bord", link: '/account/dashboard'}; // Default fallback
   const shouldShowSidebar = useSidebarEligibility(); // Assuming this hook determines if a sidebar is relevant for the current user/page
-  const shouldShowDashboardLink = useDashboardLinkEligibillity(userAuth?.roles, currentPath);
   
   const handleLogout = () => {
     logout();
     router.push('/');
   };
 
-  const handleFlyoutToggle = (label: string, targetElement: HTMLElement) => {
-    if (activeFlyoutLabel === label || label === "") {
-      setActiveFlyoutLabel(null);
-      setFlyoutPosition(null);
-      setCurrentFlyoutTriggerRef(null);
-    } else {
-      const rect = targetElement.getBoundingClientRect();
-      setActiveFlyoutLabel(label);
-      setFlyoutPosition({
-        top: rect.top,
-        left: rect.left + rect.width + 2 // Add small gap
-      });
-      const triggerRefObject = { current: targetElement };
-      setCurrentFlyoutTriggerRef(triggerRefObject as RefObject<HTMLElement>);
-    }
-  };
-
-  const closeFlyout = () => {
-    setActiveFlyoutLabel(null);
-    setFlyoutPosition(null);
-    setCurrentFlyoutTriggerRef(null);
-  };
-
-  const toggleSidebar = () => {
-    setIsSidebarOpen(!isSidebarOpen);
-    closeFlyout(); // Close flyout when sidebar state changes
-  }
+  const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
   const closeMobileMenu = () => setIsMobileMenuOpen(false);
 
@@ -203,7 +165,7 @@ export default function AppLayout({ children, navItems }: AppLayoutProps) {
             <aside className={`relative flex flex-col w-64 max-w-xs h-full bg-surface shadow-xl py-4 z-50 transform transition-transform duration-300 ease-in-out ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
               {/* Mobile Sidebar Header with Close Button and Logo/Title */}
               <div className="flex items-center justify-between px-4 pb-2 border-b border-line">
-                <Link href={buildLink(dashboard.link)} className="flex items-center " onClick={closeFlyout}>
+                <Link href={buildLink(dashboard.link)} className="flex items-center ">
                   <div className={`p-2`}>
                     <ArrowLeft className="h-4 w-4 text-ink-subtle" />
                   </div>
