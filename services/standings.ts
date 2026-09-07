@@ -54,6 +54,19 @@ const StandingsViewSchema = z.object({
   organisationCity: z.string().nullable(),
   seasonId: z.string(),
   seasonName: z.string(),
+  /**
+   * The phase this table is *of*, and the pool inside it when the phase has pools.
+   *
+   * A table belongs to a phase — EUBAGO publish « le classement phase de 6 Version masculine et
+   * général version féminine » on one signed sheet. With a single phase, which is every
+   * competition until somebody composes a second, `stages` has one entry and no control appears.
+   */
+  stageId: z.string(),
+  stageName: z.string(),
+  stageFormat: z.enum(['LEAGUE', 'GROUPS', 'KNOCKOUT']),
+  groupId: z.string().nullable(),
+  groupName: z.string().nullable(),
+  groups: z.array(z.object({ id: z.string(), name: z.string() })),
   lastCalculated: z.string().nullable(),
   gamesCounted: z.number(),
   /** Fixtures whose date has passed with no result entered. */
@@ -87,12 +100,22 @@ export type StandingsColumn = z.infer<typeof StandingsColumnSchema>;
  * a competition), so a screen that had to name a season could not show them the table their own
  * club is in.
  */
-export function useStandings(leagueId?: string, seasonId?: string) {
+export function useStandings(
+  leagueId?: string,
+  seasonId?: string,
+  stageId?: string,
+  groupId?: string,
+) {
   return useQuery({
-    queryKey: ['standings', leagueId, seasonId ?? 'current'],
+    queryKey: ['standings', leagueId, seasonId ?? 'current', stageId ?? 'current', groupId ?? 'first'],
     queryFn: async () => {
       const res = await api.get('/games/standings/view', {
-        params: { leagueId, ...(seasonId ? { seasonId } : {}) },
+        params: {
+          leagueId,
+          ...(seasonId ? { seasonId } : {}),
+          ...(stageId ? { stageId } : {}),
+          ...(groupId ? { groupId } : {}),
+        },
       });
       return parseResponse(StandingsViewSchema, res.data);
     },

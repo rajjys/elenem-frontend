@@ -8,6 +8,7 @@ import { AlertTriangle, FileDown, Loader2, RefreshCw, SlidersHorizontal, Trophy 
 import { Button, SelectField, Tooltip } from '@/components/ui';
 import { cn, toastApiError } from '@/utils';
 import { useCurrentUser, useScopeContext } from '@/hooks';
+import { useStages } from '@/services/stages';
 import { Roles } from '@/schemas';
 import {
   useRecalculateStandings,
@@ -94,7 +95,31 @@ export function StandingsView({
     setSeasonId(league?.currentSeasonId ?? seasonOptions[seasonOptions.length - 1].id);
   }, [seasonOptions, seasonId, options, leagueId]);
 
-  const standings = useStandings(leagueId || undefined, seasonId || undefined);
+  /**
+   * Which phase, and which pool inside it.
+   *
+   * Both left empty until the reader changes them, so the server answers with the phase being
+   * played — which is what a club administrator gets, since they cannot list seasons or phases and
+   * would otherwise see an empty frame. The controls appear only past one option, the same rule
+   * the season picker already follows.
+   */
+  const [stageId, setStageId] = useState('');
+  const [groupId, setGroupId] = useState('');
+
+  const standings = useStandings(
+    leagueId || undefined,
+    seasonId || undefined,
+    stageId || undefined,
+    groupId || undefined,
+  );
+  const stages = useStages(seasonId || undefined);
+  const stageOptions = useMemo(() => stages.data ?? [], [stages.data]);
+
+  // A season change is a different set of phases, so the phase and pool stop meaning anything.
+  useEffect(() => {
+    setStageId('');
+    setGroupId('');
+  }, [seasonId]);
   const recalc = useRecalculateStandings();
 
   const data = standings.data;
@@ -139,6 +164,33 @@ export function StandingsView({
               onChange={setSeasonId}
               className="w-44"
               options={seasonOptions.map((s) => ({ value: s.id, label: s.name }))}
+            />
+          )}
+          {/* A table belongs to a phase, not to a season — EUBAGO publish « le classement phase de
+              6 » — so a season with more than one gets a switcher, and one with a single phase
+              never learns the word. */}
+          {stageOptions.length > 1 && (
+            <SelectField
+              label="Phase"
+              placeholder="Phase"
+              value={stageId || data?.stageId || ''}
+              onChange={(v) => {
+                setStageId(v);
+                setGroupId('');
+              }}
+              className="w-48"
+              options={stageOptions.map((st) => ({ value: st.id, label: st.name }))}
+            />
+          )}
+          {/* A pool is a table of its own. */}
+          {(data?.groups.length ?? 0) > 1 && (
+            <SelectField
+              label="Poule"
+              placeholder="Poule"
+              value={groupId || data?.groupId || ''}
+              onChange={setGroupId}
+              className="w-36"
+              options={(data?.groups ?? []).map((g) => ({ value: g.id, label: g.name }))}
             />
           )}
           {/* The artefact this whole module exists to replace: the signed sheet a league publishes

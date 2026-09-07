@@ -48,7 +48,19 @@ function defaultsFor(data: StandingsView): DocumentFields {
     organ: 'COMITÉ EXÉCUTIF',
     reference: '',
     title: `CLASSEMENT ${data.leagueName.toUpperCase()}`,
-    subtitle: data.seasonName,
+    // The season, and the phase when the season has more than one.
+    //
+    // « Saison 2026-2027 · Phase de 6 » — which is the line their own bulletin carries and the
+    // secretary retypes every Saturday. Derived from the table being published, so it can never
+    // name a phase that is not the one on the page. A single-phase season keeps saying only the
+    // season, because « Saison régulière » beside it would be saying nothing twice.
+    subtitle: [
+      data.seasonName,
+      data.stageName !== 'Saison régulière' ? data.stageName : null,
+      data.groupName,
+    ]
+      .filter(Boolean)
+      .join(' · '),
     matchday: '',
     preamble: '',
     city: data.organisationCity ?? '',

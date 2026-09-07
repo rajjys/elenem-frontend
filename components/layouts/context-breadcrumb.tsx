@@ -48,6 +48,7 @@ const PAGE_TITLES: Record<string, string> = {
   calendar: 'Calendrier',
   generate: 'Génération',
   seasons: 'Saisons',
+  format: 'Format',
   standings: 'Classement',
   analytics: 'Statistiques',
   posts: 'Actualités',

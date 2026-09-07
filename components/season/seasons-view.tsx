@@ -4,7 +4,7 @@ import React, { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { CalendarDays, CheckCircle2, ListOrdered, Trash2 } from 'lucide-react';
+import { CalendarDays, CheckCircle2, Layers, ListOrdered, Trash2 } from 'lucide-react';
 import {
   Button,
   LoadingSpinner,
@@ -20,6 +20,7 @@ import {
   useDeleteSeason,
   type SeasonRow,
 } from '@/services/seasons';
+import { describeShape, useStages } from '@/services/stages';
 import { toastApiError } from '@/utils';
 import { toast } from 'sonner';
 import { SeasonFormDialog } from './season-form-dialog';
@@ -132,6 +133,7 @@ export function SeasonsView({ scope }: { scope: 'league' | 'admin' }) {
             scope={scope}
             calendarHref={buildLink('/league/calendar', { ctxLeagueId: season.leagueId })}
             standingsHref={buildLink('/league/standings', { ctxLeagueId: season.leagueId })}
+            formatHref={buildLink(`/league/seasons/${season.id}/format`, { ctxLeagueId: season.leagueId })}
             onEdit={() => setEditing(season)}
             onMove={(move) => setMoving({ season, move })}
             onDelete={() => onDelete(season)}
@@ -249,6 +251,7 @@ function SeasonCard({
   scope,
   calendarHref,
   standingsHref,
+  formatHref,
   onEdit,
   onMove,
   onDelete,
@@ -259,6 +262,7 @@ function SeasonCard({
   scope: 'league' | 'admin';
   calendarHref: string;
   standingsHref: string;
+  formatHref: string;
   onEdit: () => void;
   onMove: (move: SeasonMove) => void;
   onDelete: () => void;
@@ -266,6 +270,10 @@ function SeasonCard({
   canDelete: boolean;
 }) {
   const moves = MOVES[season.status] ?? [];
+  // The season's shape, when it has one. A single phase has no shape to describe, and printing
+  // « Saison régulière » beside a season would be saying the same thing twice.
+  const stages = useStages(season.id);
+  const shape = describeShape(stages.data ?? []);
   const closed =
     season.status === SeasonStatus.COMPLETED || season.status === SeasonStatus.CANCELED;
 
@@ -326,6 +334,13 @@ function SeasonCard({
         <Link href={standingsHref} className="inline-flex items-center gap-1.5 nav-hover">
           <ListOrdered className="h-4 w-4" />
           {season.playedCount} avec un résultat
+        </Link>
+        {/* A season's shape is the biggest thing about it, and it is the one thing this card
+            could not say. Reads « Saison régulière → Play-offs », or « Format » when there is
+            only one phase and there is therefore no shape to describe. */}
+        <Link href={formatHref} className="inline-flex items-center gap-1.5 nav-hover">
+          <Layers className="h-4 w-4" />
+          {shape ?? 'Format'}
         </Link>
       </div>
 
