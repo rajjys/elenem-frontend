@@ -524,11 +524,20 @@ an oversight — and the MVP is a free launch, so "good enough for Goma this sea
 
 ### Still open, and why
 
-**Accent-blind text matching.** The database runs under `C` collation, so 52
-`mode: 'insensitive'` comparisons do not fold accents: *Kasereka* and *Kaséréka* compare as two
-people. The box score already works around it in JS for the one place it matters
-(`GAME_AND_STANDINGS` §6.4). The real fix is a deploy-time decision — a collation on the production
-database — and it belongs with **Phase 5**, not before.
+**Accent-blind text matching**, and the framing above it was wrong. *Kasereka* and *Kaséréka* do
+compare as two people across 51 `mode: 'insensitive'` comparisons — but **no ordinary collation
+folds accents**, so this was never a deploy-time collation decision. Verified on Postgres 18.4:
+`'Kaséréka' ILIKE '%kasereka%'` is false under `C` **and** under `fr-FR-x-icu`.
+
+The three real options, and their costs, are written up in `docs/HANDOVER_PHASE4.md` — including the
+one with genuine risk: a non-deterministic ICU collation folds accents and, new in Postgres 18,
+works with `LIKE`, but **errors on `ILIKE`**, which is exactly what Prisma's `mode: 'insensitive'`
+emits. Adopting it means deleting all 51, and a single one missed becomes a runtime 500 rather than
+a silent miss.
+
+The recommendation is a folded shadow column on the names people actually search, reusing the
+folding helper that already exists at `box-score.service.ts:25`. The box score already handles the
+one place accents are correctness-critical (`GAME_AND_STANDINGS` §6.4).
 
 **A club administrator is refused `GET /seasons` and `GET /leagues/:id`.** By design: they
 administer a team, not a competition. Their screens no longer ask.
