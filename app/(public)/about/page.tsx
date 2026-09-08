@@ -1,11 +1,5 @@
-import React from 'react'
+import { ComingWithLaunch } from '@/components/ui';
 
-const AboutPage = () => {
-  return (
-    <div>
-      En revue. Revenez plus tard
-    </div>
-  )
+export default function Page() {
+  return <ComingWithLaunch title="À propos" what="La présentation d'Elenem" />;
 }
-
-export default AboutPage

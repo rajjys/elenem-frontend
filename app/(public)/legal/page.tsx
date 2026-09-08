@@ -1,10 +1,5 @@
-import React from 'react'
+import { ComingWithLaunch } from '@/components/ui';
 
-const LegalPage = () => {
-  return (
-    <div>
-      En revue. Revenez plus tard
-    </div>
-  )
+export default function Page() {
+  return <ComingWithLaunch title="Mentions légales" what="Les mentions légales" />;
 }
-export default LegalPage

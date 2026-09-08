@@ -1,11 +1,5 @@
-import React from 'react'
+import { ComingWithLaunch } from '@/components/ui';
 
-const PublicApiPage = () => {
-  return (
-    <div>
-      Page en revue. Revenez plus tard
-    </div>
-  )
+export default function Page() {
+  return <ComingWithLaunch title="API publique" what="La documentation de l'API" />;
 }
-
-export default PublicApiPage

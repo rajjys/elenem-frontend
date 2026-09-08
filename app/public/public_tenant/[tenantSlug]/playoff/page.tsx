@@ -1,11 +1,5 @@
-import React from 'react'
+import { ComingWithLaunch } from '@/components/ui';
 
-const PlayoffPage = () => {
-  return (
-    <div>
-      PlayoffPage
-    </div>
-  )
+export default function Page() {
+  return <ComingWithLaunch title="Phase finale" what="Le tableau des phases finales" />;
 }
-
-export default PlayoffPage

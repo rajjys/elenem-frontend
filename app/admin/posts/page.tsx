@@ -1,11 +1,8 @@
-import React from 'react'
+'use client';
 
-const AdminPosts = () => {
-  return (
-    <div>
-      En developpement. Revenez plus tard
-    </div>
-  )
+import { PostsListView } from '@/components/post';
+
+/** Every publication on the platform. The operator has no organisation of their own to scope to. */
+export default function AdminPostsPage() {
+  return <PostsListView scope="platform" />;
 }
-
-export default AdminPosts

@@ -8,6 +8,7 @@
 // Because every user-facing label lives in this one file, translating the
 // admin shell later is a single-file change (see docs/ANALYSIS_2026-08.md §5).
 import {
+  BarChart3,
   LayoutDashboard,
   Users,
   Shield,
@@ -69,6 +70,7 @@ export const adminNavItems: NavGroup[] = [
     { label: 'Seasons', basePath: '/admin/seasons', icon: CalendarDays },
     { label: 'Teams', basePath: '/admin/teams', icon: Shield },
     { label: 'Games', basePath: '/admin/games', icon: ListOrdered },
+    { label: 'Posts', basePath: '/admin/posts', icon: Newspaper },
     ],
   },
 ];
@@ -91,6 +93,11 @@ export const tenantNavItems: NavGroup[] = [
     // here at all — it lived under /league and was reachable only by drilling into a competition
     // first. At LIPROBAKIN the person who publishes it is the tenant's community manager.
     { label: 'Classement', basePath: '/tenant/standings', icon: ListOrdered },
+    // Leagues track scorers, and until Phase 4 the product held every scoresheet and surfaced
+    // none of it. One sortable table answers all four of the questions asked of it — meilleur
+    // marqueur, moyenne, volume de trois points, matchs joués — because the columns are the
+    // sport's rather than this file's.
+    { label: 'Statistiques', basePath: '/tenant/stats', icon: BarChart3 },
     ],
   },
   {
@@ -118,12 +125,16 @@ export const leagueNavItems: NavGroup[] = [
     { label: 'Saisons', basePath: '/league/seasons', icon: CalendarDays },
     { label: 'Calendrier', basePath: '/league/calendar', icon: CalendarDays },
     { label: 'Classement', basePath: '/league/standings', icon: ListOrdered },
+    { label: 'Statistiques', basePath: '/league/stats', icon: BarChart3 },
     ],
   },
   {
     label: 'Administration',
     items: [
     { label: 'Utilisateurs', basePath: '/league/users', icon: Users },
+    // Added with the page itself. `/post/create` has redirected here on success since it was
+    // written, and there was no way to reach the list any other way.
+    { label: 'Actualités', basePath: '/league/posts', icon: Newspaper },
     { label: 'Paramètres', basePath: '/league/settings/general', icon: Settings },
     ],
   },
@@ -147,6 +158,10 @@ export const teamNavItems: NavGroup[] = [
     // it was the one screen their sidebar did not have. `StandingsView` reads the competition
     // from the team, and the row for their own club is marked.
     { label: 'Classement', basePath: '/team/standings', icon: ListOrdered },
+    // Opens on the club's own players, and does not lock them there — the competition's
+    // leaderboard is as readable to a club as its table is.
+    { label: 'Statistiques', basePath: '/team/stats', icon: BarChart3 },
+    { label: 'Actualités', basePath: '/team/posts', icon: Newspaper },
     { label: 'Utilisateurs', basePath: '/team/users', icon: Users },
     ],
   },

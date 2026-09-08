@@ -1,11 +1,5 @@
-import React from 'react'
+import { ComingWithLaunch } from '@/components/ui';
 
-const PublicDocsPage = () => {
-  return (
-    <div>
-      Page en revue. Revenez plus tard
-    </div>
-  )
+export default function Page() {
+  return <ComingWithLaunch title="Documentation" what="Le guide d'utilisation" />;
 }
-
-export default PublicDocsPage

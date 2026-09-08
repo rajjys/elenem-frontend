@@ -1,11 +1,5 @@
-import React from 'react'
+import { ComingWithLaunch } from '@/components/ui';
 
-const StandingsPage = () => {
-  return (
-    <div>
-      Standings Page Not Implemented Yet
-    </div>
-  )
+export default function Page() {
+  return <ComingWithLaunch title="Classements" what="Le classement public" />;
 }
-
-export default StandingsPage

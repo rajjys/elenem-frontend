@@ -129,6 +129,9 @@ export function ContextBreadcrumb() {
   // stay links and neither offers a switcher — there are no sibling leagues to move between while
   // you are looking at one fixture.
   const isGameSurface = pathname.startsWith('/game');
+  // A player is the other leaf, and for the same reason: below their organisation and their
+  // competition, both of which stay links.
+  const isPlayerSurface = pathname.startsWith('/player/');
   const canManageTenant =
     (user?.roles ?? []).some((r) => r === Roles.SYSTEM_ADMIN || r === Roles.TENANT_ADMIN);
 
@@ -147,7 +150,10 @@ export function ContextBreadcrumb() {
 
   // The deepest entity for the surface you are on is the one you may switch between; everything
   // above it stays a link. Managing a team is not the moment to change organisation.
-  if (scope.tenant && (isTenantSurface || isLeagueSurface || isTeamSurface || isGameSurface)) {
+  if (
+    scope.tenant &&
+    (isTenantSurface || isLeagueSurface || isTeamSurface || isGameSurface || isPlayerSurface)
+  ) {
     crumbs.push({
       label: scope.tenant.short,
       title: scope.tenant.name,
@@ -162,7 +168,7 @@ export function ContextBreadcrumb() {
     });
   }
 
-  if (scope.league && (isLeagueSurface || isTeamSurface || isGameSurface)) {
+  if (scope.league && (isLeagueSurface || isTeamSurface || isGameSurface || isPlayerSurface)) {
     crumbs.push({
       label: scope.league.short,
       title: scope.league.name,
@@ -190,6 +196,12 @@ export function ContextBreadcrumb() {
   // distinguishes it from any other match.
   if (scope.game && isGameSurface && trail[0] === PAGE_TITLES.game) {
     trail[0] = scope.game.short;
+  }
+
+  // Same again for a player: « … › Joueur » names the kind, « … › Kasereka » names the person.
+  if (scope.player && isPlayerSurface) {
+    trail.length = 0;
+    trail.push(scope.player.name || scope.player.short);
   }
 
   // Nothing to orient by: a system admin on their own dashboard just gets the page name.

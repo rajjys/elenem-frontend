@@ -1,11 +1,5 @@
-import React from 'react'
+import { ComingWithLaunch } from '@/components/ui';
 
-const PublicPlayersPage = () => {
-  return (
-    <div>
-      Public Players Page
-    </div>
-  )
+export default function Page() {
+  return <ComingWithLaunch title="Joueurs" what="L'effectif public des clubs" />;
 }
-
-export default PublicPlayersPage

@@ -1,11 +1,5 @@
-import React from 'react'
+import { ComingWithLaunch } from '@/components/ui';
 
-const PublicStatsPage = () => {
-  return (
-    <div>
-      Public Stats Page
-    </div>
-  )
+export default function Page() {
+  return <ComingWithLaunch title="Statistiques" what="Le classement public des marqueurs" />;
 }
-
-export default PublicStatsPage

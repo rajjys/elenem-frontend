@@ -1,11 +1,5 @@
-import React from 'react'
+import { ComingWithLaunch } from '@/components/ui';
 
-const TenantnewsPage = () => {
-  return (
-    <div>
-      Daily news
-    </div>
-  )
+export default function Page() {
+  return <ComingWithLaunch title="Actualités" what="Les actualités publiées" />;
 }
-
-export default TenantnewsPage

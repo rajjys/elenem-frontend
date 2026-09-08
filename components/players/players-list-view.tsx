@@ -10,6 +10,7 @@ import { toastApiError } from '@/utils';
 import type { Player, PlayerFilterParams } from '@/schemas/player-schemas';
 import { PlayerFormDialog } from './player-form-dialog';
 import { BulkRosterDialog } from './bulk-roster-dialog';
+import { PlayerQuickView } from './player-quick-view';
 
 /**
  * Scope-agnostic roster list. `GET /players` is already scoped by the caller's role, so the
@@ -38,6 +39,15 @@ export function PlayersListView({
   const [creating, setCreating] = useState(false);
   const [bulkOpen, setBulkOpen] = useState(false);
   const [toDelete, setToDelete] = useState<Player | null>(null);
+  /**
+   * Whose figures are open.
+   *
+   * The name is the control, not a row-wide click: the row already carries two buttons that mean
+   * something else, and a row that both edits and opens depending on where you land on it is a row
+   * that eventually does the wrong one. Clicking a person's name to see that person is also what
+   * every list in the product already trains the reader to expect.
+   */
+  const [viewing, setViewing] = useState<Player | null>(null);
 
   const pageSize = 20;
   const filters: PlayerFilterParams = useMemo(
@@ -112,7 +122,13 @@ export function PlayersListView({
                     {p.jerseyNumber ?? '—'}
                   </td>
                   <td className="px-4 py-3 font-medium text-ink">
-                    {p.firstName} {p.lastName}
+                    <button
+                      type="button"
+                      onClick={() => setViewing(p)}
+                      className="rounded text-left transition-colors hover:text-accent-text hover:underline hover:underline-offset-2"
+                    >
+                      {p.firstName} {p.lastName}
+                    </button>
                   </td>
                   <td className="px-4 py-3 text-ink-muted">{p.position ?? '—'}</td>
                   <td className="px-4 py-3 text-ink-muted">{p.currentTeam?.name ?? '—'}</td>
@@ -164,6 +180,16 @@ export function PlayersListView({
               setEditing(null);
             }
           }}
+        />
+      )}
+
+      {/* Modal-first: photo, club, number, position, the season line and the last five games, with
+          a way out to the full page. Most of what anyone wants to know about a player is answered
+          without leaving the roster (`docs/PLAYERS_AND_STATS.md` §2.1). */}
+      {viewing && (
+        <PlayerQuickView
+          playerId={viewing.id}
+          onOpenChange={(o) => !o && setViewing(null)}
         />
       )}
 

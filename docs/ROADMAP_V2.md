@@ -522,6 +522,29 @@ an oversight — and the MVP is a free launch, so "good enough for Goma this sea
 | A league admin 403s on `GET /tenants/:id` on every page | Fixed. The breadcrumb reads the organisation from the token; `/leagues/:id/identity` answers the smaller question a crumb has |
 | A system admin cannot open any calendar | Fixed — `useCalendar` never sent `tenantId` |
 
+### Closed 2026-09-08 (Phase 4, items 15–16)
+
+**Accent-blind text matching is decided: left as it is.** `docs/PLAYERS_AND_STATS.md` §5 carries the
+verification and the costing. The framing in this section was wrong — it was never a deploy-time
+collation decision, because **no ordinary collation folds accents**. The option that does folds them
+and, new in Postgres 18, works with `LIKE` — but **errors on `ILIKE`**, which is exactly what
+Prisma's `mode: 'insensitive'` emits, and there are now **59 of those across 17 service files**, up
+from 51 across 13 a fortnight ago. Adopting it would convert a cosmetic miss into a runtime 500 on a
+surface that is still growing. The defect is bounded: case-insensitivity already works, and the one
+place folding is correctness-critical is handled in JS (`GAME_AND_STANDINGS` §6.4). Revisit when a
+roster passes a few hundred names in one competition and somebody complains; `Player.searchName` is
+the answer and §5 is the write-up.
+
+**`PlayerSeasonStat` is deleted**, with `minutesPlayed` on both stat models. It was read in seven
+places and written in none — so every count over it answered zero, and two delete guards that read
+as safety had never once fired. A player's season line is derived from `PlayerGameStat`, the way
+their game log and the box score's own totals already were.
+
+**The remaining stubs are resolved.** Thirty-one routes rendered a hardcoded string, none of them in
+any sidebar: fourteen deleted, five built, nine public-site routes given one honest French
+placeholder until item 19. `/post/create` had redirected to three of them on success since it was
+written.
+
 ### Still open, and why
 
 **Accent-blind text matching**, and the framing above it was wrong. *Kasereka* and *Kaséréka* do

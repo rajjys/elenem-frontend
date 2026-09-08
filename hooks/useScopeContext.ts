@@ -38,11 +38,14 @@ export interface ScopeContext {
   leagueId?: string;
   teamId?: string;
   gameId?: string;
+  playerId?: string;
   tenant?: ScopeEntity;
   league?: ScopeEntity;
   team?: ScopeEntity;
   /** The match itself, when one is open. `short` is the matchup: "VIR – MUU". */
   game?: ScopeEntity;
+  /** The player, when their page is open. `short` is their family name. */
+  player?: ScopeEntity;
   isLoading: boolean;
 }
 
@@ -72,8 +75,25 @@ export function useScopeContext(): ScopeContext {
     staleTime: ENTITY_STALE_MS,
   });
 
+  // A player's page is the second leaf resource, and it works exactly the way a match does: the id
+  // is in the path because there is one page, and the record names its own competition and
+  // organisation, so `/player/abc123` produces the full trail with nothing appended to the URL.
+  const playerId = pathname.match(/^\/player\/([^/]+)/)?.[1];
+
+  const player = useQuery({
+    queryKey: ['scope', 'player', playerId],
+    queryFn: async () => (await api.get(`/players/${playerId}`)).data,
+    enabled: !!playerId,
+    staleTime: ENTITY_STALE_MS,
+  });
+
   const teamId = ctxTeamId ?? user?.managingTeamId ?? undefined;
-  const leagueId = ctxLeagueId ?? game.data?.leagueId ?? user?.managingLeagueId ?? undefined;
+  const leagueId =
+    ctxLeagueId ??
+    game.data?.leagueId ??
+    player.data?.primaryLeague?.id ??
+    user?.managingLeagueId ??
+    undefined;
 
   const team = useQuery({
     queryKey: ['scope', 'team', teamId],
@@ -106,6 +126,7 @@ export function useScopeContext(): ScopeContext {
     league.data?.tenantId ??
     team.data?.tenantId ??
     game.data?.tenantId ??
+    player.data?.tenantId ??
     user?.tenantId ??
     undefined;
 
@@ -140,6 +161,7 @@ export function useScopeContext(): ScopeContext {
     leagueId: effectiveLeagueId,
     teamId,
     gameId,
+    playerId,
     tenant: tenantIdentity
       ? {
           id: tenantIdentity.id,
@@ -181,6 +203,16 @@ export function useScopeContext(): ScopeContext {
           }`.trim(),
         }
       : undefined,
-    isLoading: team.isLoading || league.isLoading || tenant.isLoading || game.isLoading,
+    // The family name, not the kind. Same argument as the match above: a trail exists to say
+    // which page this is, and « Joueur » is the one thing the reader already knew.
+    player: player.data
+      ? {
+          id: player.data.id,
+          name: `${player.data.firstName ?? ''} ${player.data.lastName ?? ''}`.trim(),
+          short: player.data.lastName ?? player.data.firstName ?? '',
+        }
+      : undefined,
+    isLoading:
+      team.isLoading || league.isLoading || tenant.isLoading || game.isLoading || player.isLoading,
   };
 }

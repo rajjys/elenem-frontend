@@ -171,19 +171,24 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // General authenticated user routes (e.g., /account, /player-dashboard)
+  /**
+   * Leaf resources and the reader's own account: open to any authenticated user, because the
+   * server resolves the record and attaches the permissions. A match and a player are the same
+   * resource whichever of the four roles opens them, which is why they are here and not in a
+   * role's own block (`GAME_AND_STANDINGS` §2.3).
+   *
+   * `/season` and `/coach` were both in this list with no page behind them — `/season` was retired
+   * in item 14a, `/coach` in item 16 — and `/referee` never had one at all. A middleware entry for
+   * a route that does not exist is a rule that can only ever wave somebody through to a 404.
+   */
   const generalUserAuthenticatedPaths = [
     '/account', // Root of authenticated user accounts
     '/account/profile',
     '/account/security',
     '/account/preferences',
-    '/season',
     '/player',
-    '/coach',
-    '/referee',
     '/game',
     '/post'
-    // Add other paths specific to logged-in general users, players, referees etc.
   ];
   if (generalUserAuthenticatedPaths.some(path => pathname === path || pathname.startsWith(path + '/'))) {
     // Any authenticated user is allowed here, as long as they have *any* role.

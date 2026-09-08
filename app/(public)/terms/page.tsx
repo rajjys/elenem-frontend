@@ -1,11 +1,5 @@
-import React from 'react'
+import { ComingWithLaunch } from '@/components/ui';
 
-const TermsPage = () => {
-  return (
-    <div>
-      En revue. Revenez plus tard
-    </div>
-  )
+export default function Page() {
+  return <ComingWithLaunch title="Conditions d'utilisation" what="Les conditions d'utilisation" />;
 }
-
-export default TermsPage
