@@ -155,11 +155,15 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
             ref={ref}
             type={type}
             maxLength={maxCharacters}
-            className={`block w-full px-3 py-2 border ${
+            // `bg-surface text-ink` is not decoration: without them the field had NO colour of its
+            // own — border, radius and shadow, and nothing else — so it fell through to the user
+            // agent's stylesheet. On the dark theme that is a white box, and on any field Chrome
+            // decides is a username it is the autofill yellow, which is what the search box on
+            // /players had become. `placeholder:text-ink-subtle` and `disabled:` follow for the
+            // same reason: every state has to be a token, or the browser picks one for us.
+            className={`block w-full rounded-md border bg-surface px-3 py-2 text-ink shadow-sm placeholder:text-ink-subtle focus:outline-none focus:ring-1 focus:ring-accent focus:border-accent disabled:cursor-not-allowed disabled:bg-surface-sunk disabled:text-ink-subtle sm:text-sm ${
               error ? 'border-negative' : 'border-line'
-            } rounded-md shadow-sm focus:outline-none focus:ring-accent focus:border-accent sm:text-sm ${
-              isSearchType ? 'pl-10' : ''
-            } ${props.className || ''}`}
+            } ${isSearchType ? 'pl-10' : ''} ${props.className || ''}`}
             {...props}
             onBlur={handleBlur}
             onKeyDown={handleKeyDown}

@@ -5,6 +5,8 @@ import { toast } from 'sonner';
 import { Search, Trash2, Pencil, Users } from 'lucide-react';
 import { Button, Input, ConfirmDialog, ListPage } from '@/components/ui';
 import { usePlayers, useDeletePlayer } from '@/services/players';
+import { useCurrentUser } from '@/hooks/useAuth';
+import { Roles } from '@/schemas/enums';
 import { useDebounce } from 'use-debounce';
 import { toastApiError } from '@/utils';
 import type { Player, PlayerFilterParams } from '@/schemas/player-schemas';
@@ -32,6 +34,25 @@ export function PlayersListView({
   tenantId?: string;
   canManage?: boolean;
 }) {
+  /**
+   * Who owns the register.
+   *
+   * `POST /players` and `DELETE /players/:id` are SYSTEM / TENANT / LEAGUE only — registering and
+   * removing a player is the organiser's, which matches how this market works: one person enters
+   * everything (`ROADMAP_V2` §6, A3). `PUT /players/:id` *does* admit a club administrator, so a
+   * club can correct its own shirt number or position.
+   *
+   * The screen used to offer a club all three. « Nouveau joueur », « Ajouter une liste » and the
+   * bin each produced a 403 — three buttons whose only outcome was a refusal, on the one screen a
+   * club opens most.
+   */
+  const user = useCurrentUser();
+  const isOrganiser = (user?.roles ?? []).some(
+    (r) => r === Roles.SYSTEM_ADMIN || r === Roles.TENANT_ADMIN || r === Roles.LEAGUE_ADMIN,
+  );
+  const canRegister = canManage && isOrganiser;
+  const canEdit = canManage;
+
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
   const [debouncedSearch] = useDebounce(search, 400);
@@ -75,9 +96,9 @@ export function PlayersListView({
     <ListPage
       title={title}
       description={`${total} ${total === 1 ? 'joueur enregistré' : 'joueurs enregistrés'}`}
-      action={canManage ? { label: 'Nouveau joueur', onClick: () => setCreating(true) } : undefined}
+      action={canRegister ? { label: 'Nouveau joueur', onClick: () => setCreating(true) } : undefined}
       secondaryAction={
-        canManage ? { label: 'Ajouter une liste', onClick: () => setBulkOpen(true), icon: Users } : undefined
+        canRegister ? { label: 'Ajouter une liste', onClick: () => setBulkOpen(true), icon: Users } : undefined
       }
       filters={
         <div className="relative max-w-sm">
@@ -90,6 +111,9 @@ export function PlayersListView({
             }}
             placeholder="Rechercher un joueur…"
             className="pl-9"
+            // Chrome offers to fill any unnamed text input it takes for a username, and paints it
+            // its autofill yellow when it does. A search box over a roster is never that.
+            autoComplete="off"
           />
         </div>
       }
@@ -97,7 +121,7 @@ export function PlayersListView({
       isError={isError}
       onRetry={() => refetch()}
       isEmpty={players.length === 0}
-      empty={<EmptyRoster canManage={canManage} searching={!!debouncedSearch} onAdd={() => setBulkOpen(true)} />}
+      empty={<EmptyRoster canManage={canRegister} searching={!!debouncedSearch} onAdd={() => setBulkOpen(true)} />}
       page={page}
       totalPages={totalPages}
       onPageChange={setPage}
@@ -112,7 +136,7 @@ export function PlayersListView({
                 <th className="px-4 py-3">Poste</th>
                 <th className="px-4 py-3">Équipe</th>
                 <th className="px-4 py-3">Compte</th>
-                {canManage && <th className="w-24 px-4 py-3 text-right">Actions</th>}
+                {canEdit && <th className="w-24 px-4 py-3 text-right">Actions</th>}
               </tr>
             </thead>
             <tbody className="divide-y divide-line">
@@ -141,7 +165,7 @@ export function PlayersListView({
                       <span className="text-xs text-ink-subtle">Fiche d&apos;effectif</span>
                     )}
                   </td>
-                  {canManage && (
+                  {canEdit && (
                     <td className="px-4 py-3">
                       <div className="flex justify-end gap-1">
                         <button
@@ -151,13 +175,17 @@ export function PlayersListView({
                         >
                           <Pencil className="h-4 w-4" />
                         </button>
-                        <button
-                          onClick={() => setToDelete(p)}
-                          className="rounded p-1.5 text-ink-subtle hover:bg-negative-soft hover:text-negative"
-                          aria-label={`Retirer ${p.firstName} ${p.lastName}`}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
+                        {/* Removing somebody from the register is the organiser's, so a club does
+                            not get a bin it would be refused. */}
+                        {canRegister && (
+                          <button
+                            onClick={() => setToDelete(p)}
+                            className="rounded p-1.5 text-ink-subtle hover:bg-negative-soft hover:text-negative"
+                            aria-label={`Retirer ${p.firstName} ${p.lastName}`}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        )}
                       </div>
                     </td>
                   )}
@@ -241,8 +269,9 @@ function EmptyRoster({
       <Users className="mx-auto mb-3 h-8 w-8 text-ink-subtle" />
       <p className="font-medium text-ink">Aucun joueur pour le moment</p>
       <p className="mx-auto mt-1 max-w-sm text-sm text-ink-muted">
-        Collez la feuille d&apos;équipe pour enregistrer tout l&apos;effectif d&apos;un coup. Aucune
-        adresse e-mail n&apos;est nécessaire.
+        {canManage
+          ? 'Collez la feuille d’équipe pour enregistrer tout l’effectif d’un coup. Aucune adresse e-mail n’est nécessaire.'
+          : 'Les joueurs sont enregistrés par la compétition. Contactez-la pour compléter votre effectif.'}
       </p>
       {canManage && (
         <Button variant="primary" className="mt-4" onClick={onAdd}>

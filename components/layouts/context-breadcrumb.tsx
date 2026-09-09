@@ -50,13 +50,12 @@ const PAGE_TITLES: Record<string, string> = {
   seasons: 'Saisons',
   format: 'Format',
   standings: 'Classement',
-  analytics: 'Statistiques',
+  stats: 'Statistiques',
   posts: 'Actualités',
   post: 'Actualité',
   settings: 'Paramètres',
   rules: 'Règles',
   tenants: 'Organisations',
-  tickets: 'Billetterie',
   general: 'Paramètres',
   profile: 'Mon profil',
   security: 'Sécurité',
@@ -132,8 +131,30 @@ export function ContextBreadcrumb() {
   // A player is the other leaf, and for the same reason: below their organisation and their
   // competition, both of which stay links.
   const isPlayerSurface = pathname.startsWith('/player/');
-  const canManageTenant =
-    (user?.roles ?? []).some((r) => r === Roles.SYSTEM_ADMIN || r === Roles.TENANT_ADMIN);
+  const roles = user?.roles ?? [];
+  const canManageTenant = roles.some((r) => r === Roles.SYSTEM_ADMIN || r === Roles.TENANT_ADMIN);
+
+  /**
+   * `/league/*` is gated to competition administrators in the middleware, so a club
+   * administrator's league crumb was a link to an access-denied page. A crumb that refuses you is
+   * worse than a crumb that is not a link.
+   */
+  const canReachLeagueSurface = roles.some(
+    (r) => r === Roles.SYSTEM_ADMIN || r === Roles.TENANT_ADMIN || r === Roles.LEAGUE_ADMIN,
+  );
+
+  /**
+   * A switcher is a promise that there is something to switch to.
+   *
+   * A club administrator administers exactly one club and a league administrator exactly one
+   * competition — `managingTeamId` and `managingLeagueId` are single values — so the chevron beside
+   * their own name opened a dropdown that could only ever list them back to themselves, and on a
+   * club administrator it also fires `GET /teams` which they are refused. Decided from the role
+   * rather than from a count, because the count is only known after the menu is opened and paying
+   * for that list on every page to decide whether to draw a chevron is the wrong trade.
+   */
+  const hasSiblingLeagues = roles.some((r) => r === Roles.SYSTEM_ADMIN || r === Roles.TENANT_ADMIN);
+  const hasSiblingTeams = canReachLeagueSurface;
 
   /**
    * A ctx param is only worth putting in a link when it says something the destination could not
@@ -162,7 +183,7 @@ export function ContextBreadcrumb() {
         : own(scope.tenant.id, user?.tenantId, '/tenant/dashboard', 'ctxTenantId'),
       // Only a system admin has sibling organisations to move between.
       switcher:
-        isTenantSurface && (user?.roles ?? []).includes(Roles.SYSTEM_ADMIN)
+        isTenantSurface && roles.includes(Roles.SYSTEM_ADMIN)
           ? { kind: 'tenant', id: scope.tenant.id }
           : undefined,
     });
@@ -172,12 +193,14 @@ export function ContextBreadcrumb() {
     crumbs.push({
       label: scope.league.short,
       title: scope.league.name,
-      href: isLeagueSurface
-        ? undefined
-        : own(scope.league.id, user?.managingLeagueId, '/league/dashboard', 'ctxLeagueId'),
-      switcher: isLeagueSurface
-        ? { kind: 'league', id: scope.league.id, parentId: scope.tenantId }
-        : undefined,
+      href:
+        isLeagueSurface || !canReachLeagueSurface
+          ? undefined
+          : own(scope.league.id, user?.managingLeagueId, '/league/dashboard', 'ctxLeagueId'),
+      switcher:
+        isLeagueSurface && hasSiblingLeagues
+          ? { kind: 'league', id: scope.league.id, parentId: scope.tenantId }
+          : undefined,
     });
   }
 
@@ -185,9 +208,30 @@ export function ContextBreadcrumb() {
     crumbs.push({
       label: scope.team.short,
       title: scope.team.name,
-      switcher: { kind: 'team', id: scope.team.id, parentId: scope.leagueId },
+      switcher: hasSiblingTeams
+        ? { kind: 'team', id: scope.team.id, parentId: scope.leagueId }
+        : undefined,
     });
   }
+
+  /**
+   * A crumb in the middle earns its place by being navigable.
+   *
+   * A club administrator's trail read `Ligue de Basketball de Goma › D1 M › VIR ˅ › Tableau de
+   * bord`. The competition crumb linked to `/league/dashboard`, which the middleware bounces them
+   * off; the chevron beside their own club offered a choice between it and nothing. Neither was
+   * orientation — one was a dead link and one was a dead menu.
+   *
+   * **The ends are kept whatever happens.** The first crumb is the organisation, which is what a
+   * multi-tenant product is oriented by and the only place its name appears in the chrome; the
+   * last is the thing being looked at. Only what sits between them has to justify itself, and it
+   * does that by being a link or a switcher. A club administrator now reads `LIBAGO › VIR ›
+   * Effectif`; a league administrator's `LIBAGO › D1 M › …` is untouched.
+   */
+  const last = crumbs.length - 1;
+  const kept = crumbs.filter((c, i) => i === 0 || i === last || c.href || c.switcher);
+  crumbs.length = 0;
+  crumbs.push(...kept);
 
   const trail = pageTrail(pathname);
 

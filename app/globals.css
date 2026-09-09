@@ -414,6 +414,28 @@ body {
   color: var(--t-ink);
   font-family: var(--font-inter), Arial, Helvetica, sans-serif;
 }
+
+/* Chrome's autofill, brought back inside the palette.
+ *
+ * When Chrome decides a field is a username it paints it its own yellow, and it does so with a
+ * UA rule no class can override — `background-color` is applied at a level `!important` cannot
+ * reach. The one thing that does cover it is an inset shadow the width of the field, which is why
+ * this looks like a hack: it is the documented way round, not a preference.
+ *
+ * It mattered because the search box on /players is an unnamed text input, so Chrome offered to
+ * fill it and the box turned yellow in the middle of a dark screen. Tokens, so it stays right in
+ * both themes; the long transition keeps Chrome from repainting its colour a frame later. */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+select:-webkit-autofill {
+  -webkit-text-fill-color: var(--t-ink);
+  -webkit-box-shadow: 0 0 0 1000px var(--t-surface) inset;
+  box-shadow: 0 0 0 1000px var(--t-surface) inset;
+  caret-color: var(--t-ink);
+  transition: background-color 5000s ease-in-out 0s;
+}
 @keyframes progress {
   from {
     width: 0;
