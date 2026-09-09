@@ -5,7 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { toast } from 'sonner';
 import { AlertTriangle, FileDown, Loader2, RefreshCw, SlidersHorizontal, Trophy } from 'lucide-react';
-import { Button, SelectField, Tooltip } from '@/components/ui';
+import { PageHeader, PageShell, SelectField, Tooltip } from '@/components/ui';
 import { cn, toastApiError } from '@/utils';
 import { useCurrentUser, useScopeContext } from '@/hooks';
 import { useStages } from '@/services/stages';
@@ -143,15 +143,26 @@ export function StandingsView({
   const myTeamId = user?.managingTeamId ?? ctx.teamId ?? null;
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6">
-      <header className="mb-5 flex flex-wrap items-end justify-between gap-3">
-        <div className="min-w-0">
-          <h1 className="text-2xl font-semibold tracking-tight text-ink">Classement</h1>
-          <p className="mt-1 text-sm text-ink-muted">
-            Calculé à partir des matchs terminés — jamais saisi à la main.
-          </p>
-        </div>
-
+    <PageShell>
+      {/* One header shape for every screen: the title and the primary action on the same line, the
+          controls that decide *what* is shown underneath it. The bespoke row this replaced put
+          « Publier » in among the pickers, at a different height and a different inset from
+          « Nouveau joueur » two clicks away. */}
+      <PageHeader
+        title="Classement"
+        description="Calculé à partir des matchs terminés — jamais saisi à la main."
+        action={
+          /* The export renders a table. A knockout has a bracket, and offering to publish a
+             classement that does not exist is the screen promising something it cannot do. */
+          !readOnly && data && data.stageFormat !== 'KNOCKOUT'
+            ? {
+                label: 'Publier',
+                href: `/league/standings/export?ctxLeagueId=${data.leagueId}&seasonId=${data.seasonId}`,
+                icon: FileDown,
+              }
+            : undefined
+        }
+      >
         <div className="flex flex-wrap items-center gap-2">
           {/* A single competition is not a choice, and a dropdown offering one option is furniture
               that has to be read before it can be dismissed. */}
@@ -202,22 +213,8 @@ export function StandingsView({
               options={(data?.groups ?? []).map((g) => ({ value: g.id, label: g.name }))}
             />
           )}
-          {/* The artefact this whole module exists to replace: the signed sheet a league publishes
-              after every matchday. Last in the row, after the controls that decide *which* table is
-              being published — an action placed before its own inputs reads as applying to
-              whatever was on screen a moment ago. */}
-          {/* The export renders a table. A knockout has a bracket, and offering to publish a
-              classement that does not exist is the screen promising something it cannot do. */}
-          {!readOnly && data && data.stageFormat !== 'KNOCKOUT' && (
-            <Button variant="primary" asChild>
-              <Link href={`/league/standings/export?ctxLeagueId=${data.leagueId}&seasonId=${data.seasonId}`}>
-                <FileDown className="mr-1.5 h-4 w-4" aria-hidden />
-                Publier
-              </Link>
-            </Button>
-          )}
         </div>
-      </header>
+      </PageHeader>
 
       {scope === 'tenant' && options.length > 1 && data && (
         <p className="mb-3 flex items-center gap-1.5 text-sm font-medium text-ink">
@@ -464,7 +461,7 @@ export function StandingsView({
           </div>
         </>
       )}
-    </div>
+    </PageShell>
   );
 }
 

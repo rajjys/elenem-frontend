@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { AlertTriangle, ArrowRightLeft, Check, Info, Loader2, Lock, Plus, X } from 'lucide-react';
 import { Button, Label } from '@/components/ui';
+import { PlayerQuickView } from '@/components/players/player-quick-view';
 import { toastApiError, cn } from '@/utils';
 import {
   existingPlayersFrom,
@@ -88,6 +89,8 @@ export function BoxScoreSheet({
   const [adding, setAdding] = useState(false);
   const [newPlayer, setNewPlayer] = useState<NewPlayer>(EMPTY_NEW);
   const [duplicates, setDuplicates] = useState<ExistingPlayerMatch[] | null>(null);
+  /** Whose figures are open over the sheet. Never navigation — see the name button below. */
+  const [viewing, setViewing] = useState<string | null>(null);
 
   const box = useBoxScore(gameId, active);
   const saveMut = useSaveBoxScore();
@@ -476,14 +479,26 @@ export function BoxScoreSheet({
                     >
                       {p.jerseyNumber ?? '—'}
                     </span>
-                    <span
+                    {/* The name opens the player, and does it in a dialog rather than by
+                        navigating.
+                        
+                        This sheet is an entry form: somebody is typing up twenty lines off a piece
+                        of paper, and a link that leaves the page would throw the evening away —
+                        the same failure §6.1 of GAME_AND_STANDINGS was written about when a
+                        refetch used to wipe the draft. The quick view carries the season line and
+                        the last five games without going anywhere, and its own button goes to the
+                        full page for anyone who wants it. */}
+                    <button
+                      type="button"
+                      onClick={() => setViewing(p.playerId)}
                       className={cn(
-                        'min-w-0 flex-1 truncate text-sm',
+                        'min-w-0 flex-1 truncate text-left text-sm transition-colors hover:text-accent-text hover:underline hover:underline-offset-2',
                         line.played ? 'text-ink' : 'text-ink-subtle',
                       )}
+                      title={`Voir les statistiques de ${p.lastName} ${p.firstName}`.trim()}
                     >
                       {p.lastName} <span className="text-ink-muted">{p.firstName}</span>
-                    </span>
+                    </button>
                     {columns.map((c) => (
                       <input
                         key={c.code}
@@ -780,6 +795,11 @@ export function BoxScoreSheet({
       {/* Pinned by the containing dialog when it can; rendered here otherwise, which is the case
           on the match page where the sheet is simply part of the page. */}
       {!renderFooter && <div className="border-t border-line pt-4">{footer}</div>}
+
+      {/* Over the sheet, not instead of it. Nothing typed is lost. */}
+      {viewing && (
+        <PlayerQuickView playerId={viewing} onOpenChange={(o) => !o && setViewing(null)} />
+      )}
     </div>
   );
 }

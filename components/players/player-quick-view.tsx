@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { ArrowRight, Loader2, Shirt } from 'lucide-react';
+import { ArrowRight, ChevronRight, Loader2, Shirt } from 'lucide-react';
 import { Button, Modal } from '@/components/ui';
 import { usePlayerStats, type PlayerGameLine } from '@/services/player-stats';
 import { cn } from '@/utils';
@@ -121,9 +121,20 @@ export function PlayerQuickView({
   );
 }
 
+/**
+ * One line of the game log, and the whole row is the link.
+ *
+ * A dialog holds nothing unsaved, so leaving it costs nothing — unlike the scoresheet, where the
+ * same click had to become a nested dialog instead. « Combien il a marqué contre Katindo » leads
+ * straight to « et comment s'est passé ce match », and the answer is a page away.
+ */
 function GameRow({ game, totalAbbr }: { game: PlayerGameLine; totalAbbr: string }) {
   return (
-    <li className="flex items-center justify-between gap-3 px-3 py-2 text-sm">
+    <li>
+      <Link
+        href={`/game/${game.gameId}`}
+        className="flex items-center justify-between gap-3 px-3 py-2 text-sm transition-colors hover:bg-surface-sunk"
+      >
       <div className="min-w-0">
         <p className="truncate text-ink">
           <span className="text-ink-subtle">{game.isHome ? 'vs' : 'à'}</span> {game.opponentName}
@@ -151,7 +162,9 @@ function GameRow({ game, totalAbbr }: { game: PlayerGameLine; totalAbbr: string 
         <span className="w-14 text-right font-medium tabular-nums text-ink">
           {game.total} {totalAbbr}
         </span>
+        <ChevronRight className="h-4 w-4 shrink-0 text-ink-subtle" aria-hidden />
       </div>
+      </Link>
     </li>
   );
 }

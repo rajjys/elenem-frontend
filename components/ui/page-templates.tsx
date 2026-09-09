@@ -51,6 +51,30 @@ export function EmptyState({
 // --- ListPage ----------------------------------------------------------------
 
 /**
+ * The column every screen's content sits in.
+ *
+ * There were four of them. `ListPage` capped at `max-w-7xl` with no padding of its own;
+ * `StandingsView` capped at `max-w-5xl` and added `px-4 py-6 sm:px-6` **on top of** the `p-6` that
+ * `AppLayout`'s `<main>` already applies; `SeasonsView` did the same at `max-w-4xl`; the calendar
+ * ran full-bleed. So the title, the filters and the primary action each landed in a different place
+ * depending on which sibling screen you had come from, and « Publier » on the table sat lower and
+ * further in than « Nouveau joueur » on the roster for no reason anybody chose.
+ *
+ * One shell, and the padding stays where it already was — on `<main>`. A screen that genuinely
+ * wants to be narrower constrains its *content*, never its header, so the heading and the action
+ * do not move.
+ */
+export function PageShell({
+  children,
+  className,
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return <div className={cn('mx-auto w-full max-w-7xl', className)}>{children}</div>;
+}
+
+/**
  * Header, optional filters, then exactly one of: loading, error, empty, or content.
  * Making those four states mutually exclusive here is what stops a page rendering an empty table
  * while a request is still in flight — the "Aucune ligue trouvée" flash before data arrives.
@@ -87,7 +111,7 @@ export function ListPage({
   onPageChange?: (page: number) => void;
 }) {
   return (
-    <div className="mx-auto w-full max-w-7xl">
+    <PageShell>
       <PageHeader title={title} description={description} action={action} secondaryAction={secondaryAction}>
         {filters}
       </PageHeader>
@@ -110,7 +134,7 @@ export function ListPage({
           )}
         </>
       )}
-    </div>
+    </PageShell>
   );
 }
 
@@ -153,7 +177,7 @@ export function DetailPage({
   }
 
   return (
-    <div className="mx-auto w-full max-w-7xl">
+    <PageShell>
       <PageHeader title={title} description={description} action={action} secondaryAction={secondaryAction}>
         {tabs}
       </PageHeader>
@@ -161,7 +185,7 @@ export function DetailPage({
         <div className="min-w-0 space-y-6">{children}</div>
         {aside && <aside className="space-y-6">{aside}</aside>}
       </div>
-    </div>
+    </PageShell>
   );
 }
 

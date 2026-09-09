@@ -2,9 +2,9 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { ArrowLeft, ChevronRight, Loader2, Shirt } from 'lucide-react';
-import { Button, ErrorState, SelectField } from '@/components/ui';
+import { ErrorState, SelectField } from '@/components/ui';
 import { useCurrentUser } from '@/hooks';
 import { Roles } from '@/schemas';
 import { usePlayerStats } from '@/services/player-stats';
@@ -28,6 +28,7 @@ const WHOLE_SEASON = 'season';
  */
 export default function PlayerPage() {
   const { playerId } = useParams<{ playerId: string }>();
+  const router = useRouter();
   const user = useCurrentUser();
 
   const [seasonId, setSeasonId] = useState('');
@@ -221,7 +222,13 @@ export default function PlayerPage() {
                     </thead>
                     <tbody className="divide-y divide-line">
                       {data.games.map((g) => (
-                        <tr key={g.gameId} className="hover:bg-surface-sunk">
+                        // The whole row opens the match — the chevron is the affordance, not the
+                        // hit area. Nothing on this page is unsaved, so leaving costs nothing.
+                        <tr
+                          key={g.gameId}
+                          onClick={() => router.push(`/game/${g.gameId}`)}
+                          className="cursor-pointer transition-colors hover:bg-surface-sunk"
+                        >
                           <td className="whitespace-nowrap px-3 py-2 text-ink-muted">
                             {new Date(g.dateTime).toLocaleDateString('fr-FR', {
                               day: 'numeric',
@@ -272,11 +279,10 @@ export default function PlayerPage() {
                             {g.total}
                           </td>
                           <td className="px-1 py-2 text-right">
-                            <Button variant="ghost" size="sm" asChild aria-label="Ouvrir le match">
-                              <Link href={`/game/${g.gameId}`}>
-                                <ChevronRight className="h-4 w-4" aria-hidden />
-                              </Link>
-                            </Button>
+                            <ChevronRight
+                              className="ml-auto h-4 w-4 text-ink-subtle"
+                              aria-hidden
+                            />
                           </td>
                         </tr>
                       ))}

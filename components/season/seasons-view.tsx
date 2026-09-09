@@ -9,6 +9,7 @@ import {
   Button,
   LoadingSpinner,
   PageHeader,
+  PageShell,
   SeasonStatusBadge,
   Pagination,
 } from '@/components/ui';
@@ -86,7 +87,7 @@ export function SeasonsView({ scope }: { scope: 'league' | 'admin' }) {
   }
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-6 sm:px-6">
+    <PageShell>
       <PageHeader
         title="Saisons"
         description={
@@ -171,7 +172,7 @@ export function SeasonsView({ scope }: { scope: 'league' | 'admin' }) {
         season={moving?.season ?? null}
         move={moving?.move ?? null}
       />
-    </div>
+    </PageShell>
   );
 }
 

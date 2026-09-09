@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { AlertTriangle, ArrowDown, ArrowUp, FileText, Loader2, Trophy } from 'lucide-react';
-import { Input, SelectField, Tooltip } from '@/components/ui';
+import { Input, PageHeader, PageShell, Pagination, SelectField, Tooltip } from '@/components/ui';
 import { useScopeContext } from '@/hooks/useScopeContext';
 import { useCurrentUser } from '@/hooks/useAuth';
 import { Roles } from '@/schemas/enums';
@@ -21,6 +21,9 @@ import { PlayerQuickView } from './player-quick-view';
  * only, where the control needs something to be.
  */
 const WHOLE_SEASON = 'season';
+
+/** Twenty-five rows. Nobody reads past the top twenty of a scorers' list. */
+const PAGE_SIZE = 25;
 
 /**
  * The scorers' list — one component for the organisation, the competition and the club, the way
@@ -113,7 +116,11 @@ export function PlayerStatsView({
    */
   const [sort, setSort] = useState<string>('total');
   const [asc, setAsc] = useState(false);
+  const [page, setPage] = useState(1);
   const toggle = (key: string) => {
+    // Back to the top: sorting by threes and staying on page 3 shows you ranks 51-75 of a list you
+    // have just reordered, which is nobody's intent.
+    setPage(1);
     if (sort === key) return setAsc((v) => !v);
     setSort(key);
     setAsc(false); // A new column always starts at "most", which is what a leaderboard means.
@@ -134,18 +141,39 @@ export function PlayerStatsView({
     return sorted;
   }, [data?.rows, sort, asc]);
 
+  /**
+   * Paged, because a competition's whole squad list is not a leaderboard.
+   *
+   * Goma D1 Messieurs already returns 49 rows on three entered sheets; Kinshasa's 25 clubs are
+   * 250 players before a single one of them scores. Nobody reads past the top twenty of a
+   * scorers' list, and the ones who want the tail can sort or filter to it.
+   *
+   * Sorted and paged on the client on purpose. The rows are the phase's, they arrive in one
+   * response, and every column is sortable — asking the server to re-rank on each click would be
+   * a round trip for an ordering the browser already has the data for.
+   */
+  const totalPages = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
+  const pageRows = useMemo(
+    () => rows.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE),
+    [rows, page],
+  );
+
+  // A filter that shortens the list must not strand the reader on a page past its end.
+  useEffect(() => {
+    if (page > totalPages) setPage(1);
+  }, [page, totalPages]);
+
   const stageOptions = data?.stages ?? [];
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6">
-      <header className="mb-5 flex flex-wrap items-end justify-between gap-3">
-        <div className="min-w-0">
-          <h1 className="text-2xl font-semibold tracking-tight text-ink">Statistiques des joueurs</h1>
-          <p className="mt-1 text-sm text-ink-muted">
-            Calculées à partir des feuilles de match — jamais saisies à la main.
-          </p>
-        </div>
-
+    <PageShell>
+      {/* Same header shape as the table and the roster: title and primary action on one line, the
+          controls that decide what is shown underneath. This screen has no primary action — a
+          leaderboard is derived and there is nothing to do to it — so the row is controls only. */}
+      <PageHeader
+        title="Statistiques des joueurs"
+        description="Calculées à partir des feuilles de match — jamais saisies à la main."
+      >
         <div className="flex flex-wrap items-center gap-2">
           {scope === 'tenant' && options.length > 1 && (
             <SelectField
@@ -222,7 +250,7 @@ export function PlayerStatsView({
             />
           </label>
         </div>
-      </header>
+      </PageHeader>
 
       {scope === 'tenant' && options.length > 1 && data && (
         <p className="mb-3 flex items-center gap-1.5 text-sm font-medium text-ink">
@@ -297,13 +325,17 @@ export function PlayerStatsView({
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-line">
-                    {rows.map((row, i) => (
+                    {pageRows.map((row, i) => (
                       <tr
                         key={row.playerId}
                         onClick={() => setOpen(row)}
                         className="cursor-pointer transition-colors hover:bg-surface-sunk"
                       >
-                        <td className="px-2 py-2 text-center tabular-nums text-ink-subtle">{i + 1}</td>
+                        {/* The rank is the row's position in the whole ordering, not on this
+                            page: « 21 » on page two, not « 1 » again. */}
+                        <td className="px-2 py-2 text-center tabular-nums text-ink-subtle">
+                          {(page - 1) * PAGE_SIZE + i + 1}
+                        </td>
                         <td className="px-2 py-2">
                           <span className="font-medium text-ink">
                             {row.firstName} {row.lastName}
@@ -353,6 +385,12 @@ export function PlayerStatsView({
             </div>
           )}
 
+          {totalPages > 1 && (
+            <div className="mt-4">
+              <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
+            </div>
+          )}
+
           {data.belowMinimum > 0 && rows.length > 0 && (
             <p className="mt-2 text-xs text-ink-subtle">
               {data.belowMinimum} joueur{data.belowMinimum > 1 ? 's' : ''} masqué
@@ -371,7 +409,7 @@ export function PlayerStatsView({
           onOpenChange={(o) => !o && setOpen(null)}
         />
       )}
-    </div>
+    </PageShell>
   );
 }
 
