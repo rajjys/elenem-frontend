@@ -2,8 +2,8 @@
 
 import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
-import { Search, Trash2, Pencil, Users } from 'lucide-react';
-import { Button, Input, ConfirmDialog, ListPage } from '@/components/ui';
+import { Trash2, Pencil, Users } from 'lucide-react';
+import { Button, ConfirmDialog, ListPage, ListToolbar } from '@/components/ui';
 import { usePlayers, useDeletePlayer } from '@/services/players';
 import { useCurrentUser } from '@/hooks/useAuth';
 import { Roles } from '@/schemas/enums';
@@ -100,22 +100,18 @@ export function PlayersListView({
       secondaryAction={
         canRegister ? { label: 'Ajouter une liste', onClick: () => setBulkOpen(true), icon: Users } : undefined
       }
+      // The same toolbar the clubs list uses, so *find the row I want* looks identical two links
+      // apart. It carried a hand-positioned icon over a bare Input before, which is where the
+      // divergence started.
       filters={
-        <div className="relative max-w-sm">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-subtle" />
-          <Input
-            value={search}
-            onChange={(e) => {
-              setSearch(e.target.value);
-              setPage(1);
-            }}
-            placeholder="Rechercher un joueur…"
-            className="pl-9"
-            // Chrome offers to fill any unnamed text input it takes for a username, and paints it
-            // its autofill yellow when it does. A search box over a roster is never that.
-            autoComplete="off"
-          />
-        </div>
+        <ListToolbar
+          search={search}
+          onSearchChange={(v) => {
+            setSearch(v);
+            setPage(1);
+          }}
+          placeholder="Rechercher un joueur…"
+        />
       }
       isLoading={isLoading}
       isError={isError}

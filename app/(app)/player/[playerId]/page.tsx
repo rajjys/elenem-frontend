@@ -10,10 +10,6 @@ import { Roles } from '@/schemas';
 import { usePlayerStats } from '@/services/player-stats';
 import { cn } from '@/utils';
 
-/** See `player-stats-view.tsx`: a Radix Select cannot carry an empty value, so the whole season
- *  needs one of its own. The server still gets an omitted `stageId`. */
-const WHOLE_SEASON = 'season';
-
 /**
  * One player, on their own page.
  *
@@ -32,9 +28,9 @@ export default function PlayerPage() {
   const user = useCurrentUser();
 
   const [seasonId, setSeasonId] = useState('');
-  const [stageId, setStageId] = useState(WHOLE_SEASON);
+  const [stageId, setStageId] = useState('');
 
-  const stageFilter = stageId === WHOLE_SEASON ? undefined : stageId;
+  const stageFilter = stageId || undefined;
 
   const { data, isPending, isError, refetch } = usePlayerStats(
     playerId,
@@ -124,7 +120,7 @@ export default function PlayerPage() {
               value={seasonId || data.seasonId}
               onChange={(v) => {
                 setSeasonId(v);
-                setStageId(WHOLE_SEASON);
+                setStageId('');
               }}
               className="w-44"
               options={data.seasons.map((s) => ({ value: s.id, label: s.name }))}
@@ -133,14 +129,11 @@ export default function PlayerPage() {
           {data.stages.length > 1 && (
             <SelectField
               label="Phase"
-              placeholder="Phase"
+              placeholder="Toute la saison"
               value={stageId}
               onChange={setStageId}
               className="w-48"
-              options={[
-                { value: WHOLE_SEASON, label: 'Toute la saison' },
-                ...data.stages.map((st) => ({ value: st.id, label: st.name })),
-              ]}
+              options={data.stages.map((st) => ({ value: st.id, label: st.name }))}
             />
           )}
         </div>

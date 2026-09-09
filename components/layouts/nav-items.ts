@@ -100,7 +100,11 @@ export const tenantNavItems: NavGroup[] = [
   {
     label: 'Répertoire',
     items: [
-    { label: 'Ligues', basePath: '/tenant/leagues', icon: Trophy },
+    // « Compétitions », not « Ligues ». At this customer the *organisation* is the Ligue —
+    // LIPROBAKIN is the Ligue Provinciale de Basketball de Kinshasa, LIBAGO the Ligue de
+    // Basketball de Goma — and what it runs are championnats. Calling the children "ligues" makes
+    // the parent and the child the same word, which is the one thing a hierarchy must not do.
+    { label: 'Compétitions', basePath: '/tenant/leagues', icon: Trophy },
     { label: 'Équipes', basePath: '/tenant/teams', icon: Shield },
     { label: 'Joueurs', basePath: '/tenant/players', icon: UserSquare2 },
     // Venues belong here — same shape, same lifetime — and get an entry the day they render

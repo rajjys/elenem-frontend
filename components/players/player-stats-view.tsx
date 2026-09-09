@@ -12,16 +12,6 @@ import { usePlayerLeaderboard, type LeaderboardRow } from '@/services/player-sta
 import { cn } from '@/utils';
 import { PlayerQuickView } from './player-quick-view';
 
-/**
- * "The whole season" as a value, because it cannot be the absence of one.
- *
- * A Radix `Select.Item` refuses `value=""` — an empty string is how a Select is *cleared*, so an
- * option carrying one is indistinguishable from no selection and the component throws. The server
- * still receives an omitted `stageId` for this case: the sentinel lives on this side of the wire
- * only, where the control needs something to be.
- */
-const WHOLE_SEASON = 'season';
-
 /** Twenty-five rows. Nobody reads past the top twenty of a scorers' list. */
 const PAGE_SIZE = 25;
 
@@ -58,7 +48,7 @@ export function PlayerStatsView({
 
   const [leagueId, setLeagueId] = useState('');
   const [seasonId, setSeasonId] = useState('');
-  const [stageId, setStageId] = useState(WHOLE_SEASON);
+  const [stageId, setStageId] = useState('');
   const [minGames, setMinGames] = useState(1);
   const [open, setOpen] = useState<LeaderboardRow | null>(null);
 
@@ -83,7 +73,7 @@ export function PlayerStatsView({
   }, [seasonOptions, seasonId, options, leagueId]);
 
   // A different season is a different set of phases, so the phase stops meaning anything.
-  useEffect(() => setStageId(WHOLE_SEASON), [seasonId]);
+  useEffect(() => setStageId(''), [seasonId]);
 
   /**
    * The club's own screen opens on its own players, and does not lock them there.
@@ -98,7 +88,10 @@ export function PlayerStatsView({
   const [onlyMyTeam, setOnlyMyTeam] = useState(true);
   const teamId = scope === 'team' && onlyMyTeam ? myTeamId : '';
 
-  const stageFilter = stageId === WHOLE_SEASON ? undefined : stageId;
+  // The empty string is « toute la saison »: `SelectField` renders that row from its own
+  // `placeholder` and hands back '' when it is chosen. The server reads an omitted `stageId` the
+  // same way, so nothing has to translate between them.
+  const stageFilter = stageId || undefined;
 
   const query = usePlayerLeaderboard({
     leagueId: leagueId || undefined,
@@ -201,14 +194,11 @@ export function PlayerStatsView({
           {stageOptions.length > 1 && (
             <SelectField
               label="Phase"
-              placeholder="Phase"
+              placeholder="Toute la saison"
               value={stageId}
               onChange={setStageId}
               className="w-48"
-              options={[
-                { value: WHOLE_SEASON, label: 'Toute la saison' },
-                ...stageOptions.map((st) => ({ value: st.id, label: st.name })),
-              ]}
+              options={stageOptions.map((st) => ({ value: st.id, label: st.name }))}
             />
           )}
           {scope === 'team' && myTeamId && (

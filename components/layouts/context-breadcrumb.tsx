@@ -39,7 +39,7 @@ function useRootCrumb() {
 /** The current page's own name, derived from the path. */
 const PAGE_TITLES: Record<string, string> = {
   dashboard: 'Tableau de bord',
-  leagues: 'Ligues',
+  leagues: 'Compétitions',
   teams: 'Équipes',
   players: 'Joueurs',
   roster: 'Effectif',

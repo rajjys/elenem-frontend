@@ -44,6 +44,17 @@ export function SelectField({
   id?: string;
   disabled?: boolean;
 }) {
+  if (process.env.NODE_ENV !== 'production') {
+    const offender = options.find((o) => o.value === '');
+    if (offender) {
+      throw new Error(
+        `SelectField: an option cannot have value "" (« ${offender.label} »). ` +
+          'The "all" row is rendered from `placeholder` and already maps to the empty string — ' +
+          'drop the option and pass its label as the placeholder instead.',
+      );
+    }
+  }
+
   return (
     <Select
       value={value === '' ? ALL : value}
@@ -58,6 +69,13 @@ export function SelectField({
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
       <SelectContent>
+        {/* The "all" row is this component's, not the caller's.
+            
+            Passing `{ value: '', label: '…' }` in `options` as well is a Radix crash — an empty
+            value is how a Select is *cleared*, so an item carrying one is indistinguishable from
+            no selection and the whole screen is replaced by an error boundary. It has been written
+            twice by people who could not see this file from theirs, so it is caught here, loudly,
+            in development, instead of at the next reader's expense. */}
         <SelectItem value={ALL}>{placeholder}</SelectItem>
         {options.map((o) => (
           <SelectItem key={o.value} value={o.value}>
