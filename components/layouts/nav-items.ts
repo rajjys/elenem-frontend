@@ -212,3 +212,39 @@ export const teamNavItems: NavGroup[] = [
   },
 ];
 
+
+/**
+ * Which menu a **leaf** resource shows — a match, a player.
+ *
+ * `/game/abc123` and `/player/abc123` are reachable from four directions and are genuinely the same
+ * resource each time, so the sidebar belongs to whoever is reading rather than to the resource
+ * (`GAME_AND_STANDINGS` §2.3). Role alone was not enough to say who that is, though: a tenant
+ * administrator who had drilled into a competition and opened a fixture from *its* calendar came
+ * back to the organisation's menu, and reaching the next fixture meant Compétitions → the league →
+ * the calendar → the date, every time.
+ *
+ * So the link carries the surface it was made on (`useSurfaceLink`) and this reads it. The hint is
+ * a *preference*, never a grant: it is intersected with what the reader's role can actually reach,
+ * so a `ctxLeagueId` in the URL of a club administrator changes nothing — `/league/*` would refuse
+ * them, and a menu of links that refuse you is worse than the wrong menu.
+ */
+export function navItemsForSurface(
+  roles: readonly string[],
+  hint: { teamId?: string | null; leagueId?: string | null; tenantId?: string | null },
+): NavGroup[] {
+  const has = (r: string) => roles.includes(r);
+
+  const canLeague = has('SYSTEM_ADMIN') || has('TENANT_ADMIN') || has('LEAGUE_ADMIN');
+  const canTenant = has('SYSTEM_ADMIN') || has('TENANT_ADMIN');
+
+  if (hint.teamId) return teamNavItems;
+  if (hint.leagueId && canLeague) return leagueNavItems;
+  if (hint.tenantId && canTenant) return tenantNavItems;
+
+  // No usable hint — a pasted link, or a reader who arrived from their own dashboard. Fall back to
+  // the role, which is where this started and is still right for three of the four cases.
+  if (has('SYSTEM_ADMIN')) return adminNavItems;
+  if (has('TENANT_ADMIN')) return tenantNavItems;
+  if (has('LEAGUE_ADMIN')) return leagueNavItems;
+  return teamNavItems;
+}

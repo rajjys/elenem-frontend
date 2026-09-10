@@ -91,6 +91,7 @@ export function ListPage({
   isEmpty,
   empty,
   children,
+  overlays,
   page,
   totalPages,
   onPageChange,
@@ -106,6 +107,16 @@ export function ListPage({
   isEmpty?: boolean;
   empty?: React.ReactNode;
   children: React.ReactNode;
+  /**
+   * Dialogs, confirmations — anything that must exist whether or not there is a list.
+   *
+   * `children` is the *list*, and it is replaced by `empty` when there is nothing to show. A dialog
+   * put in there is therefore unmounted at exactly the moment it is most needed: on a brand-new
+   * competition « Nouveau joueur » set its state, the dialog was not on the page to react, and the
+   * button silently did nothing. No error, no clue — the one screen where adding the first record
+   * is the entire point.
+   */
+  overlays?: React.ReactNode;
   page?: number;
   totalPages?: number;
   onPageChange?: (page: number) => void;
@@ -134,6 +145,9 @@ export function ListPage({
           )}
         </>
       )}
+
+      {/* Outside the conditional, always. See `overlays` above. */}
+      {overlays}
     </PageShell>
   );
 }

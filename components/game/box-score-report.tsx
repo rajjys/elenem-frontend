@@ -117,8 +117,16 @@ export function BoxScoreReport({
           )}
         </div>
 
-        <SideReport side={data.home} sheet={data} onOpenPlayer={setViewing} />
-        <SideReport side={data.away} sheet={data} onOpenPlayer={setViewing} />
+        {/* Side by side once there is room.
+            
+            A box score is read by *comparing* — who outscored whom, which bench turned up — and two
+            columns is how the paper it comes from is laid out. Stacked, the second club begins
+            below the fold and the comparison becomes a scroll. Below `lg` they stack, because
+            eight names and a breakdown do not fit twice across a phone. */}
+        <div className="grid gap-4 lg:grid-cols-2 lg:items-start">
+          <SideReport side={data.home} sheet={data} onOpenPlayer={setViewing} />
+          <SideReport side={data.away} sheet={data} onOpenPlayer={setViewing} />
+        </div>
       </div>
 
       {edit}

@@ -6,6 +6,7 @@ import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { usePlannedFixtures, useStageTies } from '@/services/planned-fixtures';
 import { LoadingSpinner } from '@/components/ui';
+import { useSurfaceLink } from '@/hooks/useSurfaceLink';
 
 /**
  * A knockout phase, which has a bracket rather than a table.
@@ -20,6 +21,7 @@ import { LoadingSpinner } from '@/components/ui';
  * which is what the federation's own calendar prints.
  */
 export function BracketView({ stageId, stageName }: { stageId: string; stageName: string }) {
+  const surfaceLink = useSurfaceLink();
   const planned = usePlannedFixtures(stageId);
   // A phase's ties, asked for as a phase. Not read from the calendar: the calendar caps its range
   // at 400 days because it answers "what is on this month", and a play-off spans what it spans.
@@ -53,7 +55,7 @@ export function BracketView({ stageId, stageName }: { stageId: string; stageName
         {ties.map((e) => (
           <li key={e.id}>
             <Link
-              href={`/game/${e.id}`}
+              href={surfaceLink(`/game/${e.id}`)}
               className="flex items-center gap-3 px-4 py-2.5 transition-colors hover:bg-surface-sunk"
             >
               <span className="w-32 shrink-0 text-xs text-ink-muted">

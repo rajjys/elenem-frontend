@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { AlertTriangle, ArrowUpRight, CheckCircle2, Info, XCircle } from 'lucide-react';
 import type { DraftInsight } from '@/services/calendar-draft';
 import { cn } from '@/utils';
+import { useSurfaceLink } from '@/hooks/useSurfaceLink';
 
 /**
  * What the draft is trying to tell the organiser.
@@ -49,6 +50,7 @@ export function DraftInsights({
   insights: DraftInsight[];
   className?: string;
 }) {
+  const surfaceLink = useSurfaceLink();
   if (insights.length === 0) return null;
 
   const sorted = [...insights].sort((a, b) => RANK[a.severity] - RANK[b.severity]);
@@ -92,7 +94,7 @@ export function DraftInsights({
                     at the one that already exists. */}
                 {insight.gameId && (
                   <Link
-                    href={`/game/${insight.gameId}`}
+                    href={surfaceLink(`/game/${insight.gameId}`)}
                     className="ml-1.5 inline-flex items-center gap-0.5 whitespace-nowrap text-accent-text hover:underline"
                   >
                     voir

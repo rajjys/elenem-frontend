@@ -154,7 +154,10 @@ export function StandingsView({
         action={
           /* The export renders a table. A knockout has a bracket, and offering to publish a
              classement that does not exist is the screen promising something it cannot do. */
-          !readOnly && data && data.stageFormat !== 'KNOCKOUT'
+          /* And only once there is a table to publish. A league whose season has not started has
+             an empty classement, and offering to export it is the screen promising a document that
+             would come out blank. */
+          !readOnly && data && data.stageFormat !== 'KNOCKOUT' && data.rows.length > 0
             ? {
                 label: 'Publier',
                 href: `/league/standings/export?ctxLeagueId=${data.leagueId}&seasonId=${data.seasonId}`,

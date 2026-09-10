@@ -16,6 +16,7 @@ import { Button } from '@/components/ui';
 import type { CalendarCompetition, CalendarEntry, CalendarVenue } from '@/services/calendar';
 import { cn } from '@/utils';
 import { DayStacks } from './day-stacks';
+import { useSurfaceLink } from '@/hooks/useSurfaceLink';
 
 /**
  * The panel that opens when a fixture — or a whole day — is clicked.
@@ -117,6 +118,7 @@ export function FixtureDrawer({
   /** The "why did that move?" bar, pinned to the bottom after a drop. */
   reasonBar?: React.ReactNode;
 }) {
+  const surfaceLink = useSurfaceLink();
   // Escape closes, because a panel that overlays content must be dismissible without aiming.
   useEffect(() => {
     if (!open) return;
@@ -334,7 +336,7 @@ export function FixtureDrawer({
                     name of the paper in the operator's hand; this one says where it goes instead
                     of what it is. */}
                 <Link
-                  href={`/game/${focused.id}`}
+                  href={surfaceLink(`/game/${focused.id}`)}
                   className="flex w-full items-center justify-center gap-1 rounded-lg px-3 py-1.5 text-xs text-ink-subtle transition-colors hover:text-ink"
                 >
                   Ouvrir la page du match

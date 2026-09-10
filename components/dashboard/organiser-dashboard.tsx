@@ -15,6 +15,7 @@ import {
 import { Avatar, Button, LoadingSpinner, SeasonStatusBadge } from '@/components/ui';
 import { SeasonStatus } from '@/schemas';
 import { useContextualLink, useScopeContext } from '@/hooks';
+import { useSurfaceLink } from '@/hooks/useSurfaceLink';
 import {
   useOrganiserDashboard,
   type DashboardCompetition,
@@ -294,7 +295,10 @@ function PreSeason({
   if (c.teamsWithoutPlayers > 0)
     blockers.push({
       label: `${c.teamsWithoutPlayers} ${c.teamsWithoutPlayers === 1 ? 'équipe sans joueurs' : 'équipes sans joueurs'}`,
-      href: link('/league/teams'),
+      // The players screen, not the clubs one. « Trois équipes sans joueurs » is a complaint about
+      // the *roster*, and the clubs list has no way to act on it — the reader arrived wanting to
+      // add names and was handed a list of clubs to click through first.
+      href: link('/league/players'),
     });
   if (c.fixtureCount === 0)
     blockers.push({ label: 'Aucune rencontre au calendrier', href: link('/league/calendar') });
@@ -529,11 +533,12 @@ export function FixtureRow({
   showCompetition: boolean;
   overdue?: boolean;
 }) {
+  const surfaceLink = useSurfaceLink();
   const played = f.homeScore !== null && f.awayScore !== null;
   return (
     <li>
       <Link
-        href={`/game/${f.id}`}
+        href={surfaceLink(`/game/${f.id}`)}
         className="flex items-center gap-3 px-4 py-2.5 transition-colors hover:bg-surface-sunk"
       >
         <span

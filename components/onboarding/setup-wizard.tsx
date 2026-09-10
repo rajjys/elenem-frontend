@@ -551,7 +551,20 @@ export function SetupWizard() {
       homeHref="/tenant/dashboard"
       aside={aside}
       align="center"
-      title={`${league?.name ?? 'Votre ligue'} est prête.`}
+      /**
+       * « Tout est prêt pour X », never « X est prête ».
+       *
+       * A competition's name carries its own gender and nothing here can know it: « Tournoi U-16
+       * est prête » is wrong, « Championnat … est prêt » would be right, and the same sentence
+       * cannot be both. Putting the adjective on « tout » makes the agreement independent of the
+       * name, which is the only version that is correct for every league anybody will ever create.
+       */
+      badge={
+        <span className="flex h-12 w-12 items-center justify-center rounded-full bg-positive-soft">
+          <Check className="h-6 w-6 text-positive" aria-hidden />
+        </span>
+      }
+      title={league?.name ? `Tout est prêt pour ${league.name}.` : 'Tout est prêt.'}
       subtitle={
         outcome && outcome.created.length > 0
           ? `${outcome.created.length} équipe${outcome.created.length > 1 ? 's' : ''} enregistrée${outcome.created.length > 1 ? 's' : ''}${season ? ` pour ${season.name}` : ''}.`
@@ -602,17 +615,32 @@ export function SetupWizard() {
             already been decided. The calendar is where both paths start, and the generator is
             waiting there for the ones who want it. */}
         <div className="space-y-2.5">
+          {/* Into *this* competition's calendar, not the organisation's.
+              
+              A tenant administrator finishing the wizard was dropped on /tenant/calendar, which
+              shows every competition they run — so the one they had just spent five minutes
+              creating was a chip among others, and they had to find it again. The league is known
+              here; carrying it is the whole difference between finishing a task and being handed
+              back to a lobby. */}
           <Button
             variant="primary"
             className="h-11 w-full"
-            onClick={() => router.push('/tenant/calendar')}
+            onClick={() =>
+              router.push(
+                league ? `/league/calendar?ctxLeagueId=${league.id}` : '/tenant/calendar',
+              )
+            }
           >
             Ouvrir le calendrier
             <ArrowRight size={16} className="ml-2" />
           </Button>
           <button
             type="button"
-            onClick={() => router.push('/tenant/dashboard')}
+            onClick={() =>
+              router.push(
+                league ? `/league/dashboard?ctxLeagueId=${league.id}` : '/tenant/dashboard',
+              )
+            }
             className="w-full rounded-md py-1.5 text-sm text-ink-muted transition-colors hover:text-ink"
           >
             Plus tard — aller au tableau de bord

@@ -2,6 +2,7 @@ import { Calendar, Clock, MapPin, Users } from "lucide-react";
 import Link from "next/link";
 import { Avatar, Button, Badge, Card, CardContent, getStatusBadge } from ".";
 import { GameDetails, GameStatus } from "@/schemas";
+import { useSurfaceLink } from '@/hooks/useSurfaceLink';
 
 interface GameCardProps {
   game: GameDetails;
@@ -9,6 +10,7 @@ interface GameCardProps {
 }
 
 export const GameCard: React.FC<GameCardProps> = ({ game }) => {
+  const surfaceLink = useSurfaceLink();
   const formatDate = new Date(game.dateTime).toLocaleDateString("en-US", {
     weekday: "short",
     month: "short",
@@ -87,7 +89,7 @@ export const GameCard: React.FC<GameCardProps> = ({ game }) => {
 
           {/* Actions */}
           <div className="flex flex-col gap-2 min-w-[130px]">
-            <Link href={`/game/${game.id}`}>
+            <Link href={surfaceLink(`/game/${game.id}`)}>
               <Button className="w-full text-sm">Manage</Button>
             </Link>
             {game.status === GameStatus.SCHEDULED && (

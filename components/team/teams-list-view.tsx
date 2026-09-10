@@ -156,6 +156,39 @@ export function TeamsListView({
       page={page}
       totalPages={data?.totalPages ?? 1}
       onPageChange={setPage}
+      overlays={
+        <>
+        <TeamFormDialog
+          open={creating}
+          onOpenChange={setCreating}
+          leagueId={scope === 'league' ? (ctx.leagueId ?? undefined) : undefined}
+        />
+        <TeamFormDialog
+          open={!!editing}
+          onOpenChange={(o) => !o && setEditing(null)}
+          team={editing}
+        />
+        <BulkTeamsDialog
+          open={bulkOpen}
+          onOpenChange={setBulkOpen}
+          leagueId={scope === 'league' ? (ctx.leagueId ?? undefined) : undefined}
+        />
+        {/* `window.confirm` is the browser's dialog, not the product's, and it cannot name what is
+            about to be lost in the product's own words. */}
+        <ConfirmDialog
+          open={!!toDelete}
+          onOpenChange={(o) => !o && setToDelete(null)}
+          title="Supprimer ce club ?"
+          description={
+            toDelete
+              ? `${toDelete.name} sera retiré de la compétition. Ses matchs déjà joués restent au classement.`
+              : undefined
+          }
+          confirmLabel="Supprimer"
+          onConfirm={confirmDelete}
+        />
+        </>
+      }
     >
       <div className="overflow-hidden rounded-xl border border-line bg-surface">
         <div className="overflow-x-auto">
@@ -221,37 +254,6 @@ export function TeamsListView({
           </table>
         </div>
       </div>
-
-      <TeamFormDialog
-        open={creating}
-        onOpenChange={setCreating}
-        leagueId={scope === 'league' ? (ctx.leagueId ?? undefined) : undefined}
-      />
-      <TeamFormDialog
-        open={!!editing}
-        onOpenChange={(o) => !o && setEditing(null)}
-        team={editing}
-      />
-      <BulkTeamsDialog
-        open={bulkOpen}
-        onOpenChange={setBulkOpen}
-        leagueId={scope === 'league' ? (ctx.leagueId ?? undefined) : undefined}
-      />
-
-      {/* `window.confirm` is the browser's dialog, not the product's, and it cannot name what is
-          about to be lost in the product's own words. */}
-      <ConfirmDialog
-        open={!!toDelete}
-        onOpenChange={(o) => !o && setToDelete(null)}
-        title="Supprimer ce club ?"
-        description={
-          toDelete
-            ? `${toDelete.name} sera retiré de la compétition. Ses matchs déjà joués restent au classement.`
-            : undefined
-        }
-        confirmLabel="Supprimer"
-        onConfirm={confirmDelete}
-      />
     </ListPage>
   );
 }

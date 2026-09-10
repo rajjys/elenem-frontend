@@ -14,6 +14,7 @@ import { BrandMark } from './brand-mark';
 export function SplitShell({
   title,
   subtitle,
+  badge,
   crossLink,
   children,
   footer,
@@ -23,6 +24,12 @@ export function SplitShell({
 }: {
   title: string;
   subtitle?: ReactNode;
+  /**
+   * A mark above the heading. Used by the setup wizard's last step, where the reader has just
+   * finished something and a page that only *says* so reads the same as a page that is asking for
+   * more. Rendered before the title so it is the first thing seen.
+   */
+  badge?: ReactNode;
   /** "Already have an account? Log in" — the other door, named, next to the heading. */
   crossLink?: { prompt: string; label: string; href: string };
   children: ReactNode;
@@ -55,6 +62,7 @@ export function SplitShell({
 
         <main className="flex-1 flex items-start sm:items-center justify-center px-5 sm:px-8 pb-10">
           <div className={`w-full max-w-[27rem] py-6 sm:py-10 ${centered ? 'text-center' : ''}`}>
+            {badge && <div className={`mb-5 ${centered ? 'flex justify-center' : ''}`}>{badge}</div>}
             <h1 className="text-[1.75rem] sm:text-4xl font-bold tracking-tight text-ink text-balance">
               {title}
             </h1>

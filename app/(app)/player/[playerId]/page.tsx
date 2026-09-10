@@ -6,6 +6,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { ArrowLeft, ChevronRight, Loader2, Shirt } from 'lucide-react';
 import { ErrorState, SelectField } from '@/components/ui';
 import { useCurrentUser } from '@/hooks';
+import { useSurfaceLink } from '@/hooks/useSurfaceLink';
 import { Roles } from '@/schemas';
 import { usePlayerStats } from '@/services/player-stats';
 import { cn } from '@/utils';
@@ -25,6 +26,7 @@ import { cn } from '@/utils';
 export default function PlayerPage() {
   const { playerId } = useParams<{ playerId: string }>();
   const router = useRouter();
+  const surfaceLink = useSurfaceLink();
   const user = useCurrentUser();
 
   const [seasonId, setSeasonId] = useState('');
@@ -219,7 +221,7 @@ export default function PlayerPage() {
                         // hit area. Nothing on this page is unsaved, so leaving costs nothing.
                         <tr
                           key={g.gameId}
-                          onClick={() => router.push(`/game/${g.gameId}`)}
+                          onClick={() => router.push(surfaceLink(`/game/${g.gameId}`))}
                           className="cursor-pointer transition-colors hover:bg-surface-sunk"
                         >
                           <td className="whitespace-nowrap px-3 py-2 text-ink-muted">

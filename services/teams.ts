@@ -115,7 +115,9 @@ export function useUpdateTeam() {
       id: string;
       dto: { name?: string; shortCode?: string | null };
     }) => {
-      const res = await api.patch(`/teams/${id}`, dto);
+      // PUT, not PATCH: `TeamsController` exposes `@Put(':teamId')`, and a PATCH to it 404s with
+      // « Cannot PATCH /teams/… » — which is what every rename from the clubs list did.
+      const res = await api.put(`/teams/${id}`, dto);
       return res.data;
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: teamKeys.all }),

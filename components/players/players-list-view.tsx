@@ -121,6 +121,58 @@ export function PlayersListView({
       page={page}
       totalPages={totalPages}
       onPageChange={setPage}
+      overlays={
+        <>
+        {(creating || editing) && (
+          <PlayerFormDialog
+            open
+            player={editing}
+            leagueId={leagueId}
+            teamId={teamId}
+            tenantId={tenantId}
+            onOpenChange={(o) => {
+              if (!o) {
+                setCreating(false);
+                setEditing(null);
+              }
+            }}
+          />
+        )}
+
+        {/* Modal-first: photo, club, number, position, the season line and the last five games, with
+            a way out to the full page. Most of what anyone wants to know about a player is answered
+            without leaving the roster (`docs/PLAYERS_AND_STATS.md` §2.1). */}
+        {viewing && (
+          <PlayerQuickView
+            playerId={viewing.id}
+            onOpenChange={(o) => !o && setViewing(null)}
+          />
+        )}
+
+        {bulkOpen && (
+          <BulkRosterDialog
+            open
+            leagueId={leagueId}
+            teamId={teamId}
+            tenantId={tenantId}
+            onOpenChange={setBulkOpen}
+          />
+        )}
+
+        <ConfirmDialog
+          open={!!toDelete}
+          onOpenChange={(o) => !o && setToDelete(null)}
+          title="Retirer ce joueur ?"
+          description={
+            toDelete
+              ? `${toDelete.firstName} ${toDelete.lastName} sera retiré de l'effectif. Ses statistiques déjà enregistrées sont conservées.`
+              : undefined
+          }
+          confirmLabel="Retirer"
+          onConfirm={confirmDelete}
+        />
+        </>
+      }
     >
       <>
         <div className="overflow-x-auto rounded-lg border border-line bg-surface">
@@ -191,54 +243,6 @@ export function PlayersListView({
           </table>
         </div>
 
-      {(creating || editing) && (
-        <PlayerFormDialog
-          open
-          player={editing}
-          leagueId={leagueId}
-          teamId={teamId}
-          tenantId={tenantId}
-          onOpenChange={(o) => {
-            if (!o) {
-              setCreating(false);
-              setEditing(null);
-            }
-          }}
-        />
-      )}
-
-      {/* Modal-first: photo, club, number, position, the season line and the last five games, with
-          a way out to the full page. Most of what anyone wants to know about a player is answered
-          without leaving the roster (`docs/PLAYERS_AND_STATS.md` §2.1). */}
-      {viewing && (
-        <PlayerQuickView
-          playerId={viewing.id}
-          onOpenChange={(o) => !o && setViewing(null)}
-        />
-      )}
-
-      {bulkOpen && (
-        <BulkRosterDialog
-          open
-          leagueId={leagueId}
-          teamId={teamId}
-          tenantId={tenantId}
-          onOpenChange={setBulkOpen}
-        />
-      )}
-
-      <ConfirmDialog
-        open={!!toDelete}
-        onOpenChange={(o) => !o && setToDelete(null)}
-        title="Retirer ce joueur ?"
-        description={
-          toDelete
-            ? `${toDelete.firstName} ${toDelete.lastName} sera retiré de l'effectif. Ses statistiques déjà enregistrées sont conservées.`
-            : undefined
-        }
-        confirmLabel="Retirer"
-        onConfirm={confirmDelete}
-      />
       </>
     </ListPage>
   );

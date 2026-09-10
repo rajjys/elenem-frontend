@@ -5,6 +5,7 @@ import { ArrowRight, ChevronRight, Loader2, Shirt } from 'lucide-react';
 import { Button, Modal } from '@/components/ui';
 import { usePlayerStats, type PlayerGameLine } from '@/services/player-stats';
 import { cn } from '@/utils';
+import { useSurfaceLink } from '@/hooks/useSurfaceLink';
 
 /**
  * A player, in a dialog, with real content — and a way out to the page.
@@ -29,6 +30,7 @@ export function PlayerQuickView({
   stageId?: string;
   onOpenChange: (open: boolean) => void;
 }) {
+  const surfaceLink = useSurfaceLink();
   const { data, isPending, isError } = usePlayerStats(playerId, seasonId, stageId);
 
   const title = data ? `${data.firstName} ${data.lastName}` : 'Joueur';
@@ -42,7 +44,7 @@ export function PlayerQuickView({
       footer={
         <div className="flex justify-end">
           <Button variant="primary" asChild>
-            <Link href={`/player/${playerId}`}>
+            <Link href={surfaceLink(`/player/${playerId}`)}>
               Ouvrir la fiche du joueur
               <ArrowRight className="ml-1.5 h-4 w-4" aria-hidden />
             </Link>
@@ -129,10 +131,11 @@ export function PlayerQuickView({
  * straight to « et comment s'est passé ce match », and the answer is a page away.
  */
 function GameRow({ game, totalAbbr }: { game: PlayerGameLine; totalAbbr: string }) {
+  const surfaceLink = useSurfaceLink();
   return (
     <li>
       <Link
-        href={`/game/${game.gameId}`}
+        href={surfaceLink(`/game/${game.gameId}`)}
         className="flex items-center justify-between gap-3 px-3 py-2 text-sm transition-colors hover:bg-surface-sunk"
       >
       <div className="min-w-0">
