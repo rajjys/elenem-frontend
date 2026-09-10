@@ -237,7 +237,7 @@ list of things to fix.
   with Annuler and Supprimer is dismissed by reflex; writing « Championnat Goma D1 Messieurs »
   cannot be, and it makes the reader read what they are about to remove.
 
-## 8. Leaf pages keep the menu you arrived with
+## 8. Leaf pages keep the menu you arrived with, and the way back
 
 `/game/abc123` and `/player/abc123` are flat, self-owned routes so they survive being pasted into a
 message. The sidebar on them belongs to **whoever is reading**, which turned out to need more than a
@@ -253,6 +253,23 @@ properties keep it honest:
   worse than the wrong menu.
 - It carries the **surface, not the scope**. A league administrator's own league is not appended —
   their role already selects that menu.
+
+It appends the **path** too, and `useBackLink` reads it: « Retour aux statistiques » goes to
+`/league/stats` with the ctx it was carrying. A fixed back destination was wrong for everyone who
+had arrived from anywhere else, and `router.back()` cannot be labelled and is unpredictable after a
+refresh. The `from` parameter is a plain path validated on the way out — never a URL inside a URL,
+which is how open redirects get built by accident. No origin means a pasted link, which gets the
+role's default.
+
+**The chrome is never what goes missing.** The sidebar used to be hidden whenever the URL lacked a
+ctx id its route implied, which stranded a reader on a page with no menu and no way out. Navigation
+is the frame; deciding whether there is enough context to *render* is the page's job, and
+`ContextRequired` says what is missing in words instead of removing the furniture.
+
+**Show what the reader may not open; do not make it a door.** A club administrator reading another
+club's scorer sees that club's whole season, and may open none of those fixtures. The rows stay —
+the match happened and the figures are the player's — and stop being links. A door onto an
+access-denied page reads as the product being broken.
 
 ## 9. What is deliberately still inconsistent
 
