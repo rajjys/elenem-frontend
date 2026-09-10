@@ -83,6 +83,70 @@ export function useTeams(params: TeamFilterParams, enabled = true) {
   });
 }
 
+/**
+ * Registers one club.
+ *
+ * **Name and competition, and that is all the server wants** — `CreateTeamDto` marks everything
+ * else `@IsOptional()`, `shortCode` included. The four-step form this replaces asked besides for a
+ * logo, a banner, a founding year, a contact e-mail, a website, a tax number and bank details, on
+ * a screen an organiser opens to add a club that turned up in week three.
+ *
+ * Those are not lost, they are *later*: `/team/edit` is where a club's details are filled in once
+ * the club exists, which is the only order in which anybody actually has them.
+ */
+export function useCreateTeam() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (dto: { name: string; leagueId: string; shortCode?: string }) => {
+      const res = await api.post('/teams', dto);
+      return res.data as { id: string; name: string; shortCode?: string | null };
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: teamKeys.all }),
+  });
+}
+
+export function useUpdateTeam() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      id,
+      dto,
+    }: {
+      id: string;
+      dto: { name?: string; shortCode?: string | null };
+    }) => {
+      const res = await api.patch(`/teams/${id}`, dto);
+      return res.data;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: teamKeys.all }),
+  });
+}
+
+/**
+ * A short code from a club's name, the way a results table would write it.
+ *
+ * « BC Virunga » → VIR, « Nyiragongo BC » → NYI, « AS Goma » → ASG. The rule: drop the words a
+ * basketball club's name is padded with — BC, AS, FC, CS — then take the first three letters of
+ * what is left, or the initials when several words remain. It is a *suggestion*: the field stays
+ * editable, because two clubs in one town can genuinely both shorten to KIV and only the organiser
+ * knows which one gets it.
+ */
+const PADDING = new Set(['BC', 'AS', 'FC', 'CS', 'SC', 'AC', 'US', 'CF', 'ASD', 'BBC']);
+
+export function suggestShortCode(name: string): string {
+  const words = name
+    .toUpperCase()
+    .replace(/[^A-Z0-9\s]/g, ' ')
+    .split(/\s+/)
+    .filter(Boolean);
+  const meaningful = words.filter((w) => !PADDING.has(w));
+  const source = meaningful.length ? meaningful : words;
+  if (!source.length) return '';
+  if (source.length >= 3) return source.slice(0, 3).map((w) => w[0]).join('');
+  if (source.length === 2) return (source[0].slice(0, 2) + source[1][0]).slice(0, 3);
+  return source[0].slice(0, 3);
+}
+
 export function useDeleteTeam() {
   const qc = useQueryClient();
   return useMutation({

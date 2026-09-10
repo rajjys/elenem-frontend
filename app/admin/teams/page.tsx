@@ -2,12 +2,11 @@
 "use client";
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { api } from '@/services/api'; // Your actual API instance
 import { SortableColumn, TeamDetails, TeamFilterParams, TeamFilterParamsSchema } from '@/schemas'; // Your new filter schema
 import { TeamsFilters, TeamsTable } from '@/components/team/'; // Your new TeamsFilters component
-import { Pagination, LoadingSpinner, Button } from '@/components/ui/'; // Your Pagination component
+import { Pagination, LoadingSpinner } from '@/components/ui/'; // Your Pagination component
 import { toast } from 'sonner'; // Your toast notification library (e.g., Sonner)
 import { Roles } from '@/schemas';
 import { useAuthStore } from '@/store/auth.store'; // Auth store to get user roles
@@ -137,9 +136,13 @@ export default function AdminTeamsPage() {
           onPageSizeChange={handlePageSizeChange}
           // No fixedTenantId or fixedLeagueId for System Admin page
         />
-        <Link href="/team/create" passHref>
-          <Button variant="primary" className='whitespace-nowrap'>Create New Team</Button>
-        </Link>
+        {/* No create button here.
+            
+            A platform operator making a club (or a competition) has to say **which organisation**
+            it belongs to, and a cross-tenant list is the one place that question has no answer.
+            The door that does answer it already exists: /admin/tenants → the organisation → its
+            own clubs, where the scope is settled before anything is created. This used to
+            link to /team/create, which is gone. */}
       </div>
       <span hidden>{totalItems} Teams</span>
       <TeamsTable

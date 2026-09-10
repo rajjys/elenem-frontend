@@ -25,8 +25,6 @@ const publicPaths = [
    '/contact', '/pricing', '/features', '/terms', '/privacy',
    ///entity creation routes. These are protected by access Gates. Review is needed later
    '/tenant/create', '/tenant/create/', '/tenant/create/*',
-   '/league/create', '/league/create/', '/league/create/*',
-   '/team/create', '/team/create/', '/team/create/*',
    '/api', '/api/', '/api/*',
    '/terms', '/terms/', '/terms/*',
    '/legal', '/legal/', '/legal/*',

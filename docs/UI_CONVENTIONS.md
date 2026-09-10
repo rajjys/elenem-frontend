@@ -77,16 +77,19 @@ because *find the row I want* was being reinvented on every screen, and only som
 
 ---
 
-## 3. Sidebar: the register, then the competition
+## 3. Sidebar: the register, then how it unfolds
 
 The line between the two groups is **time**.
 
 - **Répertoire** — competitions, clubs, players, and halls when they exist. What the organisation
   *has*. It survives every season: the same clubs turn up next year, on the same sheets, in the
   same hall.
-- **Compétition** — the season, its calendar, its table, its scorers. What is *happening*. All of it
+- **Déroulement** — the season, its calendar, its table, its scorers. What is *happening*. All of it
   is a season's, which is why a season opens that group rather than sitting with the clubs: it is
-  not another record you keep, it is the thing the other three hang off.
+  not another record you keep, it is the thing the other three hang off. Named « Déroulement » and
+  not « Compétition » because « Compétitions » is a *link* in the group above it, and a heading one
+  letter from an item three rows up is two labels the reader has to tell apart before either means
+  anything.
 - **Administration / Organisation** — users, publications, settings.
 
 A club's sidebar takes the same split: **Mon club** (effectif, actualités, utilisateurs,
@@ -128,12 +131,18 @@ boundary. **Do not pass `{ value: '', label: '…' }` in `options`.** It now thr
 with the fix in the message, because it had been written twice by people who could not see that file
 from theirs — and both times the symptom was a blank screen rather than a bad dropdown.
 
-### Every input needs a colour
+### Spread `{...props}` before `className`, never after
 
-`Input` set border, radius and shadow and **no background or text colour**, so every plain field in
-the app inherited the user agent's: white on the dark theme, and Chrome's autofill yellow on
-anything it took for a username — which is what the roster's search box had become. A control that
-does not name its own background does not have one.
+`Input` computed its `className` — base classes, error border, the caller's addition — and then
+spread `{...props}` *after it*, so `props.className` overwrote the lot. Every `<Input className="…">`
+in the app, sixty-odd of them, rendered with **only** the caller's classes: no border, no
+background, no padding, no focus ring. The roster's search passes `className="pl-9"`; that is
+exactly how it became an unstyled field Chrome was free to paint autofill yellow, and giving the
+base its own colours fixed only the fields that passed no className, because the string was never
+reaching the element.
+
+The colours matter too, once they arrive: a field that does not name its own background does not
+have one, and inherits the user agent's — white on the dark theme.
 
 ### A list validates what a list renders
 
@@ -144,12 +153,57 @@ one place instead of quietly in five.
 
 ---
 
-## 6. What is deliberately still inconsistent
+## 6. Creating things
+
+There are two creation situations, and for a long time the product had one form for both.
+
+- **First-time setup** — an organiser with nothing. Needs sequence: a competition is useless
+  without a season, and a season without clubs. That is `SetupWizard`, and it writes at each step
+  so a competition that exists is useful even if the organiser stops there.
+- **Adding one more later** — a second division, a club that turned up in week three. The organiser
+  knows exactly what they want and needs the fields that matter, now.
+
+**Create asks the minimum that makes the thing real. Everything else is editing.** The server agrees
+already: `CreateTeamDto` needs a name and a competition, `CreateLeagueDto` a name and a tenant, and
+marks the rest optional. The forms that asked besides for a logo, a banner, a founding year, a
+contact e-mail, a website, a tax number and bank details were asking an organiser for things they do
+not have on the day they register a club — and none of it is lost, it is filled in on the resource's
+own screen once the resource exists, which is the only order in which anybody has it.
+
+So:
+
+| Resource | How it is created | Why |
+|---|---|---|
+| Competition | `/onboarding` — the wizard | It needs a season and clubs behind it; the wizard sequences that and adapts its heading to whether this is the first |
+| Club | Dialog, **or** the bulk list, both on the header | A season's entry list arrives as a *list* as often as one at a time, so neither is the exception |
+| Season | Dialog from `/league/seasons` | Three fields, and it belongs to a competition already on screen |
+| Player | Dialog, **or** the bulk paste | Same argument as clubs, and it was already built this way |
+| Organisation | Sign-up | A platform operator making one for somebody else is `/admin/tenants` |
+
+**A cross-tenant list has no create button.** A platform operator making a competition has to say
+*which organisation*, and that is the one place the question has no answer — so the door is
+`/admin/tenants` → the organisation → its own list, where the scope is settled first. The wizard
+reads `ctxTenantId` through `useScopeContext` so that path works.
+
+**Suggest, never impose.** A club's abbreviation is derived from its name — « BC Virunga » → VIR —
+because a results table needs one and asking an organiser to invent twenty is how you get twenty
+blanks. It stops following the name the moment it is touched: two clubs in one town can genuinely
+both shorten to KIV, and only the organiser knows which gets it.
+
+**Partial success is reported, not swallowed.** Bulk creation posts one at a time and collects what
+failed, so sixteen clubs with one duplicate register fifteen and name the one they could not — and
+the dialog stays open holding the reason, because a toast that disappears is not where you put a
+list of things to fix.
+
+---
+
+## 7. What is deliberately still inconsistent
 
 - **`/admin/*` is in English** and uses the pre-Phase-2 table style. It is the platform operator's
   surface — one person, who is the person reading this — and translating it is item 18, after
   launch. `/admin/teams` is the last page holding `TeamsFilters` and `TeamsTable` (713 lines)
-  alive; both die with it.
+  alive; both die with it. Its create buttons are gone rather than repointed, for the reason in
+  §6: a cross-tenant list cannot answer « for which organisation ».
 - **The calendar is full-bleed**, and should be: a month grid wants the width. Its heading is its
   own for the reason its own file gives — the title is part of the grid's chrome, not a page
   header above it.

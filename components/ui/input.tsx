@@ -150,21 +150,32 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
             </div>
           )}
           <input
+            {...props}
             id={name}
             name={name}
             ref={ref}
             type={type}
             maxLength={maxCharacters}
-            // `bg-surface text-ink` is not decoration: without them the field had NO colour of its
-            // own — border, radius and shadow, and nothing else — so it fell through to the user
-            // agent's stylesheet. On the dark theme that is a white box, and on any field Chrome
-            // decides is a username it is the autofill yellow, which is what the search box on
-            // /players had become. `placeholder:text-ink-subtle` and `disabled:` follow for the
-            // same reason: every state has to be a token, or the browser picks one for us.
+            /**
+             * `{...props}` goes FIRST, and that ordering is the whole bug.
+             *
+             * It used to be spread *after* this, so `className` was computed — base classes,
+             * error border, the caller's addition — and then immediately overwritten by the raw
+             * `props.className`. Every `<Input className="…">` in the app, sixty-odd of them,
+             * therefore rendered with **only** the caller's classes: no border, no background, no
+             * padding, no focus ring. The roster's search box passes `className="pl-9"`, which is
+             * exactly how it became an unstyled field the browser was free to paint autofill
+             * yellow. Giving the base its own colours last session made the fields that had no
+             * className right and left these untouched, because the string was never reaching the
+             * element.
+             *
+             * `bg-surface`/`text-ink` are not decoration either: without them a field has no
+             * colour of its own and falls through to the user agent's — a white box on the dark
+             * theme. Every state has to be a token, or the browser picks one for us.
+             */
             className={`block w-full rounded-md border bg-surface px-3 py-2 text-ink shadow-sm placeholder:text-ink-subtle focus:outline-none focus:ring-1 focus:ring-accent focus:border-accent disabled:cursor-not-allowed disabled:bg-surface-sunk disabled:text-ink-subtle sm:text-sm ${
               error ? 'border-negative' : 'border-line'
             } ${isSearchType ? 'pl-10' : ''} ${props.className || ''}`}
-            {...props}
             onBlur={handleBlur}
             onKeyDown={handleKeyDown}
             onChange={handleChange}

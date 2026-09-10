@@ -9,6 +9,7 @@ import { ArrowLeft, ArrowRight, Check, CircleAlert, Loader2 } from 'lucide-react
 import { Button, DatePicker, Input, Label } from '@/components/ui';
 import { SplitShell } from '@/components/auth';
 import { useAuthStore } from '@/store/auth.store';
+import { useScopeContext } from '@/hooks/useScopeContext';
 import { Gender } from '@/schemas';
 import { getApiErrorMessage } from '@/services/api';
 import {
@@ -115,6 +116,7 @@ const GENDERS: { value: Gender; label: string }[] = [
 export function SetupWizard() {
   const router = useRouter();
   const user = useAuthStore((s) => s.user);
+  const scope = useScopeContext();
   const sportType = user?.tenant?.sportType as string | undefined;
 
   const [step, setStep] = useState<Step>('league');
@@ -125,7 +127,28 @@ export function SetupWizard() {
   const [outcome, setOutcome] = useState<BulkTeamResult | null>(null);
   const [failure, setFailure] = useState<string | null>(null);
 
-  const existingLeagues = useExistingLeagues(user?.tenantId ?? undefined);
+  /**
+   * Whose organisation this competition is for.
+   *
+   * A tenant administrator's own, all but always. A system administrator has none of their own, so
+   * they reach this by drilling into one — `/tenant/leagues?ctxTenantId=…` → « Nouvelle compétition »
+   * — and `useScopeContext` resolves that parameter exactly as it does on every other scoped
+   * screen. Without this the wizard refused a platform operator with « votre organisation n'a pas
+   * pu être identifiée », which is true and unhelpful.
+   */
+  const tenantId = scope.tenantId ?? user?.tenantId ?? undefined;
+
+  const existingLeagues = useExistingLeagues(tenantId);
+
+  /**
+   * Is this the organisation's first competition, or another one?
+   *
+   * The same screen serves both — its own comment always said so, and the competitions list now
+   * links here — but it greeted a federation with three championnats as « Votre première
+   * compétition ». Wording that is wrong about what the reader already has is wording they stop
+   * trusting about everything else.
+   */
+  const isFirst = (existingLeagues.data?.data?.length ?? 0) === 0;
   const createLeague = useCreateLeague();
   const updateLeague = useUpdateLeague();
   const createSeason = useCreateSeason();
@@ -172,14 +195,16 @@ export function SetupWizard() {
 
   async function submitLeague(values: LeagueEssentialsValues) {
     setFailure(null);
-    if (!user?.tenantId) {
-      setFailure("Votre organisation n'a pas pu être identifiée. Rechargez la page.");
+    if (!tenantId) {
+      setFailure(
+        "Votre organisation n'a pas pu être identifiée. Ouvrez la compétition depuis l'organisation concernée.",
+      );
       return;
     }
     try {
       const saved = league
         ? await updateLeague.mutateAsync({ ...values, id: league.id })
-        : await createLeague.mutateAsync({ ...values, tenantId: user.tenantId });
+        : await createLeague.mutateAsync({ ...values, tenantId });
       setLeague({ id: saved.id, name: saved.name });
       setStep('season');
     } catch (error) {
@@ -247,8 +272,12 @@ export function SetupWizard() {
       <SplitShell
         homeHref="/tenant/dashboard"
         aside={aside}
-        title="Votre première compétition"
-        subtitle="Le championnat ou la coupe que vos équipes disputent. Vous pourrez en ajouter d'autres."
+        title={isFirst ? 'Votre première compétition' : 'Une compétition de plus'}
+        subtitle={
+          isFirst
+            ? "Le championnat ou la coupe que vos équipes disputent. Vous pourrez en ajouter d'autres."
+            : "Un second championnat, une catégorie, une division. Elle aura son propre calendrier et son propre classement."
+        }
       >
         <Rail current={step} onJump={setStep} />
         {errorBanner}

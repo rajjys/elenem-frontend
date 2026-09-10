@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useDebounce } from 'use-debounce';
 import { toast } from 'sonner';
-import { Pencil, Shield, Trash2 } from 'lucide-react';
+import { ListPlus, Pencil, Shield, Trash2 } from 'lucide-react';
 import { Button, ConfirmDialog, ListPage, ListToolbar, SelectField } from '@/components/ui';
 import { useScopeContext } from '@/hooks/useScopeContext';
 import { useAuthStore } from '@/store/auth.store';
@@ -12,6 +12,8 @@ import { Roles, type TeamFilterParams } from '@/schemas';
 import { useTeams, useDeleteTeam, type TeamListItem } from '@/services/teams';
 import { useStandingsLeagues } from '@/services/standings';
 import { toastApiError } from '@/utils';
+import { TeamFormDialog } from './team-form-dialog';
+import { BulkTeamsDialog } from './bulk-teams-dialog';
 
 const PAGE_SIZE = 20;
 
@@ -46,6 +48,16 @@ export function TeamsListView({
   const [debounced] = useDebounce(search, 400);
   const [leagueId, setLeagueId] = useState('');
   const [toDelete, setToDelete] = useState<TeamListItem | null>(null);
+  /**
+   * Both ways in, on the header, with equal weight.
+   *
+   * A competition's clubs arrive as a *list* at least as often as one at a time — a WhatsApp
+   * message, a photographed page — so neither path is the exception. Same shape as the roster's
+   * « Nouveau joueur » / « Ajouter une liste ».
+   */
+  const [creating, setCreating] = useState(false);
+  const [bulkOpen, setBulkOpen] = useState(false);
+  const [editing, setEditing] = useState<TeamListItem | null>(null);
 
   // The organisation's list may narrow to one competition; a competition's list is already one and
   // offers no picker. A club belongs to exactly one, so this is the only filter either page needs —
@@ -104,7 +116,12 @@ export function TeamsListView({
     <ListPage
       title="Équipes"
       description={`${totalItems} ${totalItems === 1 ? 'club enregistré' : 'clubs enregistrés'}`}
-      action={canManage ? { label: 'Nouveau club', href: '/team/create' } : undefined}
+      action={canManage ? { label: 'Nouveau club', onClick: () => setCreating(true) } : undefined}
+      secondaryAction={
+        canManage
+          ? { label: 'Ajouter une liste', onClick: () => setBulkOpen(true), icon: ListPlus }
+          : undefined
+      }
       filters={
         <ListToolbar
           search={search}
@@ -129,7 +146,13 @@ export function TeamsListView({
       isError={isError}
       onRetry={() => refetch()}
       isEmpty={teams.length === 0}
-      empty={<EmptyTeams canManage={canManage} searching={!!debounced} />}
+      empty={
+        <EmptyTeams
+          canManage={canManage}
+          searching={!!debounced}
+          onAdd={() => setBulkOpen(true)}
+        />
+      }
       page={page}
       totalPages={data?.totalPages ?? 1}
       onPageChange={setPage}
@@ -172,13 +195,16 @@ export function TeamsListView({
                   {canManage && (
                     <td className="px-4 py-3">
                       <div className="flex justify-end gap-1">
-                        <Link
-                          href={`/team/edit?ctxTeamId=${team.id}`}
+                        {/* The name and the abbreviation, in place. A club's *details* — ville,
+                            année de fondation, logo — are its own screen, reached by opening the
+                            club, because that is a different act from correcting a typo in a list. */}
+                        <button
+                          onClick={() => setEditing(team)}
                           className="rounded p-1.5 text-ink-subtle hover:bg-surface-sunk hover:text-ink"
                           aria-label={`Modifier ${team.name}`}
                         >
                           <Pencil className="h-4 w-4" />
-                        </Link>
+                        </button>
                         <button
                           onClick={() => setToDelete(team)}
                           className="rounded p-1.5 text-ink-subtle hover:bg-negative-soft hover:text-negative"
@@ -195,6 +221,22 @@ export function TeamsListView({
           </table>
         </div>
       </div>
+
+      <TeamFormDialog
+        open={creating}
+        onOpenChange={setCreating}
+        leagueId={scope === 'league' ? (ctx.leagueId ?? undefined) : undefined}
+      />
+      <TeamFormDialog
+        open={!!editing}
+        onOpenChange={(o) => !o && setEditing(null)}
+        team={editing}
+      />
+      <BulkTeamsDialog
+        open={bulkOpen}
+        onOpenChange={setBulkOpen}
+        leagueId={scope === 'league' ? (ctx.leagueId ?? undefined) : undefined}
+      />
 
       {/* `window.confirm` is the browser's dialog, not the product's, and it cannot name what is
           about to be lost in the product's own words. */}
@@ -214,7 +256,15 @@ export function TeamsListView({
   );
 }
 
-function EmptyTeams({ canManage, searching }: { canManage: boolean; searching: boolean }) {
+function EmptyTeams({
+  canManage,
+  searching,
+  onAdd,
+}: {
+  canManage: boolean;
+  searching: boolean;
+  onAdd: () => void;
+}) {
   if (searching) {
     return (
       <div className="rounded-lg border border-dashed border-line bg-surface py-16 text-center">
@@ -230,9 +280,11 @@ function EmptyTeams({ canManage, searching }: { canManage: boolean; searching: b
         Une compétition sans clubs ne peut recevoir aucun calendrier : ce sont eux qui se
         rencontrent.
       </p>
+      {/* The list, not the single form: an empty competition is one whose entry list has not been
+          entered yet, and that is a list. */}
       {canManage && (
-        <Button variant="primary" className="mt-4" asChild>
-          <Link href="/team/create">Ajouter un club</Link>
+        <Button variant="primary" className="mt-4" onClick={onAdd}>
+          Ajouter la liste des clubs
         </Button>
       )}
     </div>

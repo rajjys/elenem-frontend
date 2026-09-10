@@ -93,7 +93,7 @@ export function OrganiserDashboard({ scope }: { scope: 'tenant' | 'league' }) {
           </Button>
           {scope === 'tenant' && (
             <Button variant="outline" size="sm" asChild>
-              <Link href={buildLink('/league/create')}>
+              <Link href={'/onboarding'}>
                 <Trophy className="mr-2 h-4 w-4" />
                 Nouvelle compétition
               </Link>
@@ -121,7 +121,7 @@ export function OrganiserDashboard({ scope }: { scope: 'tenant' | 'league' }) {
           </h2>
         )}
         {data.competitions.length === 0 && (
-          <EmptyOrganisation createHref={buildLink('/league/create')} />
+          <EmptyOrganisation createHref={'/onboarding'} />
         )}
         {data.competitions.map((c) => (
           <CompetitionCard

@@ -58,7 +58,15 @@ export function LeaguesListView() {
           ? `${leagues.length} ${leagues.length === 1 ? 'compétition' : 'compétitions'}`
           : undefined
       }
-      action={canManage ? { label: 'Nouvelle compétition', href: '/league/create' } : undefined}
+      // The guided path, not a form.
+      //
+      // A competition is useless on its own: it needs a season before it can hold a fixture and
+      // clubs before it can hold a calendar, and `SetupWizard` already sequences exactly that —
+      // writing at each step, so a competition that exists is useful even if the organiser stops
+      // there. It was built for onboarding and its own comment says it is meant to be reachable
+      // again « for an organiser who is adding a second competition »; nothing linked to it. The
+      // 970-line four-step form that this CTA used to open is gone.
+      action={canManage ? { label: 'Nouvelle compétition', href: '/onboarding' } : undefined}
       isLoading={isLoading}
       isError={isError}
       onRetry={() => refetch()}
@@ -73,7 +81,7 @@ export function LeaguesListView() {
           </p>
           {canManage && (
             <Button variant="primary" className="mt-4" asChild>
-              <Link href="/league/create">Créer une compétition</Link>
+              <Link href="/onboarding">Créer une compétition</Link>
             </Button>
           )}
         </div>

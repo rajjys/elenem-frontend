@@ -2,14 +2,12 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from 'react';
-import Link from 'next/link';
 import { api } from '@/services/api'; // Your actual API instance
 import { LeagueDetails, PaginatedLeaguesResponseSchema, LeagueFilterParams } from '@/schemas/league-schemas'; // Your actual League types and schemas
 import { LeagueFilters } from '@/components/league/league-filters'; // Your new LeagueFilters component
 import { LeaguesTable } from '@/components/league/leagues-table'; // Your new LeaguesTable component
 import { Pagination } from '@/components/ui/'; // Your Pagination component
 import { LoadingSpinner } from '@/components/ui/loading-spinner'; // Your LoadingSpinner component
-import { Button } from '@/components/ui/button'; // Your Button component
 import { toast } from 'sonner'; // Your toast notification library (e.g., Sonner)
 
 export default function AdminLeaguesPage() {
@@ -129,9 +127,13 @@ export default function AdminLeaguesPage() {
           onFilterChange={handleFilterChange}
           onPageSizeChange={handlePageSizeChange}
         />
-        <Link href="/league/create" passHref>
-          <Button variant="primary" className='whitespace-nowrap'>Create New League</Button>
-        </Link>
+        {/* No create button here.
+            
+            A platform operator making a competition (or a club) has to say **which organisation**
+            it belongs to, and a cross-tenant list is the one place that question has no answer.
+            The door that does answer it already exists: /admin/tenants → the organisation → its
+            own competitions, where the scope is settled before anything is created. This used to
+            link to /league/create, which is gone. */}
       </div>
 
       {loading ? (
