@@ -144,6 +144,27 @@ reaching the element.
 The colours matter too, once they arrive: a field that does not name its own background does not
 have one, and inherits the user agent's — white on the dark theme.
 
+### A dialog does not live in `children`
+
+`ListPage` renders `isEmpty ? empty : children`. Every list kept its dialogs inside `children`, so
+on an empty list they were **unmounted** — the button set state nobody was listening to, and there
+was no error to see. It failed on exactly the screen where adding the first record is the entire
+point: a competition created five minutes ago. Dialogs go in `overlays`, which is outside the
+conditional.
+
+### Check the verb before you write the call
+
+`TeamsController` exposes `@Put(':teamId')`. A PATCH to it 404s with « Cannot PATCH /teams/… », and
+that was every club rename for a day. Nest does not fall back between verbs, and a wrong one is a
+404 rather than a 405, which reads like a missing record.
+
+### A write that returns 200 is not a write
+
+`PUT /players/:id` returned 200 and changed nothing, on every player, for as long as the endpoint
+existed: the name was written to the linked `User`, and roster players have no account. Verify a
+mutation **against the database**, not against the response — the response was assembled from a
+re-read that was itself correct.
+
 ### A list validates what a list renders
 
 `TeamDetailsSchema` is the shape a *form* works with. `GET /teams` does not send `externalId`, which
@@ -197,7 +218,43 @@ list of things to fix.
 
 ---
 
-## 7. What is deliberately still inconsistent
+## 7. Settings, and other rooms with sections
+
+`/league/settings` is the pattern: **one screen, tabs, one section per decision.**
+
+- **Tabs, not a nested sidebar.** The app already spends 16rem on a left rail; a second one at
+  1280px leaves a form about as wide as a phone. Tabs also match `/game/[gameId]`, so there is one
+  pattern for "different views of one resource" rather than a new one per screen.
+- **The tab is in the URL.** « Règles du classement » under the table lands on the right one, and a
+  link to it can be sent to somebody.
+- **A section is the unit of saving, not the page.** A name and a visibility setting are different
+  decisions; one Save under a two-column grid makes every change a change of everything, and a
+  reader who came to fix a typo cannot tell what else they are committing. `SettingsSection` gives
+  each its own footer band.
+- **The save is disabled until something differs.** A form that always offers to save cannot tell
+  you whether you have changed anything.
+- **Irreversible actions get their own tab, last, and are confirmed by typing the name.** A dialog
+  with Annuler and Supprimer is dismissed by reflex; writing « Championnat Goma D1 Messieurs »
+  cannot be, and it makes the reader read what they are about to remove.
+
+## 8. Leaf pages keep the menu you arrived with
+
+`/game/abc123` and `/player/abc123` are flat, self-owned routes so they survive being pasted into a
+message. The sidebar on them belongs to **whoever is reading**, which turned out to need more than a
+role: a tenant administrator inside a competition got the organisation's menu back, so the next
+fixture was four clicks away.
+
+`useSurfaceLink` appends the surface a link was made on; `navItemsForSurface` reads it. Three
+properties keep it honest:
+
+- It is a **hint, not a requirement** — a pasted link still works, with the reader's default menu.
+- It is **intersected with the role**, never a grant. A `ctxLeagueId` in a club administrator's URL
+  changes nothing, because `/league/*` would refuse them, and a menu of links that refuse you is
+  worse than the wrong menu.
+- It carries the **surface, not the scope**. A league administrator's own league is not appended —
+  their role already selects that menu.
+
+## 9. What is deliberately still inconsistent
 
 - **`/admin/*` is in English** and uses the pre-Phase-2 table style. It is the platform operator's
   surface — one person, who is the person reading this — and translating it is item 18, after
