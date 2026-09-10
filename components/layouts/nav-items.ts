@@ -112,7 +112,12 @@ export const tenantNavItems: NavGroup[] = [
     ],
   },
   {
-    label: 'Compétition',
+    // « Déroulement », not « Compétition » — the register above it already has a *link* called
+    // « Compétitions », and a group heading one letter away from an item three rows up is two
+    // labels the reader has to tell apart before either means anything. This group is not the
+    // competitions; it is how one unfolds. Répertoire / Déroulement: what the organisation has,
+    // and what is happening to it.
+    label: 'Déroulement',
     items: [
     { label: 'Calendrier', basePath: '/tenant/calendar', icon: CalendarDays },
     // The table is what the organisation publishes every matchday, and it had no entry point
@@ -151,7 +156,9 @@ export const leagueNavItems: NavGroup[] = [
     ],
   },
   {
-    label: 'Compétition',
+    // Same heading as the organisation's, for the same reason and to keep the two organiser
+    // surfaces reading alike.
+    label: 'Déroulement',
     items: [
     // First, because the three below it are all a season's: the calendar is its fixtures, the
     // table is its phases', the scorers are its sheets'.
@@ -193,8 +200,9 @@ export const teamNavItems: NavGroup[] = [
     ],
   },
   {
-    // Where the club stands and when it plays: the two facts a club opens the product for, and
-    // neither of them anything the club decides.
+    // The club keeps « Compétition » rather than « Déroulement »: there is no link of that name
+    // in its sidebar to collide with, and « Mon club » / « Compétition » is the exact contrast a
+    // club reads by — what is ours, and what is happening around us.
     label: 'Compétition',
     items: [
     { label: 'Calendrier', basePath: '/team/calendar', icon: CalendarDays },

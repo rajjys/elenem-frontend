@@ -49,7 +49,7 @@ import { FixtureDialog } from './fixture-dialog';
 import { ScoreDialog } from './score-dialog';
 import { PromoteDialog } from './promote-dialog';
 import { ReasonBar } from './reason-bar';
-import { BoxScoreDialog } from './box-score-dialog';
+import { BoxScoreDialog } from '@/components/game/box-score-dialog';
 
 /**
  * The organisation's calendar, read-only.
@@ -1246,7 +1246,9 @@ export function CalendarView({
           <BoxScoreDialog
             open={boxScoring !== null}
             onClose={() => setBoxScoring(null)}
-            entry={boxScoring}
+            gameId={boxScoring?.id ?? null}
+            homeName={boxScoring?.home.name}
+            awayName={boxScoring?.away.name}
           />
         </>
       )}

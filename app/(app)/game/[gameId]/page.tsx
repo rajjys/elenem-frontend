@@ -21,7 +21,7 @@ import {
 import { Button, ErrorState } from '@/components/ui';
 import { useCurrentUser } from '@/hooks';
 import { Roles } from '@/schemas';
-import { BoxScoreSheet } from '@/components/game/box-score-sheet';
+import { BoxScoreReport } from '@/components/game/box-score-report';
 import { GameTimeline } from '@/components/game/game-timeline';
 import { GameActionDialog, type GameAction } from '@/components/game/game-action-dialog';
 import { FixtureDialog, ScoreDialog } from '@/components/calendar';
@@ -101,6 +101,24 @@ export default function GamePage() {
   const [action, setAction] = useState<GameAction | null>(null);
 
   const user = useCurrentUser();
+
+  /**
+   * Who may change this fixture.
+   *
+   * A club administrator may *read* their own match — that is what commit 2ea6f51 opened up — and
+   * may change nothing about it. Moving, voiding, deleting or rescoring is the organiser's,
+   * because a club that could reschedule its own game would be moving a match its opponent has to
+   * travel to; `_validateUserScope(…, 'write')` enforces exactly that on the server.
+   *
+   * The screen was not saying so. « Corriger le score » and the whole Actions rail — Déplacer,
+   * Confirmer, Supprimer — rendered for everyone, so a club could click five buttons and collect
+   * five refusals. Same defect as the roster's « Nouveau joueur », and the same fix: offer what
+   * the server will accept.
+   */
+  const canManageGame = (user?.roles ?? []).some(
+    (r) => r === Roles.SYSTEM_ADMIN || r === Roles.TENANT_ADMIN || r === Roles.LEAGUE_ADMIN,
+  );
+
   const game = useGame(gameId);
   const day = game.data ? isoDay(new Date(game.data.dateTime)) : null;
 
@@ -257,14 +275,21 @@ export default function GamePage() {
             </button>
           ))}
         </nav>
-        {entry && (
+        {entry && canManageGame && (
           <Button variant="primary" className="mb-2" onClick={() => setScoring(true)}>
             {hasScore ? 'Corriger le score' : 'Saisir le score'}
           </Button>
         )}
       </div>
 
-      <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_18rem]">
+      {/* The rail is the organiser's; without it the content takes the width rather than leaving
+          an eighteen-rem hole where a club administrator has nothing to do. */}
+      <div
+        className={cn(
+          'mt-6 grid gap-6',
+          canManageGame && 'lg:grid-cols-[1fr_18rem]',
+        )}
+      >
         <div className="min-w-0">
           {tab === 'overview' && (
             <Overview
@@ -275,9 +300,15 @@ export default function GamePage() {
             />
           )}
 
+          {/* A report, not the entry grid. Typing a sheet is a decision taken in a modal; this tab
+              is for reading one. See `components/game/box-score-report.tsx`. */}
           {tab === 'sheet' &&
             (played ? (
-              <BoxScoreSheet gameId={gameId} />
+              <BoxScoreReport
+                gameId={gameId}
+                homeName={g.homeTeam?.name}
+                awayName={g.awayTeam?.name}
+              />
             ) : (
               <p className="rounded-xl border border-dashed border-line px-4 py-12 text-center text-sm text-ink-muted">
                 La feuille se saisit après le match, à partir de la feuille des officiels.
@@ -298,6 +329,7 @@ export default function GamePage() {
         {/* Each action on its own line, because each is its own decision. The two clubs are
             reachable from the masthead, so the "Équipes" card that used to sit here was a second
             door onto the same room. */}
+        {canManageGame && (
         <aside className="lg:sticky lg:top-6 lg:self-start">
           <div className="overflow-hidden rounded-xl border border-line">
             <p className="border-b border-line bg-surface-sunk px-3.5 py-2 text-xs font-medium uppercase tracking-wider text-ink-subtle">
@@ -362,6 +394,7 @@ export default function GamePage() {
             </div>
           </div>
         </aside>
+        )}
       </div>
 
       <ScoreDialog open={scoring} onClose={() => setScoring(false)} entry={entry} />
