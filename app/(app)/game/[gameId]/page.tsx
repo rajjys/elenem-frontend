@@ -28,6 +28,7 @@ import { FixtureDialog, ScoreDialog } from '@/components/calendar';
 import { useCalendar, type CalendarEntry } from '@/services/calendar';
 import { useGame, useGameAudit, type GameDetail } from '@/services/games';
 import { useBoxScore, totalOf, type BoxScore } from '@/services/box-score';
+import { useBackLink } from '@/hooks/useBackLink';
 import { cn } from '@/utils';
 
 /**
@@ -101,6 +102,9 @@ export default function GamePage() {
   const [action, setAction] = useState<GameAction | null>(null);
 
   const user = useCurrentUser();
+  const backLink = useBackLink();
+  /** Set by the overview's CTA so one click both switches tab and opens the editor. */
+  const [openSheetEditor, setOpenSheetEditor] = useState(false);
 
   /**
    * Who may change this fixture.
@@ -186,7 +190,15 @@ export default function GamePage() {
   const played = g.status === 'COMPLETED';
   const hasScore = g.homeScore != null && g.awayScore != null;
   const duration = entry?.durationMinutes ?? 100;
-  const backHref = calendarHref(user?.roles ?? [], g.leagueId);
+  /**
+   * Back to where the reader came from, named.
+   *
+   * It was « Retour au calendrier » to a fixed route, whoever you were and wherever you had come
+   * from — so opening a match from a club's dashboard and pressing back put you in a month grid you
+   * had never opened.
+   */
+  const back = backLink;
+  const backHref = back?.href ?? calendarHref(user?.roles ?? [], g.leagueId);
 
   const teamHref = (teamId: string) =>
     `/team/dashboard?ctxTeamId=${teamId}&ctxLeagueId=${g.leagueId}`;
@@ -207,7 +219,7 @@ export default function GamePage() {
         className="-ml-2 mt-5 inline-flex items-center gap-1.5 rounded-md px-2 py-1.5 text-sm font-medium text-ink-muted transition-colors hover:bg-surface-sunk hover:text-ink"
       >
         <ArrowLeft className="h-4 w-4 shrink-0" aria-hidden />
-        Retour au calendrier
+        {back?.label ?? 'Retour au calendrier'}
       </Link>
 
       {/* The masthead. One block answering "which match, and how did it go" before anything else
@@ -296,7 +308,10 @@ export default function GamePage() {
               game={g}
               duration={duration}
               boxScore={box.data}
-              onOpenSheet={() => setTab('sheet')}
+              onOpenSheet={() => {
+                setTab('sheet');
+                setOpenSheetEditor(true);
+              }}
             />
           )}
 
@@ -308,6 +323,8 @@ export default function GamePage() {
                 gameId={gameId}
                 homeName={g.homeTeam?.name}
                 awayName={g.awayTeam?.name}
+                autoOpenEditor={openSheetEditor}
+                onAutoOpened={() => setOpenSheetEditor(false)}
               />
             ) : (
               <p className="rounded-xl border border-dashed border-line px-4 py-12 text-center text-sm text-ink-muted">

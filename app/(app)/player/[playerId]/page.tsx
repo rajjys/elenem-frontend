@@ -5,10 +5,10 @@ import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { ArrowLeft, ChevronRight, Loader2, Shirt } from 'lucide-react';
 import { ErrorState, SelectField } from '@/components/ui';
-import { useCurrentUser } from '@/hooks';
 import { useSurfaceLink } from '@/hooks/useSurfaceLink';
-import { Roles } from '@/schemas';
-import { usePlayerStats } from '@/services/player-stats';
+import { useBackLink } from '@/hooks/useBackLink';
+import { usePlayerStats, canOpenGame } from '@/services/player-stats';
+import { useCurrentUser } from '@/hooks';
 import { cn } from '@/utils';
 
 /**
@@ -27,6 +27,7 @@ export default function PlayerPage() {
   const { playerId } = useParams<{ playerId: string }>();
   const router = useRouter();
   const surfaceLink = useSurfaceLink();
+  const back = useBackLink();
   const user = useCurrentUser();
 
   const [seasonId, setSeasonId] = useState('');
@@ -62,14 +63,6 @@ export default function PlayerPage() {
     );
   }
 
-  const roles = user?.roles ?? [];
-  const rosterHref = roles.includes(Roles.TENANT_ADMIN)
-    ? '/tenant/players'
-    : roles.includes(Roles.LEAGUE_ADMIN)
-      ? '/league/players'
-      : roles.includes(Roles.TEAM_ADMIN)
-        ? '/team/roster'
-        : null;
 
   const fullName = `${data.firstName} ${data.lastName}`;
   const scoring = data.columns.filter((c) => c.weight !== 0);
@@ -77,17 +70,16 @@ export default function PlayerPage() {
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6">
-      {/* Back to *this reader's* roster. `/league/*` is gated to competition administrators in the
-          middleware, so a single hardcoded destination would have sent two of the four roles to
-          an access-denied page — and a back link that refuses you is worse than none. A system
-          admin has no roster screen at all, so they get the breadcrumb and the sidebar instead. */}
-      {rosterHref && (
+      {/* Back to where the reader came from, named — the statistics table if that is where they
+          opened this scorer, the roster if it was the roster. It used to be « Retour aux joueurs »
+          to a route chosen by role, which was right for nobody who had arrived from anywhere else. */}
+      {back && (
         <Link
-          href={rosterHref}
+          href={back.href}
           className="mb-4 inline-flex items-center gap-1 text-sm text-ink-subtle transition-colors hover:text-ink"
         >
           <ArrowLeft className="h-4 w-4" aria-hidden />
-          Retour aux joueurs
+          {back.label}
         </Link>
       )}
 
@@ -216,13 +208,23 @@ export default function PlayerPage() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-line">
-                      {data.games.map((g) => (
+                      {data.games.map((g) => {
                         // The whole row opens the match — the chevron is the affordance, not the
                         // hit area. Nothing on this page is unsaved, so leaving costs nothing.
+                        //
+                        // Unless the reader may not open it: a club administrator reading another
+                        // club's scorer sees that club's whole season, and `_validateUserScope`
+                        // refuses every one of those fixtures. The row stays, without the door.
+                        const openable = canOpenGame(g, user);
+                        return (
                         <tr
                           key={g.gameId}
-                          onClick={() => router.push(surfaceLink(`/game/${g.gameId}`))}
-                          className="cursor-pointer transition-colors hover:bg-surface-sunk"
+                          onClick={openable ? () => router.push(surfaceLink(`/game/${g.gameId}`)) : undefined}
+                          title={openable ? undefined : 'Vous ne pouvez consulter que les matchs de votre club.'}
+                          className={cn(
+                            'transition-colors',
+                            openable && 'cursor-pointer hover:bg-surface-sunk',
+                          )}
                         >
                           <td className="whitespace-nowrap px-3 py-2 text-ink-muted">
                             {new Date(g.dateTime).toLocaleDateString('fr-FR', {
@@ -274,13 +276,16 @@ export default function PlayerPage() {
                             {g.total}
                           </td>
                           <td className="px-1 py-2 text-right">
-                            <ChevronRight
-                              className="ml-auto h-4 w-4 text-ink-subtle"
-                              aria-hidden
-                            />
+                            {openable && (
+                              <ChevronRight
+                                className="ml-auto h-4 w-4 text-ink-subtle"
+                                aria-hidden
+                              />
+                            )}
                           </td>
                         </tr>
-                      ))}
+                        );
+                      })}
                     </tbody>
                   </table>
                 </div>

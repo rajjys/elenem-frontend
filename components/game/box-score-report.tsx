@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { AlertTriangle, ClipboardList, Loader2, Pencil } from 'lucide-react';
 import { Button } from '@/components/ui';
 import {
@@ -38,14 +38,36 @@ export function BoxScoreReport({
   gameId,
   homeName,
   awayName,
+  autoOpenEditor,
+  onAutoOpened,
 }: {
   gameId: string;
   homeName?: string;
   awayName?: string;
+  /**
+   * Open the editor as soon as the sheet is known to be writable.
+   *
+   * The overview's « Aucune feuille de match saisie — la remplir » switched to this tab and stopped
+   * there, so filling a sheet took two clicks on two buttons that say the same thing. One button,
+   * one intention: it is a request to *fill the sheet*, not to look at the tab where the sheet
+   * would be.
+   *
+   * It waits for the response rather than opening blind, because whether the sheet can be written
+   * at all is the server's answer — a club administrator pressing the same thing must land on the
+   * report, not on a dialog they cannot save.
+   */
+  autoOpenEditor?: boolean;
+  onAutoOpened?: () => void;
 }) {
   const { data, isPending, isError, refetch } = useBoxScore(gameId);
   const [editing, setEditing] = useState(false);
   const [viewing, setViewing] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!autoOpenEditor || !data) return;
+    if (data.editable) setEditing(true);
+    onAutoOpened?.();
+  }, [autoOpenEditor, data, onAutoOpened]);
 
   if (isPending) {
     return (

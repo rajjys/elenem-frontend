@@ -9,7 +9,7 @@ import { NavLink } from '.';
 import { SidebarBrand } from './sidebar-brand';
 import type { NavGroup } from './nav-items';
 import { SidebarUserMenu } from './sidebar-user-menu';
-import { useContextualLink, useSidebarEligibility } from '@/hooks';
+import { useContextualLink } from '@/hooks';
 import { Roles } from '@/schemas'; // Assuming Role enum is here
 import { AppLayoutHeader } from './AppLayoutHeader'; // Import the updated Navbar
 import { ArrowLeft } from 'lucide-react';
@@ -84,16 +84,39 @@ export default function AppLayout({ children, navItems }: AppLayoutProps) {
   const isCoach       = userAuth?.roles.includes(Roles.COACH);
   const isReferee     = userAuth?.roles.includes(Roles.REFEREE);
 
-  // dashboard link based on user roles
-  const dashboard = isSystemAdmin ? { label: "Retour au Systeme", link: '/admin/dashboard' }:
-                    isTenantAdmin ? { label: "Retour a l'Organisation", link: '/tenant/dashboard' } :
-                    isLeagueAdmin ? { label: "Retour a la ligue", link: '/league/dashboard' } :
-                    isTeamAdmin   ? { label: "Retour a l'equipe", link: '/team/dashboard' } :
-                    isPlayer      ? { label: "Profil athlete", link: '/player/dashboard'} :
-                    isCoach       ? { label: "Profil coach", link: '/coach/dashboard' }:
-                    isReferee     ? { label: "Profil Arbitre", link: '/referee/dashboard'} :
-                                    {label: "Tableau de bord", link: '/account/dashboard'}; // Default fallback
-  const shouldShowSidebar = useSidebarEligibility(); // Assuming this hook determines if a sidebar is relevant for the current user/page
+  /**
+   * Where the brand goes: this reader's own dashboard.
+   *
+   * The labels were unaccented — « Retour a la ligue », « Retour a l'equipe », « Retour au
+   * Systeme » — which is the one thing a French-only product cannot afford to get wrong in its
+   * permanent chrome. They also all began « Retour », competing with the page's own back link two
+   * inches away, which goes somewhere else entirely. This is not a way *back*, it is the way
+   * *home*; naming the destination is enough.
+   */
+  const dashboard = isSystemAdmin ? { label: 'Plateforme', link: '/admin/dashboard' } :
+                    isTenantAdmin ? { label: 'Mon organisation', link: '/tenant/dashboard' } :
+                    isLeagueAdmin ? { label: 'Ma compétition', link: '/league/dashboard' } :
+                    isTeamAdmin   ? { label: 'Mon club', link: '/team/dashboard' } :
+                    isPlayer      ? { label: 'Profil athlète', link: '/player/dashboard' } :
+                    isCoach       ? { label: 'Profil coach', link: '/coach/dashboard' } :
+                    isReferee     ? { label: 'Profil arbitre', link: '/referee/dashboard' } :
+                                    { label: 'Tableau de bord', link: '/account/dashboard' };
+  /**
+   * The sidebar is always here.
+   *
+   * It used to be conditional on `useSidebarEligibility`, which demanded that the URL carry every
+   * ctx id its route section implied — `/team/*` needed a tenant *and* a league *and* a team — and
+   * hid **all navigation** when one was missing. So a tenant administrator who opened a club from
+   * `/tenant/teams` landed on `/team/roster?ctxTeamId=…` with no `ctxLeagueId`, and the entire rail
+   * vanished: no menu, no way out of the page except the browser's back button. The page itself was
+   * fine; the frame around it disappeared.
+   *
+   * The premise was wrong twice over. Navigation is the frame, and **the frame is never the thing
+   * that is missing** — if anything, a reader who has arrived somewhere unexpected needs the way
+   * out more, not less. And deciding whether there is enough context to *render* is the page's job,
+   * which the pages already do: `ContextRequired` is exactly that, and says what is missing in
+   * words instead of removing the furniture.
+   */
   
   const handleLogout = () => {
     logout();
@@ -125,8 +148,7 @@ export default function AppLayout({ children, navItems }: AppLayoutProps) {
       <div className="flex min-h-0 flex-1 overflow-hidden">
         {/* Sidebar (desktop). It starts at the top of the viewport rather than under the navbar:
             it is the permanent frame, and it owns the brand. */}
-        {shouldShowSidebar
-          && (
+        {(
               <aside className={`hidden h-full shrink-0 flex-col border-r border-line bg-surface transition-[width] duration-200 ease-in-out md:flex
                                 ${isSidebarOpen ? "w-64" : "w-20"}`}>
                 {/* The brand is deliberately not contextual: it is the way home to your own
@@ -159,7 +181,7 @@ export default function AppLayout({ children, navItems }: AppLayoutProps) {
             )}
 
         {/* Mobile Sidebar (Overlay) */}
-        {shouldShowSidebar && (
+        {(
           <div className={`fixed inset-0 z-40 flex md:hidden ${isMobileMenuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"} transition-opacity duration-300 ease-in-out`}>
             <div className="fixed inset-0 bg-ink/50" onClick={closeMobileMenu}></div>
             <aside className={`relative flex flex-col w-64 max-w-xs h-full bg-surface shadow-xl py-4 z-50 transform transition-transform duration-300 ease-in-out ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>

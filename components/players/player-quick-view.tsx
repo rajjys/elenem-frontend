@@ -3,7 +3,8 @@
 import Link from 'next/link';
 import { ArrowRight, ChevronRight, Loader2, Shirt } from 'lucide-react';
 import { Button, Modal } from '@/components/ui';
-import { usePlayerStats, type PlayerGameLine } from '@/services/player-stats';
+import { usePlayerStats, canOpenGame, type PlayerGameLine } from '@/services/player-stats';
+import { useCurrentUser } from '@/hooks';
 import { cn } from '@/utils';
 import { useSurfaceLink } from '@/hooks/useSurfaceLink';
 
@@ -31,6 +32,7 @@ export function PlayerQuickView({
   onOpenChange: (open: boolean) => void;
 }) {
   const surfaceLink = useSurfaceLink();
+  const user = useCurrentUser();
   const { data, isPending, isError } = usePlayerStats(playerId, seasonId, stageId);
 
   const title = data ? `${data.firstName} ${data.lastName}` : 'Joueur';
@@ -112,7 +114,12 @@ export function PlayerQuickView({
             ) : (
               <ul className="divide-y divide-line rounded-lg border border-line">
                 {data.games.slice(0, 5).map((g) => (
-                  <GameRow key={g.gameId} game={g} totalAbbr={data.totalAbbr} />
+                  <GameRow
+                    key={g.gameId}
+                    game={g}
+                    totalAbbr={data.totalAbbr}
+                    openable={canOpenGame(g, user)}
+                  />
                 ))}
               </ul>
             )}
@@ -130,14 +137,20 @@ export function PlayerQuickView({
  * same click had to become a nested dialog instead. « Combien il a marqué contre Katindo » leads
  * straight to « et comment s'est passé ce match », and the answer is a page away.
  */
-function GameRow({ game, totalAbbr }: { game: PlayerGameLine; totalAbbr: string }) {
+function GameRow({
+  game,
+  totalAbbr,
+  openable,
+}: {
+  game: PlayerGameLine;
+  totalAbbr: string;
+  /** False for a club administrator looking at a match their own club did not play. */
+  openable: boolean;
+}) {
   const surfaceLink = useSurfaceLink();
-  return (
-    <li>
-      <Link
-        href={surfaceLink(`/game/${game.gameId}`)}
-        className="flex items-center justify-between gap-3 px-3 py-2 text-sm transition-colors hover:bg-surface-sunk"
-      >
+
+  const body = (
+    <>
       <div className="min-w-0">
         <p className="truncate text-ink">
           <span className="text-ink-subtle">{game.isHome ? 'vs' : 'à'}</span> {game.opponentName}
@@ -165,8 +178,31 @@ function GameRow({ game, totalAbbr }: { game: PlayerGameLine; totalAbbr: string 
         <span className="w-14 text-right font-medium tabular-nums text-ink">
           {game.total} {totalAbbr}
         </span>
-        <ChevronRight className="h-4 w-4 shrink-0 text-ink-subtle" aria-hidden />
+        {openable && <ChevronRight className="h-4 w-4 shrink-0 text-ink-subtle" aria-hidden />}
       </div>
+    </>
+  );
+
+  // Shown either way — the match happened and the figures are this player's. It simply stops being
+  // a door, rather than becoming a door onto a refusal.
+  if (!openable) {
+    return (
+      <li
+        className="flex items-center justify-between gap-3 px-3 py-2 text-sm"
+        title="Vous ne pouvez consulter que les matchs de votre club."
+      >
+        {body}
+      </li>
+    );
+  }
+
+  return (
+    <li>
+      <Link
+        href={surfaceLink(`/game/${game.gameId}`)}
+        className="flex items-center justify-between gap-3 px-3 py-2 text-sm transition-colors hover:bg-surface-sunk"
+      >
+        {body}
       </Link>
     </li>
   );

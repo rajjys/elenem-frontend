@@ -83,6 +83,8 @@ const PlayerGameLineSchema = z.object({
   stageName: z.string(),
   teamId: z.string(),
   teamName: z.string(),
+  /** The other club. Needed to decide whether this reader may open the match at all. */
+  opponentId: z.string(),
   opponentName: z.string(),
   opponentShortCode: z.string().nullable(),
   isHome: z.boolean(),
@@ -191,6 +193,29 @@ export function usePlayerStats(playerId?: string, seasonId?: string, stageId?: s
     enabled: !!playerId,
     staleTime: 60_000,
   });
+}
+
+/**
+ * May this reader open this match?
+ *
+ * A club administrator may read a fixture **only if their own club played it** — that is what
+ * `_validateUserScope(…, 'read')` enforces, and it is right: a club has no business in the
+ * scoresheet of a game it was not in. But the league-wide scorers' list is open to them, and from
+ * it they can reach a player of another club whose whole season is other clubs' games.
+ *
+ * So the line stays visible and stops being a link. Showing it and refusing the click is honest —
+ * the match happened and the figures are the player's — where navigating to an access-denied page
+ * would read as the product being broken. Everyone else opens everything.
+ */
+export function canOpenGame(
+  line: { teamId: string; opponentId: string },
+  reader: { roles?: readonly string[]; managingTeamId?: string | null } | null | undefined,
+): boolean {
+  const roles = reader?.roles ?? [];
+  const clubOnly = roles.includes('TEAM_ADMIN') && !roles.some((r) => r === 'SYSTEM_ADMIN' || r === 'TENANT_ADMIN' || r === 'LEAGUE_ADMIN');
+  if (!clubOnly) return true;
+  const mine = reader?.managingTeamId;
+  return !!mine && (line.teamId === mine || line.opponentId === mine);
 }
 
 /**

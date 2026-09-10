@@ -54,6 +54,20 @@ export function useSurfaceLink() {
       }
     }
 
+    /**
+     * Where the reader was, so the leaf can offer a way back to it rather than to a guess.
+     *
+     * The path only — never its query. The ctx ids above already carry the scope, and putting a
+     * whole encoded URL inside a URL is how an open redirect gets built by accident. `useBackLink`
+     * re-attaches the ctx on the way out, and refuses any `from` that is not a plain path.
+     */
+    if (pathname && !pathname.startsWith('/game/') && !pathname.startsWith('/player/')) {
+      carried.set('from', pathname);
+    } else {
+      const inherited = params.get('from');
+      if (inherited) carried.set('from', inherited);
+    }
+
     const query = carried.toString();
     if (!query) return href;
     return href.includes('?') ? `${href}&${query}` : `${href}?${query}`;

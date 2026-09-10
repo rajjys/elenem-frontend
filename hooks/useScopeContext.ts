@@ -80,9 +80,21 @@ export function useScopeContext(): ScopeContext {
   // organisation, so `/player/abc123` produces the full trail with nothing appended to the URL.
   const playerId = pathname.match(/^\/player\/([^/]+)/)?.[1];
 
+  /**
+   * The player, read through the endpoint the *reader of this page* is entitled to.
+   *
+   * `GET /players/:id` is scoped to the club: a club administrator asking for another club's player
+   * gets a 403. But they may read that player's figures — a league-wide scorers' list is public to
+   * the competition — so the breadcrumb was 403ing on a page that otherwise rendered perfectly, on
+   * every visit, purely to fetch a name the page already had.
+   *
+   * `GET /players/:id/stats` answers the same question inside the permission the page is built on,
+   * and carries the name, the league and the organisation. The query key matches the page's own, so
+   * the two share one response rather than making two requests.
+   */
   const player = useQuery({
-    queryKey: ['scope', 'player', playerId],
-    queryFn: async () => (await api.get(`/players/${playerId}`)).data,
+    queryKey: ['player-stats', playerId, 'current', 'season'],
+    queryFn: async () => (await api.get(`/players/${playerId}/stats`)).data,
     enabled: !!playerId,
     staleTime: ENTITY_STALE_MS,
   });
@@ -91,7 +103,7 @@ export function useScopeContext(): ScopeContext {
   const leagueId =
     ctxLeagueId ??
     game.data?.leagueId ??
-    player.data?.primaryLeague?.id ??
+    player.data?.leagueId ??
     user?.managingLeagueId ??
     undefined;
 
@@ -207,7 +219,7 @@ export function useScopeContext(): ScopeContext {
     // which page this is, and « Joueur » is the one thing the reader already knew.
     player: player.data
       ? {
-          id: player.data.id,
+          id: player.data.playerId ?? player.data.id,
           name: `${player.data.firstName ?? ''} ${player.data.lastName ?? ''}`.trim(),
           short: player.data.lastName ?? player.data.firstName ?? '',
         }
