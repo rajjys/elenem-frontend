@@ -451,7 +451,7 @@ export function StandingsView({
                       Recalculer
                     </button>
                     <Link
-                      href={`/league/settings/rules?ctxLeagueId=${data.leagueId}`}
+                      href={`/league/settings?ctxLeagueId=${data.leagueId}&tab=classement`}
                       className="inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-ink-subtle transition-colors hover:bg-surface hover:text-ink"
                     >
                       <SlidersHorizontal className="h-3 w-3" aria-hidden />

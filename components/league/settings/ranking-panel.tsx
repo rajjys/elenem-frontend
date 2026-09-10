@@ -1,12 +1,10 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import Link from 'next/link';
 import { toast } from 'sonner';
-import { ArrowLeft, GripVertical, Loader2, RefreshCw, X } from 'lucide-react';
+import { GripVertical, Loader2, RefreshCw, X } from 'lucide-react';
 import { Button } from '@/components/ui';
 import { cn, toastApiError } from '@/utils';
-import { useScopeContext } from '@/hooks';
 import {
   RANKING_METRICS,
   TIE_BREAKERS,
@@ -17,6 +15,11 @@ import {
 
 /**
  * The rules that produce a table.
+ *
+ * A tab of `/league/settings` now, rather than a page of its own reachable only from a link under
+ * the classement. It was the most considered screen in the module and the hardest to find: an
+ * organiser looking for « où change-t-on ce qu'une victoire vaut » went to settings, found a name
+ * and a visibility dropdown, and left.
  *
  * The standings screen states them under every table — `PTS = 2 × MG + MP`, the tie-break order,
  * the coloured bands — and this is where they are set. Keeping the two together is the point: a
@@ -32,10 +35,7 @@ import {
  * is a promise the federation has made about its playoff, and LIPROBAKIN's changes every season
  * (ROADMAP_V2 §6, A4). Shipping a guess would put a promise on screen that nobody made.
  */
-export default function StandingsRulesPage() {
-  const ctx = useScopeContext();
-  const leagueId = ctx.leagueId;
-
+export function RankingPanel({ leagueId }: { leagueId: string }) {
   const standings = useStandings(leagueId);
   const updateMut = useUpdateStandingsRules();
   const recalcMut = useRecalculateStandings();
@@ -101,14 +101,6 @@ export default function StandingsRulesPage() {
     );
   }, [form, server]);
 
-  if (!leagueId) {
-    return (
-      <p className="mx-auto max-w-2xl px-4 py-16 text-center text-sm text-ink-muted">
-        Ouvrez une compétition pour modifier ses règles de classement.
-      </p>
-    );
-  }
-
   if (standings.isPending || !form) {
     return (
       <div className="flex justify-center py-24">
@@ -151,23 +143,7 @@ export default function StandingsRulesPage() {
   }
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6">
-      <Link
-        href={`/league/standings?ctxLeagueId=${leagueId}`}
-        className="-ml-2 inline-flex items-center gap-1.5 rounded-md px-2 py-1.5 text-sm font-medium text-ink-muted transition-colors hover:bg-surface-sunk hover:text-ink"
-      >
-        <ArrowLeft className="h-4 w-4 shrink-0" aria-hidden />
-        Retour au classement
-      </Link>
-
-      <header className="mb-6 mt-3">
-        <h1 className="text-2xl font-semibold tracking-tight text-ink">Règles du classement</h1>
-        <p className="mt-1 text-sm text-ink-muted">
-          Ce qu&apos;un résultat vaut, comment les égalités se départagent, et quelles places le
-          tableau met en couleur. Rien ici ne touche à un résultat.
-        </p>
-      </header>
-
+    <div>
       {/* Saving deliberately leaves the table alone; this is the second, explicit act. */}
       {stale && (
         <div className="mb-6 flex flex-wrap items-center gap-3 rounded-lg border border-caution/40 bg-caution-soft px-3.5 py-3 text-sm text-ink">

@@ -315,7 +315,7 @@ export default function StandingsExportPage() {
               <p className="text-xs text-ink-subtle">
                 Aucune bande n&apos;est définie pour cette compétition.{' '}
                 <Link
-                  href={`/league/settings/rules?ctxLeagueId=${leagueId}`}
+                  href={`/league/settings?ctxLeagueId=${leagueId}&tab=classement`}
                   className="text-accent-text underline underline-offset-2"
                 >
                   Les configurer

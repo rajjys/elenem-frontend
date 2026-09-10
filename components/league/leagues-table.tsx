@@ -172,12 +172,12 @@ export function LeaguesTable({ leagues, onSort, sortOrder, sortBy, onDelete } : 
                   <DropdownMenuContent align="end">
                     <DropdownMenuItem asChild>
                       {/* `/league/edit/[leagueId]` rendered the words "Edit League Page" and was
-                          the only thing linking to it. `/league/settings/general` already edits
+                          the only thing linking to it. `/league/settings` already edits
                           every field it would have — name, division, gender, visibility, the
                           current season — so the stub is deleted and this points at the screen that
                           works. Two editors for one resource is drift waiting to happen. */}
                       <Link
-                        href={`/league/settings/general?ctxLeagueId=${league.id}`}
+                        href={`/league/settings?ctxLeagueId=${league.id}`}
                         className="flex items-center"
                       >
                         <Pencil className="mr-2 h-4 w-4" /> Modifier

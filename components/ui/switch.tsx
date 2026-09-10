@@ -32,9 +32,16 @@ export const Switch = React.forwardRef<HTMLInputElement, SwitchProps>(
             className="sr-only"
             {...props}
           />
+          {/* `bg-accent` when on, not `bg-ink-subtle`.
+              
+              A switch has one job — say at a glance whether the thing is on — and grey-on-grey does
+              not do it: at arm's length the only difference between on and off was which side a
+              white dot sat on. The accent is what the rest of the product uses to mean "this is
+              the state you chose", and it is the same colour the reader has already learnt from
+              every selected tab and primary button. */}
           <div
             className={`w-11 h-6 flex items-center flex-shrink-0 p-1 rounded-full cursor-pointer transition-colors duration-300 ${
-              checked ? 'bg-ink-subtle' : 'bg-line'
+              checked ? 'bg-accent' : 'bg-line'
             } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
             onClick={() => {
               if (!disabled) {

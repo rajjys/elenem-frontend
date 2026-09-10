@@ -12,7 +12,7 @@ import { toastApiError } from '@/utils';
 /**
  * A club's own details.
  *
- * The organisation has `/tenant/settings` and a competition has `/league/settings/general`; a club
+ * The organisation has `/tenant/settings` and a competition has `/league/settings`; a club
  * had **nothing** — `/team/edit` rendered the words "Edit Team Page", so a club that spelt its own
  * name wrong at registration had no way to correct it, and no logo could ever be set. That is the
  * one genuine gap among the four "edit" stubs: the other two duplicate a settings screen that

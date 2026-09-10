@@ -4,7 +4,8 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { toast } from 'sonner';
 import { Trophy } from 'lucide-react';
-import { Button, ConfirmDialog, LeagueCard, ListPage } from '@/components/ui';
+import { Button, ConfirmDialog, ListPage } from '@/components/ui';
+import { LeagueCard } from './league-card';
 import { useScopeContext } from '@/hooks/useScopeContext';
 import { useAuthStore } from '@/store/auth.store';
 import { Roles, type LeagueDetails } from '@/schemas';
@@ -88,12 +89,17 @@ export function LeaguesListView() {
       }
     >
       <>
-        <div>
+        {/* Two across once there is room. A federation runs two or three competitions, so a single
+            column left two thirds of a desktop empty and pushed the third card below the fold for
+            no reason. */}
+        <div className="grid gap-3 sm:grid-cols-2">
           {leagues.map((league) => (
             <LeagueCard
               key={league.id}
               league={league}
-              onDeleteLeague={() => setToDelete(league)}
+              href={`/league/dashboard?ctxLeagueId=${league.id}`}
+              canManage={canManage}
+              onDelete={canManage ? () => setToDelete(league) : undefined}
             />
           ))}
         </div>

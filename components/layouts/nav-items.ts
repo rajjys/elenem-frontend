@@ -175,7 +175,7 @@ export const leagueNavItems: NavGroup[] = [
     // Added with the page itself. `/post/create` has redirected here on success since it was
     // written, and there was no way to reach the list any other way.
     { label: 'Actualités', basePath: '/league/posts', icon: Newspaper },
-    { label: 'Paramètres', basePath: '/league/settings/general', icon: Settings },
+    { label: 'Paramètres', basePath: '/league/settings', icon: Settings },
     ],
   },
 ];
