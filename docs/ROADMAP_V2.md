@@ -581,3 +581,53 @@ does *not* do yet:
   Phase 5, with the rest of the public site.
 - **Touch drag on the calendar**, and **long rosters on the scoresheet** — both parked since
   Phase 3 opened (§10.2), both still unasked-for.
+
+
+---
+
+## 13. Phase 4 closed, Phase 5 opened (2026-09-11)
+
+Four decisions from the closing conversation, each reversing something written above. The full
+handover is `docs/HANDOVER_PHASE5.md`; the infrastructure is `docs/INFRASTRUCTURE.md`.
+
+### The product is renamed **DXScores**
+
+`elenem.com` was not available. `dxscores.com` and `dxscores.app` are registered. `dx` as in `d/dx`
+— deriving something from the numbers, which is what a table and a scorers' list are. The code,
+repositories and these documents still say *elenem*; renaming is Phase 5 work, ordered
+strings-first and repositories-last, because renaming a repository breaks every deploy hook.
+
+### Item 17 is **not blocking**, and that wording is withdrawn
+
+It reads *"S3 wired. Blocking for the public site"*. It is not. Most Congolese clubs have no
+recognisable logo, and a federation that has never published a photograph still has a table, a
+calendar and results — which is the whole product. **A missing image must never stop a game being
+saved, a standing being computed or a page being served.** Placeholders everywhere; R2 when
+convenient. Launching is the requirement.
+
+### Item 24 — **blog posts**, which were never on this roadmap
+
+The `Post` model has been complete for months — Markdown, rich content, excerpt, type, status,
+scheduling, hero image, scoped by target — and the admin side exists. Only the public rendering is
+missing. It belongs in Phase 5.
+
+**But not as the hero.** Most local leagues do not blog; that is a feature of bigger, more organised
+federations. The interactive value — the owner's words, *"that's where the money is"* — is
+**standings, schedules and completed games**. A tenant's public site is ordered by that, and a news
+section on a federation with no posts is hidden rather than shown empty.
+
+### The platform is **self-serve**
+
+The old version depended on the owner onboarding each federation by hand. The marketing CTA is
+**"start for free"**. This is the reason `*.dxscores.app` sits on Vercel's nameservers: a federation
+that signs up at nine has a live site at 09:01, with nobody in the loop.
+
+It creates one obligation nobody has met: **reserved slugs**. A slug becomes a public hostname the
+instant somebody registers, so `www`, `api`, `app`, `admin`, `media`, `cdn` and friends must be
+refused server-side.
+
+### Phase 5, re-ordered
+
+Deploy what exists first — it flushes out environment problems while they are cheap — then the
+tenant public site (standings, schedule, results), then the rename, then the marketing site, then
+SEO, then R2 and blogging, then LIPROBAKIN in person.
