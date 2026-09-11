@@ -1,8 +1,10 @@
 import { format, isToday, isYesterday, isTomorrow, differenceInCalendarDays } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
-export function formatDateFr(isoDate: string): string {
-  const date = new Date(isoDate);
+export function formatDateFr(isoDate: string | Date): string {
+  // A `Date` as readily as a string: the API sends ISO text, but several schemas parse it into a
+  // `Date` on the way in, and every call site was otherwise obliged to remember which.
+  const date = isoDate instanceof Date ? isoDate : new Date(isoDate);
   const now = new Date();
 
   if (isToday(date)) {

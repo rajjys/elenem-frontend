@@ -39,7 +39,7 @@ export default function PublicGamesPage() {
           const dates = response.data;
           if (!dates || dates.length === 0) {
             toast.info("Aucune date de match disponible.");
-            //console.warn("No available dates found.");
+            //console.warn("Aucune date disponible.");
             return;
           }
           setAvailableDates(dates);

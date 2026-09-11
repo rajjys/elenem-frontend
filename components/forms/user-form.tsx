@@ -26,20 +26,20 @@ import { useAuthStore } from '@/store/auth.store'; // Import useAuthStore
 // Define the schema for the user form based on the provided User model
 const userFormSchema = z.object({
   username: z.string().min(3, "Username must be at least 3 characters."),
-  email: z.string().email("Invalid email address."),
-  password: z.string().min(8, "Password must be at least 8 characters.").optional().or(z.literal('')),
-  firstName: z.string().min(1, "First name is required."),
-  lastName: z.string().min(1, "Last name is required."),
-  profileImageUrl: z.string().url("Invalid URL").optional().or(z.literal('')),
+  email: z.string().email("Adresse e-mail invalide."),
+  password: z.string().min(8, "Le mot de passe doit faire au moins 8 caractères.").optional().or(z.literal('')),
+  firstName: z.string().min(1, "Le prénom est obligatoire."),
+  lastName: z.string().min(1, "Le nom est obligatoire."),
+  profileImageUrl: z.string().url("Adresse invalide.").optional().or(z.literal('')),
   phone: z.string().optional().or(z.literal('')),
   dateOfBirth: z.string().optional(),
   nationality: z.string().optional().or(z.literal('')),
   gender: z.nativeEnum(Gender).optional(),
-  bio: z.string().max(500, "Bio cannot exceed 500 characters.").optional().or(z.literal('')),
-  avatarUrl: z.string().url("Invalid URL").optional().or(z.literal('')),
+  bio: z.string().max(500, "La biographie ne peut pas dépasser 500 caractères.").optional().or(z.literal('')),
+  avatarUrl: z.string().url("Adresse invalide.").optional().or(z.literal('')),
   preferredLanguage: z.nativeEnum(SupportedLanguages).optional(),
   timezone: z.string().optional().or(z.literal('')),
-  tenantId: z.string().cuid("Invalid Tenant ID").optional().or(z.literal("")),
+  tenantId: z.string().cuid("Organisation invalide.").optional().or(z.literal("")),
 });
 
 export type UserFormValues = z.infer<typeof userFormSchema>;
@@ -111,8 +111,8 @@ export function UserForm({
   useEffect(() => {
     if (!isEditMode && creationMethod === 'password') {
       register("password", {
-        required: "Password is required for new users.",
-        minLength: { value: 8, message: "Password must be at least 8 characters." },
+        required: "Un mot de passe est obligatoire pour un nouveau compte.",
+        minLength: { value: 8, message: "Le mot de passe doit faire au moins 8 caractères." },
       });
     } else {
       register("password", { required: false });
@@ -149,7 +149,7 @@ export function UserForm({
           });
         } catch (error) {
           console.error('Failed to fetch user details:', error);
-          toast.error("Failed to load user details.", { description: "User not found or access denied." });
+          toast.error("Ce compte n’a pas pu être chargé.", { description: "User not found or access denied." });
           onCancel?.(); // Go back if user not found/accessible
         } finally {
           setLoadingForm(false);
@@ -176,7 +176,7 @@ export function UserForm({
           setAvailableTenants(response.data.data);
         } catch (error) {
           console.error('Failed to fetch tenants:', error);
-          toast.error("Failed to load tenants for selection.");
+          toast.error("Les organisations n’ont pas pu être chargées.");
         } finally {
           setLoadingTenants(false);
         }
@@ -190,7 +190,7 @@ export function UserForm({
 
   const onSubmit = useCallback(async (data: UserFormValues) => {
     if (!user) {
-      toast.error("Authentication required.", { description: "Please log in to perform this action." });
+      toast.error("Vous devez être connecté.", { description: "Connectez-vous pour effectuer cette action." });
       return;
     }
 
@@ -264,7 +264,7 @@ export function UserForm({
   }
 
   if (user === null) { // Not authenticated
-    toast.error("Authentication required", { description: "Please log in to access user management." });
+    toast.error("Vous devez être connecté.", { description: "Connectez-vous pour gérer les utilisateurs." });
     // This redirect should ideally happen at the page level, but as a fallback for the component
     if (typeof window !== 'undefined') {
       window.location.href = '/login'; // Direct redirect for unauthenticated state
@@ -338,7 +338,7 @@ export function UserForm({
       )}
 
       <div>
-        <Label htmlFor="username">Username</Label>
+        <Label htmlFor="username">Nom d’utilisateur</Label>
         <Input id="username" {...register("username")} disabled={overallLoading} />
         {errors.username && (
           <p className="text-negative text-xs mt-1">{errors.username.message}</p>
@@ -346,7 +346,7 @@ export function UserForm({
       </div>
 
       <div>
-        <Label htmlFor="email">Email</Label>
+        <Label htmlFor="email">Adresse e-mail</Label>
         <Input id="email" type="email" {...register("email")} disabled={overallLoading} />
         {errors.email && (
           <p className="text-negative text-xs mt-1">{errors.email.message}</p>
@@ -408,14 +408,14 @@ export function UserForm({
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <Label htmlFor="firstName">First Name</Label>
+          <Label htmlFor="firstName">Prénom</Label>
           <Input id="firstName" {...register("firstName")} disabled={overallLoading} />
           {errors.firstName && (
             <p className="text-negative text-xs mt-1">{errors.firstName.message}</p>
           )}
         </div>
         <div>
-          <Label htmlFor="lastName">Last Name</Label>
+          <Label htmlFor="lastName">Nom</Label>
           <Input id="lastName" {...register("lastName")} disabled={overallLoading} />
           {errors.lastName && (
             <p className="text-negative text-xs mt-1">{errors.lastName.message}</p>
@@ -543,7 +543,7 @@ export function UserForm({
           </Button>
         )}
         <Button type="submit" disabled={overallLoading}>
-          {isSubmitting ? "Saving..." : isEditMode ? "Save Changes" : "Create User"}
+          {isSubmitting ? "Enregistrement…" : isEditMode ? "Enregistrer" : "Créer le compte"}
         </Button>
       </div>
     </form>

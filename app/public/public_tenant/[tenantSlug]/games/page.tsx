@@ -41,7 +41,7 @@ export default function PublicGamesPage({ params }: { params: Promise<{ tenantSl
           const dates = response.data;
           if (!dates || dates.length === 0) {
             //toast.error("Aucune date de match disponible.");
-            console.warn("No available dates found.");
+            console.warn("Aucune date disponible.");
             return;
           }
           setAvailableDates(dates);

@@ -17,6 +17,16 @@ export const UserBasicSchema = z.object({
   lastName: z.string().min(1, 'Last name is required'),
   roles: z.array((RoleSchema)).default([Roles.GENERAL_USER]), // User can have multiple roles
   isActive: z.boolean(),
+  /**
+   * Both are on the list payload and both are on the list *screen*: an unverified address is the
+   * commonest reason somebody cannot sign in, and « jamais connecté » is how you spot an account
+   * that was created and never used.
+   */
+  isEmailVerified: z.boolean().optional().default(false),
+  // `z.coerce.date()` rather than a hand-rolled `preprocess`: it parses the ISO text the API sends
+  // and infers `Date` cleanly, where the preprocess form infers an empty object under zod 4 and
+  // every read of it becomes a type error.
+  lastLoginAt: z.coerce.date().nullable().optional(),
   avatarUrl: z.string().url().optional().or(z.literal('')).nullable(), // Allowing empty string for optional URL
   profileImageUrl: z.string().url().optional().or(z.literal('')).nullable(), // Allowing empty string for optional URL
   createdAt: z.preprocess((arg) => (typeof arg === 'string' ? new Date(arg) : arg), z.date()),
@@ -45,7 +55,7 @@ export const UserDetailSchema = UserBasicSchema.extend({
   profileVisibility: z.record(z.string(), z.any()).optional().nullable(), // For flexible JSON object
 
   isEmailVerified: z.boolean(),
-  lastLoginAt: z.preprocess((arg) => (typeof arg === 'string' ? new Date(arg) : arg), z.date()).optional().nullable(),
+  lastLoginAt: z.coerce.date().nullable().optional(),
 
   // Audit fields, typically read-only on frontend forms
   createdById: z.string().cuid().optional().nullable(),
@@ -53,11 +63,16 @@ export const UserDetailSchema = UserBasicSchema.extend({
   deletedAt: z.preprocess((arg) => (typeof arg === 'string' ? new Date(arg) : arg), z.date()).optional().nullable(),
   deletedById: z.string().cuid().optional().nullable(),
 
-  // Security fields, also mostly read-only or managed via specific forms
-  lastPasswordChange: z.preprocess((arg) => (typeof arg === 'string' ? new Date(arg) : arg), z.date()),
-  failedLoginAttempts: z.number().int(),
-  accountLocked: z.boolean(),
-  accountLockedUntil: z.preprocess((arg) => (typeof arg === 'string' ? new Date(arg) : arg), z.date()).optional().nullable(),
+  /**
+   * The security columns are gone, and nothing here ever read them.
+   *
+   * `lastPasswordChange`, `failedLoginAttempts`, `accountLocked` and `accountLockedUntil` used to
+   * arrive because the server spread the whole row — alongside `passwordResetToken` and
+   * `verificationToken`, which is the leak closed in the backend's 603db19. They were declared
+   * here as *required*, so leaving them would have turned that fix into a parse error on every
+   * user detail. No screen reads them; a lock-out surface, if one is ever built, gets a purpose-made
+   * endpoint rather than the side effect of an over-broad projection.
+   */
   mfaSecret: z.string().optional().nullable(),
   emailVerified: z.boolean().optional().nullable(),
   // passwordHistory is a relation, not a direct field on User

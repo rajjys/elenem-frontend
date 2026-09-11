@@ -217,7 +217,7 @@ export function TeamsFilters({ filters, onFilterChange, onPageSizeChange, fixedT
         <Input
           id="teamSearch"
           type="search"
-          placeholder="Search by name or short code"
+          placeholder="Rechercher un nom ou une abréviation…"
           value={search}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value)}
         />

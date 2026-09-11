@@ -72,7 +72,7 @@ export function PostsFilters({
       const response = await api.get("/tenants?pageSize=100");
       setAvailableTenants(response.data.data);
     } catch (err) {
-      toast.error("Failed to fetch tenants.");
+      toast.error("Les organisations n’ont pas pu être chargées.");
       console.error("Fetch tenants error:", err);
     }
   }, [fixedTenantId, isSystemAdmin]);
@@ -176,7 +176,7 @@ export function PostsFilters({
         <Input
           id="postSearch"
           type="search"
-          placeholder="Recherchez un post"
+          placeholder="Rechercher une actualité…"
           value={search}
           onChange={e => setSearch(e.target.value)}
         />
@@ -201,16 +201,16 @@ export function PostsFilters({
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 py-4">
             {isSystemAdmin && !fixedTenantId && (
               <div>
-                <Label htmlFor="tenantId">Tenant</Label>
+                <Label htmlFor="tenantId">Organisation</Label>
                 <Select
                   value={selectedTenantId}
                   onValueChange={value => setSelectedTenantId(value === "clear_selection" ? "" : value)}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Select Tenant" />
+                    <SelectValue placeholder="Toutes les organisations" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="clear_selection">Clear Selection</SelectItem>
+                    <SelectItem value="clear_selection">Tout effacer</SelectItem>
                     {availableTenants.map(tenant => (
                       <SelectItem key={tenant.id} value={tenant.id}>
                         {tenant.name}
@@ -222,16 +222,16 @@ export function PostsFilters({
             )}
 
             <div>
-              <Label htmlFor="postStatus">Status</Label>
+              <Label htmlFor="postStatus">État</Label>
               <Select
                 value={selectedStatus || ""}
                 onValueChange={(value: PostStatus) => setSelectedStatus(!value ? undefined : value)}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select Post Status" />
+                  <SelectValue placeholder="Tous les états" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="clear_selection">Clear Selection</SelectItem>
+                  <SelectItem value="clear_selection">Tout effacer</SelectItem>
                   {statusOptions.map(option => (
                     <SelectItem key={option.value} value={option.value}>
                       {option.label}
@@ -242,16 +242,16 @@ export function PostsFilters({
             </div>
 
             <div>
-              <Label htmlFor="targetType">Target Type</Label>
+              <Label htmlFor="targetType">Portée</Label>
               <Select
                 value={selectedTargetType || ""}
                 onValueChange={(value: PostTargetType) => setSelectedTargetType(!value ? undefined : value)}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select Target Type" />
+                  <SelectValue placeholder="Toutes les portées" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="clear_selection">Clear Selection</SelectItem>
+                  <SelectItem value="clear_selection">Tout effacer</SelectItem>
                   {postTargetTypeOptions.map(option => (
                     <SelectItem key={option.value} value={option.value}>
                       {option.label}
@@ -262,16 +262,16 @@ export function PostsFilters({
             </div>
 
             <div>
-              <Label htmlFor="postType">Post Type</Label>
+              <Label htmlFor="postType">Type</Label>
               <Select
                 value={selectedPostType || ""}
                 onValueChange={(value: PostType) => setSelectedPostType(!value ? undefined : value)}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select Post Type" />
+                  <SelectValue placeholder="Tous les types" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="clear_selection">Clear Selection</SelectItem>
+                  <SelectItem value="clear_selection">Tout effacer</SelectItem>
                   {postTypeOptions.map(option => (
                     <SelectItem key={option.value} value={option.value}>
                       {option.label}

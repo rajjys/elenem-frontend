@@ -179,7 +179,7 @@ export function LeagueFilters({ filters, onFilterChange, onPageSizeChange }: Lea
         <Input
           id="leagueSearch"
           type="search"
-          placeholder="Search by name or code"
+          placeholder="Rechercher un nom ou un code…"
           value={search}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value)}
         />

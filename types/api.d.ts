@@ -382,6 +382,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/leagues/{leagueId}/identity": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Name, division and gender of a competition */
+        get: operations["LeaguesController_getLeagueIdentity"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/leagues/{leagueId}": {
         parameters: {
             query?: never;
@@ -677,6 +694,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/players/stats/leaderboard": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Players ranked over a season or one of its phases */
+        get: operations["PlayersController_leaderboard"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/players": {
         parameters: {
             query?: never;
@@ -709,6 +743,23 @@ export interface paths {
         post?: never;
         /** Delete (soft-delete) player by ID (scope checked) */
         delete: operations["PlayersController_deletePlayer"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/players/{playerId}/stats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One player’s season line and the games behind it */
+        get: operations["PlayersController_getPlayerStats"];
+        put?: never;
+        post?: never;
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -782,6 +833,93 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/seasons/{seasonId}/stages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The phases of a season, in order, with what each holds */
+        get: operations["StagesController_list"];
+        put?: never;
+        /** Add a phase to the end of a season */
+        post: operations["StagesController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/seasons/{seasonId}/stages/template": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Compose a season from a template */
+        post: operations["StagesController_applyTemplate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/seasons/{seasonId}/stages/order": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Put a season’s phases in a new order */
+        put: operations["StagesController_reorder"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/stages/{stageId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Rename a phase, or change its format, legs or qualification */
+        put: operations["StagesController_update"];
+        post?: never;
+        /** Remove a phase */
+        delete: operations["StagesController_remove"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/stage-groups/{groupId}/members": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Set which clubs are in a pool */
+        put: operations["StagesController_setMembers"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/seasons": {
         parameters: {
             query?: never;
@@ -814,6 +952,23 @@ export interface paths {
         post?: never;
         /** Delete (soft-delete) season by ID (scope checked) */
         delete: operations["SeasonsController_deleteSeason"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/seasons/{seasonId}/transitions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Move a season to another state (open, close, cancel, reopen) */
+        post: operations["SeasonsController_transitionSeason"];
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -853,15 +1008,15 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/tenants": {
+    "/dashboard/organiser": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /** List tenants with filtering and pagination (scoped by role) */
-        get: operations["TenantsController_listTenants"];
+        /** Everything an organiser owes their competitions right now */
+        get: operations["DashboardController_organiser"];
         put?: never;
         post?: never;
         delete?: never;
@@ -870,7 +1025,77 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/tenants/create": {
+    "/dashboard/platform": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** What exists on the platform, and what happened this week */
+        get: operations["DashboardController_platform"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/dashboard/club": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Where a club stands, when it plays next, and how the last ones went */
+        get: operations["DashboardController_club"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/planned-fixtures": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** What a phase still has to be drawn */
+        get: operations["PlannedFixturesController_list"];
+        put?: never;
+        /** Reserve a hall and an hour for a fixture whose teams are not yet known */
+        post: operations["PlannedFixturesController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/planned-fixtures/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Move it, rename its sides, or mark it conditional */
+        put: operations["PlannedFixturesController_update"];
+        post?: never;
+        /** Drop it — a barrage that turned out not to be necessary */
+        delete: operations["PlannedFixturesController_remove"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/planned-fixtures/{id}/promote": {
         parameters: {
             query?: never;
             header?: never;
@@ -879,98 +1104,8 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Create a new tenant organization */
-        post: operations["TenantsController_createTenant"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/tenants/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get full details of a specific tenant */
-        get: operations["TenantsController_getTenantById"];
-        /** Update tenant organization details */
-        put: operations["TenantsController_updateTenant"];
-        post?: never;
-        /** Soft-delete or archive a tenant */
-        delete: operations["TenantsController_deleteTenant"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/public-tenants": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List all public tenants with filtering and pagination */
-        get: operations["PublicTenantsController_listPublicTenants"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/public-tenants/{slug}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get a single public tenant by its slug */
-        get: operations["PublicTenantsController_getTenantBySlug"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/sport-rules/{sportType}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Retrieve point system and tie-breaker rules for a specific sport */
-        get: operations["SportRulesController_getSportRules"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/games/generate-fixtures": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Generate a round-robin fixture list for a season
-         * @description Builds the whole schedule in one call instead of creating games one at a time. Send dryRun=true first to preview the matchdays, then repeat with dryRun=false to write them. Fixtures that clash are reported and skipped rather than failing the whole run.
-         */
-        post: operations["GamesController_generateFixtures"];
+        /** Name the two teams and turn it into a fixture */
+        post: operations["PlannedFixturesController_promote"];
         delete?: never;
         options?: never;
         head?: never;
@@ -988,6 +1123,86 @@ export interface paths {
         get: operations["GamesController_getLeagueStandings"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/games/standings/view": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * The league table, with the rules that produced it
+         * @description Carries the column heads in this sport’s vocabulary (MJ · MG · MP · FI · P.M · P.E · +/- · PTS for basketball), when it was last computed, how many results it is derived from, and the points rule written out — because a table a committee cannot re-derive is a table they will go on computing by hand.
+         */
+        get: operations["GamesController_getStandingsView"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/games/standings/rules": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * What a result is worth, how ties are broken, and which clubs the table colours
+         * @description The only editable thing on a standings screen. It does not recalculate on its own: changing the points for a win invalidates every row of every season, and rewriting history because somebody opened a settings screen is not something this product should do quietly.
+         */
+        put: operations["GamesController_updateStandingsRules"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/games/standings/export.xlsx": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * The published table as a spreadsheet
+         * @description The other half of the export. The PDF is produced in the browser, where the operator can see what they are adjusting; this is what gets forwarded to somebody who wants to work with the numbers, so the cells are numbers. Same heading, bands and footer as the document — the two circulate together.
+         */
+        get: operations["GamesController_exportStandingsXlsx"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/games/standings/recalculate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Rebuild a season’s table from its games
+         * @description Not a repair tool — results already recompute rather than accumulate. It exists for the drift the engine cannot see: a point system or tie-break order changed in settings, leaving every row computed under a rule nobody is using any more.
+         */
+        post: operations["GamesController_recalculateStandings"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1057,6 +1272,46 @@ export interface paths {
         put: operations["GamesController_updateGame"];
         post?: never;
         delete: operations["GamesController_deleteGame"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/games/{id}/invert": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Swap which club is at home
+         * @description For the fixture typed the wrong way round. The pairing itself stays immutable — a genuine change of opponents is a cancelled fixture and a new one, not the same one edited. Refused once a score exists, because home and away then say which club scored what.
+         */
+        post: operations["GamesController_invertGame"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/games/{id}/audit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * A fixture's history — what changed, when, by whom, and why
+         * @description The point of the product is that nobody argues about what changed, which needs the record to be readable by the people who would otherwise argue. A club administrator is one of them — « pourquoi ce match est-il passé au dimanche » is their question, and the service bounds them to the two clubs that played.
+         */
+        get: operations["GamesController_getGameAudit"];
+        put?: never;
+        post?: never;
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -1305,6 +1560,50 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/games/{id}/box-score": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Both rosters, with whatever has been recorded per player
+         * @description Shaped like the paper it is copied from: baskets by kind, and points derived from them. Returns every eligible player, scoring or not, so the operator can work down the sheet in front of them rather than searching for names.
+         */
+        get: operations["GamesController_getBoxScore"];
+        /**
+         * Record or correct the box score
+         * @description Replaces the sheet rather than merging into it: the operator has the whole thing in front of them. Deliberately does not touch the final score — a box score that disagrees with the recorded result is the discrepancy the officials check for on paper, and resolving it silently would destroy the only signal that something was mistyped.
+         */
+        put: operations["GamesController_saveBoxScore"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/games/{id}/box-score/players": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Add a player to one of the two rosters, from the sheet
+         * @description Rosters in this market are not finished when the season starts: clubs are still recruiting, and youth squads are known on the morning of the game. A sheet that can only name players registered in advance is a sheet that does not get typed up. The game supplies tenant, league and sport, and bounds the teams — so this cannot reach into a third club.
+         */
+        post: operations["GamesController_addBoxScorePlayer"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/public-games/dates": {
         parameters: {
             query?: never;
@@ -1382,6 +1681,110 @@ export interface paths {
         };
         /** Get a single public game by its slug and league */
         get: operations["PublicGamesController_getGameBySlug"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/sport-rules/{sportType}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Retrieve point system and tie-breaker rules for a specific sport */
+        get: operations["SportRulesController_getSportRules"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/tenants": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List tenants with filtering and pagination (scoped by role) */
+        get: operations["TenantsController_listTenants"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/tenants/create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create a new tenant organization */
+        post: operations["TenantsController_createTenant"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/tenants/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get full details of a specific tenant */
+        get: operations["TenantsController_getTenantById"];
+        /** Update tenant organization details */
+        put: operations["TenantsController_updateTenant"];
+        post?: never;
+        /** Soft-delete or archive a tenant */
+        delete: operations["TenantsController_deleteTenant"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public-tenants": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List all public tenants with filtering and pagination */
+        get: operations["PublicTenantsController_listPublicTenants"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public-tenants/{slug}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a single public tenant by its slug */
+        get: operations["PublicTenantsController_getTenantBySlug"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1705,6 +2108,86 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/calendar/draft": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Draft a fixture list. Writes nothing.
+         * @description Existing games are inputs, never regenerated: every fixture already on record removes both a slot and a pairing. Returns the draft the organiser studies, plus the checks a secretary does by hand today — who is short of fixtures, which pairing already happened, what had no room. Publish it with POST /calendar/publish.
+         */
+        post: operations["CalendarController_draft"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/calendar/publish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Write a studied draft to the calendar
+         * @description Takes the fixture list back rather than regenerating it, so what gets published is what was on screen. Each fixture passes the same conflict checks as one created by hand; a clash is reported and skipped rather than aborting the run.
+         */
+        post: operations["CalendarController_publish"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/calendar/reorder": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Reassign the start times inside one stack
+         * @description A stack is a hall on a day, not a day: two fixtures in different rooms do not compete for the same hours. The requested times must be a permutation of the times these fixtures already hold, which is what makes it a reorder rather than a bulk edit — and what makes it safe, since the hall is provably as free afterwards as before. Played fixtures are refused: dragging is how a calendar is planned, not how history is rearranged.
+         */
+        post: operations["CalendarController_reorder"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/calendar/annotate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Explain a change that was just made
+         * @description A drag has to land instantly or it is not worth doing, so the reason cannot be collected before the change commits. This writes it onto the audit entries the change produced — the same rows, not new ones, because there was one decision. Limited to this user’s own entries from the last quarter of an hour.
+         */
+        post: operations["CalendarController_annotate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1865,13 +2348,28 @@ export interface components {
             createdAt?: string | null;
             /** Format: date-time */
             updatedAt?: string | null;
-            lastLoginAt?: Record<string, never> | null;
+            /** Format: date-time */
+            lastLoginAt?: string | null;
             tenant?: components["schemas"]["UserTenantLiteDto"] | null;
             managingLeague?: components["schemas"]["ManagingLeagueResponseDto"] | null;
             managingTeam?: components["schemas"]["ManagingTeamResponseDto"] | null;
             playerProfile?: components["schemas"]["PlayerProfileResponseDto"] | null;
             refereeProfile?: components["schemas"]["RefereeProfileResponseDto"] | null;
             coachProfile?: components["schemas"]["CoachProfileResponseDto"] | null;
+            externalId?: Record<string, never> | null;
+            phone?: Record<string, never> | null;
+            avatarUrl?: Record<string, never> | null;
+            profileImageUrl?: Record<string, never> | null;
+            /** Format: date-time */
+            dateOfBirth?: string | null;
+            nationality?: Record<string, never> | null;
+            bio?: Record<string, never> | null;
+            timezone?: Record<string, never> | null;
+            profileVisibility?: Record<string, never> | null;
+            notificationPreferences?: Record<string, never> | null;
+            tenantId?: Record<string, never> | null;
+            managingLeagueId?: Record<string, never> | null;
+            managingTeamId?: Record<string, never> | null;
         };
         UpdateUserProfileDto: {
             /**
@@ -2318,8 +2816,6 @@ export interface components {
             parentLeagueId?: Record<string, never>;
             /** @description The updated business profile details for the league. */
             businessProfile?: components["schemas"]["BusinessProfileDto"];
-            /** @description The ID of the current active season for the league. */
-            currentSeasonId?: Record<string, never>;
         };
         LeagueSettingsDto: {
             /**
@@ -2601,6 +3097,59 @@ export interface components {
             /** @description Player brief public bio */
             bio?: string;
         };
+        StageOptionDto: {
+            id: string;
+            name: string;
+            /** @enum {string} */
+            format: "LEAGUE" | "GROUPS" | "KNOCKOUT";
+            order: number;
+        };
+        LeaderboardRowDto: {
+            rank: number;
+            playerId: string;
+            firstName: string;
+            lastName: string;
+            slug: string;
+            jerseyNumber?: Record<string, never> | null;
+            position?: Record<string, never> | null;
+            profileImageUrl?: Record<string, never> | null;
+            /** @description The club of their most recent appearance. */
+            teamId?: Record<string, never> | null;
+            teamName?: Record<string, never> | null;
+            teamShortCode?: Record<string, never> | null;
+            multipleTeams: boolean;
+            /** @description Appearances. The row on a sheet is the appearance, zeroes included. */
+            gamesPlayed: number;
+            /** @description Totals per sport column code, summed over every appearance. */
+            stats: Record<string, never>;
+            /** @description Σ value × weight. Never stored, on either side of the wire. */
+            total: number;
+            /** @description Total per appearance, to one decimal. */
+            average: number;
+        };
+        PlayerLeaderboardDto: {
+            leagueId: string;
+            leagueName: string;
+            seasonId: string;
+            seasonName: string;
+            /** @description Null when the list covers the whole season. */
+            stageId: Record<string, never> | null;
+            /** @description The season’s phases, in the order they run. */
+            stages: components["schemas"]["StageOptionDto"][];
+            /** @description Column heads, in this sport’s vocabulary. */
+            columns: Record<string, never>[];
+            totalAbbr: string;
+            totalLabel: string;
+            /** @description Completed fixtures in scope. */
+            gamesCompleted: number;
+            /** @description Of those, how many have a scoresheet. */
+            gamesWithSheet: number;
+            /** @description The appearance floor applied. */
+            minGames: number;
+            /** @description Players hidden by that floor. */
+            belowMinimum: number;
+            rows: components["schemas"]["LeaderboardRowDto"][];
+        };
         BasicTeamDto: {
             id: string;
             name: string;
@@ -2763,6 +3312,61 @@ export interface components {
             /** @description ID of the associated user account (if creating a player with a linked user). */
             userId?: string;
         };
+        SeasonOptionDto: {
+            id: string;
+            name: string;
+        };
+        PlayerGameLineDto: {
+            gameId: string;
+            dateTime: string;
+            stageName: string;
+            /** @description The club they played for in this match. */
+            teamId: string;
+            teamName: string;
+            /** @description The other club's id. Present so a client can decide whether this line is openable — a club administrator may read only the fixtures their own club played. */
+            opponentId: string;
+            opponentName: string;
+            opponentShortCode?: Record<string, never> | null;
+            isHome: boolean;
+            teamScore?: Record<string, never> | null;
+            opponentScore?: Record<string, never> | null;
+            /** @enum {string|null} */
+            outcome: "WIN" | "LOSS" | "DRAW" | null;
+            stats: Record<string, never>;
+            total: number;
+        };
+        PlayerStatsDto: {
+            playerId: string;
+            firstName: string;
+            lastName: string;
+            slug: string;
+            jerseyNumber?: Record<string, never> | null;
+            position?: Record<string, never> | null;
+            profileImageUrl?: Record<string, never> | null;
+            dateOfBirth?: Record<string, never> | null;
+            nationality?: Record<string, never> | null;
+            /** @description Their club on the roster today. */
+            teamId?: Record<string, never> | null;
+            teamName?: Record<string, never> | null;
+            leagueId: string;
+            leagueName: string;
+            tenantId: string;
+            tenantName: string;
+            seasonId: string;
+            seasonName: string;
+            seasons: components["schemas"]["SeasonOptionDto"][];
+            stageId: Record<string, never> | null;
+            stages: components["schemas"]["StageOptionDto"][];
+            columns: Record<string, never>[];
+            totalAbbr: string;
+            totalLabel: string;
+            gamesPlayed: number;
+            stats: Record<string, never>;
+            total: number;
+            average: number;
+            /** @description Most recent first. */
+            games: components["schemas"]["PlayerGameLineDto"][];
+        };
         AssignPlayerToTeamDto: {
             /** @description ID of the player to assign/unassign. */
             playerId: string;
@@ -2814,6 +3418,56 @@ export interface components {
              */
             visibility?: "PUBLIC" | "PRIVATE" | "RESERVED";
         };
+        StageResponseDto: {
+            id: string;
+            name: string;
+            order: number;
+            /** @enum {string} */
+            format: "LEAGUE" | "GROUPS" | "KNOCKOUT";
+            legs: number;
+            advancing: Record<string, never> | null;
+            seasonId: string;
+            fixtureCount: number;
+            playedCount: number;
+            groups: Record<string, never>[];
+        };
+        CreateStageDto: {
+            /** @example Play-offs */
+            name: string;
+            /** @enum {string} */
+            format: "LEAGUE" | "GROUPS" | "KNOCKOUT";
+            /** @description How many times everyone plays everyone. LEAGUE only. */
+            legs?: number;
+            /** @description How many clubs go through from this phase. */
+            advancing?: number;
+            /** @description How many pools to create. GROUPS only. */
+            groupCount?: number;
+            reason?: string;
+        };
+        ApplyTemplateDto: {
+            /** @enum {string} */
+            template: "SIMPLE" | "LEAGUE_PLAYOFFS" | "GROUPS_KNOCKOUT";
+            /** @description How many clubs go through to the knockout. */
+            advancing?: number;
+            /** @description How many pools, for a GROUPS template. */
+            groupCount?: number;
+        };
+        ReorderStagesDto: {
+            /** @description Every phase of the season, in its new order. A permutation of what is there — nothing invented, nothing dropped, which is what makes "reorder" mean what it says. */
+            stageIds: string[];
+        };
+        UpdateStageDto: {
+            name?: string;
+            /** @enum {string} */
+            format?: "LEAGUE" | "GROUPS" | "KNOCKOUT";
+            legs?: number;
+            advancing?: Record<string, never> | null;
+            reason?: string;
+        };
+        SetGroupMembersDto: {
+            /** @description The clubs in this pool, replacing what was there. */
+            teamIds: string[];
+        };
         TenantMiniResponseDto: {
             id: string;
             name: string;
@@ -2836,13 +3490,15 @@ export interface components {
             name: string;
             description?: Record<string, never> | null;
             /** @enum {string} */
-            status: "UNKNOWN" | "PLANNING" | "SCHEDULED" | "ACTIVE" | "PAUSED" | "COMPLETED" | "CANCELED" | "ARCHIVED" | "DELETED";
+            status: "PLANNING" | "ACTIVE" | "COMPLETED" | "CANCELED";
             /** Format: date-time */
             startDate: string;
             /** Format: date-time */
             endDate: string;
-            /** @description INdicates if the season is currently active */
-            isActive: boolean;
+            /** @description Fixtures on record, excluding cancelled ones. */
+            fixtureCount: number;
+            /** @description How many of those fixtures have a result. */
+            playedCount: number;
             leagueId?: string | null;
             tenantId?: string | null;
             /** Format: date-time */
@@ -2875,19 +3531,8 @@ export interface components {
              * @example 2024-05-31
              */
             endDate: string;
-            /**
-             * @description Initial status of the season. Defaults to PLANNING.
-             * @default PLANNING
-             * @enum {string}
-             */
-            status: "UNKNOWN" | "PLANNING" | "SCHEDULED" | "ACTIVE" | "PAUSED" | "COMPLETED" | "CANCELED" | "ARCHIVED" | "DELETED";
             /** @description Description of the season */
             description?: string;
-            /**
-             * @description Indicates if the season is currently active
-             * @default true
-             */
-            isActive: boolean;
             /** @description URL to season logo image */
             logoUrl?: string;
             /** @description URL to season banner image */
@@ -2921,7 +3566,7 @@ export interface components {
              * @description Current status of the season
              * @enum {string}
              */
-            status: "UNKNOWN" | "PLANNING" | "SCHEDULED" | "ACTIVE" | "PAUSED" | "COMPLETED" | "CANCELED" | "ARCHIVED" | "DELETED";
+            status: "PLANNING" | "ACTIVE" | "COMPLETED" | "CANCELED";
             /** @description The league this season belongs to */
             league: components["schemas"]["BasicLeagueDto"];
             /** @description The tenant this season belongs to */
@@ -2966,11 +3611,6 @@ export interface components {
             startDate?: string;
             /** @description End date of the season (YYYY-MM-DD) */
             endDate?: string;
-            /**
-             * @description Current status of the season
-             * @enum {string}
-             */
-            status?: "UNKNOWN" | "PLANNING" | "SCHEDULED" | "ACTIVE" | "PAUSED" | "COMPLETED" | "CANCELED" | "ARCHIVED" | "DELETED";
             /** @description Description of the season */
             description?: string;
             /** @description URL to season logo image */
@@ -2981,6 +3621,15 @@ export interface components {
             pointsSystem?: Record<string, never>;
             /** @description Custom JSON for tiebreaker rules */
             tiebreakerRules?: Record<string, never>;
+        };
+        TransitionSeasonDto: {
+            /**
+             * @description The state to move to.
+             * @enum {string}
+             */
+            status: "PLANNING" | "ACTIVE" | "COMPLETED" | "CANCELED";
+            /** @description Why. Required for every move except opening a season — the others stop a result being recorded, void a table, or change a classification that has already been published. */
+            reason?: string;
         };
         SeasonBasicDto: {
             /** @description Season ID */
@@ -3005,11 +3654,391 @@ export interface components {
              * @description Current status of the season
              * @enum {string}
              */
-            status: "UNKNOWN" | "PLANNING" | "SCHEDULED" | "ACTIVE" | "PAUSED" | "COMPLETED" | "CANCELED" | "ARCHIVED" | "DELETED";
+            status: "PLANNING" | "ACTIVE" | "COMPLETED" | "CANCELED";
             /** @description The league this season belongs to */
             league: components["schemas"]["BasicLeagueDto"];
             /** @description The tenant this season belongs to */
             tenant: components["schemas"]["BasicTenantDto"];
+        };
+        DashboardCompetitionDto: {
+            id: string;
+            name: string;
+            division: Record<string, never> | null;
+            /** @enum {string|null} */
+            gender: "MALE" | "FEMALE" | "MIXED" | "OTHER" | null;
+            season: Record<string, never> | null;
+            teamCount: number;
+            playerCount: number;
+            teamsWithoutPlayers: number;
+            fixtureCount: number;
+            playedCount: number;
+            missingResults: number;
+            champion: Record<string, never> | null;
+            stage: Record<string, never> | null;
+            awaitingNextStage: boolean;
+            plannedCount: number;
+            pools: Record<string, never>[];
+        };
+        DashboardFixtureDto: {
+            id: string;
+            /** Format: date-time */
+            dateTime: string;
+            /** @enum {string} */
+            status: "DRAFT" | "SCHEDULED" | "CONFIRMED" | "LIVE" | "PAUSED" | "COMPLETED" | "CANCELLED" | "POSTPONED" | "RESCHEDULED";
+            homeTeam: string;
+            awayTeam: string;
+            homeShortCode: Record<string, never> | null;
+            awayShortCode: Record<string, never> | null;
+            homeScore: Record<string, never> | null;
+            awayScore: Record<string, never> | null;
+            venue: Record<string, never> | null;
+            leagueId: string;
+            leagueName: string;
+        };
+        OrganiserDashboardDto: {
+            organisationId: string;
+            organisationName: string;
+            organisationCode: Record<string, never> | null;
+            competitions: components["schemas"]["DashboardCompetitionDto"][];
+            awaitingResults: components["schemas"]["DashboardFixtureDto"][];
+            upcoming: components["schemas"]["DashboardFixtureDto"][];
+        };
+        PlatformDashboardDto: {
+            tenants: number;
+            leagues: number;
+            teams: number;
+            players: number;
+            users: number;
+            games: number;
+            resultsThisWeek: number;
+            tenantsWithoutFixtures: number;
+            recentTenants: Record<string, never>[];
+        };
+        ClubDashboardDto: {
+            teamId: string;
+            teamName: string;
+            shortCode: Record<string, never> | null;
+            logoUrl: Record<string, never> | null;
+            leagueId: string;
+            leagueName: string;
+            organisationName: string;
+            season: Record<string, never> | null;
+            playerCount: number;
+            standing: Record<string, never> | null;
+            form: string[];
+            recent: components["schemas"]["DashboardFixtureDto"][];
+            upcoming: components["schemas"]["DashboardFixtureDto"][];
+        };
+        CreatePlannedFixtureDto: {
+            /** @description Phase this belongs to. Must be a KNOCKOUT. */
+            stageId: string;
+            /** @example Vainqueur demi-finale 1 */
+            homeLabel: string;
+            /** @example Vainqueur demi-finale 2 */
+            awayLabel: string;
+            /** Format: date-time */
+            dateTime: string;
+            /** @description Whether it happens at all — EUBAGO’s « SI NECESSITE ». */
+            conditional?: boolean;
+            homeVenueId?: Record<string, never>;
+            courtId?: Record<string, never>;
+            round?: number;
+            bracketSlot?: number;
+            notes?: string;
+        };
+        UpdatePlannedFixtureDto: {
+            homeLabel?: string;
+            awayLabel?: string;
+            /** Format: date-time */
+            dateTime?: string;
+            conditional?: boolean;
+            homeVenueId?: Record<string, never>;
+            courtId?: Record<string, never>;
+            round?: number;
+            notes?: string;
+            reason?: string;
+        };
+        PromotePlannedFixtureDto: {
+            homeTeamId: string;
+            awayTeamId: string;
+            reason?: string;
+        };
+        UpdateStandingsRulesDto: {
+            leagueId: string;
+            rankingMetric?: string;
+            winPoints?: number;
+            drawPoints?: number;
+            lossPoints?: number;
+            /** @description What a forfeited loss is worth. Zero at LIPROBAKIN, where an ordinary loss earns one. */
+            forfeitPoints?: number;
+            /** @description In the order they are applied. An empty list means alphabetical after points. */
+            tieBreakerOrder?: ("POINTS" | "GOAL_DIFFERENCE" | "GOALS_FOR" | "GOALS_AGAINST" | "WINS" | "AWAY_WINS" | "AWAY_GOALS" | "HEAD_TO_HEAD_POINTS" | "HEAD_TO_HEAD_GOAL_DIFFERENCE" | "HEAD_TO_HEAD_GOALS_FOR" | "HEAD_TO_HEAD_WIN_PERCENTAGE" | "FAIR_PLAY_POINTS" | "WIN_PERCENTAGE" | "DIVISION_WIN_PERCENTAGE" | "CONFERENCE_WIN_PERCENTAGE" | "STRENGTH_OF_SCHEDULE" | "STRENGTH_OF_VICTORY" | "RANDOM_DRAW")[];
+            /** @description Clubs qualifying from the top. 0 turns the band off. */
+            qualificationCount?: number;
+            qualificationLabel?: string;
+            /** @description Clubs relegated from the bottom. 0 turns the band off. */
+            relegationCount?: number;
+            relegationLabel?: string;
+        };
+        RecalculateStandingsDto: {
+            leagueId: string;
+            seasonId: string;
+        };
+        CreateGameDto: {
+            /** @description The ID of the home team. */
+            homeTeamId: string;
+            /** @description The ID of the away team. */
+            awayTeamId: string;
+            /**
+             * Format: date-time
+             * @description The scheduled date and time of the game in ISO 8601 format.
+             */
+            dateTime: string;
+            /** @description The ID of the league this game belongs to. */
+            leagueId: string;
+            /** @description The tenant ID for multi-tenancy support. */
+            tenantId: string;
+            /** @description Season to place the fixture in. Defaults to the competition’s current season. */
+            seasonId?: string;
+            /** @description Phase to place the fixture in. Defaults to the current one. */
+            stageId?: string;
+            /** @description Pool, inside a GROUPS phase. */
+            groupId?: string;
+            /** @description The ID of the venue where the game was played. */
+            homeVenueId?: Record<string, never>;
+            courtId?: string;
+            /**
+             * @description The final score of the home team. If provided, awayScore must also be provided.
+             * @example 2
+             */
+            homeScore?: number;
+            /**
+             * @description The final score of the away team. If provided, homeScore must also be provided.
+             * @example 1
+             */
+            awayScore?: number;
+            /**
+             * @description Flexible JSON object for sport-specific stats (e.g., period scores, innings). Only applicable if scores are provided.
+             * @example {
+             *       "period1": {
+             *         "home": 1,
+             *         "away": 0
+             *       },
+             *       "period2": {
+             *         "home": 1,
+             *         "away": 1
+             *       }
+             *     }
+             */
+            customStats?: Record<string, never>;
+            /** @description Notes about the game, such as "Overtime win". */
+            notes?: string;
+            /** @description Knockout round: 1 = quarter-final, 2 = semi-final… */
+            round?: number;
+            /** @description Which journée this fixture belongs to. */
+            matchday?: number;
+            /**
+             * @description (Optional) The URL of the banner image for the game.
+             * @example https://example.com/banner.jpg
+             */
+            bannerImageUrl?: string;
+            /**
+             * @description (Optional) The URL of the highlights video for the game.
+             * @example https://example.com/highlights.mp4
+             */
+            highlightsUrl?: string;
+        };
+        UpdateGameDto: {
+            /** @description Why the fixture changed, in the organiser’s own words. Not stored on the game — it is written to the audit trail, because "moved to the 22nd" settles nothing without "the hall was double-booked". Strongly encouraged whenever a date or a venue changes. */
+            reason?: string;
+            /**
+             * Format: date-time
+             * @description The new scheduled date and time of the game.
+             */
+            dateTime?: string;
+            /** @description The new venue ID for the game. */
+            homeVenueId?: Record<string, never>;
+            /** @description The new court ID for the game. */
+            courtId?: string;
+            /** @description Points required to win a set. */
+            pointsToWin?: number;
+            /** @description Number of sets required to win the game. */
+            setsToWin?: number;
+            /**
+             * @description Update the game status (e.g., to POSTPONED or CANCELLED). Cannot be set to COMPLETED here.
+             * @enum {string}
+             */
+            status?: "SCHEDULED" | "POSTPONED" | "CANCELLED" | "LIVE";
+            /**
+             * @description Flexible JSON object for IN-GAME stats updates (e.g., live period scores).
+             * @example {
+             *       "period1": {
+             *         "home": 1,
+             *         "away": 0
+             *       }
+             *     }
+             */
+            customStats?: Record<string, never>;
+            /** @description Updated notes about the game. */
+            notes?: string;
+            /** @description Knockout round: 1 = quarter-final, 2 = semi-final… */
+            round?: number;
+            /** @description Which journée this fixture belongs to. */
+            matchday?: number;
+        };
+        UpdateGameScoreDto: {
+            /**
+             * @description The final score of the home team.
+             * @example 3
+             */
+            homeScore: number;
+            /**
+             * @description The final score of the away team.
+             * @example 1
+             */
+            awayScore: number;
+            /** @description Why the score changed. Recorded on a correction, where it is the difference between a fixed typo and a rewritten result. */
+            reason?: string;
+            /** @description The loser did not field a team. Scored with the league’s forfeit rule rather than its loss rule — LIPROBAKIN give a point for a loss and nothing for a forfeit. */
+            isForfeit?: boolean;
+        };
+        ScoreDto: Record<string, never>;
+        EndGameDto: {
+            /** @description Final scores */
+            finalScore: components["schemas"]["ScoreDto"];
+        };
+        CancelGameDto: {
+            /**
+             * @description Reason for cancellation
+             * @example Inclement weather
+             */
+            reason: string;
+        };
+        PostponeGameDto: {
+            /**
+             * @description Reason for postponement
+             * @example Stadium maintenance
+             */
+            reason: string;
+        };
+        CreateGameEventDto: {
+            /** @enum {string} */
+            eventType: "GOAL" | "YELLOW_CARD" | "RED_CARD" | "SUBSTITUTION" | "PERIOD_START" | "PERIOD_END" | "COMMENTARY" | "PENALTY_SHOOTOUT" | "VAR_CHECK";
+        };
+        SaveBoxScoreLineDto: {
+            playerId: string;
+            /** @description Whether this player appeared. A squad of twenty turns up eight strong, and a player who took the floor without scoring or fouling was previously indistinguishable from one who stayed at home — both produced no row. Presence of the row is now the answer, so a line with nothing but zeroes is still written when this is true. */
+            played: boolean;
+            /**
+             * @description The player’s line, keyed by the sport’s column codes (basketball: FG3, FG2, FT, PF). Unknown codes are dropped and values are clamped to each column’s maximum, so what is stored is always something the sport can describe.
+             * @example {
+             *       "FG3": 2,
+             *       "FG2": 5,
+             *       "FT": 3,
+             *       "PF": 4
+             *     }
+             */
+            stats: {
+                [key: string]: number;
+            };
+        };
+        SaveBoxScoreDto: {
+            /** @description Every player with something to record. A player left out — or sent with nothing but zeroes — has no row rather than an empty one. */
+            lines: components["schemas"]["SaveBoxScoreLineDto"][];
+            /** @description Why, when a sheet that was already entered is being changed. Recorded on the audit trail like every other correction. */
+            reason?: string;
+        };
+        AddBoxScorePlayerDto: {
+            /** @description One of the two teams in this match. */
+            teamId: string;
+            /** @description Family name — the one written on the sheet. */
+            lastName: string;
+            /** @description Given name, when the sheet carries one. */
+            firstName?: string;
+            /** @description Shirt number. */
+            jerseyNumber?: number;
+            /** @description Position, free text — the vocabulary differs by sport. */
+            position?: string;
+            /** @description Create the player even though somebody of the same name already exists in this organisation. Without it the request is refused with the matches, so the operator can transfer the existing player instead of forking them into two records — which is how a roster quietly acquires the same person twice. */
+            force?: boolean;
+        };
+        StandingsResponseDto: Record<string, never>;
+        BasicSeasonDto: {
+            id: string;
+            name: string;
+        };
+        GamePublicResponseDto: {
+            id: string;
+            slug: string;
+            /** Format: date-time */
+            dateTime: string;
+            location?: Record<string, never>;
+            /** @enum {string} */
+            status: "DRAFT" | "SCHEDULED" | "CONFIRMED" | "LIVE" | "PAUSED" | "COMPLETED" | "CANCELLED" | "POSTPONED" | "RESCHEDULED";
+            homeScore?: Record<string, never>;
+            awayScore?: Record<string, never>;
+            notes?: Record<string, never>;
+            round?: Record<string, never>;
+            matchday?: Record<string, never>;
+            bannerImageUrl?: Record<string, never>;
+            highlightsUrl?: Record<string, never>;
+            isActive: boolean;
+            leagueId: string;
+            tenantId: string;
+            homeTeamId: string;
+            awayTeamId: string;
+            homeVenueId?: Record<string, never>;
+            homeTeam: components["schemas"]["BasicTeamDto"];
+            awayTeam: components["schemas"]["BasicTeamDto"];
+            league: components["schemas"]["BasicLeagueDto"];
+            season?: components["schemas"]["BasicSeasonDto"];
+            homeVenue?: components["schemas"]["BasicVenueDto"];
+            tenant: components["schemas"]["BasicTenantDto"];
+        };
+        PointRuleDto: {
+            /** @description Identifier for the outcome (e.g., WIN, DRAW, LOSS, SCORED_3_GOALS) */
+            outcome: string;
+            /** @description Points awarded for this outcome */
+            points: number;
+            /** @description Optional: Additional condition for this rule (e.g., CLEAN_SHEET) */
+            condition?: string;
+        };
+        PointSystemConfigDto: {
+            /** @description Array of rules for awarding points based on outcomes */
+            rules: components["schemas"]["PointRuleDto"][];
+            /** @description Optional: Array of rules for awarding bonus points */
+            bonusPoints?: components["schemas"]["PointRuleDto"][];
+            /** @description Optional: Common metric labels for display (e.g., Goals For, Points Differential) */
+            commonMetrics?: {
+                [key: string]: string;
+            };
+        };
+        TieBreakerRuleDto: {
+            /** @description Order of precedence for this tie-breaker (1 is highest) */
+            order: number;
+            /**
+             * @description Identifier for the tie-breaker metric (e.g., HEAD_TO_HEAD_POINTS, GOAL_DIFFERENCE)
+             * @enum {string}
+             */
+            rule: "HEAD_TO_HEAD_POINTS" | "HEAD_TO_HEAD_GOAL_DIFFERENCE" | "HEAD_TO_HEAD_GOALS_FOR" | "HEAD_TO_HEAD_WIN_PERCENTAGE" | "GOALS_SCORED" | "GOALS_DIFFERENCE" | "GOALS_AGAINST" | "WINS" | "MOST_WINS" | "AWAY_WINS" | "AWAY_GOALS" | "FAIR_PLAY_POINTS" | "WIN_PERCENTAGE" | "DISCIPLINE" | "NET_RUN_RATE";
+            /** @description Human-readable description of the tie-breaker rule */
+            description: string;
+            /**
+             * @description Sort order for the metric (Ascending, Descending, Random)
+             * @enum {string}
+             */
+            sort: "ASC" | "DESC" | "RANDOM";
+        };
+        SportRulesResponseDto: {
+            /**
+             * @description The sport type these rules apply to
+             * @enum {string}
+             */
+            sportType: "SOCCER" | "BASKETBALL" | "FOOTBALL" | "BASEBALL" | "TENNIS" | "HOCKEY" | "GOLF" | "CRICKET" | "RUGBY" | "VOLLEYBALL" | "OTHER";
+            /** @description Configuration for the point system */
+            pointSystem: components["schemas"]["PointSystemConfigDto"];
+            /** @description Ordered list of tie-breaker rules */
+            tieBreakers: components["schemas"]["TieBreakerRuleDto"][];
         };
         BusinessProfileResponseDto: {
             id: string;
@@ -3170,263 +4199,6 @@ export interface components {
             leagues?: string[] | null;
             teams?: string[] | null;
             _count: Record<string, never>;
-        };
-        PointRuleDto: {
-            /** @description Identifier for the outcome (e.g., WIN, DRAW, LOSS, SCORED_3_GOALS) */
-            outcome: string;
-            /** @description Points awarded for this outcome */
-            points: number;
-            /** @description Optional: Additional condition for this rule (e.g., CLEAN_SHEET) */
-            condition?: string;
-        };
-        PointSystemConfigDto: {
-            /** @description Array of rules for awarding points based on outcomes */
-            rules: components["schemas"]["PointRuleDto"][];
-            /** @description Optional: Array of rules for awarding bonus points */
-            bonusPoints?: components["schemas"]["PointRuleDto"][];
-            /** @description Optional: Common metric labels for display (e.g., Goals For, Points Differential) */
-            commonMetrics?: {
-                [key: string]: string;
-            };
-        };
-        TieBreakerRuleDto: {
-            /** @description Order of precedence for this tie-breaker (1 is highest) */
-            order: number;
-            /**
-             * @description Identifier for the tie-breaker metric (e.g., HEAD_TO_HEAD_POINTS, GOAL_DIFFERENCE)
-             * @enum {string}
-             */
-            rule: "HEAD_TO_HEAD_POINTS" | "HEAD_TO_HEAD_GOAL_DIFFERENCE" | "HEAD_TO_HEAD_GOALS_FOR" | "HEAD_TO_HEAD_WIN_PERCENTAGE" | "GOALS_SCORED" | "GOALS_DIFFERENCE" | "GOALS_AGAINST" | "WINS" | "MOST_WINS" | "AWAY_WINS" | "AWAY_GOALS" | "FAIR_PLAY_POINTS" | "WIN_PERCENTAGE" | "DISCIPLINE" | "NET_RUN_RATE";
-            /** @description Human-readable description of the tie-breaker rule */
-            description: string;
-            /**
-             * @description Sort order for the metric (Ascending, Descending, Random)
-             * @enum {string}
-             */
-            sort: "ASC" | "DESC" | "RANDOM";
-        };
-        SportRulesResponseDto: {
-            /**
-             * @description The sport type these rules apply to
-             * @enum {string}
-             */
-            sportType: "SOCCER" | "BASKETBALL" | "FOOTBALL" | "BASEBALL" | "TENNIS" | "HOCKEY" | "GOLF" | "CRICKET" | "RUGBY" | "VOLLEYBALL" | "OTHER";
-            /** @description Configuration for the point system */
-            pointSystem: components["schemas"]["PointSystemConfigDto"];
-            /** @description Ordered list of tie-breaker rules */
-            tieBreakers: components["schemas"]["TieBreakerRuleDto"][];
-        };
-        GenerateFixturesDto: {
-            /** @description Season to generate the fixture list for. */
-            seasonId: string;
-            /** @description Teams to include, in draw order. Omit to use every active team in the season’s league. */
-            teamIds?: string[];
-            /**
-             * @description 1 = single round robin (each pair meets once), 2 = double (home and away).
-             * @default 1
-             */
-            legs: number;
-            /** @description Hall every generated fixture is played in. Optional: a fixture with a date and no venue is still worth publishing, and both launch customers use a single hall anyway. When set, each fixture passes the same venue conflict check as one created by hand, so a clash against another competition is reported and skipped rather than double-booked. */
-            homeVenueId?: string;
-            /** @description Date of the first matchday (YYYY-MM-DD). */
-            startDate: string;
-            /**
-             * @description Days between matchdays. Ignored when daysOfWeek is supplied.
-             * @default 7
-             */
-            intervalDays: number;
-            /** @description Restrict matchdays to these weekdays (0 = Sunday … 6 = Saturday), e.g. [6, 0] for weekends. Takes precedence over intervalDays. */
-            daysOfWeek?: number[];
-            /**
-             * @description Kick-off time on each matchday, 24h HH:mm.
-             * @default 16:00
-             */
-            kickOffTime: string;
-            /**
-             * @description Preview only — return the generated schedule without writing any games. Always run this first in the UI.
-             * @default false
-             */
-            dryRun: boolean;
-        };
-        GeneratedFixtureDto: {
-            matchday: number;
-            dateTime: string;
-            homeTeamId: string;
-            homeTeamName: string;
-            awayTeamId: string;
-            awayTeamName: string;
-            /** @description Set when this fixture could not be created. */
-            error?: string;
-            /** @description Id of the created game. Absent on a dry run. */
-            gameId?: string;
-        };
-        GenerateFixturesResponseDto: {
-            dryRun: boolean;
-            teamCount: number;
-            matchdayCount: number;
-            fixtureCount: number;
-            /** @description Games actually written. 0 on a dry run. */
-            createdCount: number;
-            /** @description Fixtures that could not be created (see each fixture’s error). */
-            skippedCount: number;
-            fixtures: components["schemas"]["GeneratedFixtureDto"][];
-        };
-        CreateGameDto: {
-            /** @description The ID of the home team. */
-            homeTeamId: string;
-            /** @description The ID of the away team. */
-            awayTeamId: string;
-            /**
-             * Format: date-time
-             * @description The scheduled date and time of the game in ISO 8601 format.
-             */
-            dateTime: string;
-            /** @description The ID of the league this game belongs to. */
-            leagueId: string;
-            /** @description The tenant ID for multi-tenancy support. */
-            tenantId: string;
-            /** @description The ID of the venue where the game was played. */
-            homeVenueId?: Record<string, never>;
-            courtId?: string;
-            /**
-             * @description The final score of the home team. If provided, awayScore must also be provided.
-             * @example 2
-             */
-            homeScore?: number;
-            /**
-             * @description The final score of the away team. If provided, homeScore must also be provided.
-             * @example 1
-             */
-            awayScore?: number;
-            /**
-             * @description Flexible JSON object for sport-specific stats (e.g., period scores, innings). Only applicable if scores are provided.
-             * @example {
-             *       "period1": {
-             *         "home": 1,
-             *         "away": 0
-             *       },
-             *       "period2": {
-             *         "home": 1,
-             *         "away": 1
-             *       }
-             *     }
-             */
-            customStats?: Record<string, never>;
-            /** @description Notes about the game, such as "Overtime win". */
-            notes?: string;
-            /** @description The round or week of the season this game is in. */
-            round?: string;
-            /**
-             * @description (Optional) The URL of the banner image for the game.
-             * @example https://example.com/banner.jpg
-             */
-            bannerImageUrl?: string;
-            /**
-             * @description (Optional) The URL of the highlights video for the game.
-             * @example https://example.com/highlights.mp4
-             */
-            highlightsUrl?: string;
-        };
-        UpdateGameDto: {
-            /**
-             * Format: date-time
-             * @description The new scheduled date and time of the game.
-             */
-            dateTime?: string;
-            /** @description The new venue ID for the game. */
-            homeVenueId?: Record<string, never>;
-            /** @description The new court ID for the game. */
-            courtId?: string;
-            /** @description Points required to win a set. */
-            pointsToWin?: number;
-            /** @description Number of sets required to win the game. */
-            setsToWin?: number;
-            /**
-             * @description Update the game status (e.g., to POSTPONED or CANCELLED). Cannot be set to COMPLETED here.
-             * @enum {string}
-             */
-            status?: "SCHEDULED" | "POSTPONED" | "CANCELLED" | "LIVE";
-            /**
-             * @description Flexible JSON object for IN-GAME stats updates (e.g., live period scores).
-             * @example {
-             *       "period1": {
-             *         "home": 1,
-             *         "away": 0
-             *       }
-             *     }
-             */
-            customStats?: Record<string, never>;
-            /** @description Updated notes about the game. */
-            notes?: string;
-            /** @description Updated round or week of the season. */
-            round?: string;
-        };
-        UpdateGameScoreDto: {
-            /**
-             * @description The final score of the home team.
-             * @example 3
-             */
-            homeScore: number;
-            /**
-             * @description The final score of the away team.
-             * @example 1
-             */
-            awayScore: number;
-        };
-        ScoreDto: Record<string, never>;
-        EndGameDto: {
-            /** @description Final scores */
-            finalScore: components["schemas"]["ScoreDto"];
-        };
-        CancelGameDto: {
-            /**
-             * @description Reason for cancellation
-             * @example Inclement weather
-             */
-            reason: string;
-        };
-        PostponeGameDto: {
-            /**
-             * @description Reason for postponement
-             * @example Stadium maintenance
-             */
-            reason: string;
-        };
-        CreateGameEventDto: {
-            /** @enum {string} */
-            eventType: "GOAL" | "YELLOW_CARD" | "RED_CARD" | "SUBSTITUTION" | "PERIOD_START" | "PERIOD_END" | "COMMENTARY" | "PENALTY_SHOOTOUT" | "VAR_CHECK";
-        };
-        StandingsResponseDto: Record<string, never>;
-        BasicSeasonDto: {
-            id: string;
-            name: string;
-        };
-        GamePublicResponseDto: {
-            id: string;
-            slug: string;
-            /** Format: date-time */
-            dateTime: string;
-            location?: Record<string, never>;
-            /** @enum {string} */
-            status: "DRAFT" | "SCHEDULED" | "CONFIRMED" | "LIVE" | "PAUSED" | "COMPLETED" | "CANCELLED" | "POSTPONED" | "RESCHEDULED";
-            homeScore?: Record<string, never>;
-            awayScore?: Record<string, never>;
-            notes?: Record<string, never>;
-            round?: Record<string, never>;
-            bannerImageUrl?: Record<string, never>;
-            highlightsUrl?: Record<string, never>;
-            isActive: boolean;
-            leagueId: string;
-            tenantId: string;
-            homeTeamId: string;
-            awayTeamId: string;
-            homeVenueId?: Record<string, never>;
-            homeTeam: components["schemas"]["BasicTeamDto"];
-            awayTeam: components["schemas"]["BasicTeamDto"];
-            league: components["schemas"]["BasicLeagueDto"];
-            season?: components["schemas"]["BasicSeasonDto"];
-            homeVenue?: components["schemas"]["BasicVenueDto"];
-            tenant: components["schemas"]["BasicTenantDto"];
         };
         ProxyDto: Record<string, never>;
         PresignDto: Record<string, never>;
@@ -3670,7 +4442,7 @@ export interface components {
             city?: Record<string, never>;
         };
         CalendarSideDto: {
-            id: string;
+            id: Record<string, never> | null;
             name: string;
             shortCode: string;
         };
@@ -3680,8 +4452,8 @@ export interface components {
             dateTime: string;
             /** @description Minutes the fixture occupies its hall, from the sport default. */
             durationMinutes: number;
-            /** @enum {string} */
-            status: "DRAFT" | "SCHEDULED" | "CONFIRMED" | "LIVE" | "PAUSED" | "COMPLETED" | "CANCELLED" | "POSTPONED" | "RESCHEDULED";
+            /** @description A GameStatus, or PLANNED. */
+            status: string;
             leagueId: string;
             venueId?: Record<string, never>;
             courtId?: Record<string, never>;
@@ -3689,6 +4461,7 @@ export interface components {
             away: components["schemas"]["CalendarSideDto"];
             homeScore?: Record<string, never>;
             awayScore?: Record<string, never>;
+            conditional?: boolean;
         };
         CalendarBlackoutDto: {
             venueId: string;
@@ -3705,6 +4478,136 @@ export interface components {
             venues: components["schemas"]["CalendarVenueDto"][];
             entries: components["schemas"]["CalendarEntryDto"][];
             blackouts: components["schemas"]["CalendarBlackoutDto"][];
+        };
+        FixtureDraftDto: {
+            /** @description Season to draft a fixture list for. */
+            seasonId: string;
+            /** @description Teams to include, in draw order. Omit for every active team in the league. */
+            teamIds?: string[];
+            /**
+             * @description 1 = each pair meets once, 2 = home and away.
+             * @default 1
+             */
+            legs: number;
+            /** @description First day the draft may use (YYYY-MM-DD). */
+            from: string;
+            /** @description Last day the draft may use (YYYY-MM-DD). */
+            to: string;
+            /**
+             * @description Weekdays this competition plays, 0 = Sunday … 6 = Saturday. Per competition on purpose: D1 plays weekends and Wednesdays while D2 takes what is left (§2.3).
+             * @default [
+             *       6,
+             *       0
+             *     ]
+             */
+            daysOfWeek: number[];
+            /**
+             * @description Tip-off of the first game of the day, HH:mm.
+             * @default 13:30
+             */
+            openingTime: string;
+            /** @description How long a fixture holds the hall, door to door. Defaults to the sport’s slot length — basketball is 100, not the 120 a football-shaped default assumes. */
+            gameDurationMinutes?: number;
+            /**
+             * @description Games this competition may play per day in the hall. Two or three is normal.
+             * @default 3
+             */
+            slotsPerDay: number;
+            /** @description Hall the fixtures are played in. Optional — both launch customers use one (§2.4). */
+            homeVenueId?: string;
+            /**
+             * @description Minutes the organiser’s clock is ahead of UTC (`-new Date().getTimezoneOffset()`). Without it the times they typed are read as UTC and the draft shows an hour they never chose. Defaults to 0 for API callers who work in UTC anyway.
+             * @default 0
+             */
+            utcOffsetMinutes: number;
+        };
+        DraftFixtureDto: {
+            matchday: number;
+            /** @description Null when nothing could take this fixture. */
+            dateTime: Record<string, never> | null;
+            homeTeamId: string;
+            homeTeamName: string;
+            homeTeamShortCode: string;
+            awayTeamId: string;
+            awayTeamName: string;
+            awayTeamShortCode: string;
+            venueId: Record<string, never> | null;
+        };
+        DraftInsightDto: {
+            /** @enum {string} */
+            kind: "short-fixtures" | "existing-pairing" | "unplaced" | "blackout" | "no-venue" | "ok";
+            /** @enum {string} */
+            severity: "info" | "caution" | "problem";
+            /** @description Ready to read, in French — this is shown, not formatted again. */
+            message: string;
+            /** @description Existing game this refers to, when there is one to open. */
+            gameId?: string;
+            /** @description Team this is about, when it is about one. */
+            teamId?: string;
+        };
+        FixtureDraftResponseDto: {
+            seasonId: string;
+            seasonName: string;
+            leagueId: string;
+            leagueName: string;
+            /** @description Slot length actually used, after the sport default was applied. */
+            gameDurationMinutes: number;
+            teamCount: number;
+            /** @description Fixtures the season needs in total, existing ones included. */
+            requiredFixtureCount: number;
+            /** @description Fixtures this competition already has on record. */
+            existingFixtureCount: number;
+            fixtures: components["schemas"]["DraftFixtureDto"][];
+            /** @description Fixtures no slot could take. */
+            unplaced: components["schemas"]["DraftFixtureDto"][];
+            /** @description Slots this draft leaves for the division below (§2.2). */
+            freeSlotCount: number;
+            insights: components["schemas"]["DraftInsightDto"][];
+        };
+        PublishFixtureDto: {
+            dateTime: string;
+            homeTeamId: string;
+            awayTeamId: string;
+            venueId?: Record<string, never>;
+            matchday?: number;
+        };
+        PublishDraftDto: {
+            /** @description Season the fixtures belong to. */
+            seasonId: string;
+            /** @description Phase the fixtures belong to. Defaults to the current one. */
+            stageId?: string;
+            /** @description The draft exactly as the organiser studied it. Sent back rather than regenerated: a second run against a moved world is a different fixture list, and publishing something other than what was on screen is the one thing this module may never do. */
+            fixtures: components["schemas"]["PublishFixtureDto"][];
+        };
+        PublishedFixtureDto: {
+            dateTime: string;
+            homeTeamId: string;
+            awayTeamId: string;
+            gameId?: string;
+            /** @description Set when this fixture could not be written. */
+            error?: string;
+        };
+        PublishDraftResponseDto: {
+            createdCount: number;
+            skippedCount: number;
+            results: components["schemas"]["PublishedFixtureDto"][];
+        };
+        ReorderAssignmentDto: {
+            gameId: string;
+            /** @description The start time this fixture takes. */
+            dateTime: string;
+        };
+        ReorderStackDto: {
+            /** @description Every fixture in the stack that moves, with the time it takes. The set of times must be a permutation of the set these fixtures already hold. */
+            assignments: components["schemas"]["ReorderAssignmentDto"][];
+            /** @description Why, recorded against every fixture that moved. */
+            reason?: string;
+        };
+        AnnotateDto: {
+            /** @description Fixtures whose last change is being explained. */
+            gameIds: string[];
+            /** @description The explanation. */
+            reason: string;
         };
     };
     responses: never;
@@ -4565,6 +5468,26 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                leagueId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    LeaguesController_getLeagueIdentity: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description League ID */
                 leagueId: string;
             };
             cookie?: never;
@@ -5448,6 +6371,49 @@ export interface operations {
             };
         };
     };
+    PlayersController_leaderboard: {
+        parameters: {
+            query: {
+                leagueId: string;
+                /** @description Defaults to the competition’s current season. */
+                seasonId?: string;
+                /** @description Restrict to one phase. Empty means the whole season. */
+                stageId?: string;
+                /** @description Restrict to one club’s players. */
+                teamId?: string;
+                /** @description Appearances a player needs to be listed. Sorting by the per-game column with no floor puts whoever played once at the top, so the qualifier is visible rather than implicit. */
+                minGames?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlayerLeaderboardDto"];
+                };
+            };
+            /** @description Not this reader’s competition. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Competition, season or phase not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     PlayersController_listPlayers: {
         parameters: {
             query?: {
@@ -5690,6 +6656,47 @@ export interface operations {
             };
         };
     };
+    PlayersController_getPlayerStats: {
+        parameters: {
+            query?: {
+                /** @description Defaults to the competition’s current season. */
+                seasonId?: string;
+                /** @description Restrict to one phase. Empty means the whole season. */
+                stageId?: string;
+            };
+            header?: never;
+            path: {
+                /** @description Player ID */
+                playerId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlayerStatsDto"];
+                };
+            };
+            /** @description Not this reader’s competition. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Player, season or phase not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     PlayersController_assignPlayerToTeam: {
         parameters: {
             query?: never;
@@ -5859,6 +6866,166 @@ export interface operations {
             };
         };
     };
+    StagesController_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                seasonId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StageResponseDto"][];
+                };
+            };
+        };
+    };
+    StagesController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                seasonId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateStageDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    StagesController_applyTemplate: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                seasonId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ApplyTemplateDto"];
+            };
+        };
+        responses: {
+            /** @description The season already has fixtures or results. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    StagesController_reorder: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                seasonId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReorderStagesDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    StagesController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                stageId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateStageDto"];
+            };
+        };
+        responses: {
+            /** @description Its format cannot change once it has results. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    StagesController_remove: {
+        parameters: {
+            query: {
+                reason: string;
+            };
+            header?: never;
+            path: {
+                stageId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description It holds fixtures, or it is the last one. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    StagesController_setMembers: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                groupId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SetGroupMembersDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     SeasonsController_listSeasons: {
         parameters: {
             query?: {
@@ -5880,10 +7047,8 @@ export interface operations {
                 leagueId?: components["schemas"]["Object"];
                 /** @description Filter by tenant ID. */
                 tenantId?: components["schemas"]["Object"];
-                /** @description Optional: Filter seasons by active status */
-                isActive?: boolean;
                 /** @description Optional: Filter seasons by status */
-                status?: "UNKNOWN" | "PLANNING" | "SCHEDULED" | "ACTIVE" | "PAUSED" | "COMPLETED" | "CANCELED" | "ARCHIVED" | "DELETED";
+                status?: "PLANNING" | "ACTIVE" | "COMPLETED" | "CANCELED";
                 /** @description Filter seasons starting after this date (ISO 8601 format). */
                 startDateAfter?: string;
                 /** @description Filter seasons starting before this date (ISO 8601 format). */
@@ -6112,6 +7277,61 @@ export interface operations {
             };
         };
     };
+    SeasonsController_transitionSeason: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Season ID */
+                seasonId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TransitionSeasonDto"];
+            };
+        };
+        responses: {
+            /** @description Season moved. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SeasonDetailsDto"];
+                };
+            };
+            /** @description A reason is required for this move. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Forbidden. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Season not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description That move is not legal from this state. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     PublicSeasonsController_listPublicSeasons: {
         parameters: {
             query?: {
@@ -6122,7 +7342,7 @@ export interface operations {
                 /** @description Filter by tenant ID. */
                 tenantId?: string;
                 /** @description Filter by season status. */
-                status?: "UNKNOWN" | "PLANNING" | "SCHEDULED" | "ACTIVE" | "PAUSED" | "COMPLETED" | "CANCELED" | "ARCHIVED" | "DELETED";
+                status?: "PLANNING" | "ACTIVE" | "COMPLETED" | "CANCELED";
                 /** @description Records to skip (pagination). */
                 skip?: number;
                 /** @description Records to take (pagination). */
@@ -6182,35 +7402,13 @@ export interface operations {
             };
         };
     };
-    TenantsController_listTenants: {
+    DashboardController_organiser: {
         parameters: {
             query?: {
-                /** @description Number of items to skip (offset) */
-                skip?: number;
-                /** @description Number of items to take (limit) */
-                take?: number;
-                /** @description Current page number */
-                page?: number;
-                /** @description Page size */
-                pageSize?: number;
-                /** @description Field to sort by */
-                sortBy?: string;
-                /** @description Sort order (asc/desc) */
-                sortOrder?: "asc" | "desc";
-                /** @description Search filter for tenant name or tenant code (case-insensitive) */
-                search?: string;
-                /** @description Filter tenants by active status */
-                isActive?: boolean;
-                /** @description Filter by tenant type */
-                tenantType?: "COMMERCIAL" | "NON_PROFIT" | "GOVERNMENT" | "EDUCATIONAL" | "OTHER";
-                /** @description Filter by sport type */
-                sportType?: "SOCCER" | "BASKETBALL" | "FOOTBALL" | "BASEBALL" | "TENNIS" | "HOCKEY" | "GOLF" | "CRICKET" | "RUGBY" | "VOLLEYBALL" | "OTHER";
-                /** @description Filter by country (ISO 2-letter code) */
-                country?: string;
-                /** @description City where the tenant is based */
-                city?: string;
-                /** @description Filter by specific tenant ID(s). System Admin only. */
-                tenantIds?: string[];
+                /** @description Organisation to read (system admins only). */
+                tenantId?: string;
+                /** @description Narrow to one competition. Omit for the whole organisation — which is the tenant scope of this screen: the community manager publishes men’s, women’s and D2 together. */
+                leagueId?: string;
             };
             header?: never;
             path?: never;
@@ -6218,26 +7416,69 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Returns a paginated list of tenants that the authenticated user is authorized to view. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["PaginatedResponseDto"] & {
-                        data?: components["schemas"]["TenantResponseDto"][];
-                    };
+                    "application/json": components["schemas"]["OrganiserDashboardDto"];
                 };
             };
-            /** @description Unauthorized - Missing or invalid JWT token. */
-            401: {
+        };
+    };
+    DashboardController_platform: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["PlatformDashboardDto"];
+                };
             };
-            /** @description Forbidden - User does not have required roles (SYSTEM_ADMIN, TENANT_ADMIN). */
-            403: {
+        };
+    };
+    DashboardController_club: {
+        parameters: {
+            query?: {
+                /** @description Club to read. Defaults to the one the caller administers. */
+                teamId?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClubDashboardDto"];
+                };
+            };
+        };
+    };
+    PlannedFixturesController_list: {
+        parameters: {
+            query: {
+                stageId: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -6245,7 +7486,7 @@ export interface operations {
             };
         };
     };
-    TenantsController_createTenant: {
+    PlannedFixturesController_create: {
         parameters: {
             query?: never;
             header?: never;
@@ -6254,41 +7495,18 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["CreateTenantDto"];
+                "application/json": components["schemas"]["CreatePlannedFixtureDto"];
             };
         };
         responses: {
-            /** @description Tenant successfully created. */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["TenantResponseDto"];
-                };
-            };
-            /** @description Bad Request - Validation failed or user already has a tenant. */
+            /** @description The phase is not a knockout. */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content?: never;
             };
-            /** @description Unauthorized. */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Forbidden - Admin users cannot create new tenants. */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Conflict - Tenant code or name already exists. */
+            /** @description The hall is already taken at that hour. */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -6297,105 +7515,22 @@ export interface operations {
             };
         };
     };
-    TenantsController_getTenantById: {
+    PlannedFixturesController_update: {
         parameters: {
             query?: never;
             header?: never;
             path: {
-                /** @description Internal Tenant UUID */
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Full tenant details including owner and business profile. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["TenantResponseDto"];
-                };
-            };
-            /** @description Unauthorized. */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Forbidden - User does not have access to this specific tenant. */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Not Found - Tenant does not exist or has been deleted. */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    TenantsController_updateTenant: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description Internal Tenant UUID */
                 id: string;
             };
             cookie?: never;
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["UpdateTenantDto"];
+                "application/json": components["schemas"]["UpdatePlannedFixtureDto"];
             };
         };
         responses: {
-            /** @description Tenant updated successfully. */
             200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["TenantResponseDto"];
-                };
-            };
-            /** @description Bad Request - Validation error. */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Unauthorized. */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Forbidden - No permission to update this tenant. */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Not Found. */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Conflict - Updated name or code already taken. */
-            409: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -6403,174 +7538,47 @@ export interface operations {
             };
         };
     };
-    TenantsController_deleteTenant: {
+    PlannedFixturesController_remove: {
         parameters: {
-            query?: never;
+            query: {
+                reason: string;
+            };
             header?: never;
             path: {
-                /** @description Internal Tenant UUID */
                 id: string;
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description Tenant soft-deleted successfully. */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Bad Request - Tenant has active resources and cannot be deleted. */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Unauthorized. */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Forbidden. */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Not Found. */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    PublicTenantsController_listPublicTenants: {
-        parameters: {
-            query?: {
-                /** @description Page number for pagination. */
-                page?: number;
-                /** @description Number of items per page. */
-                pageSize?: number;
-                /** @description Search term for tenant name or code. */
-                search?: string;
-                /** @description Filter by sport type. */
-                sportType?: "SOCCER" | "BASKETBALL" | "FOOTBALL" | "BASEBALL" | "TENNIS" | "HOCKEY" | "GOLF" | "CRICKET" | "RUGBY" | "VOLLEYBALL" | "OTHER";
-                /** @description Filter by country code (e.g., US, GB). */
-                country?: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description A paginated list of public tenants. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content: {
-                    "application/json": components["schemas"]["PaginatedResponseDto"] & {
-                        data?: components["schemas"]["PublicTenantResponseDto"][];
-                    };
-                };
+                content?: never;
             };
         };
     };
-    PublicTenantsController_getTenantBySlug: {
+    PlannedFixturesController_promote: {
         parameters: {
             query?: never;
             header?: never;
             path: {
-                slug: string;
+                id: string;
             };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description The details of the tenant. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PublicTenantResponseDto"];
-                };
-            };
-            /** @description Tenant not found or is not currently active. */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    SportRulesController_getSportRules: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                sportType: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Sport rules retrieved successfully */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SportRulesResponseDto"];
-                };
-            };
-            /** @description Invalid sport type */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Sport rules not found */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    GamesController_generateFixtures: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
             cookie?: never;
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["GenerateFixturesDto"];
+                "application/json": components["schemas"]["PromotePlannedFixtureDto"];
             };
         };
         responses: {
-            /** @description The generated schedule. */
             201: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content: {
-                    "application/json": components["schemas"]["GenerateFixturesResponseDto"];
-                };
+                content?: never;
             };
         };
     };
@@ -6599,6 +7607,112 @@ export interface operations {
             };
         };
     };
+    GamesController_getStandingsView: {
+        parameters: {
+            query: {
+                leagueId: string;
+                /** @description Defaults to the competition’s current season. Optional because a club administrator is refused by GET /seasons — they administer a team, not a competition — and would otherwise have no way to name one. */
+                seasonId?: string;
+                /** @description Defaults to the phase being played. A table belongs to a phase — EUBAGO publish « le classement phase de 6 » — and a competition with one phase never has to name it. */
+                stageId?: string;
+                groupId: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    GamesController_updateStandingsRules: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateStandingsRulesDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    GamesController_exportStandingsXlsx: {
+        parameters: {
+            query: {
+                leagueId: string;
+                /** @description Defaults to the competition’s current season. */
+                seasonId?: string;
+                title?: string;
+                subtitle?: string;
+                /** @description Matchday number. Empty hides the badge. */
+                matchday?: string;
+                city?: string;
+                /** @description yyyy-mm-dd. Defaults to today. */
+                date?: string;
+                /** @description Defaults to the organisation’s name. */
+                organisation?: string;
+                /** @description The chain of bodies, newline-separated. */
+                letterhead?: string;
+                /** @description The file number the document is classed under. */
+                reference?: string;
+                signatoryRole?: string;
+                signatoryName?: string;
+                signatory2Role?: string;
+                signatory2Name?: string;
+                /** @description Send "false" to publish the table without its bands. */
+                showBands?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    GamesController_recalculateStandings: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RecalculateStandingsDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     GamesController_findGamesDates: {
         parameters: {
             query?: {
@@ -6622,10 +7736,12 @@ export interface operations {
                 tenantId?: string;
                 /** @description Filter by season ID. */
                 seasonId?: string;
+                /** @description Filter by phase (stage) ID. */
+                stageId?: string;
                 /** @description Filter by team ID (either home or away). */
                 teamId?: string;
-                /** @description Filter by game status. */
-                status?: "DRAFT" | "SCHEDULED" | "CONFIRMED" | "LIVE" | "PAUSED" | "COMPLETED" | "CANCELLED" | "POSTPONED" | "RESCHEDULED";
+                /** @description Filter by game status. Repeat the parameter for several. */
+                status?: ("DRAFT" | "SCHEDULED" | "CONFIRMED" | "LIVE" | "PAUSED" | "COMPLETED" | "CANCELLED" | "POSTPONED" | "RESCHEDULED")[];
                 /** @description Filter by date (YYYY-MM-DD). */
                 date?: string;
                 /** @description Start date (inclusive) for filtering games. Format: YYYY-MM-DD */
@@ -6673,10 +7789,12 @@ export interface operations {
                 tenantId?: string;
                 /** @description Filter by season ID. */
                 seasonId?: string;
+                /** @description Filter by phase (stage) ID. */
+                stageId?: string;
                 /** @description Filter by team ID (either home or away). */
                 teamId?: string;
-                /** @description Filter by game status. */
-                status?: "DRAFT" | "SCHEDULED" | "CONFIRMED" | "LIVE" | "PAUSED" | "COMPLETED" | "CANCELLED" | "POSTPONED" | "RESCHEDULED";
+                /** @description Filter by game status. Repeat the parameter for several. */
+                status?: ("DRAFT" | "SCHEDULED" | "CONFIRMED" | "LIVE" | "PAUSED" | "COMPLETED" | "CANCELLED" | "POSTPONED" | "RESCHEDULED")[];
                 /** @description Start date (inclusive) for filtering games. Format: YYYY-MM-DD */
                 fromDate?: string;
                 /** @description End date (exclusive) for filtering games. Format: YYYY-MM-DD */
@@ -6721,10 +7839,12 @@ export interface operations {
                 tenantId?: string;
                 /** @description Filter by season ID. */
                 seasonId?: string;
+                /** @description Filter by phase (stage) ID. */
+                stageId?: string;
                 /** @description Filter by team ID (either home or away). */
                 teamId?: string;
-                /** @description Filter by game status. */
-                status?: "DRAFT" | "SCHEDULED" | "CONFIRMED" | "LIVE" | "PAUSED" | "COMPLETED" | "CANCELLED" | "POSTPONED" | "RESCHEDULED";
+                /** @description Filter by game status. Repeat the parameter for several. */
+                status?: ("DRAFT" | "SCHEDULED" | "CONFIRMED" | "LIVE" | "PAUSED" | "COMPLETED" | "CANCELLED" | "POSTPONED" | "RESCHEDULED")[];
                 /** @description Filter by date (YYYY-MM-DD). */
                 date?: string;
                 /** @description Start date (inclusive) for filtering games. Format: YYYY-MM-DD */
@@ -6813,7 +7933,10 @@ export interface operations {
     };
     GamesController_deleteGame: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Why the fixture was removed. */
+                reason?: string;
+            };
             header?: never;
             path: {
                 id: string;
@@ -6823,6 +7946,44 @@ export interface operations {
         requestBody?: never;
         responses: {
             204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    GamesController_invertGame: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    GamesController_getGameAudit: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -7162,6 +8323,71 @@ export interface operations {
             };
         };
     };
+    GamesController_getBoxScore: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    GamesController_saveBoxScore: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SaveBoxScoreDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    GamesController_addBoxScorePlayer: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AddBoxScorePlayerDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     PublicGamesController_getGameDates: {
         parameters: {
             query?: {
@@ -7337,6 +8563,374 @@ export interface operations {
                 content?: never;
             };
             /** @description Game not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    SportRulesController_getSportRules: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                sportType: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Sport rules retrieved successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SportRulesResponseDto"];
+                };
+            };
+            /** @description Invalid sport type */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Sport rules not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    TenantsController_listTenants: {
+        parameters: {
+            query?: {
+                /** @description Number of items to skip (offset) */
+                skip?: number;
+                /** @description Number of items to take (limit) */
+                take?: number;
+                /** @description Current page number */
+                page?: number;
+                /** @description Page size */
+                pageSize?: number;
+                /** @description Field to sort by */
+                sortBy?: string;
+                /** @description Sort order (asc/desc) */
+                sortOrder?: "asc" | "desc";
+                /** @description Search filter for tenant name or tenant code (case-insensitive) */
+                search?: string;
+                /** @description Filter tenants by active status */
+                isActive?: boolean;
+                /** @description Filter by tenant type */
+                tenantType?: "COMMERCIAL" | "NON_PROFIT" | "GOVERNMENT" | "EDUCATIONAL" | "OTHER";
+                /** @description Filter by sport type */
+                sportType?: "SOCCER" | "BASKETBALL" | "FOOTBALL" | "BASEBALL" | "TENNIS" | "HOCKEY" | "GOLF" | "CRICKET" | "RUGBY" | "VOLLEYBALL" | "OTHER";
+                /** @description Filter by country (ISO 2-letter code) */
+                country?: string;
+                /** @description City where the tenant is based */
+                city?: string;
+                /** @description Filter by specific tenant ID(s). System Admin only. */
+                tenantIds?: string[];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Returns a paginated list of tenants that the authenticated user is authorized to view. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedResponseDto"] & {
+                        data?: components["schemas"]["TenantResponseDto"][];
+                    };
+                };
+            };
+            /** @description Unauthorized - Missing or invalid JWT token. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Forbidden - User does not have required roles (SYSTEM_ADMIN, TENANT_ADMIN). */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    TenantsController_createTenant: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateTenantDto"];
+            };
+        };
+        responses: {
+            /** @description Tenant successfully created. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TenantResponseDto"];
+                };
+            };
+            /** @description Bad Request - Validation failed or user already has a tenant. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unauthorized. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Forbidden - Admin users cannot create new tenants. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Conflict - Tenant code or name already exists. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    TenantsController_getTenantById: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Internal Tenant UUID */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Full tenant details including owner and business profile. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TenantResponseDto"];
+                };
+            };
+            /** @description Unauthorized. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Forbidden - User does not have access to this specific tenant. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not Found - Tenant does not exist or has been deleted. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    TenantsController_updateTenant: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Internal Tenant UUID */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateTenantDto"];
+            };
+        };
+        responses: {
+            /** @description Tenant updated successfully. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TenantResponseDto"];
+                };
+            };
+            /** @description Bad Request - Validation error. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unauthorized. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Forbidden - No permission to update this tenant. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not Found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Conflict - Updated name or code already taken. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    TenantsController_deleteTenant: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Internal Tenant UUID */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Tenant soft-deleted successfully. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bad Request - Tenant has active resources and cannot be deleted. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unauthorized. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Forbidden. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not Found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    PublicTenantsController_listPublicTenants: {
+        parameters: {
+            query?: {
+                /** @description Page number for pagination. */
+                page?: number;
+                /** @description Number of items per page. */
+                pageSize?: number;
+                /** @description Search term for tenant name or code. */
+                search?: string;
+                /** @description Filter by sport type. */
+                sportType?: "SOCCER" | "BASKETBALL" | "FOOTBALL" | "BASEBALL" | "TENNIS" | "HOCKEY" | "GOLF" | "CRICKET" | "RUGBY" | "VOLLEYBALL" | "OTHER";
+                /** @description Filter by country code (e.g., US, GB). */
+                country?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description A paginated list of public tenants. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedResponseDto"] & {
+                        data?: components["schemas"]["PublicTenantResponseDto"][];
+                    };
+                };
+            };
+        };
+    };
+    PublicTenantsController_getTenantBySlug: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The details of the tenant. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublicTenantResponseDto"];
+                };
+            };
+            /** @description Tenant not found or is not currently active. */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -7973,6 +9567,8 @@ export interface operations {
                 to: string;
                 /** @description Narrow to particular competitions. Omit for the whole organisation — which is the point of the calendar: one hall on one Saturday is a single resource however many competitions want it. */
                 leagueIds?: string[];
+                /** @description Narrow to one club’s own fixtures, home and away. What a club administrator means by "the calendar" is when *we* play — the rest of the organisation’s Saturday is somebody else’s problem. */
+                teamId?: string;
                 /** @description Organisation to read (system admins only). */
                 tenantId?: string;
             };
@@ -8023,6 +9619,94 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description Per-row outcome, and totals. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    CalendarController_draft: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FixtureDraftDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FixtureDraftResponseDto"];
+                };
+            };
+        };
+    };
+    CalendarController_publish: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PublishDraftDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublishDraftResponseDto"];
+                };
+            };
+        };
+    };
+    CalendarController_reorder: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReorderStackDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    CalendarController_annotate: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AnnotateDto"];
+            };
+        };
+        responses: {
             201: {
                 headers: {
                     [name: string]: unknown;

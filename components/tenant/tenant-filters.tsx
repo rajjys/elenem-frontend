@@ -135,7 +135,7 @@ export function TenantFilters({ filters, onFilterChange, onPageSizeChange }: Ten
         <Input
           id="tenantSearch"
           type="search" // Use type="search" to benefit from native browser behaviors (e.g., clear button)
-          placeholder="Search by name or code"
+          placeholder="Rechercher un nom ou un code…"
           value={search}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value)}
         />

@@ -91,7 +91,7 @@ export function MultiSelect({
       </PopoverTrigger>
       <PopoverContent ref={contentRef} className="w-[--radix-popover-trigger-width] p-0 bg-surface" align="start">
         <Command>
-          <CommandInput placeholder="Search options..." value={searchValue} onValueChange={setSearchValue} />
+          <CommandInput placeholder="Rechercher…" value={searchValue} onValueChange={setSearchValue} />
           <CommandList>
             <CommandEmpty>No options found.</CommandEmpty>
             <CommandGroup>

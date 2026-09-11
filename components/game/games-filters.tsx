@@ -238,7 +238,7 @@ export function GamesFilters({ filters, onFilterChange, onPageSizeChange, fixedT
         <Input
           id="gameSearch"
           type="search"
-          placeholder="Search by team or venue name"
+          placeholder="Rechercher un club ou une salle…"
           value={search}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value)}
         />

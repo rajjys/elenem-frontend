@@ -98,11 +98,11 @@ export function PostForm({ initialData, onSuccess, onCancel }: PostFormProps) {
       if (isEditMode && initialData?.id) {
         // UPDATE: PUT request
         await api.put(`/posts/${initialData.id}`, payload);
-        toast.success("Post updated successfully!");
+        toast.success("Actualité enregistrée.");
       } else {
         // CREATE: POST request
         await api.post("/posts", payload);
-        toast.success("Post created successfully!");
+        toast.success("Actualité publiée.");
       }
 
       onSuccess();
@@ -113,7 +113,7 @@ export function PostForm({ initialData, onSuccess, onCancel }: PostFormProps) {
   }
 
   // 4. Determine button text
-  const buttonText = isEditMode ? "Update Post" : "Create Post";
+  const buttonText = isEditMode ? "Enregistrer" : "Publier";
 
   // Display the existing hero image if no new file is being uploaded
   const existingImage = !uploadedAsset && initialData?.heroImage?.url;
@@ -160,7 +160,7 @@ export function PostForm({ initialData, onSuccess, onCancel }: PostFormProps) {
       </div>
       {/* Hero Image */}
       <div>
-        <Label htmlFor="heroImage">Hero Image</Label>
+        <Label htmlFor="heroImage">Image de couverture</Label>
         
         <label
           htmlFor="heroImage"
@@ -188,7 +188,7 @@ export function PostForm({ initialData, onSuccess, onCancel }: PostFormProps) {
           <div className="mt-2">
             <Image
               src={uploadedAsset?.url || initialData?.heroImage?.url || ""}
-              alt="Hero"
+              alt=""
               width={400}
               height={280}
               className="rounded object-cover h-84 w-full border border-line shadow-sm"
@@ -209,7 +209,7 @@ export function PostForm({ initialData, onSuccess, onCancel }: PostFormProps) {
             onValueChange={(val) => form.setValue("type", val as PostType)}
           >
             <SelectTrigger id="type">
-              <SelectValue placeholder="Select type" />
+              <SelectValue placeholder="Choisir un type" />
             </SelectTrigger>
             <SelectContent>
               {Object.values(PostType).map((t) => (
@@ -222,13 +222,13 @@ export function PostForm({ initialData, onSuccess, onCancel }: PostFormProps) {
         </div>
         
         <div>
-          <Label htmlFor="status">Status</Label>
+          <Label htmlFor="status">État</Label>
           <Select
             value={form.watch("status")}
             onValueChange={(val) => form.setValue("status", val as PostStatus)}
           >
             <SelectTrigger id="status">
-              <SelectValue placeholder="Select status" />
+              <SelectValue placeholder="Choisir un état" />
             </SelectTrigger>
             <SelectContent>
               {Object.values(PostStatus).map((s) => (
@@ -257,11 +257,11 @@ export function PostForm({ initialData, onSuccess, onCancel }: PostFormProps) {
                 onValueChange={(val: PostTargetType) => form.setValue("targetType", val)}
             >
                 <SelectTrigger id="target-scope">
-                    <SelectValue placeholder="Select scope" />
+                    <SelectValue placeholder="Choisir la portée" />
                 </SelectTrigger>
                 <SelectContent>
-                    <SelectItem value="TENANT">Tenant</SelectItem>
-                    <SelectItem value="LEAGUE">League</SelectItem>
+                    <SelectItem value="TENANT">Organisation</SelectItem>
+                    <SelectItem value="LEAGUE">Compétition</SelectItem>
                     <SelectItem value="TEAM">Team</SelectItem>
                 </SelectContent>
             </Select>
@@ -285,7 +285,7 @@ export function PostForm({ initialData, onSuccess, onCancel }: PostFormProps) {
             type="submit" 
             disabled={form.formState.isSubmitting || uploading}
         >
-          {form.formState.isSubmitting ? `${isEditMode ? "Updating" : "Creating"}...` : buttonText}
+          {form.formState.isSubmitting ? `${isEditMode ? "Enregistrement…" : "Publication…"}...` : buttonText}
         </Button>
       </div>
     </form>
