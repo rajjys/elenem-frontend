@@ -384,38 +384,41 @@ this.
 
 ---
 
-### Step 4 — Render (the API)
+### Step 4 — Railway (the API)
 
-1. `render.com` → sign in with GitHub → **New** → **Web Service** → pick the `elenem` repository.
-2. Settings:
-   - **Region**: Frankfurt.
+1. `railway.app` → sign in with GitHub → **New Project** → **Deploy from GitHub repo** → pick
+   `elenem-backend` (or the monorepo, with **Root Directory** set to `elenem-backend` if needed).
+2. **Settings** → **Deploy**:
    - **Build command**: `npm install && npx prisma generate && npm run build`
-   - **Start command**: `npm run start:prod`
-   - **Instance type**: **Free**.
-3. **Environment variables** — everything the API needs:
+   - **Start command**: `npx prisma migrate deploy && npm run start:prod`
+   - **Region**: pick the closest to Kinshasa/Goma (e.g. **EU West**).
+3. **Variables** — everything the API needs:
    ```
    DATABASE_URL       = the Neon string from step 3
    JWT_SECRET         = a long random string
    JWT_REFRESH_SECRET = a different long random string
    FRONTEND_URL       = https://dxscores.com
+   CORS_ROOT_DOMAIN   = dxscores.com
    NODE_ENV           = production
+   PORT               = (Railway sets this automatically — do not hard-code)
    ```
    Generate secrets with `openssl rand -base64 48`. Never reuse your local ones.
-4. Deploy. The first build takes a few minutes. You get a URL like
-   `https://elenem-api.onrender.com`.
-5. **Custom domain**: Render → *Settings* → *Custom Domains* → add `api.dxscores.com`. Render shows
-   a CNAME target.
+4. Deploy. The first build takes a few minutes. Railway gives you a public URL like
+   `https://dxscores-production.up.railway.app`.
+5. **Custom domain**: Railway → your service → **Settings** → **Networking** → **Custom Domain** →
+   add `api.dxscores.com`. Railway shows a CNAME target (often something like
+   `xxxx.up.railway.app`).
 6. In **Cloudflare** → `dxscores.com` → **DNS** → **Add record**:
 
    | Field | Value |
    |---|---|
    | Type | `CNAME` |
    | Name | `api` |
-   | Target | `elenem-api.onrender.com` |
+   | Target | the hostname Railway shows (e.g. `dxscores-production.up.railway.app`) |
    | Proxy | **Grey — DNS only** |
 
-**Worked when:** `curl https://api.dxscores.com/health` answers. The very first call may take a
-minute — that is the free tier waking up, and step 10 is what stops it happening again.
+**Worked when:** `curl https://api.dxscores.com/health` answers with a 200. Unlike Render's free
+tier, Railway does not spin down after idle time — step 10 (keep-alive ping) is optional on Railway.
 
 ---
 
@@ -500,7 +503,7 @@ than a DNS error. It will show whatever your middleware does with an unknown ten
    Secret Access Key
    Endpoint     https://<account-id>.r2.cloudflarestorage.com
    ```
-5. Add them to **Render**'s environment:
+5. Add them to **Railway**'s environment:
    ```
    R2_ACCOUNT_ID        = ...
    R2_ACCESS_KEY_ID     = ...
@@ -523,7 +526,7 @@ than a DNS error. It will show whatever your middleware does with an unknown ten
    These prove to Gmail that mail claiming to be from `dxscores.com` really is. Without them your
    verification emails land in spam, which on a self-serve product means nobody ever finishes
    signing up.
-3. Create an **API key** and add it to Render:
+3. Create an **API key** and add it to Railway:
    ```
    RESEND_API_KEY = re_...
    MAIL_FROM      = DXScores <noreply@dxscores.com>
