@@ -42,7 +42,7 @@ reason.
   │  DNS: Cloudflare                  │   │  DNS: Vercel (required)          │
   │                                   │   │                                  │
   │  @ , www   → Vercel   (app)       │   │  *.<name>.app → Vercel           │
-  │  api       → Render   (NestJS)    │   │                                  │
+  │  api       → Railway  (NestJS)    │   │                                  │
   │  media     → R2       (images)    │   │  libago.<name>.app               │
   │  TXT/DKIM  → Resend   (email)     │   │  liprobakin.<name>.app           │
   └───────────────────────────────────┘   └──────────────────────────────────┘
@@ -280,7 +280,7 @@ take effect. After that you never touch Namecheap's DNS panel again.
 | Type | Answers | Looks like | Where you'll use it |
 |---|---|---|---|
 | **A** | "which IP address?" | `@ → 76.76.21.21` | the apex `dxscores.com` → Vercel |
-| **CNAME** | "same as this other name" | `api → elenem-api.onrender.com` | every subdomain |
+| **CNAME** | "same as this other name" | `api → dxscores-production.up.railway.app` | API subdomain |
 | **TXT** | "here is some text" | `@ → v=spf1 include:...` | proving you own the domain; email |
 | **MX** | "who receives mail here" | only if you host email | not needed unless you add mailboxes |
 
@@ -304,7 +304,7 @@ Cloudflare puts a cloud icon next to each record.
   Cloudflare's certificate.
 - **Grey (DNS only)** — Cloudflare just answers the question and steps out of the way.
 
-> **Use grey for anything pointing at Vercel or Render.** Both issue their own certificates, and
+> **Use grey for anything pointing at Vercel or Railway.** Both issue their own certificates, and
 > stacking Cloudflare's proxy on top is the classic cause of redirect loops and
 > `ERR_TOO_MANY_REDIRECTS` on a first launch. The one record that **must stay orange** is R2's
 > media domain, and Cloudflare creates that one for you.
@@ -313,7 +313,7 @@ Cloudflare puts a cloud icon next to each record.
 
 ```bash
 dig dxscores.com +short            # should print an IP
-dig api.dxscores.com +short        # should print the Render hostname
+dig api.dxscores.com +short        # should print the Railway hostname
 dig NS dxscores.com +short         # which nameservers are live right now
 ```
 
@@ -368,7 +368,7 @@ this.
 
 1. `neon.tech` → sign in with GitHub → **Create project**.
 2. Region: **Frankfurt** or **Paris** — closest to Kinshasa and Goma of what is offered, and the
-   same choice you will make for Render so the two are not talking across an ocean.
+   same choice you will make for Railway so the two are not talking across an ocean.
 3. Copy the **connection string**. It looks like:
    ```
    postgresql://user:password@ep-xxx.eu-central-1.aws.neon.tech/neondb?sslmode=require
@@ -386,39 +386,101 @@ this.
 
 ### Step 4 — Railway (the API)
 
+The backend repo on GitHub is still named `elenem-backend`; that is fine — Railway deploys the code,
+not the product name.
+
+#### 4.1 Create the service
+
 1. `railway.app` → sign in with GitHub → **New Project** → **Deploy from GitHub repo** → pick
-   `elenem-backend` (or the monorepo, with **Root Directory** set to `elenem-backend` if needed).
+   `elenem-backend`.
 2. **Settings** → **Deploy**:
    - **Build command**: `npm install && npx prisma generate && npm run build`
    - **Start command**: `npx prisma migrate deploy && npm run start:prod`
-   - **Region**: pick the closest to Kinshasa/Goma (e.g. **EU West**).
-3. **Variables** — everything the API needs:
-   ```
-   DATABASE_URL       = the Neon string from step 3
-   JWT_SECRET         = a long random string
-   JWT_REFRESH_SECRET = a different long random string
-   FRONTEND_URL       = https://dxscores.com
-   CORS_ROOT_DOMAIN   = dxscores.com
-   NODE_ENV           = production
-   PORT               = (Railway sets this automatically — do not hard-code)
-   ```
-   Generate secrets with `openssl rand -base64 48`. Never reuse your local ones.
-4. Deploy. The first build takes a few minutes. Railway gives you a public URL like
-   `https://dxscores-production.up.railway.app`.
-5. **Custom domain**: Railway → your service → **Settings** → **Networking** → **Custom Domain** →
-   add `api.dxscores.com`. Railway shows a CNAME target (often something like
-   `xxxx.up.railway.app`).
-6. In **Cloudflare** → `dxscores.com` → **DNS** → **Add record**:
+   - **Region**: closest to Kinshasa/Goma (e.g. **EU West**).
+
+#### 4.2 Environment variables
+
+In Railway → your backend service → **Variables**, set:
+
+| Variable | Value |
+|---|---|
+| `DATABASE_URL` | the Neon connection string from step 3 |
+| `JWT_SECRET` | see below — generate a **new** one |
+| `JWT_REFRESH_SECRET` | see below — generate a **second**, different one |
+| `FRONTEND_URL` | `https://dxscores.com` (or your Vercel preview URL until the domain is live) |
+| `CORS_ROOT_DOMAIN` | `dxscores.com` |
+| `NODE_ENV` | `production` |
+| `PORT` | **do not set** — Railway injects this automatically |
+
+**What `openssl rand -base64 48` means:** open a terminal and run that command twice. Each run
+prints a long random string (about 64 characters). Paste the first output as `JWT_SECRET`, the
+second as `JWT_REFRESH_SECRET`. These strings are the keys used to sign login tokens.
+
+**Why "never reuse your local ones":** the values in your laptop's `.env` file were created for
+development. They may have been committed to git, shared in chat, or used on other machines.
+Production needs **fresh secrets that exist only on Railway**. Copy-pasting your local
+`JWT_SECRET` would work technically, but it is a security mistake.
+
+Example (run twice, use each output once):
+```bash
+openssl rand -base64 48
+openssl rand -base64 48
+```
+
+#### 4.3 Deploy and check the Railway URL
+
+After the first successful deploy, Railway gives you two hostnames:
+
+| Hostname | What it is | Who uses it |
+|---|---|---|
+| `dxscores-production.up.railway.app` | **Public** — reachable from the internet | Browsers, Vercel, `curl`, Cloudflare CNAME |
+| `dxscores.railway.internal` | **Private** — only other Railway services in the same project | Never put this in the frontend or DNS |
+
+**Worked when (right now, before any custom domain):**
+```bash
+curl https://dxscores-production.up.railway.app/auth/health
+# → {"status":"OK"}
+
+curl https://dxscores-production.up.railway.app/public-teams
+# → {"data":[],"totalItems":0,...}   ← empty is normal on a fresh database with no teams yet
+```
+
+If `/auth/health` returns OK, the API is live. An empty `/public-teams` list just means nobody has
+created teams in production yet — it is not an error.
+
+Set this on Vercel (step 5) until the custom domain is ready:
+```
+NEXT_PUBLIC_API_URL = https://dxscores-production.up.railway.app
+```
+
+#### 4.4 Custom domain `api.dxscores.com` (when Cloudflare is ready)
+
+Do this **after** step 2 (Cloudflare active on `dxscores.com`). Skip for now if you are still
+testing with the Railway URL above.
+
+1. Railway → backend service → **Settings** → **Networking** → **Custom Domain** → add
+   `api.dxscores.com`.
+2. Railway shows a CNAME target — use **`dxscores-production.up.railway.app`** (your public
+   hostname).
+3. In **Cloudflare** → `dxscores.com` → **DNS** → **Add record**:
 
    | Field | Value |
    |---|---|
    | Type | `CNAME` |
    | Name | `api` |
-   | Target | the hostname Railway shows (e.g. `dxscores-production.up.railway.app`) |
+   | Target | `dxscores-production.up.railway.app` |
    | Proxy | **Grey — DNS only** |
 
-**Worked when:** `curl https://api.dxscores.com/health` answers with a 200. Unlike Render's free
-tier, Railway does not spin down after idle time — step 10 (keep-alive ping) is optional on Railway.
+4. Update Vercel: `NEXT_PUBLIC_API_URL = https://api.dxscores.com` and redeploy.
+
+**Worked when:**
+```bash
+curl https://api.dxscores.com/auth/health
+# → {"status":"OK"}
+```
+
+Unlike Render's free tier, Railway does not spin down after idle time — step 10 (keep-alive ping)
+is optional on Railway.
 
 ---
 
