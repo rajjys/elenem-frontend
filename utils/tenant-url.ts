@@ -6,8 +6,9 @@
 export function buildTenantUrl(slug: string, path = ''): string {
   const isDev = process.env.NODE_ENV === 'development';
   const protocol = isDev ? 'http://' : 'https://';
-  const rootDomain = isDev
-    ? 'lvh.me:3000'
-    : process.env.NEXT_PUBLIC_ROOT_DOMAIN || 'elenem.site';
-  return `${protocol}${slug}.${rootDomain}${path}`;
+  if (isDev) {
+    return `${protocol}${slug}.lvh.me:3000${path}`;
+  }
+  const tenantDomain = process.env.NEXT_PUBLIC_TENANT_DOMAIN || process.env.NEXT_PUBLIC_ROOT_DOMAIN || 'elenem.site';
+  return `${protocol}${slug}.${tenantDomain}${path}`;
 }
