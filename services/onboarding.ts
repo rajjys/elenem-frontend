@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { api, isAxiosError } from './api';
 import { parseResponse } from './parse-response';
 import { useAuthStore } from '@/store/auth.store';
+import { isReservedTenantSlug } from '@/utils/reserved-slugs';
 
 /**
  * Bringing a league onto the platform.
@@ -74,7 +75,7 @@ export function onboardingError(error: unknown): { field?: OnboardingField; mess
 const AvailabilitySchema = z.object({
   email: z.enum(['free', 'taken']).optional(),
   organisationName: z.enum(['free', 'taken']).optional(),
-  tenantCode: z.enum(['free', 'taken']).optional(),
+  tenantCode: z.enum(['free', 'taken', 'reserved']).optional(),
 });
 
 export type AvailabilityQuery = { email?: string; organisationName?: string; tenantCode?: string };
@@ -151,5 +152,9 @@ export function suggestTenantCode(name: string): string {
       ? words.map((w) => w[0]).join('')
       : (words[0] ?? name.replace(/[^A-Za-z0-9]/g, ''));
 
-  return base.toUpperCase().slice(0, 12);
+  let candidate = base.toUpperCase().slice(0, 12);
+  if (isReservedTenantSlug(candidate.toLowerCase())) {
+    candidate = (candidate + '1').slice(0, 12);
+  }
+  return candidate;
 }

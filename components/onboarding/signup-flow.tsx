@@ -28,6 +28,7 @@ import {
   useRegisterOrganisation,
   type RegisterOrganisationValues,
 } from '@/services/onboarding';
+import { buildTenantUrl } from '@/utils/tenant-url';
 
 /**
  * A first guess at the organiser's country, from their device's time zone.
@@ -133,7 +134,7 @@ export function SignUpFlow() {
   // Once the organiser edits the code themselves it stops following the organisation name —
   // their acronym is a decision, not a draft to be overwritten on the next keystroke.
   const codeEdited = useRef(false);
-  const [codeStatus, setCodeStatus] = useState<'idle' | 'checking' | 'free' | 'taken'>('idle');
+  const [codeStatus, setCodeStatus] = useState<'idle' | 'checking' | 'free' | 'taken' | 'reserved'>('idle');
   const countryTouched = useRef(false);
 
   const checkAvailability = useCheckAvailability();
@@ -197,26 +198,30 @@ export function SignUpFlow() {
     }
   }, [organisationName, tenantCode, setValue]);
 
-  // Checked as it settles, so a taken code is known before the submit rather than by being
-  // refused by it. Previously the field was labelled optional and could still fail the request,
-  // which is a contradiction the organiser had no way to see coming.
-  useEffect(() => {
-    const code = (tenantCode ?? '').trim();
-    if (code.length < 2) {
-      setCodeStatus('idle');
-      return;
-    }
-    setCodeStatus('checking');
-    const timer = setTimeout(() => {
-      checkCode
-        .mutateAsync({ tenantCode: code })
-        .then((r) => setCodeStatus(r.tenantCode === 'taken' ? 'taken' : 'free'))
-        .catch(() => setCodeStatus('idle'));
-    }, 450);
-    return () => clearTimeout(timer);
-    // checkCode is a stable mutation handle; including it would restart the timer every render.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tenantCode]);
+// Checked as it settles, so a taken code is known before the submit rather than by being
+      // refused by it. Previously the field was labelled optional and could still fail the
+      // request, which is a contradiction the organiser had no way to see coming.
+      //
+      // A reserved code is checked the same way, live: "API" and "WWW" are not names another
+      // federation got to first, they are names the platform answers on itself, and saying so
+      // on the step where it was typed beats a 409 at the end of a six-field form.
+      useEffect(() => {
+        const code = (tenantCode ?? '').trim();
+        if (code.length < 2) {
+          setCodeStatus('idle');
+          return;
+        }
+        setCodeStatus('checking');
+        const timer = setTimeout(() => {
+          checkCode
+            .mutateAsync({ tenantCode: code })
+            .then((r) => setCodeStatus(r.tenantCode === 'taken' ? 'taken' : r.tenantCode === 'reserved' ? 'reserved' : 'free'))
+            .catch(() => setCodeStatus('idle'));
+        }, 450);
+        return () => clearTimeout(timer);
+        // checkCode is a stable mutation handle; including it would restart the timer every render.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+      }, [tenantCode]);
 
   /** Validate one step's fields only, so the other step's emptiness is not an error yet. */
   function validateStep(fields: readonly (keyof RegisterOrganisationValues)[]) {
@@ -255,6 +260,13 @@ export function SignUpFlow() {
       setError('tenantCode', { message: 'Ce code est déjà pris. Choisissez-en un autre.' });
       return;
     }
+    if (codeStatus === 'reserved') {
+      // A reserved code is not a clash with another federation — it is a name the platform
+      // answers on itself. The fix is choosing a different acronym, so say that rather than
+      // inviting them to wait for it to free up.
+      setError('tenantCode', { message: 'Ce code est réservé. Choisissez-en un autre.' });
+      return;
+    }
 
     try {
       const result = await registerOrganisation.mutateAsync(getValues());
@@ -286,7 +298,7 @@ export function SignUpFlow() {
             <PartyPopper className="h-5 w-5 shrink-0 text-positive" aria-hidden />
             <p className="text-sm text-ink">
               Votre adresse publique&nbsp;:{' '}
-              <span className="font-medium">{created.tenantCode.toLowerCase()}.elenem.site</span>
+              <span className="font-medium">{buildTenantUrl(created.tenantCode.toLowerCase())}</span>
             </p>
           </div>
 
@@ -474,8 +486,13 @@ export function SignUpFlow() {
                 <FieldError message={formState.errors.tenantCode.message} />
               ) : codeStatus === 'taken' ? (
                 <p className="text-negative text-xs" role="alert">
-                  <span className="font-medium">{previewCode}</span>.elenem.site est déjà pris.
+                  <span className="font-medium">{buildTenantUrl(previewCode)}</span> est déjà pris.
                   Choisissez un autre code.
+                </p>
+              ) : codeStatus === 'reserved' ? (
+                <p className="text-negative text-xs" role="alert">
+                  <span className="font-medium">{buildTenantUrl(previewCode)}</span> est réservé — ce nom est utilisé par
+                  la plateforme elle-même. Choisissez un autre code.
                 </p>
               ) : (
                 <p className="text-xs text-ink-subtle">
@@ -487,7 +504,6 @@ export function SignUpFlow() {
                   >
                     {previewCode || 'votre-code'}
                   </span>
-                  .elenem.site
                   {codeStatus === 'free' && ' — disponible'}
                 </p>
               )}
