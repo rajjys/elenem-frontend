@@ -42,11 +42,16 @@ reason.
   │  DNS: Cloudflare                  │   │  DNS: Vercel (required)          │
   │                                   │   │                                  │
   │  @ , www   → Vercel   (app)       │   │  *.<name>.app → Vercel           │
-  │  api       → Railway  (NestJS)    │   │                                  │
-  │  media     → R2       (images)    │   │  libago.<name>.app               │
-  │  TXT/DKIM  → Resend   (email)     │   │  liprobakin.<name>.app           │
+  │  media     → R2       (images)    │   │                                  │
+  │  TXT/DKIM  → Resend   (email)     │   │  libago.<name>.app               │
+  │                                   │   │  liprobakin.<name>.app           │
   └───────────────────────────────────┘   └──────────────────────────────────┘
+
+  API (NestJS): Railway, on its own hostname — dxscores-production.up.railway.app
 ```
+
+The API has **no hostname on either domain**. Railway's free plan does not allow custom domains, so
+the frontend calls the Railway hostname directly. See §2.
 
 ### Why two, and not one
 
@@ -100,32 +105,28 @@ tenants, not on subdomain tenants — those are covered by the one wildcard entr
 > DXScores charges anybody, Vercel Pro ($20/mo) stops being optional. That is a licence term, not a
 > technical limit, and it is worth knowing before it is a surprise.
 
-### Backend — Render, free tier + a keep-alive ping
+### Backend — Railway, free plan, on Railway's own hostname
 
-**Decided: free, with a ping, and revisit with numbers.**
+**Decided 2026-09-13: Railway.** Render was tried first and left.
 
-Checked against Render's own free-tier documentation:
+The API is served at **`https://dxscores-production.up.railway.app`**, and that is the address the
+frontend is built against (`NEXT_PUBLIC_API_URL`). **There is no `api.dxscores.com`.** Railway's free
+plan does not allow a custom domain, so none is configured. An `api` record pointing at Railway does
+nothing useful on the free plan: Railway answers it with its own `*.up.railway.app` certificate and
+every browser refuses the connection.
 
-| | |
-|---|---|
-| Spin-down | after **15 minutes** without inbound traffic |
-| Cold start | **about one minute**, showing a loading page |
-| Budget | **750 instance-hours per month, per workspace** |
-| Free Postgres | **expires 30 days after creation** |
+That costs nothing today. Browsers never show the API's hostname, and CORS is keyed on the
+frontend's origin, not the API's. The API gets a custom domain when Railway is on a paid plan:
 
-A federation secretary opens Elenem once a day. Without intervention *every* first request of the
-day is a one-minute wait — which is not slowness, it is the product appearing to be broken.
+1. Railway → service → *Settings* → *Networking* → add the custom domain and complete its
+   verification.
+2. Cloudflare → `dxscores.com` → a grey-clouded `CNAME api → dxscores-production.up.railway.app`.
+3. Check `curl https://api.dxscores.com/auth/health` returns OK over HTTPS **before** changing
+   anything else.
+4. Vercel → `NEXT_PUBLIC_API_URL = https://api.dxscores.com`, and redeploy.
 
-So a free cron (cron-job.org, UptimeRobot) hits `/health` every ten minutes and it never sleeps.
-The arithmetic is tight and worth writing down: **24/7 is ~730 hours against a 750 budget.** It
-fits, with about twenty hours spare, and it means **there is no room for a second free service** in
-the same workspace — no free staging backend. That is the actual cost of this choice, and it is
-worth more than $7/month until there is a reason otherwise.
-
-Render Starter is **$7/month** and removes all of the above. Revisit when the ping proves
-unreliable, when a staging backend is wanted, or when the first federation is paying.
-
-*(Railway was the original plan and is out: it requires a card, and not a prepaid one.)*
+Step 3 comes first for a reason: switching the variable before the certificate exists takes the
+whole app down.
 
 ### Database — Neon
 
@@ -141,7 +142,7 @@ human involved**, and branching — which matters more here than it looks, becau
 migration rule is strict (`docs/ELENEM_LOCAL_DEV`: never `db push`, always a migration off the
 baseline). Testing a migration against a branch of real data is the cheapest way to keep that rule.
 
-The backend is a long-lived Render process, not a serverless function, so a direct connection is
+The backend is a long-lived Railway process, not a serverless function, so a direct connection is
 correct and none of the pooling complexity applies.
 
 ### Object storage — Cloudflare R2
@@ -183,7 +184,7 @@ Unchanged from the roadmap.
 |---|---|---|
 | Two domains | — | ~$12–26 |
 | Vercel Hobby | $0 | |
-| Render free + cron ping | $0 | |
+| Railway free plan | $0 | |
 | Neon free | $0 | |
 | Cloudflare R2 (10 GB) | $0 | |
 | Resend free | $0 | |
@@ -192,7 +193,8 @@ Unchanged from the roadmap.
 
 First things to cost money, in the order they will:
 
-1. **Render Starter, $7/mo** — the moment the ping is not enough, or a staging backend is wanted.
+1. **A paid Railway plan** — the moment the API needs its own domain (`api.dxscores.com`), more
+   resources, or a staging backend.
 2. **Vercel Pro, $20/mo** — the moment DXScores charges anybody, on licence grounds.
 3. Neon and R2 have real headroom; neither is a near-term concern.
 
@@ -239,9 +241,8 @@ and it is what keeps a move cheap if R2's terms ever change.
 | 2026-09-11 | **Cloudflare R2** for object storage | 10 GB free with no expiry, zero egress, S3-compatible, no card |
 | 2026-09-11 | **Two domains**, `.com` app / `.app` tenants | Vercel wildcard needs Vercel NS; R2 custom domain needs Cloudflare NS; one apex cannot do both |
 | 2026-09-11 | **Wildcard, not manual subdomains** | Self-serve onboarding is a Phase 5 goal; a tenant cannot wait on a human adding DNS |
-| 2026-09-11 | **Render free + keep-alive ping** | 15-min sleep and a 1-min cold start would meet the secretary every morning; 730 of 750 hours fits, and $7/mo is deferred, not refused |
 | 2026-09-11 | **Neon, not Supabase** | Elenem uses none of Supabase's extras; a free Supabase project pauses after 7 days idle needing a manual restore, Neon resumes in under a second |
-| 2026-09-11 | **Not Railway** | Requires a card, and will not take a prepaid one |
+| 2026-09-13 | **Railway free plan** for the API, not Render | Render was tried and left. The free plan allows no custom domain, so the API lives at `dxscores-production.up.railway.app` and there is no `api.dxscores.com` until a paid plan |
 | 2026-09-11 | **Vercel Hobby** | Free and correct for Next.js; Pro becomes a licence requirement the day DXScores charges |
 | 2026-09-11 | **Renamed DXScores**, domains `dxscores.com` / `dxscores.app` | `elenem.com` unavailable; `dx` as in `d/dx` — deriving insight from scores. Code rename is a Phase 5 task, not a prerequisite |
 | 2026-09-11 | **Item 17 is not blocking** | Local clubs often have no logo. A missing image renders a placeholder; launching is the requirement, images are not |
@@ -280,13 +281,13 @@ take effect. After that you never touch Namecheap's DNS panel again.
 | Type | Answers | Looks like | Where you'll use it |
 |---|---|---|---|
 | **A** | "which IP address?" | `@ → 76.76.21.21` | the apex `dxscores.com` → Vercel |
-| **CNAME** | "same as this other name" | `api → dxscores-production.up.railway.app` | API subdomain |
+| **CNAME** | "same as this other name" | `www → cname.vercel-dns.com` | `www` → Vercel |
 | **TXT** | "here is some text" | `@ → v=spf1 include:...` | proving you own the domain; email |
 | **MX** | "who receives mail here" | only if you host email | not needed unless you add mailboxes |
 
 Two terms in the forms:
 
-- **Name** (or *host*) is the part **before** the domain. `api` means `api.dxscores.com`. `@` means
+- **Name** (or *host*) is the part **before** the domain. `www` means `www.dxscores.com`. `@` means
   the domain itself with nothing in front. `*` means *anything*.
 - **TTL** is how long others may cache the answer. **Leave it on Auto.** It only matters when you
   are about to change a record and want the old answer to expire quickly.
@@ -304,7 +305,7 @@ Cloudflare puts a cloud icon next to each record.
   Cloudflare's certificate.
 - **Grey (DNS only)** — Cloudflare just answers the question and steps out of the way.
 
-> **Use grey for anything pointing at Vercel or Railway.** Both issue their own certificates, and
+> **Use grey for anything pointing at Vercel.** Both issue their own certificates, and
 > stacking Cloudflare's proxy on top is the classic cause of redirect loops and
 > `ERR_TOO_MANY_REDIRECTS` on a first launch. The one record that **must stay orange** is R2's
 > media domain, and Cloudflare creates that one for you.
@@ -313,7 +314,6 @@ Cloudflare puts a cloud icon next to each record.
 
 ```bash
 dig dxscores.com +short            # should print an IP
-dig api.dxscores.com +short        # should print the Railway hostname
 dig NS dxscores.com +short         # which nameservers are live right now
 ```
 
@@ -448,39 +448,15 @@ curl https://dxscores-production.up.railway.app/public-teams
 If `/auth/health` returns OK, the API is live. An empty `/public-teams` list just means nobody has
 created teams in production yet — it is not an error.
 
-Set this on Vercel (step 5) until the custom domain is ready:
+This is the API's address, full stop — set it on Vercel in step 5:
 ```
 NEXT_PUBLIC_API_URL = https://dxscores-production.up.railway.app
 ```
 
-#### 4.4 Custom domain `api.dxscores.com` (when Cloudflare is ready)
+#### 4.4 No custom domain for the API
 
-Do this **after** step 2 (Cloudflare active on `dxscores.com`). Skip for now if you are still
-testing with the Railway URL above.
-
-1. Railway → backend service → **Settings** → **Networking** → **Custom Domain** → add
-   `api.dxscores.com`.
-2. Railway shows a CNAME target — use **`dxscores-production.up.railway.app`** (your public
-   hostname).
-3. In **Cloudflare** → `dxscores.com` → **DNS** → **Add record**:
-
-   | Field | Value |
-   |---|---|
-   | Type | `CNAME` |
-   | Name | `api` |
-   | Target | `dxscores-production.up.railway.app` |
-   | Proxy | **Grey — DNS only** |
-
-4. Update Vercel: `NEXT_PUBLIC_API_URL = https://api.dxscores.com` and redeploy.
-
-**Worked when:**
-```bash
-curl https://api.dxscores.com/auth/health
-# → {"status":"OK"}
-```
-
-Unlike Render's free tier, Railway does not spin down after idle time — step 10 (keep-alive ping)
-is optional on Railway.
+Railway's free plan does not allow one, so there is no `api.dxscores.com` and no DNS record for the
+API. §2 has the four steps for the day Railway is on a paid plan.
 
 ---
 
@@ -489,7 +465,7 @@ is optional on Railway.
 1. `vercel.com` → sign in with GitHub → **Add New** → **Project** → `elenem-frontend`.
 2. **Environment variables**:
    ```
-   NEXT_PUBLIC_API_URL       = https://api.dxscores.com
+   NEXT_PUBLIC_API_URL       = https://dxscores-production.up.railway.app
    NEXT_PUBLIC_APP_DOMAIN    = dxscores.com
    NEXT_PUBLIC_TENANT_DOMAIN = dxscores.app
    ```
@@ -521,8 +497,7 @@ the connection is secure — Vercel redirects to HTTPS, Cloudflare re-requests o
 browser gives up with `ERR_TOO_MANY_REDIRECTS`. It is the single most common launch-day failure and
 it costs an hour to diagnose if you do not know to look.
 
-**Worked when:** `https://dxscores.com` and `https://api.dxscores.com` both load with a valid
-padlock.
+**Worked when:** `https://dxscores.com` loads with a valid padlock.
 
 ---
 
@@ -599,21 +574,7 @@ verification mail to a Gmail address **in the inbox, not spam**. Test with a rea
 
 ---
 
-### Step 10 — The keep-alive ping
-
-Without this, the API sleeps after fifteen minutes and the next person waits a minute (§2).
-
-1. `cron-job.org` → free account → **Create cronjob**.
-2. URL `https://api.dxscores.com/health`, every **10 minutes**, enabled.
-
-**Worked when:** open the app cold after an hour and the first page is fast.
-
-> Watch **Render → Metrics → instance hours** for the first month. 24/7 is ~730 against a 750
-> budget. If it creeps, that is the signal to take the $7 plan, not a crisis.
-
----
-
-### Step 11 — Sentry, and CI
+### Step 10 — Sentry, and CI
 
 1. `sentry.io` → free account → two projects, Next.js and Node. Add each DSN to the matching
    environment.
@@ -630,7 +591,6 @@ Without this, the API sleeps after fifteen minutes and the next person waits a m
 | Vercel says *Invalid Configuration* | Record is orange-clouded. Set it **grey** |
 | Domain does nothing at all | Nameservers have not propagated. `dig NS dxscores.com +short` |
 | Verification mail in spam | A Resend DNS record is missing or mistyped |
-| API takes a minute, always | The cron ping is not running (step 10) |
 | `.app` refuses http:// | Correct and unavoidable. `.app` is HSTS-preloaded — use https:// |
 | Wildcard will not verify | `dxscores.app` must be on **Vercel** nameservers, not Cloudflare |
 
