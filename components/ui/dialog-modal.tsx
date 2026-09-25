@@ -11,13 +11,23 @@ export function Modal({
   open,
   onOpenChange,
   title,
+  description,
   children,
   footer,
   className,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  title: string;
+  /** Usually a string. A node when part of it should read quieter, like a date beside the verb. */
+  title: ReactNode;
+  /**
+   * A line under the title, in the header rather than the body.
+   *
+   * Callers used to put it at the top of the body and pull it up with a negative margin, which
+   * tucked it under the header's edge — the body scrolls, and its top is a clipping line. Here it
+   * never scrolls away, and it is the dialog's accessible description.
+   */
+  description?: ReactNode;
   children: ReactNode;
   /**
    * Pinned below the scrolling body rather than at the end of it.
@@ -41,8 +51,15 @@ export function Modal({
             className,
           )}
         >
-          <div className="flex shrink-0 items-center justify-between px-6 pt-6 pb-4">
-            <Dialog.Title className="text-xl font-semibold text-ink">{title}</Dialog.Title>
+          <div className="flex shrink-0 items-start justify-between gap-4 px-6 pt-6 pb-4">
+            <div className="min-w-0">
+              <Dialog.Title className="text-xl font-semibold text-ink">{title}</Dialog.Title>
+              {description && (
+                <Dialog.Description className="mt-0.5 text-sm text-ink-muted">
+                  {description}
+                </Dialog.Description>
+              )}
+            </div>
             <Dialog.Close className="rounded p-1 text-ink-subtle hover:bg-surface-sunk hover:text-ink-muted" aria-label="Fermer">
               <X size={18} />
             </Dialog.Close>

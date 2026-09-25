@@ -154,6 +154,9 @@ function useFixtureInvalidation() {
     queryClient.invalidateQueries({ queryKey: ['games'] });
     queryClient.invalidateQueries({ queryKey: ['standings'] });
     queryClient.invalidateQueries({ queryKey: ['game'] });
+    // The organiser's dashboard leads with results still to enter, and every fixture write can
+    // change that number — a result recorded, a past fixture added without one.
+    queryClient.invalidateQueries({ queryKey: ['dashboard'] });
   };
 }
 
@@ -167,6 +170,14 @@ export interface CreateGameInput {
   homeVenueId?: string;
   courtId?: string;
   notes?: string;
+  /**
+   * Both or neither. With them the fixture is created as a result — only for a date already past;
+   * without them it is scheduled, and a past one is simply awaiting its result.
+   */
+  homeScore?: number;
+  awayScore?: number;
+  /** Only alongside a score. */
+  isForfeit?: boolean;
 }
 
 export function useCreateGame() {

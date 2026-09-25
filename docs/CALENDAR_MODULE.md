@@ -653,3 +653,61 @@ now, like every other tooltip.
   once the month has something in it — the day cells fall back to a bare `+` on hover, and a phone
   has no hover — so an icon alone would be the whole feature hiding behind a glyph.
 - Half the gap between the title row and the toolbar.
+
+
+---
+
+## 11. The past is recordable (2026-09-24)
+
+### What was wrong
+
+The calendar could only record the future. `POST /games` refused a fixture without a score dated
+in the past (*« La date d'un match à venir doit être dans le futur »*) unless the caller was an
+import, the generator or a placeholder being promoted. The add dialog never sent a score, so a
+game played yesterday could not be entered at all. Neither could this afternoon's once its start
+time had passed and before the sheets came in. Even the dialog's default failed: *Nouveau match*
+opens on today at 13:30, which is refused by evening.
+
+The rule protected nothing. Moving an existing fixture into the past had no such check, so the
+workaround was to add the game in the future, move it back, then score it.
+
+### The rule now
+
+- **A fixture without a score may be dated anywhere.** A past one is *en attente de résultat*: it
+  stays `SCHEDULED`, is counted in *résultats manquants*, and is scored later from the calendar.
+  That covers the game still being played, so no LIVE state is needed for it. LIVE needs a locked
+  roster and a live operator, and the calendar never offered it.
+- **A score still needs a date that has passed.** That is the one date rule left.
+- **Creating a game with its score is the same event as scoring it later.** The standings are
+  rebuilt before the response, not fired and forgotten. The history gets `SCORE_REPORTED` after
+  `CREATED`, and `isForfeit` is accepted alongside a score. The results import takes the same path.
+
+### The dialog: the date decides, not a checkbox
+
+A slot in the future asks nothing more. A slot in the past opens a **Résultat** section with the
+two scores under their two clubs and *Forfait* once both are typed. Filled in, the fixture is
+recorded as played. Left empty, it is recorded as awaiting its result. One score alone is refused.
+The button says which of the three is about to happen: *Ajouter*, *Ajouter avec le score*,
+*Ajouter — résultat en attente*.
+
+A "déjà joué" checkbox was considered and rejected. It asks a question the date already answers,
+and it creates contradictory combinations: ticked with a future date, unticked with a past one.
+
+### Date locked from the grid
+
+- **Opened from a day cell or the day panel:** the day is settled and shown in the header, and only
+  the hour and hall are asked. Offering the date again invites a fixture added "on the 26th" landing
+  on the 24th.
+- **Opened from *Nouveau match*, and when moving an existing fixture:** the date is still asked.
+
+### Found on the way
+
+- The header's date was the day **clicked**, not the day **chosen**. It sat in the scrolling body
+  with a negative margin, tucked under the header's edge. `Modal` now has a `description` slot in
+  the header, rendered as the dialog's accessible description.
+- *Déjà ce jour-là* and the suggested hour came from a prop computed once from the clicked day, so
+  changing the date changed neither. That prop was also the grid's **filtered** list, and a hidden
+  competition's game still holds the hall. The dialog now reads the chosen day itself, unfiltered,
+  one UTC day either side and trimmed to the local day, because an evening fixture in Goma is
+  already tomorrow in UTC.
+- Fixture writes now also refresh the dashboards, whose lead number is the missing results.

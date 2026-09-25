@@ -423,7 +423,6 @@ export default function GamePage() {
           entry={entry}
           competitions={dayCalendar.data?.competitions ?? []}
           venues={dayCalendar.data?.venues ?? []}
-          entriesThatDay={entriesThatDay}
           durationMinutes={duration}
         />
       )}

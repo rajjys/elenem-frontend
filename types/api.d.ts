@@ -3817,6 +3817,8 @@ export interface components {
              * @example 1
              */
             awayScore?: number;
+            /** @description The loser did not field a team. Only meaningful with a score; scored with the league’s forfeit rule rather than its loss rule, as on `PUT /games/:id/final-score`. */
+            isForfeit?: boolean;
             /**
              * @description Flexible JSON object for sport-specific stats (e.g., period scores, innings). Only applicable if scores are provided.
              * @example {

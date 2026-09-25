@@ -87,10 +87,13 @@ export function useCalendar(params: {
    * could not open any calendar, on any surface, and had not been able to since the module shipped.
    */
   tenantId?: string;
+  /** For a caller that is not always showing anything — a dialog mounted while closed. */
+  enabled?: boolean;
 }) {
   const leagueIds = params.leagueIds?.length ? params.leagueIds.join(',') : undefined;
 
   return useQuery({
+    enabled: params.enabled ?? true,
     queryKey: [
       'calendar', params.from, params.to,
       leagueIds ?? 'all', params.teamId ?? 'all', params.tenantId ?? 'own',

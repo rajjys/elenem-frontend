@@ -303,7 +303,12 @@ export function CalendarView({
    * of results is a different job from placing one match, and it deserves a screen that opens
    * onto two number fields rather than a form.
    */
-  const [editing, setEditing] = useState<{ day: string; entry: CalendarEntry | null } | null>(null);
+  const [editing, setEditing] = useState<{
+    day: string;
+    entry: CalendarEntry | null;
+    /** Opened from a particular day, so the dialog asks for the hour and not the date. */
+    lockDay?: boolean;
+  } | null>(null);
   const [scoring, setScoring] = useState<CalendarEntry | null>(null);
   const [boxScoring, setBoxScoring] = useState<CalendarEntry | null>(null);
   /** A bracket fixture whose teams have become known. Its own dialog: two selects, no form. */
@@ -1056,7 +1061,7 @@ export function CalendarView({
                         >
                         <button
                           type="button"
-                          onClick={() => setEditing({ day: key, entry: null })}
+                          onClick={() => setEditing({ day: key, entry: null, lockDay: true })}
                           aria-label={`Ajouter un match le ${day.getDate()} ${MONTHS[day.getMonth()]}`}
                           className={cn(
                             'flex w-full items-center justify-center gap-1 rounded py-1',
@@ -1187,7 +1192,11 @@ export function CalendarView({
         closedReasons={openDay ? closed.get(openDay) : undefined}
         // The panel used to offer two links that left the calendar — one to a page-sized wizard,
         // one to a route that renders the words "Game Management page". They open here now.
-        onAdd={writable && openDay ? () => setEditing({ day: openDay, entry: null }) : undefined}
+        onAdd={
+          writable && openDay
+            ? () => setEditing({ day: openDay, entry: null, lockDay: true })
+            : undefined
+        }
         onEdit={
           writable ? (entry) => setEditing({ day: isoDay(new Date(entry.dateTime)), entry }) : undefined
         }
@@ -1230,10 +1239,10 @@ export function CalendarView({
             open={editing !== null}
             onClose={() => setEditing(null)}
             day={editing?.day ?? null}
+            lockDay={editing?.lockDay ?? false}
             entry={editing?.entry ?? null}
             competitions={data?.competitions ?? []}
             venues={data?.venues ?? []}
-            entriesThatDay={editing ? (byDay.get(editing.day) ?? []) : []}
             durationMinutes={data?.entries[0]?.durationMinutes ?? 100}
           />
           <ScoreDialog open={scoring !== null} onClose={() => setScoring(null)} entry={scoring} />

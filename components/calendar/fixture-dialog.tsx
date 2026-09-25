@@ -6,6 +6,7 @@ import {
   AlertTriangle,
   ArrowLeftRight,
   Check,
+  Flag,
   History,
   Loader2,
   Trash2,
@@ -13,7 +14,12 @@ import {
 import { Button, DatePicker, Label, Modal, SelectField } from '@/components/ui';
 import { toastApiError } from '@/utils';
 import { useScopeContext } from '@/hooks';
-import type { CalendarCompetition, CalendarEntry, CalendarVenue } from '@/services/calendar';
+import {
+  useCalendar,
+  type CalendarCompetition,
+  type CalendarEntry,
+  type CalendarVenue,
+} from '@/services/calendar';
 import {
   useCreateGame,
   useDeleteGame,
@@ -41,19 +47,34 @@ import { auditTitle } from '@/components/game/game-timeline';
  * the same questions with the answers removed.
  *
  * One dialog covers creating and changing, because they differ in one thing: whether the fixture
- * exists yet. What it deliberately does not cover is the score — that is its own dialog, because
- * entering thirty results in a sitting is a different job from placing one match.
+ * exists yet. Scoring an existing fixture is its own dialog, because entering thirty results in a
+ * sitting is a different job from placing one match.
+ *
+ * Adding a match that has *already happened* is this dialog's job, though, and the date decides
+ * it rather than a checkbox. A slot in the future has no result to give. A slot in the past opens
+ * a result section whose scores are optional: filled, the fixture is recorded as played; left
+ * empty, it is recorded as awaiting its result — yesterday's game whose sheet has not arrived, or
+ * this afternoon's still being played. A "déjà joué" checkbox would ask a question the date
+ * already answers, and let the two contradict each other: ticked with a future date, unticked
+ * with a past one. The calendar could only record the future before this.
  */
 
-const WEEKDAYS = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
+const WEEKDAYS = ['dim.', 'lun.', 'mar.', 'mer.', 'jeu.', 'ven.', 'sam.'];
 const MONTHS = [
-  'janvier', 'février', 'mars', 'avril', 'mai', 'juin',
-  'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre',
+  'janv.', 'févr.', 'mars', 'avr.', 'mai', 'juin',
+  'juil.', 'août', 'sept.', 'oct.', 'nov.', 'déc.',
 ];
 
-function longDate(day: string): string {
+/**
+ * « sam. 26 sept. », with the year only when it is not this one.
+ *
+ * Short because it shares the title's line. The year is dropped rather than shortened: « 26 sept.
+ * 26 » puts two 26s side by side and leaves the reader to work out which is the day.
+ */
+function shortDate(day: string): string {
   const d = new Date(`${day}T12:00:00`);
-  return `${WEEKDAYS[d.getDay()]} ${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
+  const year = d.getFullYear() === new Date().getFullYear() ? '' : ` ${d.getFullYear()}`;
+  return `${WEEKDAYS[d.getDay()]} ${d.getDate()} ${MONTHS[d.getMonth()]}${year}`;
 }
 
 /** `HH:mm` of an instant, on the reader's own clock — which is the clock they typed it on. */
@@ -116,12 +137,18 @@ export interface FixtureDialogProps {
   onClose: () => void;
   /** The day the organiser clicked, `yyyy-mm-dd`. Required when creating. */
   day: string | null;
+  /**
+   * Opened from a day on the grid, so the day is already chosen: only the hour is asked.
+   *
+   * Offering the date again there invites exactly the mistake the click ruled out — a fixture
+   * added "on the 26th" that lands on the 24th because the field was brushed. "Nouveau match"
+   * starts from no day in particular, so it asks; moving an existing fixture always asks.
+   */
+  lockDay?: boolean;
   /** Present when changing an existing fixture; absent when adding one. */
   entry?: CalendarEntry | null;
   competitions: CalendarCompetition[];
   venues: CalendarVenue[];
-  /** Fixtures already on that day, used to suggest the next free hour. */
-  entriesThatDay: CalendarEntry[];
   /** Slot length for the organisation's sport — how long a game holds the hall. */
   durationMinutes: number;
 }
@@ -130,10 +157,10 @@ export function FixtureDialog({
   open,
   onClose,
   day,
+  lockDay = false,
   entry,
   competitions,
   venues,
-  entriesThatDay,
   durationMinutes,
 }: FixtureDialogProps) {
   const scope = useScopeContext();
@@ -145,6 +172,11 @@ export function FixtureDialog({
   const [date, setDate] = useState('');
   const [time, setTime] = useState('');
   const [venueId, setVenueId] = useState('');
+  /** Whether the organiser has typed an hour — until then the dialog keeps suggesting one. */
+  const [timeTouched, setTimeTouched] = useState(false);
+  const [homeScore, setHomeScore] = useState('');
+  const [awayScore, setAwayScore] = useState('');
+  const [forfeit, setForfeit] = useState(false);
   const [reason, setReason] = useState('');
   const [showHistory, setShowHistory] = useState(false);
   const [showAllThatDay, setShowAllThatDay] = useState(false);
@@ -160,6 +192,41 @@ export function FixtureDialog({
   const audit = useGameAudit(entry?.id, showHistory && !!entry);
 
   /**
+   * The chosen day's fixtures, read for that day rather than handed in by the grid.
+   *
+   * They used to arrive as a prop computed from the day that was clicked, so changing the date
+   * changed nothing: the list went on showing the 26th's games for a fixture now on the 24th, and
+   * the suggested hour went on following them. The grid's own list was the wrong source twice
+   * over — it is filtered (a hidden competition, a search, a hall) while a hidden competition's
+   * game still holds the hall, and it only covers the loaded month while a date can be typed
+   * anywhere. This asks for the day itself, unfiltered, in the scope the grid is in.
+   *
+   * A day either side, then trimmed to the local day: the endpoint's days are UTC days, and an
+   * evening fixture in Goma is already tomorrow in UTC.
+   */
+  const dayWindow = useMemo(() => {
+    if (!date) return null;
+    const [y, m, d] = date.split('-').map(Number);
+    return { from: isoDay(new Date(y, m - 1, d - 1)), to: isoDay(new Date(y, m - 1, d + 1)) };
+  }, [date]);
+
+  const dayQuery = useCalendar({
+    from: dayWindow?.from ?? '',
+    to: dayWindow?.to ?? '',
+    leagueIds: scope.leagueId ? [scope.leagueId] : undefined,
+    tenantId: scope.tenantId ?? undefined,
+    enabled: open && !!dayWindow,
+  });
+
+  const entriesThatDay = useMemo(
+    () =>
+      open && date
+        ? (dayQuery.data?.entries ?? []).filter((e) => isoDay(new Date(e.dateTime)) === date)
+        : [],
+    [open, date, dayQuery.data],
+  );
+
+  /**
    * The next free hour on that day, so the common case needs no typing.
    *
    * A day with games already on it suggests one slot after the last of them; an empty day
@@ -167,11 +234,12 @@ export function FixtureDialog({
    * `<input type="time">` does — is never right for a fixture.
    */
   const suggestedTime = useMemo(() => {
-    if (entriesThatDay.length === 0) return '13:30';
-    const last = entriesThatDay.reduce((a, b) => (a.dateTime > b.dateTime ? a : b));
+    const others = entriesThatDay.filter((e) => e.id !== entry?.id);
+    if (others.length === 0) return '13:30';
+    const last = others.reduce((a, b) => (a.dateTime > b.dateTime ? a : b));
     const next = new Date(new Date(last.dateTime).getTime() + durationMinutes * 60_000);
     return `${String(next.getHours()).padStart(2, '0')}:${String(next.getMinutes()).padStart(2, '0')}`;
-  }, [entriesThatDay, durationMinutes]);
+  }, [entriesThatDay, entry, durationMinutes]);
 
   // Reset whenever the dialog is pointed at something new, so it never opens holding the last
   // fixture's answers.
@@ -185,20 +253,32 @@ export function FixtureDialog({
       setAwayTeamId(entry.away.id ?? '');
       setDate(isoDay(new Date(entry.dateTime)));
       setTime(timeOf(entry.dateTime));
+      setTimeTouched(true);
       setVenueId(entry.venueId ?? '');
     } else {
       setLeagueId(scope.leagueId ?? (competitions.length === 1 ? competitions[0].id : ''));
       setHomeTeamId('');
       setAwayTeamId('');
       setDate(day ?? '');
-      setTime(suggestedTime);
+      // Filled by the suggestion below once the day's fixtures are known.
+      setTime('');
+      setTimeTouched(false);
       setVenueId('');
     }
+    setHomeScore('');
+    setAwayScore('');
+    setForfeit(false);
     setReason('');
     setShowHistory(false);
     setShowAllThatDay(false);
     setConfirmingDelete(false);
-  }, [open, entry, day, scope.leagueId, competitions, suggestedTime]);
+  }, [open, entry, day, scope.leagueId, competitions]);
+
+  // The suggestion follows the day until the organiser types an hour of their own. It was part of
+  // the reset above, which meant it was computed once, from the day first clicked.
+  useEffect(() => {
+    if (open && !timeTouched) setTime(suggestedTime);
+  }, [open, timeTouched, suggestedTime]);
 
   /**
    * The day's other fixtures, with the one being edited guaranteed a place.
@@ -215,10 +295,12 @@ export function FixtureDialog({
   const shownThatDay = useMemo(() => {
     if (showAllThatDay || sortedThatDay.length <= DAY_PREVIEW) return sortedThatDay;
     const head = sortedThatDay.slice(0, DAY_PREVIEW);
-    if (!entry || head.some((e) => e.id === entry.id)) return head;
+    const inHand = entry ? sortedThatDay.find((e) => e.id === entry.id) : undefined;
+    // Absent when the fixture is being moved to another day: that day's list has no place for it.
+    if (!inHand || head.some((e) => e.id === inHand.id)) return head;
     // Drop the last of the head to make room for the fixture in hand, keeping time order.
-    return [...head.slice(0, DAY_PREVIEW - 1), sortedThatDay.find((e) => e.id === entry.id)!].sort(
-      (a, b) => a.dateTime.localeCompare(b.dateTime),
+    return [...head.slice(0, DAY_PREVIEW - 1), inHand].sort((a, b) =>
+      a.dateTime.localeCompare(b.dateTime),
     );
   }, [sortedThatDay, showAllThatDay, entry]);
 
@@ -230,6 +312,19 @@ export function FixtureDialog({
   }));
 
   const at = instantFrom(date, time);
+
+  /**
+   * A new fixture whose slot has already begun — which is what decides whether a result can be
+   * given. Not offered when editing: an existing fixture is scored from its own dialog.
+   */
+  const alreadyPlayed = !editing && !!at && new Date(at).getTime() <= Date.now();
+
+  const scoreTyped = homeScore !== '' || awayScore !== '';
+  const scoreComplete =
+    homeScore !== '' && awayScore !== '' && Number(homeScore) >= 0 && Number(awayScore) >= 0;
+  /** Both or neither: one number is a typo waiting to become a result. */
+  const scoreValid = !alreadyPlayed || !scoreTyped || scoreComplete;
+  const recordsResult = alreadyPlayed && scoreComplete;
 
   const slotChanged =
     !!entry &&
@@ -246,7 +341,12 @@ export function FixtureDialog({
 
   const canSubmit = editing
     ? slotChanged
-    : !!leagueId && !!homeTeamId && !!awayTeamId && homeTeamId !== awayTeamId && !!at;
+    : !!leagueId &&
+      !!homeTeamId &&
+      !!awayTeamId &&
+      homeTeamId !== awayTeamId &&
+      !!at &&
+      scoreValid;
 
   function submit() {
     if (!canSubmit || !at) return;
@@ -282,10 +382,23 @@ export function FixtureDialog({
         awayTeamId,
         dateTime: at,
         ...(venueId ? { homeVenueId: venueId } : {}),
+        ...(recordsResult
+          ? {
+              homeScore: Number(homeScore),
+              awayScore: Number(awayScore),
+              ...(forfeit ? { isForfeit: true } : {}),
+            }
+          : {}),
       },
       {
         onSuccess: () => {
-          toast.success('Match ajouté au calendrier.');
+          toast.success(
+            recordsResult
+              ? 'Résultat enregistré.'
+              : alreadyPlayed
+                ? 'Match ajouté — résultat en attente.'
+                : 'Match ajouté au calendrier.',
+          );
           onClose();
         },
         onError: (e) => toastApiError(e),
@@ -318,13 +431,28 @@ export function FixtureDialog({
     <Modal
       open={open}
       onOpenChange={(next) => !next && onClose()}
-      title={editing ? 'Modifier le match' : 'Ajouter un match'}
+      // One line: what, and on which day. The chosen day, not the clicked one — it follows the date
+      // field when there is one.
+      // The date never breaks inside itself: on a phone it moves to the second line whole.
+      title={
+        editing ? (
+          'Modifier le match'
+        ) : (
+          <span className="flex flex-wrap items-baseline gap-x-1.5">
+            <span className="whitespace-nowrap">Ajouter un match</span>
+            {date && (
+              <span className="whitespace-nowrap font-normal text-ink-muted">
+                {/* The separator only makes sense on one line; on a phone the date sits under. */}
+                <span className="hidden sm:inline">· </span>
+                {shortDate(date)}
+              </span>
+            )}
+          </span>
+        )
+      }
       className="max-w-lg"
     >
       <div className="space-y-4">
-        {day && !editing && (
-          <p className="-mt-2 text-sm text-ink-muted first-letter:uppercase">{longDate(day)}</p>
-        )}
 
         {/* ---- who plays ---- */}
         {editing ? (
@@ -431,48 +559,138 @@ export function FixtureDialog({
         )}
 
         {/* ---- the slot: day, hour and hall are one decision ---- */}
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <Label htmlFor="fx-date" required>
-              Jour
-            </Label>
-            {/* The same picker the season step uses. `<input type="date">` renders whatever the
-                browser feels like — its own chrome, the OS locale rather than the product's, no
-                tokens — which on a French calendar is worse than the code it saves. */}
-            <div className="mt-1">
-              <DatePicker id="fx-date" value={date} onChange={setDate} size="sm" />
+        {(() => {
+          const timeField = (
+            <div>
+              <Label htmlFor="fx-time" required>
+                Heure
+              </Label>
+              <input
+                id="fx-time"
+                type="time"
+                value={time}
+                onChange={(e) => {
+                  setTime(e.target.value);
+                  setTimeTouched(true);
+                }}
+                className="h-9 w-full rounded-lg border border-line bg-surface px-3 text-sm tabular-nums text-ink transition-colors hover:border-line-strong focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+              />
             </div>
-          </div>
-          <div>
-            <Label htmlFor="fx-time" required>
-              Heure
-            </Label>
-            <input
-              id="fx-time"
-              type="time"
-              value={time}
-              onChange={(e) => setTime(e.target.value)}
-              className="mt-1 h-9 w-full rounded-lg border border-line bg-surface px-3 text-sm tabular-nums text-ink transition-colors hover:border-line-strong focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
-            />
-          </div>
-        </div>
+          );
+          const venueField = venues.length > 0 && (
+            <div>
+              <Label htmlFor="fx-venue">Salle</Label>
+              <SelectField
+                id="fx-venue"
+                label="Salle"
+                placeholder="Aucune — date seulement"
+                value={venueId}
+                onChange={setVenueId}
+                options={venues.map((v) => ({ value: v.id, label: v.name }))}
+                className="w-full"
+              />
+            </div>
+          );
+          // From a day on the grid the day is settled and shown in the header, so the hour and
+          // the hall share a row. Otherwise the day is asked for beside the hour.
+          if (lockDay && !editing) {
+            return (
+              <div className="grid grid-cols-2 gap-3">
+                {timeField}
+                {venueField}
+              </div>
+            );
+          }
+          return (
+            <>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <Label htmlFor="fx-date" required>
+                    Jour
+                  </Label>
+                  {/* The same picker the season step uses. `<input type="date">` renders whatever
+                      the browser feels like — its own chrome, the OS locale rather than the
+                      product's, no tokens — which on a French calendar is worse than the code it
+                      saves. */}
+                  <div>
+                    <DatePicker id="fx-date" value={date} onChange={setDate} size="sm" />
+                  </div>
+                </div>
+                {timeField}
+              </div>
+              {venueField}
+            </>
+          );
+        })()}
 
-        {venues.length > 0 && (
-          <div>
-            <Label htmlFor="fx-venue">Salle</Label>
-            <SelectField
-              id="fx-venue"
-              label="Salle"
-              placeholder="Aucune — date seulement"
-              value={venueId}
-              onChange={setVenueId}
-              options={venues.map((v) => ({ value: v.id, label: v.name }))}
-              className="w-full"
-            />
+        {/* ---- the result, when there can be one ---- */}
+        {alreadyPlayed && (
+          <div className="rounded-lg border border-line px-3.5 py-3">
+            <p className="text-xs uppercase tracking-wider text-ink-subtle">
+              Résultat · ce match a déjà eu lieu
+            </p>
+            {/* The two numbers sit under the two clubs they belong to, in the same columns as the
+                selects above — the order a result is read in, and the order of the sheet. */}
+            <div className="mt-2.5 grid grid-cols-2 gap-3">
+              {(
+                [
+                  ['Domicile', homeTeamId, homeScore, setHomeScore],
+                  ['Visiteur', awayTeamId, awayScore, setAwayScore],
+                ] as const
+              ).map(([side, teamId, value, set]) => {
+                const name = teamOptions.find((t) => t.value === teamId)?.label ?? side;
+                return (
+                  <input
+                    key={side}
+                    type="number"
+                    inputMode="numeric"
+                    min={0}
+                    value={value}
+                    onChange={(e) => set(e.target.value)}
+                    placeholder="–"
+                    aria-label={`Score — ${name}`}
+                    className="h-12 w-full rounded-lg border border-line bg-surface text-center text-2xl font-bold tabular-nums text-ink transition-colors placeholder:font-normal placeholder:text-ink-subtle hover:border-line-strong focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                  />
+                );
+              })}
+            </div>
+            {scoreComplete && (
+              <label
+                className={cn(
+                  'mt-2.5 flex cursor-pointer items-center gap-2.5 rounded-lg border px-3 py-2 transition-colors',
+                  forfeit ? 'border-caution/40 bg-caution-soft' : 'border-line hover:border-line-strong',
+                )}
+              >
+                <input
+                  type="checkbox"
+                  checked={forfeit}
+                  onChange={(e) => setForfeit(e.target.checked)}
+                  className="h-4 w-4 accent-caution"
+                />
+                <Flag className="h-4 w-4 shrink-0 text-caution" aria-hidden />
+                <span className="text-sm text-ink">
+                  Forfait
+                  <span className="ml-1.5 text-xs text-ink-subtle">
+                    le perdant ne s’est pas présenté
+                  </span>
+                </span>
+              </label>
+            )}
+            <p className={cn('mt-2 text-xs', scoreValid ? 'text-ink-subtle' : 'text-negative')}>
+              {scoreValid
+                ? 'Laissez vide si le score n’est pas encore connu : le match restera en attente de résultat.'
+                : 'Saisissez les deux scores, ou aucun.'}
+            </p>
           </div>
         )}
 
         {/* The day the organiser is placing into, so they are not choosing an hour blind. */}
+        {dayQuery.isFetching && entriesThatDay.length === 0 && !!date && (
+          <p className="flex items-center gap-1.5 text-xs text-ink-subtle">
+            <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden />
+            Matchs de ce jour…
+          </p>
+        )}
         {entriesThatDay.length > 0 && (
           <div className="rounded-lg border border-line bg-surface-sunk px-3 py-2.5">
             <p className="text-xs font-medium text-ink-muted">
@@ -642,7 +860,14 @@ export function FixtureDialog({
               Fermer
             </Button>
             <Button variant="primary" onClick={submit} disabled={!canSubmit || busy} isLoading={busy}>
-              {editing ? 'Déplacer' : 'Ajouter'}
+              {/* Says what is about to be recorded, since the same button records three things. */}
+              {editing
+                ? 'Déplacer'
+                : recordsResult
+                  ? 'Ajouter avec le score'
+                  : alreadyPlayed
+                    ? 'Ajouter — résultat en attente'
+                    : 'Ajouter'}
             </Button>
           </div>
         </div>
