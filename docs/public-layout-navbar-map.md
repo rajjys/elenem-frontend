@@ -1,3 +1,7 @@
+> **Superseded 2026-09-25** by `PHASE5A_PRODUCT_SITE.md` and `PHASE5B_LEAGUE_SITES.md`. Kept for
+> history: it describes a generic SaaS (testimonials, demos, pricing tiers, a league-code login)
+> that this product deliberately is not.
+
 # Public User & Features Manifest
 
 This manifest outlines the key pages, features, and user journeys for the public-facing areas of your platform.

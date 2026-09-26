@@ -631,3 +631,39 @@ refused server-side.
 Deploy what exists first — it flushes out environment problems while they are cheap — then the
 tenant public site (standings, schedule, results), then the rename, then the marketing site, then
 SEO, then R2 and blogging, then LIPROBAKIN in person.
+
+
+---
+
+## 14. Phase 5 split into 5A and 5B (2026-09-25)
+
+Phase 5 is the commercial half of the product, and since the two domains separated it is two
+products with different readers:
+
+- **5A — the product site, `dxscores.com`** — sells to one organiser: message, landing, sign-up,
+  the signed-in redirect, `.com` SEO. Plan: **`docs/PHASE5A_PRODUCT_SITE.md`**.
+- **5B — league sites, `<ligue>.dxscores.app`** — serves fans on behalf of that organiser: the
+  table, the fixtures, the results, generated and never maintained by hand. Plan:
+  **`docs/PHASE5B_LEAGUE_SITES.md`**.
+
+They supersede items 19–23 above, `HANDOVER_PHASE5.md` §3, and `public-layout-navbar-map.md`.
+
+Four audits on 2026-09-25 (every public page, routing/auth/SEO plumbing, the tenant site and its
+API, outside research) found, among much else:
+
+- **A structural data leak in production.** Public endpoints return organisations' bank,
+  mobile-money, tax and national-ID fields, and players' e-mails. The fields are empty today; the
+  first federation to fill in its settings would publish them. It is **5B sprint 0**, and it goes
+  first.
+- **Nothing on the marketing site leads to sign-up.** Three contradictory prices for a free
+  product, English copy, fake news, a contact form that sends nothing.
+- `dxscores.com/robots.txt` redirects to `/login`; `dxscores.app` serves a second copy of the app;
+  unknown league subdomains return 200.
+- **Production e-mail goes nowhere** (no `MAIL_*` variables; the service falls back to a test
+  inbox), so self-serve users cannot reset a password.
+- **The public standings are a second, phase-blind implementation.** The rebuild makes the public
+  table *be* `getStandingsView`.
+
+The recommended order interleaves the two plans (`PHASE5B_LEAGUE_SITES.md` §12): leak, `.com`
+clean-up, landing, `.com` SEO, league site, then the landing's league-site proof and the
+end-to-end sign-up on production.

@@ -703,8 +703,10 @@ and it creates contradictory combinations: ticked with a future date, unticked w
 ### Found on the way
 
 - The header's date was the day **clicked**, not the day **chosen**. It sat in the scrolling body
-  with a negative margin, tucked under the header's edge. `Modal` now has a `description` slot in
-  the header, rendered as the dialog's accessible description.
+  with a negative margin, tucked under the header's edge. It is now part of the title, *Ajouter un
+  match · sam. 26 sept.*, with the year only when it is not this one. On a phone the date moves
+  under the verb whole. `Modal`'s title accepts a node for this, and `Modal` also gained a
+  `description` slot in the header for the next dialog that needs a line under its title.
 - *Déjà ce jour-là* and the suggested hour came from a prop computed once from the clicked day, so
   changing the date changed neither. That prop was also the grid's **filtered** list, and a hidden
   competition's game still holds the hall. The dialog now reads the chosen day itself, unfiltered,
