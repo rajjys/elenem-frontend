@@ -538,23 +538,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/public-leagues/{slug}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get public league details by slug */
-        get: operations["PublicLeaguesController_getPublicLeagueBySlug"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/public-leagues/tenants": {
         parameters: {
             query?: never;
@@ -581,6 +564,23 @@ export interface paths {
         };
         /** Get public tenant details by code */
         get: operations["PublicLeaguesController_getPublicTenantByCode"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public-leagues/{slug}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get public league details by slug */
+        get: operations["PublicLeaguesController_getPublicLeagueBySlug"];
         put?: never;
         post?: never;
         delete?: never;
@@ -3178,8 +3178,6 @@ export interface components {
             firstName: string;
             /** @description Player Last Name */
             lastName: string;
-            /** @description Player Email */
-            email: Record<string, never>;
             /** @description Player external unique ID */
             externalId: string;
             /** @description Player public slug for friendly URLs */
@@ -3215,6 +3213,8 @@ export interface components {
              * @enum {string}
              */
             visibility?: "PUBLIC" | "PRIVATE" | "RESERVED";
+            /** @description Player e-mail (admin views only). */
+            email?: Record<string, never>;
             /** @description The ID of the tenant this player belongs to. */
             tenantId: string;
             /** @description Player national ID or equivalent sensitive identifier. */
@@ -3380,8 +3380,6 @@ export interface components {
             firstName: string;
             /** @description Player Last Name */
             lastName: string;
-            /** @description Player Email */
-            email: Record<string, never>;
             /** @description Player external unique ID */
             externalId: string;
             /** @description Player public slug for friendly URLs */
@@ -5913,26 +5911,6 @@ export interface operations {
             };
         };
     };
-    PublicLeaguesController_getPublicLeagueBySlug: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description League slug */
-                slug: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
     PublicLeaguesController_listPublicTenants: {
         parameters: {
             query: {
@@ -5959,6 +5937,26 @@ export interface operations {
             path: {
                 /** @description Tenant code */
                 tenantCode: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    PublicLeaguesController_getPublicLeagueBySlug: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description League slug */
+                slug: string;
             };
             cookie?: never;
         };
