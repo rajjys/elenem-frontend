@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { ArrowUpRight, LogOut, MoreHorizontal, Shield, User } from 'lucide-react';
+import { ArrowUpRight, LogOut, MoreHorizontal, Shield, User, Home } from 'lucide-react';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { cn } from '@/utils/cn';
 import { Tooltip } from '@/components/ui/tooltip';
@@ -105,6 +105,12 @@ export function SidebarUserMenu({
               Site public
             </span>
           </a>
+          {/* The product's own landing. `/` sends a signed-in reader to their dashboard, so the
+              landing lives at /home for when they want it (PHASE5A_PRODUCT_SITE §5). */}
+          <Link href="/home" onClick={close} className={itemClass} role="menuitem">
+            <Home className="h-4 w-4 shrink-0" />
+            Page d&apos;accueil
+          </Link>
 
           <div className="my-1 border-t border-line" />
 

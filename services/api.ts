@@ -57,6 +57,26 @@ const processQueue = (error: any | null) => {
   failedQueue = [];
 };
 
+/**
+ * The session is gone and cannot be refreshed: clear it, and send the reader to sign in.
+ *
+ * It used to clear the store and stop there. Pages behind `AccessGate` read a null user as
+ * "still loading", so an expired session left them spinning for ever with nothing saying why.
+ * Only app routes redirect — a public page does not need a session and should not lose its reader
+ * to a login form. Guarded, because the refresh request and every request queued behind it all
+ * arrive here within the same moment.
+ */
+const APP_ROUTE = /^\/(admin|tenant|league|team|account|onboarding|game|player|post)(\/|$)/;
+let endingSession = false;
+function endSession() {
+  useAuthStore.getState().logout();
+  if (endingSession || typeof window === 'undefined') return;
+  const { pathname, search } = window.location;
+  if (!APP_ROUTE.test(pathname)) return;
+  endingSession = true;
+  window.location.assign(`/login?redirect=${encodeURIComponent(pathname + search)}`);
+}
+
 api.interceptors.response.use(
   response => response,
   async error => {
@@ -68,12 +88,12 @@ api.interceptors.response.use(
     // never settled: a stale session left every page spinning on "Loading…" forever instead of
     // sending the user to sign in. Auth endpoints must never be retried here.
     const url: string = originalRequest?.url ?? '';
-    const isAuthEndpoint = /\/auth\/(refresh|login|register)/.test(url);
+    const isAuthEndpoint = /\/auth\/(refresh|login|register|logout)/.test(url);
 
     if (error.response?.status === 401 && isAuthEndpoint) {
-      // A failed refresh means the session is genuinely gone. Clear it and let the caller
-      // (middleware or the page) send the user to /login.
-      useAuthStore.getState().logout();
+      // A failed refresh means the session is genuinely gone. A 401 on login is a wrong password
+      // and on logout an already-expired token: neither ends anything that is not already over.
+      if (/\/auth\/refresh/.test(url)) endSession();
       processQueue(error);
       isRefreshing = false;
       return Promise.reject(error);
@@ -94,7 +114,7 @@ api.interceptors.response.use(
       isRefreshing = true; // Mark refresh as in progress
 
       try {
-        const { tokens, setTokens, logout } = useAuthStore.getState();
+        const { tokens, setTokens } = useAuthStore.getState();
         if (tokens?.refreshToken) {
           console.warn('Unauthorized request. Session might have expired. Attempting to refresh token...');
           const res = await api.post('/auth/refresh', { refreshToken: tokens.refreshToken });
@@ -105,13 +125,13 @@ api.interceptors.response.use(
           processQueue(null); // Process all queued requests successfully
           return api(originalRequest); // Retry the original request
         } else {
-            logout(); // No refresh token, force logout
+            endSession(); // No refresh token: the session cannot be renewed
             processQueue(error); // Reject queued requests
             return Promise.reject(error);
         }
       } catch (refreshError) {
         console.error("Token refresh failed:", refreshError);
-        useAuthStore.getState().logout();
+        endSession();
         processQueue(refreshError); // Reject all queued requests if refresh fails
         return Promise.reject(refreshError);
       } finally {

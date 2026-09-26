@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { LoginForm } from '@/components/forms/login-form';
 import { AuthShell } from '@/components/auth';
-import { getPostAuthRedirect } from '@/utils';
+import { getPostAuthRedirect, safeRedirectPath } from '@/utils';
 import { useAuthStore } from '@/store/auth.store';
 
 export default function LoginClientPage() {
@@ -14,8 +14,10 @@ export default function LoginClientPage() {
 
   useEffect(() => {
     if (tokens?.accessToken && user) {
-      const redirectUrl = searchParams.get('redirect');
-      router.push(redirectUrl || getPostAuthRedirect(user));
+      // Only a path on this site: an unchecked `redirect` sent a user who had just typed their
+      // password to whatever address the link carried.
+      const redirectUrl = safeRedirectPath(searchParams.get('redirect'));
+      router.push(redirectUrl ?? getPostAuthRedirect(user));
     }
   }, [user, tokens, router, searchParams]);
 

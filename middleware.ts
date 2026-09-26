@@ -1,40 +1,51 @@
 // middleware.ts
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { Roles } from './schemas'; // Assuming Role enum is imported from Prisma or shared types
-import { resolveTenantSlugFromHostname, verifyJWTForGate } from './utils'; // Your utility to verify JWT
+import { Roles } from './schemas';
+import {
+  homeForRoles,
+  resolveTenantSlugFromHostname,
+  safeRedirectPath,
+  verifyJWTForGate,
+} from './utils';
 
-// Define public paths that are accessible to everyone, regardless of authentication status.
-// These are typically paths on the root domain (e.g., website.com/login, website.com/leagues)
+/**
+ * Paths anyone may open on the app host, signed in or not.
+ *
+ * The list used to carry a page's worth of routes that no longer exist or never did — `/explore`,
+ * `/blogs`, `/landing2` and a typo `/landin2/`, `/seasons/*` — each a rule that could only wave
+ * somebody through to a 404. It is now exactly the public pages that exist.
+ */
 const publicPaths = [
-  '/', '/about', '/help', '/explore',
-  '/leagues', '/leagues/', '/leagues/*', // Public league profiles on the root domain
-  '/teams', '/teams/', '/teams/*',     // Public team profiles on the root domain
-  '/players', '/players/', '/players/*', // Public player profiles on the root domain
-  '/games', '/games/', '/games/*',     // Public game listings on the root domain
-  '/tenants', '/tenants/', '/tenants/*', // Public tenant profiles on the root domain
-  '/seasons', '/seasons/', '/seasons/*', // Public season profiles on the root domain
-  '/upload', '/upload/', '/upload/*',
-  '/upload2', '/upload2/', '/upload2/*',
-  '/login', '/register', '/access-denied', '/forgot-password', '/reset-password', '/verify-email', '/accept-invite',
-  '/blogs',
-  '/landing', '/landing/', '/landing/*',
-  '/landing2', '/landin2/', '/landing2*',
-  '/health', '/health/', '/health/*',
-  '/news', '/news/', '/news/*', // Public news articles on the root domain
-   '/contact', '/pricing', '/features', '/terms', '/privacy',
-   ///entity creation routes. These are protected by access Gates. Review is needed later
-   '/tenant/create', '/tenant/create/', '/tenant/create/*',
-   '/api', '/api/', '/api/*',
-   '/terms', '/terms/', '/terms/*',
-   '/legal', '/legal/', '/legal/*',
-   '/about', '/about/', '/about/*',
-   '/docs', '/docs/', '/docs/*',
-   '/contact', '/contact/', '/contact/*',
-   '/welcome', '/welcome/', '/welcome/*',
-   '/plans', '/plans/', '/plans/*',
-   '/ads.txt', '/ads.txt/'
+  '/', '/home', '/contact', '/terms', '/privacy', '/legal',
+  '/login', '/register', '/access-denied', '/forgot-password', '/verify-email', '/accept-invite',
 ];
+
+/**
+ * Files the framework serves from metadata routes, which must reach them on every host: on the app
+ * host they were redirected to `/login` (production `robots.txt` answered with a 307 to the login
+ * page), and on a league host they were rewritten into the league tree, where they do not exist.
+ */
+const METADATA_FILE =
+  /^\/(robots\.txt|sitemap\.xml|manifest\.webmanifest|favicon\.ico|(icon|apple-icon|opengraph-image|twitter-image)(\d*)(\.\w+)?)$/;
+
+/**
+ * Old marketing addresses, and where they went (`PHASE5A_PRODUCT_SITE` §2).
+ *
+ * Only on the app host. The same paths — `/games`, `/teams`, `/standings`, `/news` — are real pages
+ * on every league site, which is why this lives here rather than in `next.config.ts`, whose
+ * redirects apply to every host alike.
+ */
+const LEGACY_REDIRECTS: Record<string, string> = {
+  '/features': '/#fonctionnalites',
+  '/pricing': '/#gratuit',
+  '/plans': '/#gratuit',
+  '/tenant/create': '/register',
+};
+const LEGACY_TO_HOME = /^\/(games|tenants|news|about|api|docs|leagues|standings|teams|players|upload2?|welcome|health)(\/.*)?$/;
+
+/** Where a signed-in reader who asks for the landing, the login or the sign-up page is sent. */
+const SIGNED_IN_SKIPS = new Set(['/', '/login', '/register']);
 
 export async function middleware(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
@@ -46,7 +57,20 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // --- 2. Determine the tenant slug from the hostname for public-facing subdomains ---
+  // --- 2. Metadata files, on every host ---
+  if (METADATA_FILE.test(pathname)) return NextResponse.next();
+
+  // --- 3. The bare tenant domain is not a site: send it to the app ---
+  // `dxscores.app` and `www.dxscores.app` served a complete second copy of the product — landing,
+  // login, dashboards — on a second origin with its own cookies.
+  const bareHost = hostname.split(':')[0].toLowerCase();
+  const tenantDomain = process.env.NEXT_PUBLIC_TENANT_DOMAIN?.toLowerCase();
+  if (tenantDomain && (bareHost === tenantDomain || bareHost === `www.${tenantDomain}`)) {
+    const appDomain = process.env.NEXT_PUBLIC_APP_DOMAIN || 'dxscores.com';
+    return NextResponse.redirect(`https://${appDomain}${pathname}${search}`, 308);
+  }
+
+  // --- 4. League sites: rewrite into the league tree ---
   const tenantSlug = resolveTenantSlugFromHostname(hostname);
   if (tenantSlug && !['www', 'localhost'].includes(tenantSlug)) {
     const newPath = url.pathname === '/'
@@ -54,23 +78,54 @@ export async function middleware(request: NextRequest) {
     : `/public/public_tenant/${tenantSlug}${url.pathname}/`;
 
     url.pathname = newPath;
-    //console.log("Rewriting to:", url.pathname);
-
     return NextResponse.rewrite(url);
   }
 
-  // --- 4. Allow all general public paths on the root domain to proceed directly ---
-  // This also includes Next.js internal paths and API routes.
+  // --- 5. From here on, the app host ---
+
+  // The league tree is a rewrite target, not an address: reachable directly, every league page had
+  // a duplicate at dxscores.com/public/public_tenant/<slug>/….
+  if (pathname.startsWith('/public/')) {
+    url.pathname = '/__not-found';
+    return NextResponse.rewrite(url);
+  }
+
+  if (LEGACY_REDIRECTS[pathname]) {
+    return NextResponse.redirect(new URL(LEGACY_REDIRECTS[pathname], request.url), 308);
+  }
+  if (LEGACY_TO_HOME.test(pathname)) {
+    return NextResponse.redirect(new URL('/', request.url), 308);
+  }
+
+  // A signed-in reader has no use for the landing, the login form or the sign-up form: send them
+  // where they work (the Vercel `/home` model; the landing stays at /home). A 307, never a 308 —
+  // browsers cache permanent redirects, and a reader who signs out must get the landing back. An
+  // expired-but-authentic token counts, as it does below: the cookie and the refresh token share a
+  // seven-day life, and the dashboard's own refresh takes over. If the session is in fact dead, that
+  // refresh fails, the session is cleared, and the reader lands on /login — no loop.
+  if (SIGNED_IN_SKIPS.has(pathname)) {
+    const token = request.cookies.get('accessToken')?.value;
+    const secret = process.env.JWT_SECRET;
+    if (token && secret) {
+      const { payload } = await verifyJWTForGate(token, secret);
+      if (payload && Array.isArray(payload.roles) && payload.roles.length > 0) {
+        const wanted =
+          pathname === '/login' ? safeRedirectPath(request.nextUrl.searchParams.get('redirect')) : null;
+        return NextResponse.redirect(new URL(wanted ?? homeForRoles(payload.roles), request.url), 307);
+      }
+    }
+  }
+
+  // --- 6. Public pages, framework internals and API routes proceed ---
   if (
-    publicPaths.some(path => pathname === path || (path.endsWith('/*') && pathname.startsWith(path.slice(0, -1)))) ||
-    pathname.startsWith('/_next') || // Next.js internal files (e.g., _next/static, _next/image)
-    pathname.startsWith('/api/')     // Backend API routes (authentication/authorization handled by backend)
+    publicPaths.includes(pathname) ||
+    pathname.startsWith('/_next') ||
+    pathname.startsWith('/api/')
   ) {
-    //console.log(`Middleware: Allowing public path ${pathname} to proceed.`);
     return NextResponse.next();
   }
 
-  // --- 5. Check for access token for all non-public (authenticated) paths. ---
+  // --- 7. Everything else needs a session ---
   const accessToken = request.cookies.get('accessToken')?.value;
   if (!accessToken) {
     // If no token, redirect to login, preserving the intended destination.
@@ -81,7 +136,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(redirectUrl);
   }
 
-  // --- 6. Decode JWT to get user roles and details. ---
+  // --- 8. Decode JWT to get user roles and details. ---
   // We tolerate an expired-but-authentic access token here: the signature is
   // still valid, so we trust its claims for UI role-gating and let the request
   // through. The client-side axios interceptor then refreshes the session on
@@ -124,7 +179,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(accessDeniedUrl);
   };
 
-  // --- 7. Role-based access control for protected routes. ---
+  // --- 9. Role-based access control for protected routes. ---
   // We check from most specific *UI panel* to least specific, allowing higher roles access.
 
   // System Admin routes

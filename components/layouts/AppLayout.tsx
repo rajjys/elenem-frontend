@@ -1,7 +1,7 @@
 'use client'
 import React, { useState, ReactNode } from 'react';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { FiX } from 'react-icons/fi';
 import { useAuthStore } from '@/store/auth.store'; // Assuming this path is correct
 // Import your existing components. Replace these with your actual paths.
@@ -10,7 +10,8 @@ import { SidebarBrand } from './sidebar-brand';
 import type { NavGroup } from './nav-items';
 import { SidebarUserMenu } from './sidebar-user-menu';
 import { useContextualLink } from '@/hooks';
-import { Roles } from '@/schemas'; // Assuming Role enum is here
+import { Roles } from '@/schemas';
+import { homeForRoles } from '@/utils';
 import { AppLayoutHeader } from './AppLayoutHeader'; // Import the updated Navbar
 import { ArrowLeft } from 'lucide-react';
 import { VerifyEmailBanner } from '@/components/onboarding';
@@ -71,7 +72,6 @@ function SidebarGroup({
 export default function AppLayout({ children, navItems }: AppLayoutProps) {
   const currentPath = usePathname();
   const { user: userAuth, logout } = useAuthStore();
-  const router = useRouter();
   const { buildLink } = useContextualLink();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -80,9 +80,6 @@ export default function AppLayout({ children, navItems }: AppLayoutProps) {
   const isTenantAdmin = userAuth?.roles.includes(Roles.TENANT_ADMIN);
   const isLeagueAdmin = userAuth?.roles.includes(Roles.LEAGUE_ADMIN);
   const isTeamAdmin   = userAuth?.roles.includes(Roles.TEAM_ADMIN);
-  const isPlayer      = userAuth?.roles.includes(Roles.PLAYER);
-  const isCoach       = userAuth?.roles.includes(Roles.COACH);
-  const isReferee     = userAuth?.roles.includes(Roles.REFEREE);
 
   /**
    * Where the brand goes: this reader's own dashboard.
@@ -93,14 +90,16 @@ export default function AppLayout({ children, navItems }: AppLayoutProps) {
    * inches away, which goes somewhere else entirely. This is not a way *back*, it is the way
    * *home*; naming the destination is enough.
    */
-  const dashboard = isSystemAdmin ? { label: 'Plateforme', link: '/admin/dashboard' } :
-                    isTenantAdmin ? { label: 'Mon organisation', link: '/tenant/dashboard' } :
-                    isLeagueAdmin ? { label: 'Ma compétition', link: '/league/dashboard' } :
-                    isTeamAdmin   ? { label: 'Mon club', link: '/team/dashboard' } :
-                    isPlayer      ? { label: 'Profil athlète', link: '/player/dashboard' } :
-                    isCoach       ? { label: 'Profil coach', link: '/coach/dashboard' } :
-                    isReferee     ? { label: 'Profil arbitre', link: '/referee/dashboard' } :
-                                    { label: 'Tableau de bord', link: '/account/dashboard' };
+  // The link is `homeForRoles`, the one map the middleware and the 404 page also use. This copy
+  // also sent players, coaches and referees to three dashboards that do not exist.
+  const dashboard = {
+    label: isSystemAdmin ? 'Plateforme' :
+           isTenantAdmin ? 'Mon organisation' :
+           isLeagueAdmin ? 'Ma compétition' :
+           isTeamAdmin   ? 'Mon club' :
+                           'Tableau de bord',
+    link: homeForRoles(userAuth?.roles),
+  };
   /**
    * The sidebar is always here.
    *
@@ -118,9 +117,12 @@ export default function AppLayout({ children, navItems }: AppLayoutProps) {
    * words instead of removing the furniture.
    */
   
+  // A full navigation, not a client push: nothing cached from the session — query data, a
+  // prefetched dashboard — survives into the signed-out page, and the middleware sees the request
+  // without its cookie.
   const handleLogout = () => {
     logout();
-    router.push('/');
+    window.location.assign('/');
   };
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);

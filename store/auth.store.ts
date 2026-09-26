@@ -49,18 +49,25 @@ export const useAuthStore = create<AuthState>()(
         // Optionally, if the backend doesn't return the full user on login, call fetchUser here:
         // await get().fetchUser();
       },
+      /**
+       * Ends the session here first, then tells the server.
+       *
+       * The server call existed and was never made, so a signed-out browser left a valid refresh
+       * token behind for seven days. It is fired after the local state is gone and never awaited:
+       * signing out must not wait on the network, and must not fail because of it. Its own 401 (an
+       * access token that expired an hour ago) is ignored by the interceptor, so it cannot re-enter
+       * the refresh flow.
+       */
       logout: async () => {
-        try {
-          // Consider adding a backend logout call to invalidate refresh tokens
-          // await api.post('/auth/logout');
-        } catch (error) {
-          console.error("Logout failed on backend:", error);
-        } finally {
-          get().setTokens(null);
-          set({ user: null });
-          // Cookies are cleared by setTokens(null) call and direct removal if any specific ones remain
-          Cookies.remove('accessToken');
-          Cookies.remove('userRole'); // Ensure this is removed if it was ever set somewhere else
+        const accessToken = get().tokens?.accessToken;
+        get().setTokens(null);
+        set({ user: null });
+        Cookies.remove('accessToken');
+        Cookies.remove('userRole');
+        if (accessToken) {
+          api
+            .post('/auth/logout', null, { headers: { Authorization: `Bearer ${accessToken}` } })
+            .catch(() => {});
         }
       },
       fetchUser: async () => {

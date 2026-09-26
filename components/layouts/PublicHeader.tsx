@@ -7,20 +7,22 @@ import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 
 import { useAuthStore } from "@/store/auth.store";
-import useI18n from "@/hooks/useI18n";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import UserDropdown from "./user-dropdown";
 
+/**
+ * Interim header (5A.1). The full redesign is 5A.2; this pass only stops it pointing at pages that
+ * are gone and gives a visitor the two things they came for. It used to offer "Tableau de bord" —
+ * which went to /login — and nothing at all that led to sign-up. The FR/EN switch changed its own
+ * label and nothing else.
+ */
 export default function PublicHeader() {
   const { user } = useAuthStore();
-  const { locale, setLocale } = useI18n();
   const [open, setOpen] = useState(false);
 
   const nav = [
-    { label: "Solution", href: "/features" },
-    { label: "How it works", href: "/#how-it-works" },
-    { label: "Pricing", href: "/pricing" },
-    { label: "contact", href: "/contact" },
+    { label: "Comment ça marche", href: "/#how-it-works" },
+    { label: "Contact", href: "/contact" },
   ];
 
   return (
@@ -49,24 +51,25 @@ export default function PublicHeader() {
           {/* Right cluster */}
           <div className="flex items-center gap-4">
             <ThemeToggle className="hidden lg:inline-flex" />
-            {/* Language */}
-            <button
-              onClick={() => setLocale(locale === "fr" ? "en" : "fr")}
-              className="hidden lg:block text-xs text-ink-muted hover:text-ink"
-            >
-              {locale === "fr" ? "EN" : "FR"}
-            </button>
 
             {/* Auth */}
             {user ? (
               <UserDropdown />
             ) : (
-              <Link
-                href="/login"
-                className="hidden lg:inline-flex rounded-md bg-sky-600 px-4 py-2 text-sm font-semibold text-white hover:bg-sky-700"
-              >
-                Tableau de bord
-              </Link>
+              <>
+                <Link
+                  href="/login"
+                  className="hidden lg:inline-flex text-sm font-medium text-ink-muted transition-colors hover:text-ink"
+                >
+                  Se connecter
+                </Link>
+                <Link
+                  href="/register"
+                  className="hidden sm:inline-flex rounded-md bg-accent px-4 py-2 text-sm font-semibold text-accent-ink transition-colors hover:bg-accent-hover"
+                >
+                  Créer ma ligue
+                </Link>
+              </>
             )}
 
             {/* Mobile toggle */}
@@ -96,23 +99,20 @@ export default function PublicHeader() {
               </Link>
             ))}
 
-            <div className="pt-4 border-t border-line flex items-center justify-between">
-              <button
-                onClick={() => setLocale(locale === "fr" ? "en" : "fr")}
-                className="text-xs text-ink-muted"
-              >
-                {locale === "fr" ? "EN" : "FR"}
-              </button>
-
-              {!user && (
-                <Link
-                  href="/login"
-                  className="rounded-md bg-sky-600 px-4 py-2 text-sm font-semibold text-white"
-                >
-                  Tableau de bord
+            {!user && (
+              <div className="pt-4 border-t border-line flex items-center justify-between gap-3">
+                <Link href="/login" onClick={() => setOpen(false)} className="text-ink-muted">
+                  Se connecter
                 </Link>
-              )}
-            </div>
+                <Link
+                  href="/register"
+                  onClick={() => setOpen(false)}
+                  className="rounded-md bg-accent px-4 py-2 text-sm font-semibold text-accent-ink"
+                >
+                  Créer ma ligue
+                </Link>
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -134,7 +134,7 @@ function NavLink({
     <Link
       href={href}
       className={`transition-colors ${
-        active ? "text-sky-600" : "hover:text-sky-600"
+        active ? "text-accent-text" : "hover:text-accent-text"
       }`}
     >
       {label}

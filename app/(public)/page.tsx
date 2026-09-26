@@ -1,5 +1,5 @@
 import Container from '@/components/ui/container';
-import { CheckCircle2, XCircle, ArrowRight } from 'lucide-react'; // Suggested icons
+import { XCircle, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 
 export default function HomePage() {
@@ -20,18 +20,20 @@ export default function HomePage() {
                - games, standings, and communication in one place.
             </p>
             <div className="mt-10 flex flex-col sm:flex-row justify-center items-center gap-4">
+              {/* Interim (5A.1): the product is self-serve and free, so the call to action is sign-up,
+                  not "Request a demo" to a form that sent nothing. The page is rewritten in 5A.2. */}
               <Link
-                href="/contact?intent=demo"
+                href="/register"
                 className="w-auto inline-flex items-center justify-center rounded-full bg-primary px-6 py-2 text-white font-bold transition-transform hover:scale-105 active:scale-95 shadow-lg shadow-primary/20"
               >
-                Request a demo
+                Créer ma ligue — gratuit
               </Link>
 
               <Link
-                href="/features"
+                href="#how-it-works"
                 className="w-auto inline-flex items-center justify-center rounded-full border border-line bg-surface px-6 py-2 font-semibold text-ink-muted hover:bg-surface-sunk transition-colors"
               >
-                See the solution
+                Comment ça marche
               </Link>
             </div>
           </div>
@@ -134,7 +136,7 @@ export default function HomePage() {
                     ✓ Automated Logic
                   </div>
                 </div>
-                <Link href="/features" className="inline-flex items-center gap-2 text-primary font-bold text-lg hover:underline">
+                <Link href="#how-it-works" className="inline-flex items-center gap-2 text-primary font-bold text-lg hover:underline">
                   See how Elenem will work for your league
                   <ArrowRight size={20} />
                 </Link>
@@ -250,70 +252,8 @@ export default function HomePage() {
           </div>
         </Container>
       </section>
-       {/* PRICING PREVIEW - The "Middle Ground" Approach */}
-      <section className="py-24 bg-surface-sunk">
-        <Container>
-          <div className="flex flex-col md:flex-row items-center gap-12">
-            <div className="flex-1">
-              <h2 className="text-3xl font-bold text-ink mb-6">
-                Plans built for every level of play
-              </h2>
-              <p className="text-lg text-ink-muted mb-8 leading-relaxed">
-                Whether you&apos;re running a local 8-team tournament or a national 
-                football federation, Elenem scales with you. 
-              </p>
-              
-              {/* Simplified Tier List */}
-              <div className="space-y-4 mb-10">
-                <div className="flex items-center gap-4 p-4 bg-surface rounded-2xl border border-primary shadow-sm">
-                  <div className="w-12 h-12 rounded-full bg-surface-sunk flex items-center justify-center font-bold text-ink-muted">B</div>
-                  <div>
-                    <p className="font-bold text-ink">Basic</p>
-                    <p className="text-sm text-ink-muted">For small, local community leagues.</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-4 p-4 bg-surface rounded-2xl border-2 border-line shadow-md">
-                  <div className="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center font-bold">P</div>
-                  <div>
-                    <p className="font-bold text-ink">Pro</p>
-                    <p className="text-sm text-ink-muted">Advanced features for regional clubs.</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-4 p-4 bg-surface rounded-2xl border border-line shadow-sm">
-                  <div className="w-12 h-12 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold">F</div>
-                  <div>
-                    <p className="font-bold text-ink">Federation</p>
-                    <p className="text-sm text-ink-muted">Custom solutions for large organizations.</p>
-                  </div>
-                </div>
-              </div>
-              <Link
-                href="/pricing"
-                className="inline-flex items-center gap-2 text-primary font-bold text-lg hover:underline"
-              >
-                Compare all features and pricing
-                <ArrowRight size={20} />
-              </Link>
-            </div>
-
-            <div className="flex-1 bg-primary rounded-[2rem] p-12 text-white relative overflow-hidden">
-              <h3 className="text-2xl font-bold mb-4">Starting at $399/year</h3>
-              <p className="text-accent-ink/80 mb-8">
-                All plans include core league management, 
-                automated standings, and our official mobile-ready fan portal.
-              </p>
-              <ul className="space-y-3 mb-10">
-                <li className="flex items-center gap-2"><CheckCircle2 size={18} /> Configuration & Training</li>
-                <li className="flex items-center gap-2"><CheckCircle2 size={18} /> Dedicated Support</li>
-                <li className="flex items-center gap-2"><CheckCircle2 size={18} /> Regular Security Updates</li>
-              </ul>
-              <Link href="/contact?intent=discussion" className="block w-full text-center py-4 bg-surface text-primary font-bold rounded-xl hover:bg-surface-sunk transition-colors">
-                Request a Custom Quote
-              </Link>
-            </div>
-          </div>
-        </Container>
-      </section>
+       {/* The pricing preview is gone: it quoted "$399/year" and Basic/Pro/Federation tiers for a
+           product that is free (PHASE5A_PRODUCT_SITE §3.2). */}
         {/* FINAL CTA - High Contrast */}
       {/* FINAL CTA - The "Season Ready" Impact Zone */}
       <section className="pb-12">
@@ -343,21 +283,17 @@ export default function HomePage() {
 
               <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-6">
                 <Link
-                  href="/contact?intent=demo"
+                  href="/register"
                   className="w-auto inline-flex items-center justify-center rounded-full bg-primary px-6 py-2 text-white font-bold transition-transform hover:scale-105 active:scale-95 shadow-lg shadow-primary/20"
                 >
-                  Request a demo
-                </Link>
-                
-                <Link href="/pricing" className="w-auto inline-flex items-center justify-center rounded-full border border-line bg-surface px-6 py-2 font-semibold text-ink-muted hover:bg-surface-sunk transition-colors">
-                  See all plans <span aria-hidden="true" className='pl-1'>→</span>
+                  Créer ma ligue — gratuit
                 </Link>
               </div>
             </div>
 
             {/* Subtle "Trusted By" label to lower the barrier */}
             <p className="mt-12 text-xs font-medium uppercase tracking-[0.2em] text-ink">
-              Configuration and onboarding included
+              Gratuit · sans carte bancaire
             </p>
           </div>
         </Container>

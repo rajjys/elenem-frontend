@@ -7,7 +7,6 @@ import Link from 'next/link';
 import { LeagueDetails, Roles, TeamDetails, TeamDetailsSchema, TenantDetails } from '@/schemas';
 import { api } from '@/services/api';
 import { TenantDetailsSchema, LeagueDetailsSchema } from '@/schemas';
-import { Plus } from 'lucide-react';
 
 const GeneralUserDashboard = () => {
   const { user: userAuth, fetchUser } = useAuthStore();
@@ -87,29 +86,9 @@ const GeneralUserDashboard = () => {
           </Card>
         ) : (
           <>
-            {/* General User without tenant — gated on email verification */}
-            {isGeneralUser && !userAuth?.tenantId && (
-              userAuth?.isEmailVerified ? (
-                <div className="my-6 text-ink bg-line hover:bg-line transition-colors rounded-md w-auto max-w-xs text-center">
-                  <Link href="/tenant/create">
-                    <div className='flex items-center justify-center pt-6'><Plus className='w-8 h-8' /></div>
-                    <div className="text-lg font-bold px-6 pt-3 pb-6">
-                      Créez Votre Organisation
-                    </div>
-                  </Link>
-                </div>
-              ) : (
-                <div
-                  className="my-6 text-ink-subtle bg-surface-sunk rounded-md w-auto max-w-xs text-center opacity-70 cursor-not-allowed select-none"
-                  aria-disabled="true"
-                  title="Vérifiez votre email pour créer une organisation"
-                >
-                  <div className='flex items-center justify-center pt-6'><Plus className='w-8 h-8' /></div>
-                  <div className="text-lg font-bold px-6 pt-3">Créez Votre Organisation</div>
-                  <p className="text-xs pb-6 pt-1">Vérifiez votre email d&apos;abord</p>
-                </div>
-              )
-            )}
+            {/* The "Créez votre organisation" card is gone with the old creation form it opened.
+                Organisations are created by signing up (/register), which no longer produces an
+                account without one. */}
             {/* General User with tenant OR Tenant Admin */}
             {(isGeneralUser && userAuth?.tenantId) || isTenantAdmin ? (
               <Card className='my-6 text-ink bg-line hover:bg-line transition-colors rounded-md w-auto max-w-xs text-center'>

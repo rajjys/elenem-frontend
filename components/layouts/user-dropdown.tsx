@@ -9,31 +9,22 @@ import { FiChevronDown, FiUser } from 'react-icons/fi';
 import { Button } from '@/components/ui/button';
 import { useAuthStore } from '@/store/auth.store'; // Assuming this store provides userAuth
 import { Roles } from '@/schemas';
-import { useRouter } from 'next/navigation';
+import { homeForRoles } from '@/utils';
 
 export const UserDropdown = ({ }) => {
   const { user: userAuth, logout } = useAuthStore();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const router = useRouter();
 
   const isSystemAdmin = userAuth?.roles?.includes(Roles.SYSTEM_ADMIN);
   const isTenantAdmin = userAuth?.roles?.includes(Roles.TENANT_ADMIN);
   const isLeagueAdmin = userAuth?.roles?.includes(Roles.LEAGUE_ADMIN);
   const isTeamAdmin = userAuth?.roles?.includes(Roles.TEAM_ADMIN);
-  const isPlayer = userAuth?.roles?.includes(Roles.PLAYER);
-  const isCoach = userAuth?.roles?.includes(Roles.COACH);
-  const isReferee = userAuth?.roles?.includes(Roles.REFEREE);
-  const isManagementUser = isSystemAdmin || isTenantAdmin || isLeagueAdmin || isTeamAdmin || isPlayer || isCoach || isReferee;
+  const isManagementUser = isSystemAdmin || isTenantAdmin || isLeagueAdmin || isTeamAdmin;
 
-  const dashboardLink = isSystemAdmin ? "/admin/dashboard"
-    : isTenantAdmin ? "/tenant/dashboard"
-      : isLeagueAdmin ? "/league/dashboard"
-        : isTeamAdmin ? "/team/dashboard"
-          : isPlayer ? "/player/dashboard"
-            : isCoach ? "/coach/dashboard"
-              : isReferee ? "/referee/dashboard"
-                : "/account/dashboard";
+  // The shared map: this copy also pointed players, coaches and referees at dashboards that do
+  // not exist.
+  const dashboardLink = homeForRoles(userAuth?.roles);
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -53,9 +44,10 @@ export const UserDropdown = ({ }) => {
   }
 
   const closeDropdown = () => setDropdownOpen(false);
+  // A full navigation, so nothing from the session survives into the signed-out page.
   const handleLogout = () => {
     logout();
-    router.push('/');
+    window.location.assign('/');
   };
   return (
     <div className="relative" ref={dropdownRef}>
@@ -107,10 +99,10 @@ export const UserDropdown = ({ }) => {
               <Shield className="w-4 h-4" /> Sécurité
             </Link>
             <Link
-              href="/account/settings"
+              href="/account/profile"
               onClick={closeDropdown}
               className="flex items-center gap-2 px-4 py-2 text-sm rounded-md nav-hover">
-              <Settings className="w-4 h-4" /> Paramètres
+              <Settings className="w-4 h-4" /> Profil
             </Link>
             {/* Logout Button */}
             <Button

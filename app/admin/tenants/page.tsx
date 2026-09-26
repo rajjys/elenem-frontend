@@ -2,7 +2,6 @@
 "use client";
 
 import React, { useState } from 'react';
-import Link from 'next/link';
 import { useTenants, useDeleteTenant } from '@/services/tenants';
 import { toastApiError } from '@/utils';
 import { TenantFilterParams } from '@/schemas';
@@ -10,7 +9,6 @@ import { TenantFilters } from '@/components/tenant/tenant-filters';
 import { TenantsTable } from '@/components/tenant/tenants-table';
 import { Pagination } from '@/components/ui/';
 import { LoadingSpinner } from '@/components/ui/';
-import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 
 export default function AdminTenantsPage() {
@@ -71,9 +69,8 @@ export default function AdminTenantsPage() {
           onFilterChange={handleFilterChange}
           onPageSizeChange={handlePageSizeChange}
         />
-        <Link href="/tenant/create" passHref>
-          <Button variant="primary" className='whitespace-nowrap'>Create New Tenant</Button>
-        </Link>
+        {/* No create button: organisations are created by signing up (/register), and the old
+            creation form this opened is gone (PHASE5A_PRODUCT_SITE §2). */}
       </div>
 
       {isLoading ? (

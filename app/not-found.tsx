@@ -4,18 +4,13 @@ import { LayoutDashboard } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useAuthStore } from '@/store/auth.store';
-import { Roles } from '@/schemas';
+import { homeForRoles } from '@/utils';
 
 export default function NotFound() {
   const { user: userAuth } = useAuthStore();
   const currentUserRoles = userAuth?.roles || [];
 
-  const dashboardLink =
-    currentUserRoles.includes(Roles.SYSTEM_ADMIN) ? '/admin/dashboard' :
-    currentUserRoles.includes(Roles.TENANT_ADMIN) ? '/tenant/dashboard' :
-    currentUserRoles.includes(Roles.LEAGUE_ADMIN) ? '/league/dashboard' :
-    currentUserRoles.includes(Roles.TEAM_ADMIN) ? '/team/dashboard' :
-    '/account/dashboard';
+  const dashboardLink = homeForRoles(currentUserRoles);
   return (
     <div className="min-h-screen bg-surface-sunk flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="flex items-center justify-center mb-4 pb-8">

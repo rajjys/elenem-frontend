@@ -21,7 +21,6 @@ export * from './progress';
 export * from './game-card';
 export * from './skeleton';
 export * from './status-badge';
-export * from './BlogPostCard';
 export * from './vertical-blogpost-card';
 export * from './form';
 export * from './collapsible';
