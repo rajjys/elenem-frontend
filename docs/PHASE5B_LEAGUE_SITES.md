@@ -540,9 +540,16 @@ WhatsApp matters more here than Google. It is how a result spreads in Goma.
 
 Each sprint ships on its own. The recommended interleaving with 5A is in §12.
 
-### 5B.0: Stop the leak (≈ 0.5 day)
+### 5B.0: Stop the leak (≈ 0.5 day) — **done 2026-09-26**
 
-§2. **Done when:** on production, no public endpoint returns any blocklisted field, the
+§2. Shipped as backend `2a4b231`:
+- shared public selects in `src/common/public/public-profile.select.ts`;
+- a guard spec, `public-responses.spec.ts`, which fails 8 of its 10 tests against the old code;
+- the `?pageSize` 500 and the route order fixed;
+- visibility filters on the two organisation reads.
+
+Verified on production with a scan of every public endpoint: no blocklisted key anywhere. The
+owner and audit user ids that remain in other public game responses go with the 5B.1 rewrite. **Done when:** on production, no public endpoint returns any blocklisted field, the
 `?pageSize` 500 is gone, and the test guards both.
 
 ### 5B.1: The public read API (≈ 2 days)
