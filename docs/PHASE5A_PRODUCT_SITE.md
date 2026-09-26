@@ -599,7 +599,19 @@ Four sprints, each shippable on its own. Estimates assume one session each. **Be
 sprint 0** (public-API data leak; see that plan §2): it is small and it is the only item here that
 protects real people.
 
-### 5A.1: Clear the ground (≈ 1 day)
+### 5A.1: Clear the ground (≈ 1 day) — **done 2026-09-26**
+
+Shipped as frontend `625ebc5`; verified locally for all four roles and on production (except the
+signed-in redirect, which needs the owner's own login). Deviations from the list below:
+
+- An **interim** header, footer and landing CTAs are in place: sign-up links and the price block
+  removed. The real ones are 5A.2.
+- A minimal `app/robots.ts` is in; the sitemap is 5A.3.
+- The optional `proxy` rename was not done.
+- `www.dxscores.app` reaches `dxscores.com` in two hops, because Vercel's domain setting redirects
+  it to the apex first. One hop is possible by pointing that Vercel redirect straight at
+  `dxscores.com`.
+
 
 - **Delete** the pages and leftovers in §2's verdict table. Add the 308s in `next.config.ts`
   `redirects()`.
