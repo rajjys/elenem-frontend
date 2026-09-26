@@ -563,11 +563,27 @@ than a DNS error. It will show whatever your middleware does with an unknown ten
    These prove to Gmail that mail claiming to be from `dxscores.com` really is. Without them your
    verification emails land in spam, which on a self-serve product means nobody ever finishes
    signing up.
-3. Create an **API key** and add it to Railway:
+3. Create an **API key** with *Sending access* only (one for dev, one for production), and set on
+   Railway:
    ```
-   RESEND_API_KEY = re_...
-   MAIL_FROM      = DXScores <noreply@dxscores.com>
+   MAIL_HOST   = smtp.resend.com
+   MAIL_PORT   = 587
+   MAIL_SECURE = false
+   MAIL_USER   = resend
+   MAIL_PASS   = re_…                       (the production key)
+   MAIL_FROM   = DXScores <noreply@dxscores.com>
    ```
+   > **Railway blocks outbound SMTP below its Pro plan** (docs.railway.com/networking/
+   > outbound-networking): ports 465 and 587 never answer. The mail service therefore sends through
+   > **Resend's HTTPS API** whenever `MAIL_HOST` is `smtp.resend.com` and `MAIL_PASS` is a Resend key.
+   > The variables above are used for that, and SMTP is only used for other providers. Found
+   > 2026-09-26: until then, every verification, reset and invitation e-mail from production had
+   > been silently lost.
+
+4. **The mailbox** (`contact@`, `demo@`) is **Mango Mail**, authorised through Cloudflare. Its
+   records sit at the domain root (MX, SPF, DMARC `p=quarantine`) and do not touch Resend's
+   (`resend._domainkey`, `send.`, `rsend.`). Resend's mail still passes DMARC, because it is
+   DKIM-signed as `dxscores.com`. Keep a single `_dmarc` record.
 
 **Worked when:** Resend's Domains page shows **Verified**, and a real sign-up delivers a
 verification mail to a Gmail address **in the inbox, not spam**. Test with a real address.
