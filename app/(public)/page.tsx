@@ -1,315 +1,388 @@
-import Container from '@/components/ui/container';
-import { XCircle, ArrowRight } from 'lucide-react';
+import type { Metadata } from 'next';
 import Link from 'next/link';
+import {
+  ArrowRight,
+  CalendarDays,
+  Check,
+  ClipboardList,
+  FileCheck2,
+  Keyboard,
+  ListOrdered,
+  Share2,
+  Trophy,
+  UserPlus,
+  Users,
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { PhoneStandings, ScoreEntryCard } from '@/components/marketing/product-preview';
+import { VideoFacade } from '@/components/marketing/video-facade';
+import { ShowcaseLeagues, Testimonials } from '@/components/marketing/social-proof';
+import { site } from '@/content/site';
 
-export default function HomePage() {
+/**
+ * The landing page of dxscores.com (PHASE5A_PRODUCT_SITE §6).
+ *
+ * One job: a league organiser understands in ten seconds what this does, trusts it in one minute,
+ * and signs up in three. Every claim is something the product does today — the plan's §6.4 lists
+ * what backs each one — and nothing here is invented: no users, no quotes, no numbers until there
+ * are real ones (`content/site.ts` holds the slots). It is also served at /home, for signed-in
+ * readers, with this page as its canonical.
+ */
+export const metadata: Metadata = {
+  title: { absolute: 'DXScores — le classement se calcule tout seul' },
+  description:
+    'Saisissez les scores : DXScores tient le calendrier, calcule le classement selon vos règles et le publie sur le site de votre ligue. Gratuit.',
+  alternates: { canonical: '/' },
+};
+
+const wrap = 'mx-auto max-w-6xl px-4 sm:px-6';
+
+const steps = [
+  {
+    icon: UserPlus,
+    title: 'Créez votre ligue.',
+    text: 'Vos compétitions, vos équipes. Quelques minutes, même en pleine saison.',
+  },
+  {
+    icon: Keyboard,
+    title: 'Saisissez les résultats.',
+    text: 'Le score final en quelques secondes, depuis votre téléphone. La feuille de marque quand vous l’avez.',
+  },
+  {
+    icon: Share2,
+    title: 'Partagez.',
+    text: 'Classement, calendrier et résultats sont à jour sur votre-ligue.dxscores.app. Le classement officiel s’exporte en PDF, en image ou en Excel.',
+  },
+];
+
+const features = [
+  {
+    icon: CalendarDays,
+    title: 'Un calendrier pour toutes vos compétitions',
+    text: 'Salles, horaires, conflits détectés, reports et annulations avec leur motif.',
+  },
+  {
+    icon: ListOrdered,
+    title: 'Un classement qui se calcule seul',
+    text: 'Vos règles de points, les forfaits, les départages, les zones de qualification et de relégation.',
+  },
+  {
+    icon: FileCheck2,
+    title: 'Le classement officiel, prêt à signer',
+    text: 'En-tête, cachet et signature. En PDF à imprimer, en image pour WhatsApp, en Excel.',
+  },
+  {
+    icon: ClipboardList,
+    title: 'La feuille de marque',
+    text: 'Lancers francs, paniers à 2 et à 3 points par joueur — et les meilleurs marqueurs.',
+  },
+  {
+    icon: Trophy,
+    title: 'Phases et play-offs',
+    text: 'Poules, phase finale, barrages : vous composez le format, saison après saison.',
+  },
+  {
+    icon: Users,
+    title: 'Votre équipe',
+    text: 'Invitez les personnes qui saisissent les résultats, chacune avec son rôle.',
+  },
+];
+
+const faq = [
+  {
+    q: 'Faut-il installer quelque chose ?',
+    a: 'Non. DXScores s’ouvre dans le navigateur, sur téléphone comme sur ordinateur.',
+  },
+  {
+    q: 'Notre saison a déjà commencé. C’est trop tard ?',
+    a: 'Non. Vous saisissez les matchs déjà joués avec leur score, et le classement se reconstruit.',
+  },
+  {
+    q: 'Les joueurs doivent-ils créer un compte ?',
+    a: 'Non. Les effectifs sont saisis par la ligue.',
+  },
+  {
+    q: 'Qui peut modifier les résultats ?',
+    a: 'Seulement les personnes que vous invitez. Chaque modification d’un match est gardée dans son historique.',
+  },
+  {
+    q: 'Quels sports ?',
+    a: 'Tous les sports collectifs qui se jouent en matchs et en classement : basketball, football, volleyball, handball… Les règles de points se règlent pour chaque compétition. La feuille de marque par joueur est, pour l’instant, celle du basketball.',
+  },
+  {
+    q: 'Est-ce vraiment gratuit ?',
+    a: 'Oui. Tout ce que DXScores fait aujourd’hui restera gratuit. Des offres Pro, avec des fonctionnalités en plus, pourront venir plus tard — elles s’ajouteront, elles ne retireront rien.',
+  },
+];
+
+/** French typography: a non-breaking space before ? ! : ; so the mark never starts a line. */
+const fr = (s: string) => s.replace(/ ([?!:;])/g, ' $1');
+
+export default function LandingPage() {
   return (
-    <div className="selection:bg-primary/10">
-      {/* HERO - Increased impact with a subtle gradient */}
-      <section className="relative overflow-hidden py-24 lg:py-32">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-primary/5 via-transparent to-transparent -z-10" />
-        <Container>
-          <div className="max-w-4xl text-center mx-auto">
-            <h1 className="text-5xl sm:text-7xl font-extrabold tracking-tight text-ink leading-[1.1]">
-              One system to run <br />
-              <span className="text-primary">your league</span>
+    <>
+      {/* ---------- Hero ---------- */}
+      <section className="relative overflow-hidden border-b border-line">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 bg-gradient-to-b from-accent-soft/50 via-canvas to-canvas"
+        />
+        <div className={`${wrap} relative grid items-center gap-14 py-16 sm:py-24 lg:grid-cols-[1.1fr_0.9fr]`}>
+          <div>
+            <p className="inline-flex items-center gap-2 rounded-full border border-line bg-surface px-3 py-1 text-xs font-medium text-ink-muted">
+              <span className="h-1.5 w-1.5 rounded-full bg-positive" aria-hidden />
+              Gratuit · pour les ligues et fédérations sportives
+            </p>
+            <h1 className="mt-6 text-balance text-display font-bold text-ink">
+              Le classement se calcule <span className="text-accent-text">tout seul.</span>
             </h1>
-
-            <p className="mt-8 text-xl text-ink-muted leading-relaxed max-w-2xl mx-auto">
-              Elenem replaces paper schedules, manual standings, and WhatsApp groups with one simple system to manage your league
-               - games, standings, and communication in one place.
+            <p className="mt-6 max-w-xl text-lg leading-relaxed text-ink-muted">
+              Saisissez les scores de vos matchs. DXScores tient le calendrier, calcule le classement
+              selon vos règles et le publie sur le site de votre ligue — avec le classement officiel
+              prêt à partager sur WhatsApp.
             </p>
-            <div className="mt-10 flex flex-col sm:flex-row justify-center items-center gap-4">
-              {/* Interim (5A.1): the product is self-serve and free, so the call to action is sign-up,
-                  not "Request a demo" to a form that sent nothing. The page is rewritten in 5A.2. */}
-              <Link
-                href="/register"
-                className="w-auto inline-flex items-center justify-center rounded-full bg-primary px-6 py-2 text-white font-bold transition-transform hover:scale-105 active:scale-95 shadow-lg shadow-primary/20"
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <Button
+                asChild
+                variant="primary"
+                size="lg"
+                className="group motion-safe:transition-transform motion-safe:hover:-translate-y-0.5"
               >
-                Créer ma ligue — gratuit
-              </Link>
-
-              <Link
-                href="#comment-ca-marche"
-                className="w-auto inline-flex items-center justify-center rounded-full border border-line bg-surface px-6 py-2 font-semibold text-ink-muted hover:bg-surface-sunk transition-colors"
-              >
-                Comment ça marche
-              </Link>
-            </div>
-          </div>
-        </Container>
-      </section>
-        {/* PAIN POINTS - Highlighting Common League Management Issues */}
-      <section className="py-18 bg-surface">
-        <Container>
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-            <div className="space-y-8">
-              <div>
-                <h2 className="text-4xl font-extrabold text-ink tracking-tight mb-2">
-                  Every Season. <br/>
-                  <span className="text-primary font-medium italic">Same Problems.</span>
-                </h2>
-                <p className="text-ink-muted">Elenem exists because these problems repeat every season.</p>
-              </div>
-              
-              <ul className="grid gap-4">
-                {[
-                  "Match calendars managed on paper or PDF",
-                  "Schedule errors discovered too late",
-                  "Standings calculated manually",
-                  "Disputes after every matchday",
-                  "Fans uninformed or misinformed",
-                  "Facebook and WhatsApp used as official tools"
-                ].map((point, i) => (
-                  <li key={i} className="flex items-center gap-3 p-3 bg-surface-sunk rounded-md border-l-4 border-negative">
-                    <XCircle className="w-5 h-5 text-negative shrink-0" />
-                    <span className="font-medium text-ink">{point}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* THE "MESS" VISUAL (The Chaos) */}
-            <div className="relative p-8 bg-surface-sunk rounded-[2rem] border-2 border-dashed border-line">
-              <div className="space-y-4 opacity-50 grayscale">
-                {/* Mockup of a messy WhatsApp group chat */}
-                <div className="bg-surface p-3 rounded-lg shadow-sm max-w-[80%]">
-                  <p className="text-xs font-bold text-positive">Coach Mike</p>
-                  <p className="text-sm">Wait, is the game at 3pm or 4pm? The PDF says 3 but the Facebook post says 4...</p>
-                </div>
-                <div className="bg-surface p-3 rounded-lg shadow-sm max-w-[80%] ml-auto bg-accent-soft">
-                  <p className="text-xs font-bold text-accent-text">Admin</p>
-                  <p className="text-sm">Let me check the spreadsheet and get back to you.</p>
-                </div>
-                {/* Mockup of a handwritten paper score */}
-                <div className="bg-[#fff9c4] p-6 shadow-md mx-auto w-48 text-center border-t-4 border-negative">
-                  <p className="font-serif text-lg border-b border-black/10 my-2">Tigers 2 - 1 Eagles ?</p>
-                  <p className="text-xs mt-2 italic">(Signature illegible)</p>
-                </div>
-              </div>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="bg-slate-900 text-white px-4 py-2 rounded-full font-bold text-sm">THE OLD WAY</span>
-              </div>
-            </div>
-          </div>
-        </Container>
-      </section>
-        {/* SOLUTION - Emphasizing Automation, Integrity and Brand Ownership */}
-      <section id="fonctionnalites" className="py-12 bg-surface scroll-mt-20">
-        <Container>
-          <div className="grid lg:grid-cols-2 gap-20 items-center">
-            {/* LEFT: THE TEXT (League Manager Centered) */}
-            <div className="max-w-xl">
-              <div className='mb-6'>
-                <h2 className="text-4xl font-extrabold text-ink tracking-tight mb-2">
-                  Your identity. <br/>
-                  <span className="text-primary font-medium italic">Our engine.</span>
-                </h2>
-                <p className='text-ink-muted'>
-                  Elenem centralizes fixtures, results, standings, and communication into one official system -
-                  powering your league&apos;s digital presence while keeping your identity.
-                </p>
-              </div>          
-              <div className="space-y-8">
-                <div className='hidden md:block'>
-                  <h3 className="text-xl font-bold text-ink">Total Brand Ownership</h3>
-                  <p className="text-ink-muted mt-2 leading-relaxed">
-                    Elenem lives on <strong> your website</strong>. It looks like you, feels like you, 
-                    and builds your brand every matchday.
-                  </p>
-                </div>
-
-                <div className='hidden md:block'>
-                  <h3 className="text-xl font-bold text-ink">Automated league operations</h3>
-                  <p className="text-ink-muted mt-2 leading-relaxed">
-                    When a score is entered, your entire league updates instantly. 
-                    The standings, the goal-difference, and the schedules all sync 
-                    across mobile and desktop without you lifting a finger.
-                  </p>
-                </div>
-
-                <div className="pt-4 flex flex-wrap gap-4">
-                  <div className="px-4 py-2 bg-primary/5 rounded-lg border border-primary/10 text-primary text-sm font-bold">
-                    ✓ Custom Domains
-                  </div>
-                  <div className="px-4 py-2 bg-primary/5 rounded-lg border border-primary/10 text-primary text-sm font-bold">
-                    ✓ Automated Logic
-                  </div>
-                </div>
-                <Link href="#comment-ca-marche" className="inline-flex items-center gap-2 text-primary font-bold text-lg hover:underline">
-                  See how Elenem will work for your league
-                  <ArrowRight size={20} />
-                </Link>
-              </div>
-            </div>
-
-            {/* RIGHT: THE ABSTRACT PREVIEW (The "Mirror") */}
-            <div className="relative group">
-              {/* DESKTOP VIEW: The Command Center */}
-              <div className="relative z-10 bg-surface rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-line overflow-hidden transform group-hover:-translate-y-2 transition-transform duration-500">
-                {/* Browser Header with Custom Domain Focus */}
-                <div className="bg-surface-sunk border-b border-line px-4 py-3 flex items-center gap-4">
-                  <div className="flex gap-1.5">
-                    <div className="w-2.5 h-2.5 rounded-full bg-line" />
-                    <div className="w-2.5 h-2.5 rounded-full bg-line" />
-                  </div>
-                  <div className="flex-1 bg-surface border border-line rounded-md px-3 flex items-center gap-2 shadow-sm">
-                    <div className="w-3 h-3 text-ink-subtle mb-4 mr-1">🔒</div>
-                    <span className="text-xs font-medium text-ink-muted tracking-tight">https://my-league.com/standings</span>
-                  </div>
-                </div>
-                
-                <div className="p-6 space-y-6">
-                  {/* Abstract Standings Skeleton */}
-                  <div className="space-y-2">
-                    <div className="grid grid-cols-6 gap-2 mb-4">
-                      <div className="col-span-3 h-2 bg-line rounded-full w-24" />
-                      <div className="h-2 bg-surface-sunk rounded-full" />
-                      <div className="h-2 bg-surface-sunk rounded-full" />
-                      <div className="h-2 bg-surface-sunk rounded-full" />
-                    </div>
-                    {[1, 2, 3, 4, 5].map((i) => (
-                      <div key={i} className="grid grid-cols-6 gap-2 py-3 border-b border-line">
-                        <div className="col-span-3 flex items-center gap-3">
-                          <div className="w-5 h-5 bg-surface-sunk rounded" />
-                          <div className={`h-2 bg-line rounded-full ${i === 1 ? 'w-32' : 'w-24'}`} />
-                        </div>
-                        <div className="h-2 bg-surface-sunk rou-nded-full mt-1.5" />
-                        <div className="h-2 bg-surface-sunk rounded-full mt-1.5" />
-                        <div className={`h-2 rounded-full mt-1.5 ${i === 1 ? 'bg-primary/30' : 'bg-surface-sunk'}`} />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              {/* MOBILE VIEW: The Fan Experience */}
-              <div className="absolute -bottom-10 -right-6 z-20 w-48 bg-slate-900 rounded-[2rem] p-2.5 shadow-2xl border border-line hidden md:block transform group-hover:translate-x-2 transition-transform duration-500">
-                <div className="bg-surface rounded-[1.5rem] h-80 overflow-hidden flex flex-col">
-                  <div className="h-2 bg-slate-900 w-20 mx-auto mt-2 rounded-full mb-2" /> {/* Notch */}
-                  {/* Browser Header with Custom Domain Focus */}
-                <div className="bg-surface-sunk border-b border-line px-1 flex items-center gap-4">
-                  <div className="flex-1 bg-surface border border-line rounded-md px-1 flex items-center gap-2 shadow-sm">
-                    <div className="w-2 h-2 text-ink-subtle mb-4">🔒</div>
-                    <span className="text-xs pl-2 text-ink-muted font-medium tracking-tight">my-league.com</span>
-                  </div>
-                </div>
-                  
-                  <div className="p-2 space-y-3">
-                    <div className="h-2 w-12 bg-line rounded-full mb-4" />
-                    {/* Abstract Game Cards */}
-                    {[1, 2, 3].map((i) => (
-                      <div key={i} className="p-3 border border-line rounded-xl space-y-2 shadow-sm">
-                        <div className="flex justify-between items-center">
-                          <div className="w-8 h-1.5 bg-line rounded-full" />
-                          <div className={`px-2 py-1 rounded text-[10px] font-bold ${i < 3 ? 'bg-primary text-white' : 'bg-surface-sunk text-ink-subtle'}`}>
-                            {i === 1 ? '2 - 1' : i === 2 ? '0 - 3' : 'vs'}
-                          </div>
-                          <div className="w-8 h-1.5 bg-line rounded-full" />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="mt-auto p-2 pb-4 border-t border-line bg-surface-sunk flex justify-around">
-                    <div className="w-4 h-4 rounded-full bg-primary/20" />
-                    <div className="w-4 h-4 rounded-full bg-line" />
-                    <div className="w-4 h-4 rounded-full bg-line" />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-          </div>
-        </Container>
-      </section>
-        {/* HOW IT WORKS - Visualizing the Process */}
-      <section id="comment-ca-marche" className="py-18 scroll-mt-20">
-        <Container>
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-ink">How Elenem works</h2>
-            <p className="mt-4 text-ink-muted max-w-xl mx-auto">We handle the system. You focus on the sport.</p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-12 relative">
-             {/* Simple visual connector for desktop */}
-            <div className="hidden md:block absolute top-10 left-[20%] right-[20%] h-px bg-line -z-10" />
-            
-            <Step
-              number="01"
-              title="We configure your league"
-              text="Teams, calendar format, rules, and season structure set up by our experts."
-            />
-            <Step
-              number="02"
-              title="Officials manage everything"
-              text="Results, standings, and updates are handled in a centralized, secure dashboard."
-            />
-            <Step
-              number="03"
-              title="Fans follow officially"
-              text="Schedules, tables, and news are pushed to your league&apos;s public portal instantly."
-            />
-          </div>
-        </Container>
-      </section>
-       {/* The pricing preview is gone: it quoted "$399/year" and Basic/Pro/Federation tiers for a
-           product that is free (PHASE5A_PRODUCT_SITE §3.2). */}
-        {/* FINAL CTA - High Contrast */}
-      {/* FINAL CTA - The "Season Ready" Impact Zone */}
-      <section className="pb-12">
-        <Container>
-          <div className="relative isolate overflow-hidden  px-6 py-12 sm:px-24 sm:py-24 text-center">           
-            {/* Background Decorative Elements - Subtle "System Grid" */}
-            <div className="absolute inset-0 -z-10 opacity-20 [mask-image:radial-gradient(closest-side,white,transparent)]">
-              <svg className="h-full w-full" fill="none">
-                <defs>
-                  <pattern id="grid-pattern" width="40" height="40" patternUnits="userSpaceOnUse">
-                    <path d="M0 40V.5H40" stroke="black" strokeWidth="0.5" />
-                  </pattern>
-                </defs>
-                <rect width="100%" height="100%" fill="url(#grid-pattern)" />
-              </svg>
-            </div>
-            <div className="relative z-10 max-w-2xl mx-auto">
-              <h2 className="text-4xl sm:text-6xl font-bold tracking-tight text-ink leading-[1.1]">
-                Run your next season <br />
-                <span className="text-primary opacity-90">properly.</span>
-              </h2>
-              
-              <p className="mt-6 text-lg leading-8 text-ink-muted">
-                Stop improvising with spreadsheets and group chats. 
-                Start managing your league with an official system.
-              </p>
-
-              <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-6">
-                <Link
-                  href="/register"
-                  className="w-auto inline-flex items-center justify-center rounded-full bg-primary px-6 py-2 text-white font-bold transition-transform hover:scale-105 active:scale-95 shadow-lg shadow-primary/20"
-                >
+                <Link href="/register">
                   Créer ma ligue — gratuit
+                  <ArrowRight
+                    className="h-4 w-4 motion-safe:transition-transform motion-safe:group-hover:translate-x-0.5"
+                    aria-hidden
+                  />
                 </Link>
-              </div>
+              </Button>
+              {site.demoUrl ? (
+                <Button asChild variant="outline" size="lg">
+                  <a href={site.demoUrl} target="_blank" rel="noopener noreferrer">
+                    Voir un exemple
+                  </a>
+                </Button>
+              ) : (
+                <Button asChild variant="outline" size="lg">
+                  <Link href="#comment-ca-marche">Comment ça marche</Link>
+                </Button>
+              )}
             </div>
-
-            {/* Subtle "Trusted By" label to lower the barrier */}
-            <p className="mt-12 text-xs font-medium uppercase tracking-[0.2em] text-ink">
-              Gratuit · sans carte bancaire
+            <p className="mt-4 text-sm text-ink-subtle">
+              Sans carte bancaire. Le site de votre ligue est en ligne dès l’inscription.
             </p>
           </div>
-        </Container>
-      </section>
-    </div>
-  );
-}
 
-function Step({ number, title, text }: { number: string; title: string; text: string }) {
-  return (
-    <div className="flex flex-col items-center text-center group">
-      <div className="w-16 h-16 rounded-2xl bg-surface border-2 border-line shadow-sm flex items-center justify-center mb-3 group-hover:border-primary/30 transition-colors">
-        <span className="text-xl font-bold text-primary">{number}</span>
-      </div>
-      <h3 className="text-xl font-bold text-ink mb-3">{title}</h3>
-      <p className="text-ink-muted leading-relaxed">{text}</p>
-    </div>
+          {/* The score card tucks under the phone's bottom edge rather than over its table: laid
+              across the table it hid the relegation row, which is half of what the table shows. */}
+          <figure className="relative mx-auto w-full max-w-sm lg:mx-0 lg:justify-self-end">
+            <PhoneStandings className="relative z-10 mx-auto lg:mr-0" />
+            <ScoreEntryCard className="relative z-20 -mt-4 hidden sm:mx-auto sm:block lg:-ml-16 lg:mr-auto" />
+            <figcaption className="mt-3 text-center text-xs text-ink-subtle lg:text-right">
+              Exemple illustratif
+            </figcaption>
+          </figure>
+        </div>
+      </section>
+
+      {/* ---------- The chore it replaces ---------- */}
+      <section className={`${wrap} reveal grid gap-8 py-16 sm:py-24 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16`}>
+        <h2 className="text-title font-bold text-ink">{fr('Chaque journée, la même corvée.')}</h2>
+        <div className="space-y-4 text-lg leading-relaxed text-ink-muted">
+          <p>
+            Quelqu’un recalcule le classement à la main. Un graphiste le refait pour les réseaux. Et à
+            la fin de la saison, les chiffres sont contestés.
+          </p>
+          <p className="font-semibold text-ink">
+            Avec DXScores, le classement vient des matchs. Chacun peut voir d’où vient chaque point.
+          </p>
+        </div>
+      </section>
+
+      {/* ---------- How it works ---------- */}
+      <section id="comment-ca-marche" className="scroll-mt-20 border-y border-line bg-surface">
+        <div className={`${wrap} reveal py-16 sm:py-24`}>
+          <h2 className="text-title font-bold text-ink">Comment ça marche</h2>
+          <ol className="mt-10 grid gap-6 md:grid-cols-3">
+            {steps.map((s, i) => (
+              <li key={s.title} className="rounded-xl border border-line bg-canvas p-6">
+                <div className="flex items-center gap-3">
+                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-accent text-sm font-bold text-accent-ink">
+                    {i + 1}
+                  </span>
+                  <s.icon className="h-5 w-5 text-accent-text" aria-hidden />
+                </div>
+                <h3 className="mt-5 text-lg font-semibold text-ink">{s.title}</h3>
+                <p className="mt-2 leading-relaxed text-ink-muted">{fr(s.text)}</p>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+
+      {/* ---------- Presentation video (hidden until one exists) ---------- */}
+      {site.presentationVideoId && (
+        <section id="video" className={`${wrap} reveal scroll-mt-20 py-16 sm:py-24`}>
+          <h2 className="text-title font-bold text-ink">Voir DXScores en quelques minutes</h2>
+          <div className="mt-8 max-w-4xl">
+            <VideoFacade id={site.presentationVideoId} title="Présentation de DXScores" />
+          </div>
+        </section>
+      )}
+
+      {/* ---------- What it does ---------- */}
+      <section id="fonctionnalites" className={`${wrap} reveal scroll-mt-20 py-16 sm:py-24`}>
+        <h2 className="text-title font-bold text-ink">Ce que fait DXScores</h2>
+        <p className="mt-3 max-w-2xl text-lg text-ink-muted">
+          Ce dont une ligue a besoin chaque semaine — et rien que vous auriez à maintenir.
+        </p>
+        <ul className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {features.map((f) => (
+            <li
+              key={f.title}
+              className="rounded-xl border border-line bg-surface p-6 transition-colors hover:border-line-strong motion-safe:transition-all motion-safe:hover:-translate-y-0.5 motion-safe:hover:shadow-e2"
+            >
+              <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent-soft text-accent-text">
+                <f.icon className="h-5 w-5" aria-hidden />
+              </span>
+              <h3 className="mt-4 font-semibold text-ink">{f.title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-ink-muted">{fr(f.text)}</p>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      {/* ---------- Visibility: the league's own site ---------- */}
+      <section className="border-y border-line bg-surface">
+        <div className={`${wrap} reveal grid items-center gap-12 py-16 sm:py-24 lg:grid-cols-2`}>
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wider text-accent-text">Le site de votre ligue</p>
+            <h2 className="mt-3 text-title font-bold text-ink">Votre ligue mérite d’être vue.</h2>
+            <p className="mt-4 max-w-xl text-lg leading-relaxed text-ink-muted">
+              Chaque ligue reçoit son propre site — classement, calendrier, résultats — mis à jour à
+              chaque score, sans que personne n’ait à le tenir.
+            </p>
+            <ul className="mt-6 space-y-3">
+              {[
+                'Toujours à jour : il change à chaque résultat saisi.',
+                'Lisible sur n’importe quel téléphone.',
+                'À votre nom : votre-ligue.dxscores.app.',
+              ].map((t) => (
+                <li key={t} className="flex items-start gap-3 text-ink">
+                  <Check className="mt-0.5 h-5 w-5 shrink-0 text-positive" aria-hidden />
+                  <span>{fr(t)}</span>
+                </li>
+              ))}
+            </ul>
+            {site.demoUrl && (
+              <Button asChild variant="outline" size="lg" className="mt-8">
+                <a href={site.demoUrl} target="_blank" rel="noopener noreferrer">
+                  Visiter le site de démonstration
+                </a>
+              </Button>
+            )}
+          </div>
+          <div className="flex justify-center lg:justify-end">
+            <PhoneStandings />
+          </div>
+        </div>
+      </section>
+
+      <ShowcaseLeagues />
+      <Testimonials />
+
+      {/* ---------- Free ---------- */}
+      <section id="gratuit" className={`${wrap} reveal scroll-mt-20 py-16 sm:py-24`}>
+        <div className="rounded-2xl border border-line bg-surface p-8 sm:p-12">
+          <h2 className="text-title font-bold text-ink">Gratuit. Vraiment.</h2>
+          <p className="mt-4 max-w-2xl text-lg leading-relaxed text-ink-muted">
+            DXScores est gratuit : pas de carte bancaire, pas de limite d’équipes ni de compétitions.
+            Tout ce que DXScores fait aujourd’hui restera gratuit. Des offres Pro, avec des
+            fonctionnalités en plus, pourront venir plus tard — elles s’ajouteront, elles ne
+            retireront rien.
+          </p>
+        </div>
+      </section>
+
+      {/* ---------- FAQ ---------- */}
+      <section className="border-t border-line bg-surface">
+        <div className={`${wrap} reveal grid gap-10 py-16 sm:py-24 lg:grid-cols-[0.8fr_1.2fr]`}>
+          <h2 className="text-title font-bold text-ink">Questions fréquentes</h2>
+          <div className="divide-y divide-line border-y border-line">
+            {faq.map((f) => (
+              <details key={f.q} className="group py-4">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-medium text-ink [&::-webkit-details-marker]:hidden">
+                  {fr(f.q)}
+                  <span
+                    aria-hidden
+                    className="text-xl leading-none text-ink-subtle transition-transform group-open:rotate-45"
+                  >
+                    +
+                  </span>
+                </summary>
+                <p className="mt-3 leading-relaxed text-ink-muted">{fr(f.a)}</p>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ---------- The founder ---------- */}
+      <section className={`${wrap} reveal py-16 sm:py-24`}>
+        <figure className="mx-auto max-w-3xl">
+          <p className="text-xs font-semibold uppercase tracking-wider text-accent-text">Un mot du fondateur</p>
+          <blockquote className="mt-4 space-y-4 text-lg leading-relaxed text-ink">
+            <p>
+              Je suis entraîneur de basketball chez les jeunes. Chaque saison, suivre le classement, le
+              calendrier et les statistiques de mon équipe voulait dire prendre des notes à la main —
+              et c’était pénible. J’ai construit DXScores pour que les petites ligues gardent la trace
+              de leur saison, et que chaque équipe puisse mieux se préparer.
+            </p>
+            <p>
+              Beaucoup de ligues restent petites, pas seulement faute de moyens, mais parce que
+              personne ne les voit. Et un talent qu’on ne voit pas, personne ne peut le révéler.
+              {fr(' S’il y a deux choses qui manquent au sport en Afrique, ce sont l’organisation et la visibilité. ')}
+              DXScores existe pour apporter les deux.
+            </p>
+          </blockquote>
+          <figcaption className="mt-6 flex items-center gap-3">
+            <span
+              aria-hidden
+              className="flex h-11 w-11 items-center justify-center rounded-full bg-accent-soft font-semibold text-accent-text"
+            >
+              IR
+            </span>
+            <span className="text-sm">
+              <span className="block font-semibold text-ink">{site.founder.name}</span>
+              <span className="text-ink-muted">
+                Fondateur ·{' '}
+                <a href={site.contact.whatsappUrl} target="_blank" rel="noopener noreferrer" className="link-grow">
+                  WhatsApp {site.contact.whatsappDisplay}
+                </a>
+              </span>
+            </span>
+          </figcaption>
+        </figure>
+      </section>
+
+      {/* ---------- Final call to action ---------- */}
+      <section className={`${wrap} pb-20`}>
+        <div className="reveal flex flex-col items-start gap-6 rounded-2xl bg-accent px-8 py-12 sm:px-12 md:flex-row md:items-center md:justify-between">
+          <h2 className="max-w-xl text-title font-bold text-accent-ink">
+            Votre prochaine journée, sans calcul à la main.
+          </h2>
+          <Link
+            href="/register"
+            className="group inline-flex shrink-0 items-center gap-2 rounded-md bg-canvas px-5 py-3 font-semibold text-ink shadow-e1 transition-colors hover:bg-surface motion-safe:transition-transform motion-safe:hover:-translate-y-0.5"
+          >
+            Créer ma ligue — gratuit
+            <ArrowRight
+              className="h-4 w-4 motion-safe:transition-transform motion-safe:group-hover:translate-x-0.5"
+              aria-hidden
+            />
+          </Link>
+        </div>
+      </section>
+    </>
   );
 }

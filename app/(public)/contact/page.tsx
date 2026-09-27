@@ -1,188 +1,74 @@
-'use client'
+import type { Metadata } from 'next';
+import Link from 'next/link';
+import { Mail, MessageCircle } from 'lucide-react';
+import { site } from '@/content/site';
 
-import { useSearchParams } from 'next/navigation'
-import Container from '@/components/ui/container'
-import { ArrowRight, MessageSquare, ShieldCheck, CheckCircle2, Zap } from 'lucide-react'
-import { Suspense } from 'react'
-
-type Intent = 'demo' | 'setup' | 'discussion'
-
-function ContactContent() {
-  const params = useSearchParams()
-  const intent: Intent = (params.get('intent') as Intent) || 'demo'
-
-  const config = {
-    demo: {
-      title: 'See how Elenem works',
-      subtitle: 'A guided walkthrough of your future league operations.',
-      cta: 'Request demo',
-      icon: Zap
-    },
-    setup: {
-      title: 'Start your league setup',
-      subtitle: 'Initialize your competition structure for the upcoming season.',
-      cta: 'Start setup',
-      icon: ShieldCheck
-    },
-    discussion: {
-      title: 'Tell us about your league',
-      subtitle: 'Expert guidance on structuring your specific competition.',
-      cta: 'Discuss my league',
-      icon: MessageSquare
-    },
-  }[intent]
-
-  const Icon = config.icon
-
-  return (
-    <div className="bg-surface min-h-screen selection:bg-primary/10">
-      <div className="h-1 bg-surface-sunk w-full" />
-
-      <section className="py-12 lg:py-20">
-        <Container>
-          <div className="grid lg:grid-cols-12 gap-12 items-start">
-
-            {/* LEFT: THE FORM WORKSTATION */}
-            <div className="lg:col-span-7">
-              <div className="mb-10">
-                <div className="flex items-center gap-2 text-primary mb-3">
-                  <Icon size={14} />
-                  <p className="text-[9px] uppercase tracking-[0.2em] font-black">Inquiry: {intent}</p>
-                </div>
-                
-                <h1 className="text-3xl lg:text-4xl font-black text-ink tracking-tight mb-4 leading-tight">
-                  {config.title}
-                </h1>
-                <p className="text-base text-ink-muted leading-relaxed max-w-lg">
-                  {config.subtitle}
-                </p>
-              </div>
-
-              <form className="grid sm:grid-cols-2 gap-4 p-6 bg-surface-sunk rounded-[2rem] border border-line shadow-sm">
-                <div className="sm:col-span-1">
-                   <label className="text-[9px] font-black uppercase tracking-widest text-ink-subtle ml-1 mb-1.5 block">Full Name</label>
-                   <input placeholder="Your name" className="w-full px-4 py-3 rounded-xl border border-line bg-surface focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm font-medium text-ink placeholder:text-ink-subtle" />
-                </div>
-
-                <div className="sm:col-span-1">
-                   <label className="text-[9px] font-black uppercase tracking-widest text-ink-subtle ml-1 mb-1.5 block">Organization</label>
-                   <input placeholder="League name" className="w-full px-4 py-3 rounded-xl border border-line bg-surface focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm font-medium text-ink placeholder:text-ink-subtle" />
-                </div>
-
-                <div className="sm:col-span-1">
-                   <label className="text-[9px] font-black uppercase tracking-widest text-ink-subtle ml-1 mb-1.5 block">WhatsApp</label>
-                   <input placeholder="+243 ..." className="w-full px-4 py-3 rounded-xl border border-line bg-surface focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm font-medium text-ink placeholder:text-ink-subtle" />
-                </div>
-
-                <div className="sm:col-span-1">
-                   <label className="text-[9px] font-black uppercase tracking-widest text-ink-subtle ml-1 mb-1.5 block">Email</label>
-                   <input placeholder="Optional" className="w-full px-4 py-3 rounded-xl border border-line bg-surface focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm font-medium text-ink placeholder:text-ink-subtle" />
-                </div>
-
-                <div className="sm:col-span-1">
-                   <label className="text-[9px] font-black uppercase tracking-widest text-ink-subtle ml-1 mb-1.5 block">Sport</label>
-                   <select className="w-full px-4 py-3 rounded-xl border border-line bg-surface focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm font-medium text-ink appearance-none">
-                    <option>Select Sport</option>
-                    <option>Football</option>
-                    <option>Basketball</option>
-                  </select>
-                </div>
-
-                <div className="sm:col-span-1">
-                   <label className="text-[9px] font-black uppercase tracking-widest text-ink-subtle ml-1 mb-1.5 block">Team Count</label>
-                   <select className="w-full px-4 py-3 rounded-xl border border-line bg-surface focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm font-medium text-ink appearance-none">
-                    <option>Quantity</option>
-                    <option>1–8</option>
-                    <option>9–16</option>
-                    <option>17–32</option>
-                    <option>32+</option>
-                  </select>
-                </div>
-
-                <div className="sm:col-span-2">
-                   <label className="text-[9px] font-black uppercase tracking-widest text-ink-subtle ml-1 mb-1.5 block">Competition Type</label>
-                   <select className="w-full px-4 py-3 rounded-xl border border-line bg-surface focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm font-medium text-ink appearance-none">
-                    <option>League structure</option>
-                    <option>Single competition</option>
-                    <option>Multiple divisions</option>
-                    <option>Federation</option>
-                  </select>
-                </div>
-
-                <div className="sm:col-span-2">
-                   <label className="text-[9px] font-black uppercase tracking-widest text-ink-subtle ml-1 mb-1.5 block">Context</label>
-                   <textarea
-                    placeholder="Tell us more about your league (optional)"
-                    className="w-full px-4 py-3 rounded-xl border border-line bg-surface focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm font-medium text-ink placeholder:text-ink-subtle h-24 resize-none"
-                  />
-                </div>
-
-                <div className="sm:col-span-2 pt-2">
-                  <button className="w-full bg-slate-900 text-white px-6 py-4 rounded-xl font-black shadow-lg hover:bg-primary transition-all duration-300 flex items-center justify-center gap-2 text-sm uppercase tracking-widest">
-                    {config.cta}
-                    <ArrowRight size={16} />
-                  </button>
-                </div>
-              </form>
-            </div>
-
-            {/* RIGHT: THE "WHAT NEXT" GUIDE */}
-            <div className="lg:col-span-5 lg:sticky lg:top-24">
-              <div className="bg-slate-900 rounded-[1.5rem] p-8 text-white shadow-2xl relative overflow-hidden">
-                {/* Decorative Pattern */}
-                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -mr-16 -mt-16" />
-
-                <h3 className="text-xl font-black italic tracking-tight mb-6">
-                  What happens next
-                </h3>
-
-                <div className="space-y-6 relative">
-                   <div className="absolute left-[9px] top-2 bottom-2 w-px bg-slate-800" />
-
-                   {[
-                     { step: 'Review', text: 'We evaluate your competition structure and administrative needs.' },
-                     { step: 'Consultation', text: 'Real-time discussion via WhatsApp to align on goals.' },
-                     { step: 'Activation', text: 'Complete system configuration and onboarding for your team.' }
-                   ].map((item, i) => (
-                     <div key={i} className="relative flex gap-4 group">
-                        <div className="w-[18px] h-[18px] rounded-full bg-slate-800 border-2 border-line z-10 flex items-center justify-center transition-colors group-hover:bg-primary" />
-                        <div>
-                           <p className="text-[9px] font-black uppercase tracking-widest text-primary mb-0.5">{item.step}</p>
-                           <p className="text-ink-subtle font-medium text-xs leading-relaxed">{item.text}</p>
-                        </div>
-                     </div>
-                   ))}
-                </div>
-
-                <div className="mt-8 pt-6 border-t border-line">
-                  <div className="flex items-center gap-2 mb-3">
-                    <CheckCircle2 className="text-positive" size={14} />
-                    <p className="text-xs font-bold text-ink-inverted tracking-tight">24h Response Commitment</p>
-                  </div>
-                  <p className="text-[11px] text-ink-muted leading-relaxed italic">
-                    WhatsApp preferred for instant coordination and technical support.
-                  </p>
-                </div>
-              </div>
-
-              {/* Minimal Trust Badge */}
-              <div className="mt-6 flex items-center gap-3 px-6 py-4 rounded-2xl border border-line bg-surface-sunk/30">
-                 <ShieldCheck className="text-ink-inverted" size={20} />
-                 <p className="text-[10px] font-bold text-ink-subtle uppercase tracking-widest leading-tight">
-                    Enterprise Security <br/> & Data Privacy
-                 </p>
-              </div>
-            </div>
-
-          </div>
-        </Container>
-      </section>
-    </div>
-  )
-}
+/**
+ * Contact (PHASE5A_PRODUCT_SITE §3.5).
+ *
+ * WhatsApp and a real mailbox, no form. The old page was an English form that sent nothing — no
+ * submit handler, no backend — promised a "24h Response Commitment" and "Enterprise Security", and
+ * crashed on an unknown ?intent=. The audience lives on WhatsApp, so that comes first.
+ */
+export const metadata: Metadata = {
+  title: 'Contact',
+  description: 'Une question sur DXScores ? Écrivez-nous sur WhatsApp ou par e-mail.',
+};
 
 export default function ContactPage() {
-  return <Suspense fallback={<div>Loading...</div>}>
-          <ContactContent />
-         </Suspense>
+  const cards = [
+    {
+      icon: MessageCircle,
+      title: 'WhatsApp',
+      detail: site.contact.whatsappDisplay,
+      href: site.contact.whatsappUrl,
+      action: 'Écrire sur WhatsApp',
+      external: true,
+    },
+    {
+      icon: Mail,
+      title: 'E-mail',
+      detail: site.contact.email,
+      href: `mailto:${site.contact.email}`,
+      action: 'Envoyer un e-mail',
+      external: false,
+    },
+  ];
+
+  return (
+    <section className="mx-auto max-w-3xl px-4 py-16 sm:px-6 sm:py-24">
+      <h1 className="text-title font-bold text-ink">Parlons de votre ligue</h1>
+      <p className="mt-4 text-lg leading-relaxed text-ink-muted">
+        Une question avant de commencer, un format de compétition particulier, un souci en cours de
+        saison&nbsp;: écrivez-nous. C’est le fondateur qui répond.
+      </p>
+
+      <div className="mt-10 grid gap-5 sm:grid-cols-2">
+        {cards.map((c) => (
+          <a
+            key={c.title}
+            href={c.href}
+            target={c.external ? '_blank' : undefined}
+            rel={c.external ? 'noopener noreferrer' : undefined}
+            className="group rounded-xl border border-line bg-surface p-6 transition-colors hover:border-line-strong motion-safe:transition-all motion-safe:hover:-translate-y-0.5 motion-safe:hover:shadow-e2"
+          >
+            <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent-soft text-accent-text">
+              <c.icon className="h-5 w-5" aria-hidden />
+            </span>
+            <p className="mt-4 font-semibold text-ink">{c.title}</p>
+            <p className="mt-1 text-ink-muted">{c.detail}</p>
+            <p className="mt-4 text-sm font-medium text-accent-text">{c.action} →</p>
+          </a>
+        ))}
+      </div>
+
+      <p className="mt-10 text-ink-muted">
+        Vous préférez essayer directement&nbsp;?{' '}
+        <Link href="/register" className="link-grow font-medium text-accent-text">
+          Créez votre ligue
+        </Link>{' '}
+        — c’est gratuit, et votre site est en ligne dès l’inscription.
+      </p>
+    </section>
+  );
 }
