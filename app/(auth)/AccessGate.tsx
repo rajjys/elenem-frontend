@@ -5,7 +5,7 @@ import React from 'react'
 import { useRouter } from 'next/navigation'
 import { Roles } from '@/schemas'
 import { useAuthStore } from '@/store/auth.store'
-import { LoadingSpinner } from '@/components/ui'
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
 
 interface AccessGateProps {
   allowedRoles: Roles[]

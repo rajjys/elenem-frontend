@@ -5,7 +5,10 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { toast } from 'sonner';
 import { Mail, KeyRound, Lock, ArrowLeft, CheckCircle2 } from 'lucide-react';
-import { Button, Input, PasswordInput, OtpInput } from '@/components/ui';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { PasswordInput } from '@/components/ui/password-input';
+import { OtpInput } from '@/components/ui/otp-input';
 import { toastApiError } from '@/utils';
 import { useForgotPassword, useVerifyResetOtp, useResetPassword } from '@/services/auth';
 

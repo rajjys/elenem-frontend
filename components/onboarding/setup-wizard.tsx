@@ -6,7 +6,10 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ArrowLeft, ArrowRight, Check, CircleAlert, Loader2 } from 'lucide-react';
 
-import { Button, DatePicker, Input, Label } from '@/components/ui';
+import { Button } from '@/components/ui/button';
+import { DatePicker } from '@/components/ui/date-picker';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { SplitShell } from '@/components/auth';
 import { useAuthStore } from '@/store/auth.store';
 import { useScopeContext } from '@/hooks/useScopeContext';

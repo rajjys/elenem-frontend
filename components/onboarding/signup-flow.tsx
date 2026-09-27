@@ -7,15 +7,13 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ArrowLeft, ArrowRight, Check, Loader2, PartyPopper } from 'lucide-react';
 
-import {
-  Button,
-  CountryPicker,
-  Input,
-  Label,
-  PasswordChecklist,
-  PasswordInput,
-  SportPicker,
-} from '@/components/ui';
+import { Button } from '@/components/ui/button';
+import { CountryPicker } from '@/components/ui/country-picker';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { PasswordChecklist } from '@/components/ui/password-checklist';
+import { PasswordInput } from '@/components/ui/password-input';
+import { SportPicker } from '@/components/ui/sport-picker';
 import { AuthShell } from '@/components/auth/auth-shell';
 import { SportType } from '@/schemas';
 import {

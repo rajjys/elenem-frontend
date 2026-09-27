@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Logo } from '@/components/brand';
+import { site } from '@/content/site';
 
 /**
  * The product site's footer (PHASE5A_PRODUCT_SITE §7).
@@ -11,9 +12,6 @@ import { Logo } from '@/components/brand';
  * Contact is WhatsApp and a real mailbox (§3.5): the audience lives on WhatsApp, and a form needs a
  * backend, spam handling and someone watching it.
  */
-const WHATSAPP_URL =
-  'https://wa.me/243975092470?text=' +
-  encodeURIComponent('Bonjour, je voudrais utiliser DXScores pour ma ligue.');
 
 const columns: { title: string; links: { label: string; href: string; external?: boolean }[] }[] = [
   {
@@ -28,8 +26,8 @@ const columns: { title: string; links: { label: string; href: string; external?:
   {
     title: 'Contact',
     links: [
-      { label: 'WhatsApp · +243 975 092 470', href: WHATSAPP_URL, external: true },
-      { label: 'contact@dxscores.com', href: 'mailto:contact@dxscores.com', external: true },
+      { label: `WhatsApp · ${site.contact.whatsappDisplay}`, href: site.contact.whatsappUrl, external: true },
+      { label: site.contact.email, href: `mailto:${site.contact.email}`, external: true },
     ],
   },
   {

@@ -2,7 +2,10 @@
 
 import { useRef, useState } from 'react';
 import { ClipboardList, Plus, X } from 'lucide-react';
-import { Button, Input, Label, TextArea } from '@/components/ui';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { TextArea } from '@/components/ui/textarea';
 import { parseTeamLines, suggestShortCode, type TeamRow } from '@/services/setup';
 
 /**

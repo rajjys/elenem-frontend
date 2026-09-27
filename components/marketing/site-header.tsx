@@ -6,8 +6,8 @@ import { usePathname } from 'next/navigation';
 import { ArrowRight, Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Logo } from '@/components/brand';
-import { useAuthStore } from '@/store/auth.store';
-import { homeForRoles } from '@/utils';
+import { homeForRoles } from '@/utils/post-auth-redirect';
+import { readSessionRoles } from '@/utils/session-hint';
 import { cn } from '@/utils/cn';
 
 /**
@@ -20,17 +20,17 @@ import { cn } from '@/utils/cn';
  * scroll the page. Elsewhere they go to the landing's section — at `/home` for a signed-in reader,
  * because `/` sends them to their dashboard.
  *
- * The signed-in state comes from the persisted auth store, which only exists in the browser, so
- * the server renders the signed-out header and the switch happens after mount. The reverse would
- * flash a "Tableau de bord" button at every anonymous visitor.
+ * The signed-in state is read from the session cookie after mount (`readSessionRoles`), so the
+ * server renders the signed-out header and the switch happens in the browser — the reverse would
+ * flash a "Tableau de bord" button at every anonymous visitor. It used to come from the auth store,
+ * which brought zustand, axios and zod to every page of the product site for one yes-or-no.
  */
 export function SiteHeader() {
   const pathname = usePathname();
-  const user = useAuthStore((s) => s.user);
-  const [mounted, setMounted] = useState(false);
+  const [roles, setRoles] = useState<string[] | null>(null);
   const [open, setOpen] = useState(false);
 
-  useEffect(() => setMounted(true), []);
+  useEffect(() => setRoles(readSessionRoles()), []);
   useEffect(() => setOpen(false), [pathname]);
   useEffect(() => {
     if (!open) return;
@@ -39,7 +39,7 @@ export function SiteHeader() {
     return () => document.removeEventListener('keydown', onKey);
   }, [open]);
 
-  const signedIn = mounted && !!user;
+  const signedIn = !!roles;
   const onLanding = pathname === '/' || pathname === '/home';
   const section = (id: string) => (onLanding ? `#${id}` : `${signedIn ? '/home' : '/'}#${id}`);
 
@@ -71,7 +71,7 @@ export function SiteHeader() {
         <div className="flex items-center gap-2 sm:gap-3">
           {signedIn ? (
             <Button asChild variant="primary" size="md">
-              <Link href={homeForRoles(user?.roles)}>Tableau de bord</Link>
+              <Link href={homeForRoles(roles)}>Tableau de bord</Link>
             </Button>
           ) : (
             <>

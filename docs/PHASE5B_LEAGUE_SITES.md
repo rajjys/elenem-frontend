@@ -161,7 +161,8 @@ Every page is a **server component**. It fetches with
 in it. Tabs, filters and date navigation are **links** (`?c=messieurs`, `?week=2026-09-21`), not
 client state. The only client code is the mobile menu and the share button.
 
-- This is how the site stays **under 100 KB**, previews in WhatsApp (which needs `og:*` tags in the
+- This is how the site stays **under the product site's budget** (5A §6: under 200 KB compressed,
+  ~107 KB of it React and Next.js), previews in WhatsApp (which needs `og:*` tags in the
   first 300 KB of HTML), is indexable, and loads on 3G.
 - A result entered in the dashboard appears publicly **within a minute**, with no webhook. That is
   the broadcast promise, kept by the cache setting. On-demand revalidation when a score is saved
@@ -592,7 +593,7 @@ The two pages fans open most, plus the match page with its box score.
 - the numbers match the signed export for LIPROBAKIN;
 - postponed and cancelled games show as such;
 - at 390 px the table reads without horizontal scrolling for rank, club and PTS;
-- each page's JavaScript is under 100 KB.
+- each page's JavaScript stays under 200 KB compressed (5A §6), with no UI-kit barrel imports.
 
 ### 5B.4: Accueil and Équipes (≈ 1 day)
 
@@ -683,7 +684,7 @@ owner's inputs (5A §11, 5B §11) as the gating items rather than the code.
       knockout phase with planned fixtures.
 - [ ] Every time on the site equals the hall's time, whatever the reader's device zone and the
       server's.
-- [ ] `view-source` on each page type contains the data. First-load JS under 100 KB.
+- [ ] `view-source` on each page type contains the data. First-load JS under 200 KB compressed.
 - [ ] WhatsApp previews for home, standings, a match and a club.
 - [ ] Both themes; 390 px and 1440 px; no raw palette colours in `components/league-site`.
 - [ ] `/playoff` and `/players` redirect; no link on the site 404s.

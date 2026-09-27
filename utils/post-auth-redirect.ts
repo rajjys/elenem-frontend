@@ -1,4 +1,6 @@
-import { Roles } from '@/schemas';
+// Type-only: `@/schemas/enums` builds zod schemas at import time, and this runs in the product
+// site's header, where pulling zod in would cost every visitor ~20 KB for four string comparisons.
+import type { Roles } from '@/schemas';
 
 /**
  * A signed-in reader's home: the dashboard for the widest thing they administer.
@@ -9,11 +11,11 @@ import { Roles } from '@/schemas';
  * `/player/[playerId]`). It takes roles alone so the middleware can call it with a token's claims.
  */
 export function homeForRoles(roles: readonly (Roles | string)[] | null | undefined): string {
-  const has = (role: Roles) => (roles ?? []).includes(role);
-  if (has(Roles.SYSTEM_ADMIN)) return '/admin/dashboard';
-  if (has(Roles.TENANT_ADMIN)) return '/tenant/dashboard';
-  if (has(Roles.LEAGUE_ADMIN)) return '/league/dashboard';
-  if (has(Roles.TEAM_ADMIN)) return '/team/dashboard';
+  const has = (role: `${Roles}`) => (roles ?? []).includes(role);
+  if (has('SYSTEM_ADMIN')) return '/admin/dashboard';
+  if (has('TENANT_ADMIN')) return '/tenant/dashboard';
+  if (has('LEAGUE_ADMIN')) return '/league/dashboard';
+  if (has('TEAM_ADMIN')) return '/team/dashboard';
   return '/account/dashboard';
 }
 

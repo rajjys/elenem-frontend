@@ -1,16 +1,20 @@
 'use client';
-import { Desktop } from '@phosphor-icons/react';
-import { LayoutDashboard } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Home, LayoutDashboard } from 'lucide-react';
 import { Logo } from '@/components/brand';
 import Link from 'next/link';
-import { useAuthStore } from '@/store/auth.store';
-import { homeForRoles } from '@/utils';
+import { homeForRoles } from '@/utils/post-auth-redirect';
+import { readSessionRoles } from '@/utils/session-hint';
 
+/**
+ * The root 404. It sits in the root layout's tree, so its JavaScript ships with every page of the
+ * product site: it reads the session from the cookie rather than the auth store (which brought
+ * zustand, axios and zod along), and uses one icon library, not two.
+ */
 export default function NotFound() {
-  const { user: userAuth } = useAuthStore();
-  const currentUserRoles = userAuth?.roles || [];
-
-  const dashboardLink = homeForRoles(currentUserRoles);
+  const [roles, setRoles] = useState<string[] | null>(null);
+  useEffect(() => setRoles(readSessionRoles()), []);
+  const dashboardLink = roles ? homeForRoles(roles) : null;
   return (
     <div className="min-h-screen bg-surface-sunk flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="flex items-center justify-center mb-4 pb-8">
@@ -45,13 +49,15 @@ export default function NotFound() {
             </p>
             <div className="mt-6 flex flex-col sm:flex-row sm:justify-center gap-8">
               <Link href="/" className="flex items-center justify-center w-full sm:w-auto px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-accent-text bg-surface hover:bg-surface-sunk hover:text-accent-text transition-all duration-300 ease-in-out">
-                <Desktop className="w-5 h-5 font-bold" />
+                <Home className="w-5 h-5" />
                 <span className="pl-2">Page d&apos;accueil</span>
               </Link>
-              <Link href={dashboardLink} className="flex items-center justify-center w-full sm:w-auto px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-accent hover:bg-accent-hover transition-all duration-300 ease-in-out">
-                <LayoutDashboard className="w-5 h-5 font-bold" />
-                <span className="pl-2">Tableau de bord</span>
-              </Link>
+              {dashboardLink && (
+                <Link href={dashboardLink} className="flex items-center justify-center w-full sm:w-auto px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-accent-ink bg-accent hover:bg-accent-hover transition-all duration-300 ease-in-out">
+                  <LayoutDashboard className="w-5 h-5" />
+                  <span className="pl-2">Tableau de bord</span>
+                </Link>
+              )}
             </div>
           </div>
         </div>

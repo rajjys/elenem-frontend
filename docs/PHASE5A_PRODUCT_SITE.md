@@ -278,9 +278,17 @@ Today it is pushed as-is (`LoginClientPage.tsx`), an open redirect (`UI_CONVENTI
 
 ## 6. The landing page
 
-One page, server-rendered, **under 100 KB of JavaScript** on first load (the budget from
-`DESIGN_AND_MVP_PLAN` §3 stage 3; today's landing is 176 KB and `/features` 482 KB). No
-`framer-motion` on public pages (it is a dependency; nothing public imports it — keep it that way).
+One page, server-rendered. **The JavaScript budget, measured 2026-09-27 on a production build:**
+**under 200 KB compressed on first load, of which at most ~75 KB is ours.** React and the Next.js
+runtime alone are ~107 KB compressed, so the "under 100 KB" first written here (from
+`DESIGN_AND_MVP_PLAN` §3) cannot be met by any App Router page and is withdrawn. What the budget
+does forbid is shipping unused code to visitors. The first measurement found 666 KB on the landing:
+- Sentry, loaded on every page whether configured or not;
+- the whole `components/ui` barrel, pulled in by a loading boundary;
+- zustand, axios and zod, pulled in by the header's sign-in check and by the root 404.
+
+All three are fixed, which brought it to 180 KB. No `framer-motion` on public pages: it is a
+dependency, but nothing public imports it, and it stays that way.
 
 Section order, drawn from early Plausible, Tally and Linear pages, which launched without social
 proof. Copy below is a **draft in French** for the owner to edit, not final text. Anything in
@@ -326,7 +334,7 @@ The owner is making YouTube videos that explain the product; at least one lives 
 right after *Comment ça marche*, titled *Voir DXScores en 3 minutes* (or its real length).
 
 **Never a plain YouTube iframe.** One embed loads over a megabyte of JavaScript before anyone
-presses play, which alone would blow the 100 KB budget and cost a visitor on mobile data real
+presses play — several times the page's whole budget — and would cost a visitor on mobile data real
 money. Use a **click-to-load facade**: the video's thumbnail (`https://i.ytimg.com/vi/<id>/hqdefault.jpg`,
 through `next/image`) with a play button; the `youtube-nocookie.com` iframe replaces it only when
 tapped. About twenty lines, no dependency.
@@ -649,7 +657,8 @@ signed-in redirect, which needs the owner's own login). Deviations from the list
 
 **Done when:**
 - the landing reads correctly in both themes at 390 px and 1440 px;
-- Lighthouse on `/` shows first-load JS under 100 KB and no layout shift from images;
+- on a production build, `/` loads under 200 KB of compressed JavaScript and has no layout shift
+  from images;
 - every claim on the page appears in §6.4's *Backed by* column;
 - the owner has approved the copy.
 
@@ -746,7 +755,8 @@ built now. Each item says what triggers it.
 - [ ] No page on `.com` contains "Elenem", "$", "Pro", "demo" (outside the demo link), "Coach
       Mike", "LeBron", or English UI text.
 - [ ] Every footer and navbar link returns 200.
-- [ ] Landing: under 100 KB of first-load JavaScript, both themes, 390 px and 1440 px, and
+- [ ] Landing: under 200 KB of compressed first-load JavaScript (production build), both themes,
+      390 px and 1440 px, and
       `prefers-reduced-motion` respected.
 - [ ] A WhatsApp preview of `dxscores.com` shows the title, description and image.
 - [ ] End-to-end self-serve sign-up on production, from a phone, including the verification

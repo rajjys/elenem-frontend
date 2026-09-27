@@ -4,7 +4,7 @@
 
 import React, { Suspense } from "react"; // Import Suspense from React
 import LoginClientPage from "./LoginClientPage"; // Import the new client component
-import { LoadingSpinner } from "@/components/ui"; // Keep LoadingSpinner if used in fallback
+import { LoadingSpinner } from '@/components/ui/loading-spinner'; // Keep LoadingSpinner if used in fallback
 
 export default function LoginPage() {
   return (
