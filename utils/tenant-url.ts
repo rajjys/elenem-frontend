@@ -9,6 +9,6 @@ export function buildTenantUrl(slug: string, path = ''): string {
   if (isDev) {
     return `${protocol}${slug}.lvh.me:3000${path}`;
   }
-  const tenantDomain = process.env.NEXT_PUBLIC_TENANT_DOMAIN || process.env.NEXT_PUBLIC_ROOT_DOMAIN || 'elenem.site';
+  const tenantDomain = process.env.NEXT_PUBLIC_TENANT_DOMAIN || process.env.NEXT_PUBLIC_ROOT_DOMAIN || 'dxscores.app';
   return `${protocol}${slug}.${tenantDomain}${path}`;
 }

@@ -10,7 +10,7 @@ export default function PublicLayout({ children }: { children: ReactNode }) {
           <div className="flex min-h-screen flex-col bg-surface-sunk text-ink">
             <PublicTenantHeader />
               <main className="flex-grow">{children}</main>
-            { /*<PublicFooter />*/ }
+
             <PublicTenantFooter />
           </div>
   );

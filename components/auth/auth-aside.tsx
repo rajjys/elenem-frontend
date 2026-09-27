@@ -30,8 +30,8 @@ export function StandingsPreview() {
           Le classement se calcule tout seul.
         </h2>
         <p className="mt-4 text-[0.9375rem] leading-relaxed text-accent-ink/75 max-w-sm">
-          Entrez les scores. Elenem tient le tableau, applique vos règles et publie une page que
-          vos supporters peuvent partager — sans discussion en fin de saison.
+          Entrez les scores. DXScores tient le tableau, applique vos règles et publie une page que
+          vos supporters peuvent partager.
         </p>
 
         <div

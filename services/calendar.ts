@@ -158,7 +158,7 @@ export function useDownloadResultsSheet() {
       const url = URL.createObjectURL(res.data as Blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = named ?? 'elenem-calendrier.xlsx';
+      link.download = named ?? 'dxscores-calendrier.xlsx';
       document.body.appendChild(link);
       link.click();
       link.remove();

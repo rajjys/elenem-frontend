@@ -1,10 +1,10 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
 import { PanelLeft, PanelLeftClose } from 'lucide-react';
 import { cn } from '@/utils/cn';
 import { Tooltip } from '@/components/ui/tooltip';
+import { Logo } from '@/components/brand';
 
 /**
  * The top of the sidebar: brand, then the dock control.
@@ -21,12 +21,10 @@ import { Tooltip } from '@/components/ui/tooltip';
 export function SidebarBrand({
   isOpen,
   onToggle,
-  logoUrl = '/logos/elenem-sport.png',
   href = '/',
 }: {
   isOpen: boolean;
   onToggle: () => void;
-  logoUrl?: string;
   href?: string;
 }) {
   const Icon = isOpen ? PanelLeftClose : PanelLeft;
@@ -39,15 +37,8 @@ export function SidebarBrand({
       )}
     >
       {isOpen && (
-        <Link href={href} className="flex min-w-0 items-center" aria-label="Elenem">
-          <Image
-            src={logoUrl}
-            alt="Elenem"
-            width={112}
-            height={36}
-            priority
-            className="h-8 w-auto object-contain"
-          />
+        <Link href={href} className="flex min-w-0 items-center" aria-label="DXScores">
+          <Logo />
         </Link>
       )}
       <Tooltip label={isOpen ? 'Réduire le menu' : 'Déployer le menu'}>

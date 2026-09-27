@@ -11,11 +11,26 @@ async rewrites() {
       },
     ];
   },*/
+  /**
+   * Remote image hosts. `images.domains` is deprecated, and most of the list served the mock news
+   * posts deleted in 5A.1 (Facebook CDN, graphassets) or an S3 bucket that was never used. What is
+   * left is the placeholder service still used for missing logos, and the R2 domain images will be
+   * served from once storage is wired (INFRASTRUCTURE §2).
+   */
   images: {
-    domains: ["scontent-mba2-1.xx.fbcdn.net", "scontent.fgom1-1.fna.fbcdn.net", "scontent-jnb2-1.xx.fbcdn.net", "placehold.co", "via.placeholder.com", "eu-central-1-shared-euc1-02.graphassets.com",
-              "elenem-sports-media-prod.s3.eu-west-3.amazonaws.com"
+    remotePatterns: [
+      { protocol: 'https', hostname: 'placehold.co' },
+      { protocol: 'https', hostname: 'media.dxscores.com' },
     ],
-  }
+  },
+
+  /**
+   * Browsers and crawlers still ask for /favicon.ico by name. The icon is now generated
+   * (app/icon.tsx), so that name points at it — on every host, which is what a favicon wants.
+   */
+  async redirects() {
+    return [{ source: '/favicon.ico', destination: '/icon', permanent: false }];
+  },
 };
 
 // Only wrap with Sentry when a DSN is configured, so builds without one are

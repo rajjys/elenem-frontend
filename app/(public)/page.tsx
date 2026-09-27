@@ -30,7 +30,7 @@ export default function HomePage() {
               </Link>
 
               <Link
-                href="#how-it-works"
+                href="#comment-ca-marche"
                 className="w-auto inline-flex items-center justify-center rounded-full border border-line bg-surface px-6 py-2 font-semibold text-ink-muted hover:bg-surface-sunk transition-colors"
               >
                 Comment ça marche
@@ -95,7 +95,7 @@ export default function HomePage() {
         </Container>
       </section>
         {/* SOLUTION - Emphasizing Automation, Integrity and Brand Ownership */}
-      <section className="py-12 bg-surface">
+      <section id="fonctionnalites" className="py-12 bg-surface scroll-mt-20">
         <Container>
           <div className="grid lg:grid-cols-2 gap-20 items-center">
             {/* LEFT: THE TEXT (League Manager Centered) */}
@@ -136,7 +136,7 @@ export default function HomePage() {
                     ✓ Automated Logic
                   </div>
                 </div>
-                <Link href="#how-it-works" className="inline-flex items-center gap-2 text-primary font-bold text-lg hover:underline">
+                <Link href="#comment-ca-marche" className="inline-flex items-center gap-2 text-primary font-bold text-lg hover:underline">
                   See how Elenem will work for your league
                   <ArrowRight size={20} />
                 </Link>
@@ -223,7 +223,7 @@ export default function HomePage() {
         </Container>
       </section>
         {/* HOW IT WORKS - Visualizing the Process */}
-      <section id="how-it-works" className="py-18">
+      <section id="comment-ca-marche" className="py-18 scroll-mt-20">
         <Container>
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-ink">How Elenem works</h2>

@@ -44,7 +44,7 @@ export function resolveTenantSlugFromHostname(
   }
 
   // Fallback (legacy) behaviour: treat subdomains of NEXT_PUBLIC_ROOT_DOMAIN or default as tenants
-  const rawRootDomain = process.env.NEXT_PUBLIC_ROOT_DOMAIN || 'elenem.site';
+  const rawRootDomain = process.env.NEXT_PUBLIC_ROOT_DOMAIN || 'dxscores.app';
   const rootDomain = rawRootDomain.split(':')[0].toLowerCase();
   if (noPortHostname === rootDomain || noPortHostname === `www.${rootDomain}`) return null;
   const parts = noPortHostname.split('.');

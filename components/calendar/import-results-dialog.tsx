@@ -144,7 +144,7 @@ export function ImportResultsDialog({
               <span className="block text-xs text-ink-subtle">
                 {file
                   ? `${Math.round(file.size / 1024)} Ko`
-                  : 'Le fichier téléchargé depuis Elenem, avec les scores remplis'}
+                  : 'Le fichier téléchargé depuis DXScores, avec les scores remplis'}
               </span>
             </span>
             <input

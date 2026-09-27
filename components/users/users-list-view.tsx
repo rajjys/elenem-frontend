@@ -159,7 +159,7 @@ export function UsersListView({
             title="Supprimer ce compte ?"
             description={
               toDelete
-                ? `${toDelete.name} perdra l’accès à Elenem. Ce qu’il a saisi — scores, feuilles de match — reste enregistré.`
+                ? `${toDelete.name} perdra l’accès à DXScores. Ce qui a été saisi avec ce compte — scores, feuilles de match — reste enregistré.`
                 : undefined
             }
             confirmLabel="Supprimer"

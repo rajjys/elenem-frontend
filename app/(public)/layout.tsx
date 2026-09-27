@@ -1,15 +1,14 @@
-// app/(app)/layout.tsx
-// app/layout.tsx (if this is the root layout) or a specific public group layout
 import React, { ReactNode } from 'react';
-import { PublicFooter } from '@/components/layouts/';
-import PublicHeader from '@/components/layouts/PublicHeader';
+import { SiteHeader } from '@/components/marketing/site-header';
+import { SiteFooter } from '@/components/marketing/site-footer';
 
+/** The product site's frame: dxscores.com's public pages (PHASE5A_PRODUCT_SITE §7). */
 export default function PublicLayout({ children }: { children: ReactNode }) {
   return (
-          <div className="flex min-h-screen flex-col bg-surface-sunk text-ink">
-            <PublicHeader />
-              <main className="flex-grow">{children}</main>
-            { <PublicFooter /> }
-          </div>
+    <div className="flex min-h-screen flex-col bg-canvas text-ink">
+      <SiteHeader />
+      <main className="flex-grow">{children}</main>
+      <SiteFooter />
+    </div>
   );
 }

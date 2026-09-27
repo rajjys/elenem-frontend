@@ -126,8 +126,10 @@
 }
 
 @theme inline {
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* Inter is the only face loaded (app/layout.tsx). This pointed at a Geist variable that is never
+     defined, so `font-sans` resolved to nothing and fell back to the UA default. */
+  --font-sans: var(--font-inter), Arial, Helvetica, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
 
@@ -386,6 +388,19 @@
   --radius-lg: 0.75rem;
 }
 
+/* The product site's two headline sizes (PHASE5A_PRODUCT_SITE §8.1).
+   Above the app's six steps and used only on dxscores.com — the app never needs a headline this
+   big. Fluid, so a phone gets a heading that fits in two lines and a desktop one that holds the
+   page, with no breakpoint jump in between. `text-display` / `text-title`. */
+@theme {
+  --text-display: clamp(2.25rem, 4.5vw + 1rem, 4rem);
+  --text-display--line-height: 1.05;
+  --text-display--letter-spacing: -0.03em;
+  --text-title: clamp(1.625rem, 2vw + 1rem, 2.5rem);
+  --text-title--line-height: 1.15;
+  --text-title--letter-spacing: -0.02em;
+}
+
 @theme {
   /* The `primary` ramp. tailwind.config.ts declares these too, but that file is Tailwind v3
      syntax and v4 never loads it without an @config directive — so until this block existed,
@@ -522,6 +537,40 @@ select:-webkit-autofill {
   filter: brightness(0.97);
 }
 
+
+/* Product site motion (PHASE5A_PRODUCT_SITE §8.1). CSS only — no animation library on public pages.
+
+   `.reveal` fades a section in and lifts it 8px as it scrolls into view, once. It is a progressive
+   enhancement: browsers without scroll-driven animations, and readers who asked for reduced
+   motion, get the section exactly where it is with nothing hidden — the content never depends on
+   the animation running. */
+@keyframes reveal {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .reveal {
+      animation: reveal linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 40%;
+    }
+  }
+}
+
+/* An underline that grows from the left on hover, for text links on the product site. Drawn with
+   a background rather than `text-decoration` so it can animate and sit a little below the text. */
+.link-grow {
+  background: linear-gradient(currentColor, currentColor) 0 100% / 0 1px no-repeat;
+  padding-bottom: 1px;
+  transition: background-size 0.2s ease;
+}
+.link-grow:hover {
+  background-size: 100% 1px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .link-grow { transition: none; }
+}
 
 /* Fade-in animation for flyouts */
 @keyframes fadeIn {

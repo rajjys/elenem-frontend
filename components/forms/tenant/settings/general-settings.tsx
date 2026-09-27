@@ -22,6 +22,7 @@ import { api, isAxiosError } from '@/services/api';
 import { UpdateTenantSchema, VisibilityLevel, TenantDetails, SportType, TenantTypes } from "@/schemas"; // Add SportType, TenantTypes to imports
 import { Loader2 } from "lucide-react"; // Add Loader2 import
 import { countryCodeToName } from "@/utils";
+import { buildTenantUrl } from '@/utils/tenant-url';
 
 type FormValues = z.infer<typeof UpdateTenantSchema>;
 
@@ -178,7 +179,7 @@ export default function TenantGeneralSettings({ tenant, onSuccess  }: TenantGene
               />
             )}
           />
-          <Label htmlFor="sportType" className="text-ink-subtle">https://<span className="text-positive">{tenantCode?.toLowerCase()}</span>.elenem.site</Label>
+          <Label htmlFor="sportType" className="text-ink-subtle">{buildTenantUrl(tenantCode?.toLowerCase() || '…')}</Label>
           {errors.tenantCode && <p className="text-negative text-xs">{errors.tenantCode.message}</p>}
         </div>
 

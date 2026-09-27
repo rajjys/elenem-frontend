@@ -4,7 +4,7 @@ import { Roles } from '@/schemas';
 import { useAuthStore } from '@/store/auth.store';
 import { Desktop } from '@phosphor-icons/react';
 import { LayoutDashboard } from 'lucide-react';
-import Image from 'next/image';
+import { Logo } from '@/components/brand';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import React, { Suspense } from 'react'; // Import Suspense from React
@@ -35,13 +35,7 @@ if (reason === 'team_admin_only') errorMessage = "Seuls les administrateurs d'é
   return (
     <div className="min-h-screen bg-surface-sunk flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="flex items-center justify-center mb-4 pb-8">
-        <Image
-          src='/logos/elenem-sport.png'
-          alt='Elenem Logo'
-          width={180}
-          height={120}
-          //fallbackText={userAuth?.username.charAt(0) || "Logo"}
-        />
+        <Logo className="text-2xl" markClassName="h-10 w-10 text-lg" />
       </div>
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="text-center">
@@ -87,7 +81,7 @@ if (reason === 'team_admin_only') errorMessage = "Seuls les administrateurs d'é
           <p>
             Besoin d&apos;aide?{' '}
             <Link
-              href="mailto:support@yourdomain.com"
+              href="mailto:contact@dxscores.com"
               className="font-medium text-accent-text hover:text-accent-text"
             >
               Contactez le support
@@ -102,7 +96,7 @@ if (reason === 'team_admin_only') errorMessage = "Seuls les administrateurs d'é
 // The main page component that renders the content within Suspense
 const AccessDeniedPage = () => {
   return (
-    <Suspense fallback={<div>Loading access details...</div>}>
+    <Suspense fallback={<div>Chargement…</div>}>
       <AccessDeniedContent />
     </Suspense>
   );

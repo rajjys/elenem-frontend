@@ -6,7 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { TenantDetails } from "@/schemas";
 import { api } from "@/services/api";
-import { resolveTenantSlugFromHostname } from "@/utils";
+import { buildTenantUrl, resolveTenantSlugFromHostname } from "@/utils";
 import {
     Home,
     Trophy,
@@ -198,7 +198,7 @@ export const PublicTenantFooter = () => {
                             <div className="flex items-center text-ink">
                                 <Globe className="w-4 h-4 mr-3 text-ink-muted flex-shrink-0" />
                                 <span className="hover:text-caution transition-colors truncate cursor-pointer">
-                                    {businessProfile.website ? `${businessProfile.website}` : `${tenant.slug}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`}
+                                    {businessProfile.website ? `${businessProfile.website}` : buildTenantUrl(tenant.slug).replace(/^https?:\/\//, '')}
                                 </span>
                             </div>
                         </div>
@@ -273,7 +273,16 @@ export const PublicTenantFooter = () => {
                             </span>
                             <span>•</span>
                             <span className="opacity-80 hover:opacity-100 transition-opacity">
-                                Powered by <strong><a href="https://www.elenem.site" target="blank">Elenem</a></strong>
+                                Propulsé par{' '}
+                                <strong>
+                                    <a
+                                        href={`https://dxscores.com/?utm_source=league&utm_campaign=${tenant.slug}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                    >
+                                        DXScores
+                                    </a>
+                                </strong>
                             </span>
                         </div>
                     </div>

@@ -1,7 +1,7 @@
 'use client';
 import { Desktop } from '@phosphor-icons/react';
 import { LayoutDashboard } from 'lucide-react';
-import Image from 'next/image';
+import { Logo } from '@/components/brand';
 import Link from 'next/link';
 import { useAuthStore } from '@/store/auth.store';
 import { homeForRoles } from '@/utils';
@@ -14,12 +14,7 @@ export default function NotFound() {
   return (
     <div className="min-h-screen bg-surface-sunk flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="flex items-center justify-center mb-4 pb-8">
-        <Image
-          src="/logos/elenem-sport.png"
-          alt="Elenem Logo"
-          width={180}
-          height={120}
-        />
+        <Logo className="text-2xl" markClassName="h-10 w-10 text-lg" />
       </div>
 
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
@@ -65,7 +60,7 @@ export default function NotFound() {
           <p>
             Besoin d&apos;aide?{' '}
             <Link
-              href="mailto:support@yourdomain.com"
+              href="mailto:contact@dxscores.com"
               className="font-medium text-accent-text hover:text-accent-text"
             >
               Contactez le support

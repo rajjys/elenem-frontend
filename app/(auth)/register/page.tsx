@@ -1,8 +1,8 @@
 import { SignUpFlow } from '@/components/onboarding';
 
 export const metadata = {
-  title: 'Créer votre organisation · Elenem',
-  description: 'Créez votre ligue sur Elenem et publiez un classement que personne ne conteste.',
+  title: 'Créer votre organisation',
+  description: 'Créez votre ligue sur DXScores : le calendrier, les résultats et un classement que chacun peut vérifier. Gratuit.',
 };
 
 export default function RegisterPage() {

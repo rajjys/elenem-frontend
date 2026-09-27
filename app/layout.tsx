@@ -15,12 +15,17 @@ const inter = Inter({ subsets: ['latin'] , variable: '--font-inter'});
  * `metadataBase` makes relative canonical and Open Graph URLs absolute — `/home`'s canonical of `/`
  * needs it to mean https://dxscores.com/. The icon link pointed at `/favicon.png`, which does not
  * exist (a 404 on every page); `app/favicon.ico` is served by convention without one. Title and
- * description are rewritten with the rename in 5A.2.
+ * description are the DXScores ones since 5A.2.
  */
 export const metadata = {
   metadataBase: new URL(`https://${process.env.NEXT_PUBLIC_APP_DOMAIN || 'dxscores.com'}`),
-  title: 'Elenem Systems',
-  description: 'Elenem Systems. Run your sport League without chaos.',
+  // The full metadata (Open Graph, per-page descriptions) is 5A.3; the name and language are here.
+  title: {
+    default: 'DXScores — le classement se calcule tout seul',
+    template: '%s · DXScores',
+  },
+  description:
+    'Le calendrier, les résultats et le classement de votre ligue, calculés et publiés automatiquement. Gratuit.',
 }
 export default function PublicLayout({ children }: { children: ReactNode }) {
   return (

@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
-import { BrandMark } from './brand-mark';
+import { Logo } from '@/components/brand';
 
 /**
  * The frame both halves of onboarding sit in.
@@ -54,8 +54,7 @@ export function SplitShell({
             href={homeHref}
             className="flex items-center gap-2.5 rounded-md -ml-1 px-1 py-1 text-sm font-medium text-ink-muted hover:text-ink transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
           >
-            <BrandMark className="h-7 w-7" />
-            <span>Elenem</span>
+            <Logo className="text-base" />
           </Link>
           <ThemeToggle />
         </header>

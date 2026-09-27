@@ -18,6 +18,7 @@ import { api, isAxiosError } from '@/services/api';
 import { TenantDetails } from "@/schemas";
 import Image from "next/image";
 import Link from "next/link";
+import { buildTenantUrl } from '@/utils/tenant-url';
 
 export default function GeneralSearchDialog() {
   const [query, setQuery] = useState("");
@@ -94,7 +95,7 @@ export default function GeneralSearchDialog() {
             tenants.map((tenant) => (
               <Link
                 key={tenant.id}
-                href={tenant.businessProfile.website || `https://${tenant.tenantCode.toLowerCase()}.elenem.site`}
+                href={tenant.businessProfile.website || buildTenantUrl(tenant.slug)}
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -116,7 +117,7 @@ export default function GeneralSearchDialog() {
                     <div className="min-w-0 flex-1 overflow-hidden">
                       <div className="font-medium leading-tight truncate">{tenant.name}</div>
                       <div className="text-xs text-ink-muted truncate">
-                        {tenant.businessProfile.website || `https://${tenant.tenantCode.toLowerCase()}.elenem.site`}
+                        {tenant.businessProfile.website || buildTenantUrl(tenant.slug)}
                       </div>
                     </div>
                   </CardContent>
