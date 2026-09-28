@@ -17,6 +17,7 @@ const columns: { title: string; links: { label: string; href: string; external?:
   {
     title: 'Produit',
     links: [
+      { label: 'Calendrier', href: '/#calendrier' },
       { label: 'Fonctionnalités', href: '/#fonctionnalites' },
       { label: 'Comment ça marche', href: '/#comment-ca-marche' },
       { label: 'Créer ma ligue', href: '/register' },
@@ -82,9 +83,8 @@ export function SiteFooter() {
       </div>
 
       <div className="border-t border-line">
-        <div className="mx-auto flex max-w-6xl flex-col gap-1 px-4 py-5 text-xs text-ink-subtle sm:flex-row sm:justify-between sm:px-6">
-          <span>© {new Date().getFullYear()} DXScores</span>
-          <span>Fait à Goma, RDC</span>
+        <div className="mx-auto max-w-6xl px-4 py-5 text-xs text-ink-subtle sm:px-6">
+          © {new Date().getFullYear()} DXScores
         </div>
       </div>
     </footer>

@@ -24,9 +24,8 @@ export default function Conditions() {
 
       <h2>2. Gratuité</h2>
       <p>
-        DXScores est gratuit. Tout ce que DXScores fait aujourd’hui restera gratuit. Des offres Pro,
-        avec des fonctionnalités en plus, pourront venir plus tard&nbsp;: elles s’ajouteront, elles ne
-        retireront rien, et vous en serez prévenus à l’avance.
+        Gérer votre ligue du début à la fin de la saison est gratuit. Une offre Pro viendra plus tard
+        avec des outils avancés&nbsp;; vous en serez prévenus à l’avance.
       </p>
 
       <h2>3. Votre compte</h2>
