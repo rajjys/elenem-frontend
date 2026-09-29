@@ -553,7 +553,38 @@ Verified on production with a scan of every public endpoint: no blocklisted key 
 owner and audit user ids that remain in other public game responses go with the 5B.1 rewrite. **Done when:** on production, no public endpoint returns any blocklisted field, the
 `?pageSize` 500 is gone, and the test guards both.
 
-### 5B.1: The public read API (≈ 2 days)
+### 5B.1: The public read API (≈ 2 days) — **in progress** (steps 1–2 of 3 done, 2026-09-29)
+
+- **Step 1, done (backend `9543212`).** `buildStandingsView(league, season?, stage?, group?)` is
+  user-free; the admin endpoint calls it after its permission check. With no phase named, the
+  table opens on the furthest LEAGUE/GROUPS phase with a result
+  (`StagesService.currentTableStageOf`), never a knockout. The view carries `teamSlug` and
+  `tableStages`, and `StandingsViewDto` is now in the frontend's generated types.
+  `StandingsService.currentSeasonOf` is public, so the site's scorers use the table's season (the
+  leaderboard's own rule prefers `League.currentSeasonId` and can disagree).
+- **Step 2, done (backend `841994f`, frontend `e55bd19`).** The time zone, **with one deviation:
+  nothing is pre-filled at sign-up.** Pre-filling silently and confirming later needs a
+  "confirmed" marker, which means a migration, and nothing shows that Railway runs
+  `migrate deploy`. The stored zone *is* the confirmation instead: the dashboard's *À compléter*
+  card proposes the device zone (Goma → Lubumbashi), and saving it ends the question. Until then
+  `leagueTimeZone()` (`src/common/utils/league-timezone.util.ts`) gives the country's zone. The
+  settings field is a list now. Two production bugs were fixed on the way: the organisation
+  settings' Profil tab could not save anything without a rename, and a competition profile update
+  wiped its unsent JSON fields.
+  - **Backfill still pending:** the four local seeded organisations have no zone. One statement
+    for the owner to approve:
+    `UPDATE "BusinessProfile" SET timezone = CASE t.tenant_slug WHEN 'liprobakin' THEN 'Africa/Kinshasa' ELSE 'Africa/Lubumbashi' END FROM "Tenant" t WHERE t."businessProfileId" = "BusinessProfile".id AND t.tenant_slug IN ('liprobakin','libago','libuk','eubabunia');`
+- **Step 3, next:** the `public-site` module (§7), with these findings from the code:
+  - team slugs are unique per competition and game slugs per season, so every lookup is scoped
+    by competition, as §5's paths already are;
+  - the global throttle (300/min per IP) would put every visitor behind Vercel's servers in one
+    bucket, so the module needs its own limit or `@SkipThrottle`;
+  - `League.settings` was overwritten wholesale by `PUT /leagues/:id/settings`, so
+    `publicPlayerIdentity` needs that update to merge first;
+  - the box score and the leaderboard have no player-visibility filter today;
+  - a knockout's `PlannedFixture` is deleted when promoted, so a round lists its games and its
+    remaining placeholders, not a linked bracket.
+
 
 - The `public-site` module and its endpoints and DTOs (§7).
 - `buildStandingsView` extracted, with the knockout-phase fallback fixed (§4.3).
