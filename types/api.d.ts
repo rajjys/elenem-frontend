@@ -1059,53 +1059,187 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/planned-fixtures": {
+    "/public/sites/{slug}": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /** What a phase still has to be drawn */
-        get: operations["PlannedFixturesController_list"];
+        /** The site frame: organisation, competitions, what sections exist. 404 when not served. */
+        get: operations["PublicSiteController_frame"];
         put?: never;
-        /** Reserve a hall and an hour for a fixture whose teams are not yet known */
-        post: operations["PlannedFixturesController_create"];
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/planned-fixtures/{id}": {
+    "/public/sites/{slug}/standings": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get?: never;
-        /** Move it, rename its sides, or mark it conditional */
-        put: operations["PlannedFixturesController_update"];
+        /** A competition’s table — the same one the admin screen and the signed export show. */
+        get: operations["PublicSiteController_standings"];
+        put?: never;
         post?: never;
-        /** Drop it — a barrage that turned out not to be necessary */
-        delete: operations["PlannedFixturesController_remove"];
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/planned-fixtures/{id}/promote": {
+    "/public/sites/{slug}/games": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        /** Games between two local dates (at most 42 days), this week by default. */
+        get: operations["PublicSiteController_games"];
         put?: never;
-        /** Name the two teams and turn it into a fixture */
-        post: operations["PlannedFixturesController_promote"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public/sites/{slug}/games/{c}/{game}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One game, with its scoresheet when there is one. */
+        get: operations["PublicSiteController_game"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public/sites/{slug}/teams": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Clubs with a page, by competition. */
+        get: operations["PublicSiteController_clubs"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public/sites/{slug}/teams/{c}/{team}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A club: its table row, its season’s games, and its roster when the competition publishes one. */
+        get: operations["PublicSiteController_club"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public/sites/{slug}/scorers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The scorers’ table. 404 for a competition that does not publish its players. */
+        get: operations["PublicSiteController_scorers"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public/sites/{slug}/knockout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Knockout phases, round by round: games played and fixtures still to come. */
+        get: operations["PublicSiteController_knockout"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public/sites/{slug}/posts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Published articles and communiqués, newest first. */
+        get: operations["PublicSiteController_posts"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public/sites/{slug}/posts/{post}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One published article or communiqué, in Markdown. */
+        get: operations["PublicSiteController_post"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public/sites/{slug}/sitemap": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Every public path, for the site’s sitemap.xml. Empty for a PRIVATE organisation. */
+        get: operations["PublicSiteController_sitemap"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -1700,6 +1834,59 @@ export interface paths {
         get: operations["SportRulesController_getSportRules"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/planned-fixtures": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** What a phase still has to be drawn */
+        get: operations["PlannedFixturesController_list"];
+        put?: never;
+        /** Reserve a hall and an hour for a fixture whose teams are not yet known */
+        post: operations["PlannedFixturesController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/planned-fixtures/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Move it, rename its sides, or mark it conditional */
+        put: operations["PlannedFixturesController_update"];
+        post?: never;
+        /** Drop it — a barrage that turned out not to be necessary */
+        delete: operations["PlannedFixturesController_remove"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/planned-fixtures/{id}/promote": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Name the two teams and turn it into a fixture */
+        post: operations["PlannedFixturesController_promote"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2929,6 +3116,11 @@ export interface components {
              */
             maintenanceMode?: boolean;
             /**
+             * @description Whether the league site names this competition’s players (PHASE5B_LEAGUE_SITES §4.9). On by default; youth competitions switch it off, and players are then shown by number and club.
+             * @example true
+             */
+            publicPlayerIdentity?: boolean;
+            /**
              * @description Feature toggles
              * @example {
              *       "newFeature": true,
@@ -3834,42 +4026,62 @@ export interface components {
             recent: components["schemas"]["DashboardFixtureDto"][];
             upcoming: components["schemas"]["DashboardFixtureDto"][];
         };
-        CreatePlannedFixtureDto: {
-            /** @description Phase this belongs to. Must be a KNOCKOUT. */
-            stageId: string;
-            /** @example Vainqueur demi-finale 1 */
-            homeLabel: string;
-            /** @example Vainqueur demi-finale 2 */
-            awayLabel: string;
-            /** Format: date-time */
-            dateTime: string;
-            /** @description Whether it happens at all — EUBAGO’s « SI NECESSITE ». */
-            conditional?: boolean;
-            homeVenueId?: Record<string, never>;
-            courtId?: Record<string, never>;
-            round?: number;
-            bracketSlot?: number;
-            notes?: string;
+        PublicContactDto: {
+            email: string | null;
+            phone: string | null;
+            website: string | null;
         };
-        UpdatePlannedFixtureDto: {
-            homeLabel?: string;
-            awayLabel?: string;
-            /** Format: date-time */
-            dateTime?: string;
-            conditional?: boolean;
-            homeVenueId?: Record<string, never>;
-            courtId?: Record<string, never>;
-            round?: number;
-            notes?: string;
-            reason?: string;
+        PublicSeasonRefDto: {
+            slug: string;
+            name: string;
+            /** @enum {string} */
+            status: "PLANNING" | "ACTIVE" | "COMPLETED" | "CANCELED";
         };
-        PromotePlannedFixtureDto: {
-            homeTeamId: string;
-            awayTeamId: string;
-            reason?: string;
+        PublicSiteCompetitionDto: {
+            slug: string;
+            name: string;
+            /** @enum {string} */
+            gender: "MALE" | "FEMALE" | "MIXED" | "OTHER";
+            division: string;
+            /** @description The season the site shows. */
+            season: components["schemas"]["PublicSeasonRefDto"] | null;
+            /** @description More than one phase this season: phase chips are worth showing. */
+            hasPhases: boolean;
+            /** @description A knockout phase this season: the Phase finale page exists. */
+            hasKnockout: boolean;
+            /** @description Scoresheets exist this season. */
+            hasBoxScores: boolean;
+            /** @description The competition publishes its players’ names (§4.9). */
+            showsPlayers: boolean;
         };
-        StandingsGroupDto: {
-            id: string;
+        PublicSiteDto: {
+            slug: string;
+            name: string;
+            description: string | null;
+            logoUrl: string | null;
+            city: string | null;
+            /** @description IANA zone every date and time on the site is shown in (§4.4). */
+            timezone: string;
+            /** @description False for a PRIVATE organisation: served, but kept out of search. */
+            indexable: boolean;
+            /** @description Palette key (§4.6), when chosen. */
+            primaryColor: string | null;
+            /** @description Palette key (§4.6), when chosen. */
+            accentColor: string | null;
+            contact: components["schemas"]["PublicContactDto"];
+            socialLinks: {
+                [key: string]: string;
+            };
+            competitions: components["schemas"]["PublicSiteCompetitionDto"][];
+            /** @description Published posts or communiqués exist: the Actualités page exists. */
+            hasPosts: boolean;
+        };
+        PublicCompetitionRefDto: {
+            slug: string;
+            name: string;
+        };
+        PublicSeasonOptionDto: {
+            slug: string;
             name: string;
         };
         StandingsStageDto: {
@@ -3877,6 +4089,10 @@ export interface components {
             name: string;
             /** @enum {string} */
             format: "LEAGUE" | "GROUPS" | "KNOCKOUT";
+        };
+        StandingsGroupDto: {
+            id: string;
+            name: string;
         };
         StandingsColumnDto: {
             /**
@@ -3886,6 +4102,269 @@ export interface components {
             key: "gamesPlayed" | "wins" | "draws" | "losses" | "forfeits" | "goalsFor" | "goalsAgainst" | "goalDifference" | "points";
             abbr: string;
             label: string;
+        };
+        PublicBandDto: {
+            count: number;
+            label: string;
+        };
+        PublicStandingsRulesDto: {
+            /** @description « PTS = 2 × MG + 1 × MP », in the table’s own column heads. */
+            formula: string;
+            /** @description In the order they are applied, in French. */
+            tieBreakers: string[];
+            qualification: components["schemas"]["PublicBandDto"] | null;
+            relegation: components["schemas"]["PublicBandDto"] | null;
+        };
+        PublicClubRefDto: {
+            name: string;
+            shortCode: string | null;
+            /** @description Null when the club has no public page. */
+            slug: string | null;
+            logoUrl: string | null;
+        };
+        PublicStandingsRowDto: {
+            rank: number;
+            /** @enum {string|null} */
+            band: "QUALIFICATION" | "RELEGATION" | null;
+            club: components["schemas"]["PublicClubRefDto"];
+            gamesPlayed: number;
+            wins: number;
+            draws: number;
+            losses: number;
+            forfeits: number;
+            goalsFor: number;
+            goalsAgainst: number;
+            goalDifference: number;
+            points: number;
+        };
+        PublicStandingsDto: {
+            competition: components["schemas"]["PublicCompetitionRefDto"];
+            season: components["schemas"]["PublicSeasonOptionDto"];
+            /** @description Newest first; a picker only when more than one. */
+            seasons: components["schemas"]["PublicSeasonOptionDto"][];
+            stage: components["schemas"]["StandingsStageDto"];
+            tableStages: components["schemas"]["StandingsStageDto"][];
+            group: components["schemas"]["StandingsGroupDto"] | null;
+            groups: components["schemas"]["StandingsGroupDto"][];
+            /** @description ISO instant the table was last computed. */
+            updatedAt: string | null;
+            gamesCounted: number;
+            /** @description Games played but not yet entered. */
+            pendingResults: number;
+            columns: components["schemas"]["StandingsColumnDto"][];
+            rules: components["schemas"]["PublicStandingsRulesDto"];
+            rows: components["schemas"]["PublicStandingsRowDto"][];
+        };
+        PublicPhaseRefDto: {
+            name: string;
+            /** @enum {string} */
+            format: "LEAGUE" | "GROUPS" | "KNOCKOUT";
+        };
+        /** @enum {string} */
+        PublicGameStatus: "SCHEDULED" | "AWAITING_RESULT" | "COMPLETED" | "FORFEIT" | "POSTPONED" | "CANCELLED";
+        PublicGameRowDto: {
+            /** @description Unique within its season; the page is /games/<competition>/<slug>. */
+            slug: string;
+            competition: components["schemas"]["PublicCompetitionRefDto"];
+            phase: components["schemas"]["PublicPhaseRefDto"] | null;
+            /** @description The journée, when the organiser set one. */
+            matchday: number | null;
+            /** @description Knockout round: 1 is the first played. */
+            round: number | null;
+            /** @description ISO instant. */
+            instant: string;
+            /** @description yyyy-mm-dd on the league’s clock. */
+            localDate: string;
+            /** @description HH:mm on the league’s clock. */
+            localTime: string;
+            status: components["schemas"]["PublicGameStatus"];
+            /** @description Why it was postponed or cancelled, when given. */
+            statusReason: string | null;
+            home: components["schemas"]["PublicClubRefDto"];
+            away: components["schemas"]["PublicClubRefDto"];
+            homeScore: number | null;
+            awayScore: number | null;
+            hall: string | null;
+        };
+        PublicGamesDto: {
+            /** @description First day shown, yyyy-mm-dd on the league’s clock. */
+            from: string;
+            /** @description Last day shown, inclusive. */
+            to: string;
+            timezone: string;
+            /** @description The last day with games before `from`. */
+            previousDate: string | null;
+            /** @description The first day with games after `to`. */
+            nextDate: string | null;
+            games: components["schemas"]["PublicGameRowDto"][];
+        };
+        PublicStatColumnDto: {
+            code: string;
+            abbr: string;
+            label: string;
+        };
+        PublicBoxScoreLineDto: {
+            jerseyNumber: number | null;
+            /** @description Null when the player is shown by number only (§4.9). */
+            name: string | null;
+            position: string | null;
+            stats: {
+                [key: string]: number;
+            };
+            total: number;
+            /** @description The side’s top scorer in this game. */
+            topScorer: boolean;
+        };
+        PublicBoxScoreSideDto: {
+            club: components["schemas"]["PublicClubRefDto"];
+            lines: components["schemas"]["PublicBoxScoreLineDto"][];
+            total: number;
+        };
+        PublicBoxScoreDto: {
+            columns: components["schemas"]["PublicStatColumnDto"][];
+            totalAbbr: string;
+            home: components["schemas"]["PublicBoxScoreSideDto"];
+            away: components["schemas"]["PublicBoxScoreSideDto"];
+        };
+        PublicGameDto: {
+            /** @description Unique within its season; the page is /games/<competition>/<slug>. */
+            slug: string;
+            competition: components["schemas"]["PublicCompetitionRefDto"];
+            phase: components["schemas"]["PublicPhaseRefDto"] | null;
+            /** @description The journée, when the organiser set one. */
+            matchday: number | null;
+            /** @description Knockout round: 1 is the first played. */
+            round: number | null;
+            /** @description ISO instant. */
+            instant: string;
+            /** @description yyyy-mm-dd on the league’s clock. */
+            localDate: string;
+            /** @description HH:mm on the league’s clock. */
+            localTime: string;
+            status: components["schemas"]["PublicGameStatus"];
+            /** @description Why it was postponed or cancelled, when given. */
+            statusReason: string | null;
+            home: components["schemas"]["PublicClubRefDto"];
+            away: components["schemas"]["PublicClubRefDto"];
+            homeScore: number | null;
+            awayScore: number | null;
+            hall: string | null;
+            season: components["schemas"]["PublicSeasonOptionDto"];
+            group: string | null;
+            /** @description Null until a scoresheet is entered. */
+            boxScore: components["schemas"]["PublicBoxScoreDto"] | null;
+        };
+        PublicClubListItemDto: {
+            name: string;
+            shortCode: string | null;
+            /** @description Null when the club has no public page. */
+            slug: string | null;
+            logoUrl: string | null;
+            competition: components["schemas"]["PublicCompetitionRefDto"];
+        };
+        PublicRosterLineDto: {
+            jerseyNumber: number | null;
+            /** @description Null when shown by number only. */
+            name: string | null;
+            position: string | null;
+        };
+        PublicClubDto: {
+            club: components["schemas"]["PublicClubRefDto"];
+            competition: components["schemas"]["PublicCompetitionRefDto"];
+            season: components["schemas"]["PublicSeasonOptionDto"] | null;
+            /** @description Its row in the current table. */
+            standing: components["schemas"]["PublicStandingsRowDto"] | null;
+            nextGame: components["schemas"]["PublicGameRowDto"] | null;
+            /** @description The season’s games, in date order. */
+            games: components["schemas"]["PublicGameRowDto"][];
+            /** @description False when the competition does not publish its players (§4.9). */
+            rosterShown: boolean;
+            roster: components["schemas"]["PublicRosterLineDto"][];
+        };
+        PublicPhaseOptionDto: {
+            id: string;
+            name: string;
+        };
+        PublicScorerRowDto: {
+            rank: number;
+            /** @description Null when shown by number only. */
+            name: string | null;
+            jerseyNumber: number | null;
+            club: components["schemas"]["PublicClubRefDto"] | null;
+            gamesPlayed: number;
+            total: number;
+            average: number;
+            stats: {
+                [key: string]: number;
+            };
+        };
+        PublicScorersDto: {
+            competition: components["schemas"]["PublicCompetitionRefDto"];
+            season: components["schemas"]["PublicSeasonOptionDto"];
+            stageId: string | null;
+            stages: components["schemas"]["PublicPhaseOptionDto"][];
+            columns: components["schemas"]["PublicStatColumnDto"][];
+            totalAbbr: string;
+            totalLabel: string;
+            gamesCompleted: number;
+            gamesWithSheet: number;
+            /** @description At most 100. */
+            rows: components["schemas"]["PublicScorerRowDto"][];
+        };
+        PublicPlannedFixtureDto: {
+            /** @description « Vainqueur demi 1 », as the organiser wrote it. */
+            homeLabel: string;
+            awayLabel: string;
+            instant: string;
+            localDate: string;
+            localTime: string;
+            /** @description Played only if needed: « si nécessaire ». */
+            conditional: boolean;
+            hall: string | null;
+        };
+        PublicKnockoutRoundDto: {
+            /** @description 1 is the first round played; null when unset. */
+            round: number | null;
+            games: components["schemas"]["PublicGameRowDto"][];
+            planned: components["schemas"]["PublicPlannedFixtureDto"][];
+        };
+        PublicKnockoutStageDto: {
+            id: string;
+            name: string;
+            rounds: components["schemas"]["PublicKnockoutRoundDto"][];
+        };
+        PublicKnockoutDto: {
+            competition: components["schemas"]["PublicCompetitionRefDto"];
+            season: components["schemas"]["PublicSeasonOptionDto"];
+            stages: components["schemas"]["PublicKnockoutStageDto"][];
+        };
+        PublicPostSummaryDto: {
+            slug: string;
+            title: string;
+            excerpt: string | null;
+            /** @description An official communiqué rather than an article. */
+            communique: boolean;
+            publishedAt: string;
+        };
+        PublicPostDto: {
+            slug: string;
+            title: string;
+            excerpt: string | null;
+            /** @description An official communiqué rather than an article. */
+            communique: boolean;
+            publishedAt: string;
+            /** @description Markdown. */
+            content: string | null;
+        };
+        PublicSitemapEntryDto: {
+            /** @description The path on the league site, e.g. /teams/messieurs/aigles-bc. */
+            path: string;
+            lastModified: string | null;
+        };
+        PublicSitemapDto: {
+            /** @description False for a PRIVATE organisation, whose sitemap is then empty. */
+            indexable: boolean;
+            entries: components["schemas"]["PublicSitemapEntryDto"][];
         };
         BandDto: {
             /** @description How many clubs the band covers. */
@@ -4245,6 +4724,40 @@ export interface components {
             pointSystem: components["schemas"]["PointSystemConfigDto"];
             /** @description Ordered list of tie-breaker rules */
             tieBreakers: components["schemas"]["TieBreakerRuleDto"][];
+        };
+        CreatePlannedFixtureDto: {
+            /** @description Phase this belongs to. Must be a KNOCKOUT. */
+            stageId: string;
+            /** @example Vainqueur demi-finale 1 */
+            homeLabel: string;
+            /** @example Vainqueur demi-finale 2 */
+            awayLabel: string;
+            /** Format: date-time */
+            dateTime: string;
+            /** @description Whether it happens at all — EUBAGO’s « SI NECESSITE ». */
+            conditional?: boolean;
+            homeVenueId?: Record<string, never>;
+            courtId?: Record<string, never>;
+            round?: number;
+            bracketSlot?: number;
+            notes?: string;
+        };
+        UpdatePlannedFixtureDto: {
+            homeLabel?: string;
+            awayLabel?: string;
+            /** Format: date-time */
+            dateTime?: string;
+            conditional?: boolean;
+            homeVenueId?: Record<string, never>;
+            courtId?: Record<string, never>;
+            round?: number;
+            notes?: string;
+            reason?: string;
+        };
+        PromotePlannedFixtureDto: {
+            homeTeamId: string;
+            awayTeamId: string;
+            reason?: string;
         };
         BusinessProfileResponseDto: {
             id: string;
@@ -7673,85 +8186,12 @@ export interface operations {
             };
         };
     };
-    PlannedFixturesController_list: {
-        parameters: {
-            query: {
-                stageId: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    PlannedFixturesController_create: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["CreatePlannedFixtureDto"];
-            };
-        };
-        responses: {
-            /** @description The phase is not a knockout. */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description The hall is already taken at that hour. */
-            409: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    PlannedFixturesController_update: {
+    PublicSiteController_frame: {
         parameters: {
             query?: never;
             header?: never;
             path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UpdatePlannedFixtureDto"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    PlannedFixturesController_remove: {
-        parameters: {
-            query: {
-                reason: string;
-            };
-            header?: never;
-            path: {
-                id: string;
+                slug: string;
             };
             cookie?: never;
         };
@@ -7761,30 +8201,255 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["PublicSiteDto"];
+                };
             };
         };
     };
-    PlannedFixturesController_promote: {
+    PublicSiteController_standings: {
+        parameters: {
+            query?: {
+                /** @description Competition slug. Defaults to every competition, or the first for a single table. */
+                c?: string;
+                /** @description Season slug. Defaults to the season the competition is playing. */
+                season?: string;
+                /** @description Phase id. Defaults to the furthest table phase with a result. */
+                stage?: string;
+                /** @description Pool id, in a GROUPS phase. Defaults to the first pool. */
+                group?: string;
+            };
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublicStandingsDto"];
+                };
+            };
+        };
+    };
+    PublicSiteController_games: {
+        parameters: {
+            query?: {
+                /** @description Competition slug. Defaults to every competition, or the first for a single table. */
+                c?: string;
+                /** @description First day, yyyy-mm-dd on the league’s clock. Defaults to this week’s Monday. */
+                from?: string;
+                /** @description Last day, inclusive, on the league’s clock. At most 42 days after `from`. */
+                to?: string;
+                /** @description A club’s slug, within the competition named by `c`. */
+                team?: string;
+            };
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublicGamesDto"];
+                };
+            };
+        };
+    };
+    PublicSiteController_game: {
         parameters: {
             query?: never;
             header?: never;
             path: {
-                id: string;
+                slug: string;
+                c: string;
+                game: string;
             };
             cookie?: never;
         };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["PromotePlannedFixtureDto"];
-            };
-        };
+        requestBody?: never;
         responses: {
-            201: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["PublicGameDto"];
+                };
+            };
+        };
+    };
+    PublicSiteController_clubs: {
+        parameters: {
+            query?: {
+                /** @description Competition slug. Defaults to every competition, or the first for a single table. */
+                c?: string;
+            };
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublicClubListItemDto"][];
+                };
+            };
+        };
+    };
+    PublicSiteController_club: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+                c: string;
+                team: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublicClubDto"];
+                };
+            };
+        };
+    };
+    PublicSiteController_scorers: {
+        parameters: {
+            query?: {
+                /** @description Competition slug. Defaults to every competition, or the first for a single table. */
+                c?: string;
+                /** @description Season slug. Defaults to the season the table shows. */
+                season?: string;
+                /** @description Phase id. Empty means the whole season. */
+                stage?: string;
+            };
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublicScorersDto"];
+                };
+            };
+        };
+    };
+    PublicSiteController_knockout: {
+        parameters: {
+            query?: {
+                /** @description Competition slug. Defaults to every competition, or the first for a single table. */
+                c?: string;
+            };
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublicKnockoutDto"];
+                };
+            };
+        };
+    };
+    PublicSiteController_posts: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublicPostSummaryDto"][];
+                };
+            };
+        };
+    };
+    PublicSiteController_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+                post: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublicPostDto"];
+                };
+            };
+        };
+    };
+    PublicSiteController_sitemap: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublicSitemapDto"];
+                };
             };
         };
     };
@@ -8808,6 +9473,121 @@ export interface operations {
             };
             /** @description Sport rules not found */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    PlannedFixturesController_list: {
+        parameters: {
+            query: {
+                stageId: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    PlannedFixturesController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreatePlannedFixtureDto"];
+            };
+        };
+        responses: {
+            /** @description The phase is not a knockout. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description The hall is already taken at that hour. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    PlannedFixturesController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdatePlannedFixtureDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    PlannedFixturesController_remove: {
+        parameters: {
+            query: {
+                reason: string;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    PlannedFixturesController_promote: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PromotePlannedFixtureDto"];
+            };
+        };
+        responses: {
+            201: {
                 headers: {
                     [name: string]: unknown;
                 };
