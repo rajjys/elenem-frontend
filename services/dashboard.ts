@@ -79,6 +79,10 @@ const OrganiserDashboardSchema = z.object({
   organisationId: z.string(),
   organisationName: z.string(),
   organisationCode: z.string().nullable(),
+  /** The confirmed IANA zone, or null until the organiser confirms one (PHASE5B §4.4). */
+  timezone: z.string().nullable(),
+  /** What the organisation's country implies. */
+  suggestedTimezone: z.string(),
   competitions: z.array(CompetitionSchema),
   awaitingResults: z.array(FixtureSchema),
   upcoming: z.array(FixtureSchema),

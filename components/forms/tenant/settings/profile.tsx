@@ -2,6 +2,7 @@
 'use client';
 import { Button } from "@/components/ui";
 import { InlineEditField } from "@/components/ui/Inline-edit-field";
+import { TIMEZONES, timezoneLabel } from "@/utils/timezones";
 import { TenantDetails } from "@/schemas";
 import { CreateBusinessProfileSchema } from "@/schemas/common-schemas";
 import { api, isAxiosError } from '@/services/api';
@@ -316,7 +317,8 @@ const onSubmit = async (data: ProfileFormValues) => {
     <InlineEditField
       form={form}
       name="timezone"
-      label="Fuseau Horaire"
+      label="Fuseau horaire"
+      options={TIMEZONES.map((t) => ({ value: t.zone, label: timezoneLabel(t.zone, true) }))}
       activeEditField={activeEditField}
       setActiveEditField={setActiveEditField}
       initialValues={initialRef.current}

@@ -21,6 +21,7 @@ import {
   type DashboardCompetition,
   type DashboardFixture,
 } from '@/services/dashboard';
+import { TimezoneCard } from './timezone-card';
 
 /**
  * What an organiser owes their competitions right now.
@@ -102,6 +103,12 @@ export function OrganiserDashboard({ scope }: { scope: 'tenant' | 'league' }) {
           )}
         </div>
       </header>
+
+      {/* Organisation-wide settings still owed, once each. Only at the organisation's scope: a
+          competition's administrator cannot change the organisation's clock. */}
+      {scope === 'tenant' && !data.timezone && (
+        <TimezoneCard tenantId={data.organisationId} suggested={data.suggestedTimezone} />
+      )}
 
       {/* The headline, and only when there is one. A dashboard that always shows a warning box has
           taught its reader to stop seeing it — the same lesson the verification banner learned

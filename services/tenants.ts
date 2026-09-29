@@ -97,3 +97,19 @@ export function useDeleteTenant() {
     onSuccess: () => qc.invalidateQueries({ queryKey: tenantKeys.lists() }),
   });
 }
+
+/**
+ * Sets the organisation's time zone — the clock every time on its public site is shown in
+ * (PHASE5B_LEAGUE_SITES §4.4). Saving it is also what confirms it, so the dashboard stops asking.
+ */
+export function useSetTenantTimezone() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ tenantId, timezone }: { tenantId: string; timezone: string }) =>
+      api.put(`/tenants/${tenantId}`, { businessProfile: { timezone } }),
+    onSuccess: (_res, { tenantId }) => {
+      qc.invalidateQueries({ queryKey: ['dashboard', 'organiser'] });
+      qc.invalidateQueries({ queryKey: tenantKeys.detail(tenantId) });
+    },
+  });
+}

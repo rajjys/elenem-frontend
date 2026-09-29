@@ -2725,8 +2725,8 @@ export interface components {
              */
             longitude?: Record<string, never>;
             /**
-             * @description Timezone of the business.
-             * @example America/Los_Angeles
+             * @description IANA time zone, e.g. Africa/Lubumbashi.
+             * @example Africa/Kinshasa
              */
             timezone?: Record<string, never>;
             /** @description URL to the business logo. */
@@ -2789,6 +2789,111 @@ export interface components {
             /** @description The business profile details for the league. */
             businessProfile: components["schemas"]["BusinessProfileDto"];
         };
+        UpdateBusinessProfileDto: {
+            /**
+             * @description The display name for the business profile.
+             * @example My Sports Organization
+             */
+            name?: string;
+            /** @description Optional legal name of the organization. */
+            legalName?: Record<string, never>;
+            /**
+             * @description Optional business type (e.g., TENANT, LEAGUE, TEAM).
+             * @enum {string}
+             */
+            type?: "TENANT" | "LEAGUE" | "TEAM";
+            /**
+             * @description Year the business was established.
+             * @example 2020
+             */
+            establishedYear?: Record<string, never>;
+            /** @description An optional description for the tenant. */
+            description?: Record<string, never>;
+            /** @description National identification number for the business. */
+            nationalIdNumber?: Record<string, never>;
+            /** @description Unique ID assigned by a specific league. */
+            leagueRegistrationId?: Record<string, never>;
+            /**
+             * @description Business contact email address.
+             * @example contact@mybiz.com
+             */
+            contactEmail?: Record<string, never>;
+            /**
+             * @description Primary phone number for the business.
+             * @example +15551234567
+             */
+            phone?: Record<string, never>;
+            /** @description Business support phone number. */
+            businessPhone?: Record<string, never>;
+            /** @description Support email address. */
+            supportEmail?: Record<string, never>;
+            /**
+             * @description Official website URL.
+             * @example https://mybiz.com
+             */
+            website?: Record<string, never>;
+            /**
+             * @description Social media links in a key-value format.
+             * @example {
+             *       "twitter": "https://twitter.com/mybiz"
+             *     }
+             */
+            socialLinks?: Record<string, never>;
+            /** @description Optional tax identification number. */
+            taxNumber?: Record<string, never>;
+            /** @description Bank information in JSON format. */
+            bankInfo?: Record<string, never>;
+            /** @description Mobile money payment information. */
+            mobileMoneyInfo?: Record<string, never>;
+            /** @description Region or province. */
+            region?: Record<string, never>;
+            /** @description State or administrative division. */
+            state?: Record<string, never>;
+            /** @description City where the business is based. */
+            city?: Record<string, never>;
+            /** @description Physical address of the headquarters. */
+            physicalAddress?: Record<string, never>;
+            /**
+             * @description Geographic latitude.
+             * @example 34.052235
+             */
+            latitude?: Record<string, never>;
+            /**
+             * @description Geographic longitude.
+             * @example -118.243683
+             */
+            longitude?: Record<string, never>;
+            /**
+             * @description IANA time zone, e.g. Africa/Lubumbashi.
+             * @example Africa/Kinshasa
+             */
+            timezone?: Record<string, never>;
+            /** @description URL to the business logo. */
+            logoUrl?: Record<string, never>;
+            /** @description URL to the business banner image. */
+            bannerImageUrl?: Record<string, never>;
+            /** @description Branding theme information in JSON format. */
+            brandingTheme?: Record<string, never>;
+            /** @description Optional logo asset ID. */
+            logoAssetId?: Record<string, never>;
+            /** @description Optional banner asset ID. */
+            bannerAssetId?: Record<string, never>;
+            /**
+             * @description Visibility of the business profile (public, private, or hidden).
+             * @enum {string}
+             */
+            visibility?: "PUBLIC" | "PRIVATE" | "HIDDEN" | "ARCHIVED";
+            /**
+             * @description A flag indicating if the business profile is active.
+             * @default true
+             */
+            isActive: boolean;
+            /**
+             * @description A flag indicating if the business is verified.
+             * @default false
+             */
+            verified: boolean;
+        };
         UpdateLeagueDto: {
             /** @description New name for the league. */
             name?: string;
@@ -2815,7 +2920,7 @@ export interface components {
             /** @description ID of the new parent league. */
             parentLeagueId?: Record<string, never>;
             /** @description The updated business profile details for the league. */
-            businessProfile?: components["schemas"]["BusinessProfileDto"];
+            businessProfile?: components["schemas"]["UpdateBusinessProfileDto"];
         };
         LeagueSettingsDto: {
             /**
@@ -3697,6 +3802,8 @@ export interface components {
             organisationId: string;
             organisationName: string;
             organisationCode: Record<string, never> | null;
+            timezone: string | null;
+            suggestedTimezone: string;
             competitions: components["schemas"]["DashboardCompetitionDto"][];
             awaitingResults: components["schemas"]["DashboardFixtureDto"][];
             upcoming: components["schemas"]["DashboardFixtureDto"][];
@@ -3760,6 +3867,105 @@ export interface components {
             homeTeamId: string;
             awayTeamId: string;
             reason?: string;
+        };
+        StandingsGroupDto: {
+            id: string;
+            name: string;
+        };
+        StandingsStageDto: {
+            id: string;
+            name: string;
+            /** @enum {string} */
+            format: "LEAGUE" | "GROUPS" | "KNOCKOUT";
+        };
+        StandingsColumnDto: {
+            /**
+             * @description The row field the column reads.
+             * @enum {string}
+             */
+            key: "gamesPlayed" | "wins" | "draws" | "losses" | "forfeits" | "goalsFor" | "goalsAgainst" | "goalDifference" | "points";
+            abbr: string;
+            label: string;
+        };
+        BandDto: {
+            /** @description How many clubs the band covers. */
+            count: number;
+            /** @description What it means, for the legend under the table. */
+            label: string;
+        };
+        StandingsBandsDto: {
+            /** @description The clubs at the top. */
+            qualification?: components["schemas"]["BandDto"] | null;
+            /** @description The clubs at the bottom. */
+            relegation?: components["schemas"]["BandDto"] | null;
+        };
+        StandingsRulesDto: {
+            /** @description What the table is primarily ordered on. */
+            rankingMetric: string;
+            winPoints: number;
+            drawPoints: number;
+            lossPoints: number;
+            /** @description What a forfeited loss is worth. Zero at LIPROBAKIN, where an ordinary loss is worth one. */
+            forfeitPoints: number;
+            /** @description Tie-breakers in the order they are applied, already in French. */
+            tieBreakers: string[];
+            /** @description The points rule written out, in the table’s own column names — "PTS = 2 × MG + 1 × MP". Built from the same numbers the engine uses, so it cannot describe a rule that is not in force. */
+            formula: string;
+            bands: components["schemas"]["StandingsBandsDto"];
+        };
+        StandingsRowDto: {
+            rank: number;
+            /**
+             * @description Which coloured band this row falls in, if the competition has declared any.
+             * @enum {string|null}
+             */
+            band?: "QUALIFICATION" | "RELEGATION" | null;
+            teamId: string;
+            teamName: string;
+            /** @description Unique within the competition; the public site links the club by it. */
+            teamSlug: string;
+            shortCode?: Record<string, never> | null;
+            logoUrl?: Record<string, never> | null;
+            gamesPlayed: number;
+            wins: number;
+            draws: number;
+            losses: number;
+            forfeits: number;
+            goalsFor: number;
+            goalsAgainst: number;
+            goalDifference: number;
+            points: number;
+        };
+        StandingsViewDto: {
+            leagueId: string;
+            leagueName: string;
+            /** @description The organisation running the competition. The published bulletin signs off "Pour la LIPROBAKIN" — the federation, not the division. */
+            organisationName: string;
+            /** @description Its crest, for the document header. */
+            organisationLogoUrl?: Record<string, never> | null;
+            /** @description Where the sheet is signed. */
+            organisationCity?: Record<string, never> | null;
+            seasonId: string;
+            seasonName: string;
+            stageId: string;
+            stageName: string;
+            /** @enum {string} */
+            stageFormat: "LEAGUE" | "GROUPS" | "KNOCKOUT";
+            groupId: Record<string, never> | null;
+            groupName: Record<string, never> | null;
+            groups: components["schemas"]["StandingsGroupDto"][];
+            /** @description The season’s phases that have a table (LEAGUE and GROUPS), in the order they run. */
+            tableStages: components["schemas"]["StandingsStageDto"][];
+            /** @description ISO instant of the last recomputation. */
+            lastCalculated?: Record<string, never> | null;
+            /** @description Completed games this table is derived from. A table nobody has played into is not a table that is wrong — it is a table that is empty, and the two read very differently. */
+            gamesCounted: number;
+            /** @description Fixtures played but not yet reflected, if any. */
+            pendingResults: number;
+            /** @description Column heads, in this sport’s vocabulary. */
+            columns: components["schemas"]["StandingsColumnDto"][];
+            rules: components["schemas"]["StandingsRulesDto"];
+            rows: components["schemas"]["StandingsRowDto"][];
         };
         UpdateStandingsRulesDto: {
             leagueId: string;
@@ -4089,7 +4295,7 @@ export interface components {
              */
             name: string;
             /**
-             * @description Short code, which is also the public subdomain (<code>.elenem.site). Optional — derived from the name when omitted. Worth offering as an editable suggestion rather than a required field: "Ligue Provinciale de Basketball de Kinshasa" derives to something no one would want as an address, but LIPROBAKIN is the acronym they already use.
+             * @description Short code, which is also the public subdomain (<code>.dxscores.app). Optional — derived from the name when omitted. Worth offering as an editable suggestion rather than a required field: "Ligue Provinciale de Basketball de Kinshasa" derives to something no one would want as an address, but LIPROBAKIN is the acronym they already use.
              * @example LIPROBAKIN
              */
             tenantCode?: string;
@@ -4174,7 +4380,7 @@ export interface components {
              */
             ownerId?: string;
             /** @description Partial or full update of the detailed organization information. */
-            businessProfile?: components["schemas"]["BusinessProfileDto"];
+            businessProfile?: components["schemas"]["UpdateBusinessProfileDto"];
         };
         PublicBusinessProfileResponseDto: {
             id: string;
@@ -7613,7 +7819,7 @@ export interface operations {
                 leagueId: string;
                 /** @description Defaults to the competition’s current season. Optional because a club administrator is refused by GET /seasons — they administer a team, not a competition — and would otherwise have no way to name one. */
                 seasonId?: string;
-                /** @description Defaults to the phase being played. A table belongs to a phase — EUBAGO publish « le classement phase de 6 » — and a competition with one phase never has to name it. */
+                /** @description Defaults to the furthest LEAGUE or GROUPS phase with a result — never a knockout, which has no table. A table belongs to a phase — EUBAGO publish « le classement phase de 6 » — and a competition with one phase never has to name it. */
                 stageId?: string;
                 groupId: string;
             };
@@ -7627,7 +7833,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["StandingsViewDto"];
+                };
             };
         };
     };
