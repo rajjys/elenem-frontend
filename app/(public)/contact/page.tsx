@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Mail, MessageCircle } from 'lucide-react';
 import { site } from '@/content/site';
+import { pageMeta } from '@/content/seo';
 
 /**
  * Contact (PHASE5A_PRODUCT_SITE §3.5).
@@ -10,10 +11,11 @@ import { site } from '@/content/site';
  * submit handler, no backend — promised a "24h Response Commitment" and "Enterprise Security", and
  * crashed on an unknown ?intent=. The audience lives on WhatsApp, so that comes first.
  */
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMeta({
   title: 'Contact',
   description: 'Une question sur DXScores ? Écrivez-nous sur WhatsApp ou par e-mail.',
-};
+  path: '/contact',
+});
 
 export default function ContactPage() {
   const cards = [

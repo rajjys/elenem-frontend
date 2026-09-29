@@ -1,11 +1,13 @@
 import type { Metadata } from 'next';
 import { LegalPage } from '@/components/marketing/legal-page';
 import { site } from '@/content/site';
+import { pageMeta } from '@/content/seo';
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMeta({
   title: 'Mentions légales',
   description: 'Qui édite DXScores, qui l’héberge, et comment nous joindre.',
-};
+  path: '/legal',
+});
 
 export default function MentionsLegales() {
   return (

@@ -1,4 +1,3 @@
-import type { Metadata } from 'next';
 import Landing from '../page';
 
 /**
@@ -9,8 +8,6 @@ import Landing from '../page';
  * session, so for them `/` is the landing, and this page says so: its canonical is `/`, and it is
  * never indexed as a page of its own (the Vercel and Resend `/home` model).
  */
-export const metadata: Metadata = {
-  alternates: { canonical: '/' },
-};
+export { metadata } from '../page';
 
 export default Landing;

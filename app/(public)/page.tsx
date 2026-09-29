@@ -16,6 +16,7 @@ import { DayPanel, DesktopCalendar, PhoneStandings } from '@/components/marketin
 import { VideoFacade } from '@/components/marketing/video-facade';
 import { ShowcaseLeagues, Testimonials } from '@/components/marketing/social-proof';
 import { site } from '@/content/site';
+import { pageMeta } from '@/content/seo';
 
 /**
  * The landing page of dxscores.com (PHASE5A_PRODUCT_SITE §6).
@@ -29,11 +30,35 @@ import { site } from '@/content/site';
  * no numbers until there are real ones (`content/site.ts` holds the slots). Also served at /home,
  * for signed-in readers, with this page as its canonical.
  */
-export const metadata: Metadata = {
-  title: { absolute: 'DXScores — organisez votre saison, le classement se calcule tout seul' },
+export const metadata: Metadata = pageMeta({
+  title: 'DXScores — organisez votre saison, le classement se calcule tout seul',
   description:
     'Calendrier, salles, résultats et classement de votre ligue, au même endroit et publiés sur son propre site. Gratuit.',
-  alternates: { canonical: '/' },
+  path: '/',
+  absoluteTitle: true,
+});
+
+/**
+ * Who publishes the site, for search engines (§8.4). No SoftwareApplication block: Google only
+ * shows that rich result with ratings or reviews, and this product invents neither.
+ */
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'Organization',
+      name: 'DXScores',
+      url: 'https://dxscores.com',
+      logo: 'https://dxscores.com/apple-icon',
+      email: site.contact.email,
+    },
+    {
+      '@type': 'WebSite',
+      name: 'DXScores',
+      url: 'https://dxscores.com',
+      inLanguage: 'fr',
+    },
+  ],
 };
 
 const wrap = 'mx-auto max-w-6xl px-4 sm:px-6';
@@ -141,6 +166,8 @@ const faq = [
 export default function LandingPage() {
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+
       {/* ---------- Hero ---------- */}
       <section className="relative overflow-hidden border-b border-line">
         <div

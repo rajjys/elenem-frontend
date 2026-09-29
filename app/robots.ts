@@ -11,7 +11,6 @@ import { resolveTenantSlugFromHostname } from '@/utils/resolveTenantSlugFromHost
  *   the real site in search results.
  *
  * Until this existed, `https://dxscores.com/robots.txt` answered with a redirect to `/login`.
- * The sitemap for the app host is added in 5A.3.
  */
 export default async function robots(): Promise<MetadataRoute.Robots> {
   const host = (await headers()).get('host') ?? '';
@@ -32,6 +31,7 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
           '/game', '/player', '/post', '/public/', '/access-denied',
         ],
       },
+      sitemap: `https://${appDomain}/sitemap.xml`,
     };
   }
 

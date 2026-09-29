@@ -26,6 +26,16 @@ export const metadata = {
   },
   description:
     'Le calendrier, les résultats et le classement de votre ligue, calculés et publiés automatiquement. Gratuit.',
+  // Defaults for any page that sets none; the product site's pages set their own (content/seo.ts).
+  openGraph: {
+    type: 'website',
+    siteName: 'DXScores',
+    locale: 'fr_FR',
+    title: 'DXScores — le classement se calcule tout seul',
+    description:
+      'Le calendrier, les résultats et le classement de votre ligue, calculés et publiés automatiquement. Gratuit.',
+  },
+  twitter: { card: 'summary_large_image' },
 }
 export default function PublicLayout({ children }: { children: ReactNode }) {
   return (
