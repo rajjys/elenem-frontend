@@ -1,18 +1,14 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import {
-  ArrowRight,
-  Check,
-  ClipboardList,
-  FileCheck2,
-  FileSpreadsheet,
-  ListOrdered,
-  Trophy,
-  Users,
-  X,
-} from 'lucide-react';
+import { ArrowRight, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { DayPanel, DesktopCalendar, PhoneStandings } from '@/components/marketing/product-preview';
+import {
+  DayPanel,
+  DesktopCalendar,
+  PhoneStandings,
+  PointsPanel,
+  PublishPanel,
+} from '@/components/marketing/product-preview';
 import { VideoFacade } from '@/components/marketing/video-facade';
 import { ShowcaseLeagues, Testimonials } from '@/components/marketing/social-proof';
 import { site } from '@/content/site';
@@ -24,7 +20,8 @@ import { pageMeta } from '@/content/seo';
  * One job: a league organiser understands in ten seconds what this does, trusts it in one minute,
  * and signs up in three. It presents a management product — the calendar first, the standings as
  * its consequence — because the owner read the first draft as "a calculator", and the calendar,
- * halls and clash detection are what an organiser works in every week.
+ * halls and clash detection are what an organiser works in every week. The product is shown as
+ * its three modules — organisation, points, publication — which is how the owner describes it.
  *
  * Every claim is something the product does today, and nothing is invented: no users, no quotes,
  * no numbers until there are real ones (`content/site.ts` holds the slots). Also served at /home,
@@ -66,26 +63,61 @@ const wrap = 'mx-auto max-w-6xl px-4 sm:px-6';
 /** French typography: a non-breaking space before ? ! : ; so the mark never starts a line. */
 const fr = (s: string) => s.replace(/ ([?!:;])/g, ' $1');
 
-const today = [
-  'Le classement recalculé à la main après chaque journée.',
-  'Un graphiste qui le refait pour les réseaux sociaux.',
-  'Le calendrier dans un fichier, les résultats dans des messages.',
-  'Des chiffres contestés en fin de saison.',
-];
+/** The problem as it is lived, told in a sentence rather than listed (owner's review, 2026-09-29). */
+const problem =
+  'Le calendrier vit dans un fichier, les résultats arrivent par messages, et après chaque journée quelqu’un refait le classement à la main — avant qu’un graphiste ne le redessine pour les réseaux sociaux. En fin de saison, les chiffres sont contestés, et plus personne ne sait d’où vient un point.';
 
+/** The answer, point for point, in the order the problem tells it. */
 const withDx = [
+  'Calendrier, résultats et classement au même endroit, publiés sur le site de la ligue.',
   'Le classement se met à jour à chaque score saisi.',
   'Le classement officiel s’exporte en image, prêt pour WhatsApp.',
-  'Calendrier, résultats et classement au même endroit, publiés sur le site de la ligue.',
   'Chaque point se retrace jusqu’au match qui l’a donné.',
 ];
 
-const calendarPoints = [
-  'Toutes vos compétitions sur une seule grille : messieurs, dames, jeunes.',
-  'Salles et horaires : DXScores signale quand une salle ou une équipe est déjà prise.',
-  'Reports, annulations et déplacements, avec leur motif, gardés dans l’historique du match.',
-  'Un match se déplace d’un jour à l’autre en le glissant dans la grille.',
-  'En cours de saison, les matchs déjà joués s’ajoutent avec leur score.',
+/**
+ * The three modules the product is made of. Each feeds the next: a game placed becomes a result,
+ * a result becomes a table, a table becomes a page anyone can read. A fourth — growth: a league's
+ * own website, tickets, sponsors — is for later, and is not announced here.
+ */
+const modules = [
+  {
+    label: 'Organisation',
+    title: 'Le calendrier, les salles, les imprévus.',
+    lead: 'Toutes vos compétitions sur une seule grille, là où votre ligue se gère chaque semaine.',
+    points: [
+      'Matchs, salles et horaires de toutes vos compétitions : messieurs, dames, jeunes.',
+      'Un conflit de salle ou d’équipe est signalé avant qu’il n’arrive.',
+      'Le programme de chaque équipe, de la première à la dernière journée.',
+      'Les étapes de la saison : saison régulière, poules, phase finale.',
+      'Reports et annulations, avec leur motif, gardés dans l’historique du match.',
+    ],
+    Visual: DayPanel,
+  },
+  {
+    label: 'Points',
+    title: 'Chaque score devient un classement.',
+    lead: 'Le moteur de points applique vos règles à chaque résultat saisi : classement et statistiques se mettent à jour seuls.',
+    points: [
+      'Vos règles : points par victoire, défaite et forfait, départages, qualification et relégation.',
+      'La feuille de marque par joueur, et le classement des marqueurs.',
+      'En cours de saison, les matchs déjà joués s’importent depuis Excel.',
+      'Chaque point se retrace jusqu’au match qui l’a donné.',
+    ],
+    Visual: PointsPanel,
+  },
+  {
+    label: 'Publication',
+    title: 'Votre ligue, vue de tous.',
+    lead: 'Ce que vous saisissez est publié aussitôt, sur le site de votre ligue et dans les formats que l’on partage.',
+    points: [
+      'Le site de votre ligue, votre-ligue.dxscores.app : classement, calendrier, résultats, communiqués.',
+      'Le classement officiel en PDF, avec en-tête, cachet et signature.',
+      'En image pour WhatsApp, en Excel pour vos archives.',
+      'Lisible sur n’importe quel téléphone, sans rien installer.',
+    ],
+    Visual: PublishPanel,
+  },
 ];
 
 const steps = [
@@ -99,40 +131,7 @@ const steps = [
   },
   {
     title: 'Partagez',
-    text: 'Classement, calendrier et résultats sont à jour sur votre-ligue.dxscores.app. Le classement officiel s’exporte en PDF, en image ou en Excel.',
-  },
-];
-
-const features = [
-  {
-    icon: ListOrdered,
-    title: 'Un classement selon vos règles',
-    text: 'Points par victoire, défaite et forfait, départages, zones de qualification et de relégation.',
-  },
-  {
-    icon: FileCheck2,
-    title: 'Le classement officiel, prêt à signer',
-    text: 'En-tête, cachet et signature. En PDF à imprimer, en image pour WhatsApp, en Excel.',
-  },
-  {
-    icon: ClipboardList,
-    title: 'La feuille de marque',
-    text: 'Lancers francs, paniers à 2 et à 3 points par joueur, et le classement des marqueurs.',
-  },
-  {
-    icon: Trophy,
-    title: 'Phases et play-offs',
-    text: 'Saison régulière, poules, phase finale : vous composez le format, saison après saison.',
-  },
-  {
-    icon: FileSpreadsheet,
-    title: 'Vos résultats depuis Excel',
-    text: 'En cours de saison, importez d’un coup les matchs déjà joués.',
-  },
-  {
-    icon: Users,
-    title: 'Votre équipe',
-    text: 'Invitez les personnes qui saisissent les résultats, chacune avec son rôle.',
+    text: 'Votre ligue est en ligne sur votre-ligue.dxscores.app, à jour à chaque score.',
   },
 ];
 
@@ -233,27 +232,23 @@ export default function LandingPage() {
         </figure>
       </section>
 
-      {/* ---------- The chore it replaces ---------- */}
+      {/* ---------- The problem, and the answer ---------- */}
       <section className={`${wrap} reveal py-16 sm:py-24`}>
-        <h2 className="max-w-2xl text-title font-bold text-ink">{fr('Chaque journée, la même corvée.')}</h2>
-        <div className="mt-10 grid gap-5 md:grid-cols-2">
-          <div className="rounded-2xl border border-line bg-surface p-6 sm:p-8">
+        <p className="text-xs font-semibold uppercase tracking-wider text-accent-text">Pourquoi DXScores</p>
+        <h2 className="mt-3 max-w-2xl text-title font-bold text-ink">{fr('Chaque journée, la même corvée.')}</h2>
+        {/* The answer leads on a wide screen, on the left; the problem sits beside it as prose. On a
+            phone the problem comes first, so the page still reads problem, then answer. */}
+        <div className="mt-10 grid items-center gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:gap-14">
+          <div className="border-l-2 border-line-strong pl-6">
             <p className="text-xs font-semibold uppercase tracking-wider text-ink-subtle">Aujourd’hui</p>
-            <ul className="mt-5 space-y-4">
-              {today.map((t) => (
-                <li key={t} className="flex items-start gap-3 text-ink-muted">
-                  <X className="mt-0.5 h-5 w-5 shrink-0 text-ink-subtle" aria-hidden />
-                  <span>{fr(t)}</span>
-                </li>
-              ))}
-            </ul>
+            <p className="mt-4 text-xl italic leading-relaxed text-ink-muted sm:text-2xl">{fr(problem)}</p>
           </div>
-          <div className="rounded-2xl border border-accent-line bg-accent-soft/50 p-6 sm:p-8">
+          <div className="rounded-2xl border border-accent-line bg-accent-soft/50 p-6 shadow-e1 sm:p-10 lg:order-first">
             <p className="text-xs font-semibold uppercase tracking-wider text-accent-text">Avec DXScores</p>
-            <ul className="mt-5 space-y-4">
+            <ul className="mt-6 space-y-5">
               {withDx.map((t) => (
-                <li key={t} className="flex items-start gap-3 text-ink">
-                  <Check className="mt-0.5 h-5 w-5 shrink-0 text-positive" aria-hidden />
+                <li key={t} className="flex items-start gap-3 text-lg text-ink">
+                  <Check className="mt-1 h-5 w-5 shrink-0 text-positive" aria-hidden />
                   <span>{fr(t)}</span>
                 </li>
               ))}
@@ -262,28 +257,53 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ---------- The calendar: where an organiser works every week ---------- */}
-      <section id="calendrier" className="scroll-mt-20 border-y border-line bg-surface">
-        <div className={`${wrap} reveal grid items-center gap-12 py-16 sm:py-24 lg:grid-cols-[1.1fr_0.9fr]`}>
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-wider text-accent-text">Le calendrier</p>
-            <h2 className="mt-3 text-title font-bold text-ink">Toute l’organisation sur une seule grille.</h2>
-            <p className="mt-4 max-w-xl text-lg leading-relaxed text-ink-muted">
+      {/* ---------- The three modules ---------- */}
+      <section id="fonctionnalites" className="scroll-mt-20 border-y border-line bg-surface">
+        <div className={`${wrap} py-16 sm:py-24`}>
+          <div className="reveal max-w-2xl">
+            <p className="text-xs font-semibold uppercase tracking-wider text-accent-text">Fonctionnalités</p>
+            <h2 className="mt-3 text-title font-bold text-ink">Trois modules, une seule saison.</h2>
+            <p className="mt-4 text-lg leading-relaxed text-ink-muted">
               {fr(
-                'Là où votre ligue se gère chaque semaine : les matchs, les salles, les horaires — et les imprévus.',
+                'Organiser, compter, publier. Chacun alimente le suivant : un match placé devient un résultat, un résultat devient un classement, un classement devient une page que tout le monde peut lire.',
               )}
             </p>
-            <ul className="mt-6 space-y-3">
-              {calendarPoints.map((t) => (
-                <li key={t} className="flex items-start gap-3 text-ink">
-                  <Check className="mt-0.5 h-5 w-5 shrink-0 text-positive" aria-hidden />
-                  <span>{fr(t)}</span>
-                </li>
-              ))}
-            </ul>
           </div>
-          <div className="flex justify-center lg:justify-end">
-            <DayPanel />
+          <div className="mt-14 space-y-16 sm:mt-20 sm:space-y-24">
+            {modules.map((m, i) => (
+              <article key={m.label} className="reveal grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
+                <div className={i % 2 ? 'lg:order-last' : undefined}>
+                  <p className="flex items-center gap-3 text-xs font-semibold uppercase tracking-wider text-accent-text">
+                    <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-accent text-sm tabular-nums text-accent-ink">
+                      {i + 1}
+                    </span>
+                    {m.label}
+                  </p>
+                  <h3 className="mt-4 text-balance text-2xl font-bold text-ink sm:text-3xl">{fr(m.title)}</h3>
+                  <p className="mt-3 max-w-xl text-lg leading-relaxed text-ink-muted">{fr(m.lead)}</p>
+                  <ul className="mt-6 space-y-3">
+                    {m.points.map((t) => (
+                      <li key={t} className="flex items-start gap-3 text-ink">
+                        <Check className="mt-0.5 h-5 w-5 shrink-0 text-positive" aria-hidden />
+                        <span>{fr(t)}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  {m.Visual === PublishPanel && site.demoUrl && (
+                    <Button asChild variant="outline" size="lg" className="mt-8">
+                      <a href={site.demoUrl} target="_blank" rel="noopener noreferrer">
+                        Visiter le site de démonstration
+                      </a>
+                    </Button>
+                  )}
+                </div>
+                {/* A backdrop the width of the column, so the drawing is the row's other half
+                    rather than a small card floating in white space. */}
+                <div className="flex justify-center rounded-2xl border border-line bg-canvas px-4 py-10 sm:px-10 sm:py-14">
+                  <m.Visual />
+                </div>
+              </article>
+            ))}
           </div>
         </div>
       </section>
@@ -318,58 +338,6 @@ export default function LandingPage() {
           </div>
         </section>
       )}
-
-      {/* ---------- What else it does ---------- */}
-      <section id="fonctionnalites" className="scroll-mt-20 border-y border-line bg-surface">
-        <div className={`${wrap} reveal py-16 sm:py-24`}>
-          <h2 className="text-title font-bold text-ink">Et tout le reste de la saison</h2>
-          <ul className="mt-12 grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
-            {features.map((f) => (
-              <li key={f.title} className="group border-t border-line pt-6">
-                <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent-soft text-accent-text transition-colors group-hover:bg-accent group-hover:text-accent-ink">
-                  <f.icon className="h-5 w-5" aria-hidden />
-                </span>
-                <h3 className="mt-4 font-semibold text-ink">{f.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-ink-muted">{fr(f.text)}</p>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </section>
-
-      {/* ---------- Visibility: the league's own site ---------- */}
-      <section className={`${wrap} reveal grid items-center gap-12 py-16 sm:py-24 lg:grid-cols-2`}>
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-wider text-accent-text">Le site de votre ligue</p>
-          <h2 className="mt-3 text-title font-bold text-ink">Votre ligue mérite d’être vue.</h2>
-          <p className="mt-4 max-w-xl text-lg leading-relaxed text-ink-muted">
-            Chaque ligue reçoit son propre site — classement, calendrier, résultats — mis à jour à
-            chaque score, sans que personne n’ait à le tenir.
-          </p>
-          <ul className="mt-6 space-y-3">
-            {[
-              'Toujours à jour : il change à chaque résultat saisi.',
-              'Lisible sur n’importe quel téléphone.',
-              'À votre nom : votre-ligue.dxscores.app.',
-            ].map((t) => (
-              <li key={t} className="flex items-start gap-3 text-ink">
-                <Check className="mt-0.5 h-5 w-5 shrink-0 text-positive" aria-hidden />
-                <span>{fr(t)}</span>
-              </li>
-            ))}
-          </ul>
-          {site.demoUrl && (
-            <Button asChild variant="outline" size="lg" className="mt-8">
-              <a href={site.demoUrl} target="_blank" rel="noopener noreferrer">
-                Visiter le site de démonstration
-              </a>
-            </Button>
-          )}
-        </div>
-        <div className="flex justify-center lg:justify-end">
-          <PhoneStandings />
-        </div>
-      </section>
 
       <ShowcaseLeagues />
       <Testimonials />

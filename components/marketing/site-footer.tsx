@@ -17,7 +17,6 @@ const columns: { title: string; links: { label: string; href: string; external?:
   {
     title: 'Produit',
     links: [
-      { label: 'Calendrier', href: '/#calendrier' },
       { label: 'Fonctionnalités', href: '/#fonctionnalites' },
       { label: 'Comment ça marche', href: '/#comment-ca-marche' },
       { label: 'Créer ma ligue', href: '/register' },

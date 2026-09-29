@@ -44,7 +44,6 @@ export function SiteHeader() {
   const section = (id: string) => (onLanding ? `#${id}` : `${signedIn ? '/home' : '/'}#${id}`);
 
   const links = [
-    { label: 'Calendrier', href: section('calendrier') },
     { label: 'Fonctionnalités', href: section('fonctionnalites') },
     { label: 'Comment ça marche', href: section('comment-ca-marche') },
     { label: 'Contact', href: '/contact' },
