@@ -9,6 +9,7 @@ import { OtpInput } from '@/components/ui/otp-input';
 import { useAuthStore } from '@/store/auth.store';
 import { useResendVerification, useVerifyEmail } from '@/services/auth';
 import { isAxiosError } from '@/services/api';
+import { useCooldown } from '@/hooks/useCooldown';
 
 /**
  * The reminder that replaces the wall.
@@ -36,6 +37,7 @@ export function VerifyEmailBanner() {
 
   const verify = useVerifyEmail();
   const resend = useResendVerification();
+  const cooldown = useCooldown();
 
   // Nothing to nag about — and nothing to render before the user is loaded.
   if (!user || user.isEmailVerified) return null;
@@ -91,15 +93,22 @@ export function VerifyEmailBanner() {
           <Button
             type="button"
             variant="ghost"
-            disabled={resend.isPending}
+            disabled={resend.isPending || cooldown.remaining > 0}
             onClick={() =>
               resend.mutate(email, {
-                onSuccess: () => toast.success('Nouveau code envoyé.'),
+                onSuccess: () => {
+                  toast.success('Nouveau code envoyé.');
+                  cooldown.start();
+                },
                 onError: () => toast.error("L'envoi a échoué."),
               })
             }
           >
-            {resend.isPending ? 'Envoi…' : 'Renvoyer le code'}
+            {resend.isPending
+              ? 'Envoi…'
+              : cooldown.remaining > 0
+                ? `Renvoyer le code (${cooldown.remaining}s)`
+                : 'Renvoyer le code'}
           </Button>
         </form>
       )}

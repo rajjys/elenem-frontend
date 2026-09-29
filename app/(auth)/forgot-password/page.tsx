@@ -11,6 +11,7 @@ import { PasswordInput } from '@/components/ui/password-input';
 import { OtpInput } from '@/components/ui/otp-input';
 import { toastApiError } from '@/utils';
 import { useForgotPassword, useVerifyResetOtp, useResetPassword } from '@/services/auth';
+import { useCooldown } from '@/hooks/useCooldown';
 
 type Step = 'email' | 'otp' | 'password';
 const STEPS: Step[] = ['email', 'otp', 'password'];
@@ -26,6 +27,7 @@ export default function ForgotPasswordPage() {
   const forgot = useForgotPassword();
   const verifyOtp = useVerifyResetOtp();
   const reset = useResetPassword();
+  const cooldown = useCooldown();
 
   // Step 1 — request a code.
   const requestCode = (e: React.FormEvent) => {
@@ -33,9 +35,21 @@ export default function ForgotPasswordPage() {
     forgot.mutate(email, {
       onSuccess: () => {
         toast.success('Si un compte existe, un code a été envoyé.');
+        cooldown.start();
         setStep('otp');
       },
       onError: (err) => toastApiError(err, "Impossible d'envoyer le code."),
+    });
+  };
+
+  const resendCode = () => {
+    if (cooldown.remaining > 0) return;
+    forgot.mutate(email, {
+      onSuccess: () => {
+        toast.success('Nouveau code envoyé.');
+        cooldown.start();
+      },
+      onError: (e) => toastApiError(e),
     });
   };
 
@@ -121,10 +135,11 @@ export default function ForgotPasswordPage() {
               </button>
               <button
                 type="button"
-                className="text-accent-text hover:text-accent-text"
-                onClick={() => forgot.mutate(email, { onSuccess: () => toast.success('Nouveau code envoyé.'), onError: (e) => toastApiError(e) })}
+                disabled={cooldown.remaining > 0 || forgot.isPending}
+                className="text-accent-text hover:text-accent-text disabled:cursor-not-allowed disabled:text-ink-subtle"
+                onClick={resendCode}
               >
-                Renvoyer
+                {cooldown.remaining > 0 ? `Renvoyer (${cooldown.remaining}s)` : 'Renvoyer'}
               </button>
             </div>
           </form>

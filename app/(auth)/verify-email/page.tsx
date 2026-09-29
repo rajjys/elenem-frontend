@@ -11,8 +11,7 @@ import { OtpInput } from '@/components/ui/otp-input';
 import { toastApiError, getPostAuthRedirect } from '@/utils';
 import { useVerifyEmail, useResendVerification } from '@/services/auth';
 import { useAuthStore } from '@/store/auth.store';
-
-const RESEND_SECONDS = 30;
+import { useCooldown } from '@/hooks/useCooldown';
 
 function VerifyEmailInner() {
   const router = useRouter();
@@ -28,18 +27,12 @@ function VerifyEmailInner() {
 
   const [otp, setOtp] = useState('');
   const [manualEmail, setManualEmail] = useState('');
-  const [cooldown, setCooldown] = useState(RESEND_SECONDS);
+  // A code has just gone out (at sign-up, or on mount below), so the resend starts shut.
+  const cooldown = useCooldown(undefined, true);
 
   const verify = useVerifyEmail();
   const resend = useResendVerification();
   const email = knownEmail || manualEmail;
-
-  // Resend cooldown so users can't trip the rate limiter.
-  useEffect(() => {
-    if (cooldown <= 0) return;
-    const t = setInterval(() => setCooldown((c) => (c <= 1 ? 0 : c - 1)), 1000);
-    return () => clearInterval(t);
-  }, [cooldown]);
 
   // Ensure a fresh code is actually sent when landing here (e.g. from the
   // dashboard "verify now" link, where any register-time code has expired).
@@ -67,11 +60,11 @@ function VerifyEmailInner() {
   };
 
   const doResend = () => {
-    if (cooldown > 0 || !email) return;
+    if (cooldown.remaining > 0 || !email) return;
     resend.mutate(email, {
       onSuccess: (d) => {
         toast.success(d?.message ?? 'Nouveau code envoyé.');
-        setCooldown(RESEND_SECONDS);
+        cooldown.start();
       },
       onError: (err) => toastApiError(err),
     });
@@ -111,11 +104,11 @@ function VerifyEmailInner() {
         <div className="mt-4 text-center text-sm">
           <button
             type="button"
-            disabled={cooldown > 0 || resend.isPending}
+            disabled={cooldown.remaining > 0 || resend.isPending}
             onClick={doResend}
             className="text-accent-text hover:text-accent-text disabled:cursor-not-allowed disabled:text-ink-subtle"
           >
-            {cooldown > 0 ? `Renvoyer le code (${cooldown}s)` : 'Renvoyer le code'}
+            {cooldown.remaining > 0 ? `Renvoyer le code (${cooldown.remaining}s)` : 'Renvoyer le code'}
           </button>
         </div>
 
