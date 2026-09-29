@@ -645,7 +645,25 @@ signed-in redirect, which needs the owner's own login). Deviations from the list
 - every deleted route redirects or 404s;
 - typecheck and lint are clean.
 
-### 5A.2: The landing page (≈ 2 days)
+### 5A.2: The landing page (≈ 2 days) — **done 2026-09-29**
+
+Shipped as frontend `379360f` (the mark and the rename), `ad96834` (the JavaScript budget),
+`8144bdb` (landing, contact and legal pages) and `2aa0ee4` (the owner's review); approved by the
+owner on 2026-09-29. Deviations from the list below:
+
+- **The landing leads with the calendar**, not the standings: in review the page read as a
+  calculation tool, and the product is league management. Hero: *Organisez votre saison. Le
+  classement se calcule tout seul.*; a `#calendrier` section follows the chores comparison.
+- **No screenshots yet.** The hero and the calendar section use HTML mock-ups
+  (`components/marketing/product-preview.tsx`: a laptop calendar, a phone standings table, a day
+  panel), captioned *Exemple illustratif*. They cost no image bytes and stay sharp in both themes.
+  Real screenshots replace them once the demo league is complete.
+- **The demo league is partial on production** (8 men's teams, 56 games, 11 results). The *Voir la
+  démo* link stays hidden (`site.demoUrl: null`) until `scripts/seed-demo-league.mjs` (backend) has
+  finished it. The script is resumable and needs the demo account's password.
+- The video slot is built and hidden until `presentationVideoId` is set.
+- `/` ships 176 KB of compressed JavaScript on production, down from 666 KB.
+
 
 - Wordmark SVG, icons and the rename of user-visible strings (§8.2).
 - The design additions (§8.1). Build the header, footer and landing sections (§6, §7) as server
@@ -662,7 +680,23 @@ signed-in redirect, which needs the owner's own login). Deviations from the list
 - every claim on the page appears in §6.4's *Backed by* column;
 - the owner has approved the copy.
 
-### 5A.3: SEO and sharing (≈ 0.5 day)
+### 5A.3: SEO and sharing (≈ 0.5 day) — **done 2026-09-29**
+
+Shipped as frontend `4447c31`. The owner's two steps (Search Console, the WhatsApp paste test)
+remain. Deviations and findings:
+
+- **A page's `openGraph` drops the root's image.** Next.js attaches the `opengraph-image` file at
+  the root segment, but a page that sets `openGraph` replaces the whole object, image included.
+  `content/seo.ts` `pageMeta()` therefore names the image itself, and every public page uses it.
+  **Any new public page must go through `pageMeta()`**, or it shares with no picture.
+- The OG image shows a slice of a standings table instead of a phone screenshot, because there are
+  no screenshots yet (see 5A.2). It is set in Inter, read from `assets/fonts` at build time (OFL
+  text alongside). It is 54 KB.
+- `robots.txt` and `sitemap.xml` are rendered per request, because they branch on the host. A
+  non-app host gets an empty sitemap; its `Disallow: /` is in robots.
+- `noindex, follow` on the `(auth)` group; `noindex, nofollow` on the `(app)` group, which
+  includes `/onboarding`.
+
 
 - The metadata, per-host `robots` and `sitemap`, OG image, JSON-LD and `noindex` rules in §8.4.
 - Search Console property and sitemap submission, done by the owner.
