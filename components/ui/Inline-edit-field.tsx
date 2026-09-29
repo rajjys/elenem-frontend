@@ -1,8 +1,7 @@
 'use client';
 import { Button, Input } from "@/components/ui";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Check, Pencil, X } from "lucide-react";
-import { UseFormReturn, FieldValues, Path, PathValue } from "react-hook-form";
+import { UseFormReturn, FieldValues, Path } from "react-hook-form";
 import { toast } from "sonner";
 
 interface InlineEditFieldProps<T extends FieldValues> {
@@ -14,11 +13,6 @@ interface InlineEditFieldProps<T extends FieldValues> {
   activeEditField: Path<T> | null;
   setActiveEditField: (field: Path<T> | null) => void;
   initialValues: Partial<T>;
-  /**
-   * A choice from a list instead of free text: edited with a select, and shown by its label. For
-   * values a reader should never have to type — a time zone, where « UTC+1 » looks right and is not.
-   */
-  options?: { value: string; label: string }[];
 }
 
 /**
@@ -33,12 +27,10 @@ export function InlineEditField<T extends FieldValues>({
   activeEditField,
   setActiveEditField,
   initialValues,
-  options,
 }: InlineEditFieldProps<T>) {
-  const { register, getValues, reset, trigger, watch, formState, setValue } = form;
+  const { register, getValues, reset, trigger, watch, formState } = form;
   const isEditing = activeEditField === name;
   const currentValue = watch(name);
-  const shown = options?.find((o) => o.value === currentValue)?.label ?? currentValue;
   const error = formState.errors[name]?.message as string | undefined;
 
   if (!isEditing) {
@@ -54,9 +46,9 @@ export function InlineEditField<T extends FieldValues>({
   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4 w-full">
     <span
       className="text-ink truncate max-w-full sm:max-w-sm"
-      title={shown}
+      title={currentValue}
     >
-      {shown}
+      {currentValue}
     </span>
     <Button
       type="button"
@@ -90,33 +82,12 @@ export function InlineEditField<T extends FieldValues>({
     <div key={name} className="px-4 py-3 border-l-4 border-accent bg-accent-soft flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 rounded-md">
       {/* Input Section */}
       <div className="flex-1 min-w-[200px]">
-        {options ? (
-          <>
-            <span className="mb-1 block text-sm font-medium text-ink">{label}</span>
-            <Select
-              value={currentValue ?? ''}
-              onValueChange={(v) => setValue(name, v as PathValue<T, Path<T>>, { shouldDirty: true })}
-            >
-              <SelectTrigger aria-label={label}>
-                <SelectValue placeholder={placeholder} />
-              </SelectTrigger>
-              <SelectContent>
-                {options.map((o) => (
-                  <SelectItem key={o.value} value={o.value}>
-                    {o.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </>
-        ) : (
-          <Input
-            label={label}
-            type={type}
-            placeholder={placeholder}
-            {...register(name)}
-          />
-        )}
+        <Input
+          label={label}
+          type={type}
+          placeholder={placeholder}
+          {...register(name)}
+        />
         {error && <p className="text-xs text-negative mt-1">{error}</p>}
       </div>
       {/* Action Buttons */}

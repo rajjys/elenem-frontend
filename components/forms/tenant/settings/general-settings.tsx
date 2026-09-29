@@ -21,10 +21,16 @@ import { CountryDropdown } from "react-country-region-selector"; // Add import f
 import { api, isAxiosError } from '@/services/api';
 import { UpdateTenantSchema, VisibilityLevel, TenantDetails, SportType, TenantTypes } from "@/schemas"; // Add SportType, TenantTypes to imports
 import { Loader2 } from "lucide-react"; // Add Loader2 import
-import { countryCodeToName } from "@/utils";
 import { buildTenantUrl } from '@/utils/tenant-url';
+import { TIMEZONES, timezoneLabel } from '@/utils/timezones';
 
-type FormValues = z.infer<typeof UpdateTenantSchema>;
+/**
+ * The organisation's fields, plus its time zone. The zone lives on the business profile, but it
+ * belongs beside the country here: it is the clock every time on the league's site is shown in
+ * (PHASE5B_LEAGUE_SITES §4.4), and the dashboard's one-off card is not the place to correct it.
+ */
+const GeneralSettingsSchema = UpdateTenantSchema.extend({ timezone: z.string().optional() });
+type FormValues = z.infer<typeof GeneralSettingsSchema>;
 
 interface TenantGeneralSettingsProps {
   tenant: TenantDetails;
@@ -43,6 +49,7 @@ function buildDefaultValues(tenant: TenantDetails): FormValues {
     isActive: tenant.isActive,
     visibility: tenant.visibility,
     ownerId: tenant.ownerId, // Include ownerId
+    timezone: tenant.businessProfile?.timezone ?? '',
   } as FormValues; // cast - your UpdateTenantSchema determines exact optionality
 }
 
@@ -74,7 +81,7 @@ export default function TenantGeneralSettings({ tenant, onSuccess  }: TenantGene
   const initialRef = useRef<FormValues>(buildDefaultValues(tenant));
 
   const form = useForm<FormValues>({
-    resolver: zodResolver(UpdateTenantSchema),
+    resolver: zodResolver(GeneralSettingsSchema),
     defaultValues: initialRef.current,
     mode: "onChange",
   });
@@ -89,9 +96,6 @@ export default function TenantGeneralSettings({ tenant, onSuccess  }: TenantGene
     watch, // Use watch to read current values
   } = form;
 
-  // Watch for country change for CountryDropdown
-  const countryCodeOrName = watch("country")
-  const country = countryCodeOrName ? countryCodeToName[countryCodeOrName] || countryCodeOrName : countryCodeOrName;
   const tenantCode = watch("tenantCode");
 
   // keep form in sync when tenant prop changes (route navigation / data refetch)
@@ -110,9 +114,12 @@ export default function TenantGeneralSettings({ tenant, onSuccess  }: TenantGene
       toast.info("No changes detected to save.");
       return;
     }
+    // The zone is a profile field: sent under businessProfile, which accepts a partial update.
+    const { timezone, ...tenantDelta } = deltaPayload;
+    const payload = timezone === undefined ? tenantDelta : { ...tenantDelta, businessProfile: { timezone } };
     try {
       // call backend with partial payload. The backend should accept partial updates (PATCH/PUT semantics)
-      await api.put(`/tenants/${tenant.id}`, deltaPayload);
+      await api.put(`/tenants/${tenant.id}`, payload);
       toast.success("General settings updated successfully!");
       // update the "saved" baseline and reset the form's dirty state
       initialRef.current = getValues();
@@ -227,16 +234,43 @@ export default function TenantGeneralSettings({ tenant, onSuccess  }: TenantGene
             render={({ field }) => (
               // Use CountryDropdown for consistency
               <CountryDropdown
-                value={country} // Use watched value
-                aria-placeholder="Pays"
-                onChange={(val) => field.onChange(val)} // Update field value on change
-                // ISO-3166 alpha-2, matching what the API validates and stores.
+                // ISO-3166 alpha-2 in both directions, matching what the API validates and stores.
+                // It used to be handed the country's *name* while expecting a code, so it matched
+                // nothing and showed « Country » over every organisation's real country.
+                value={field.value ?? ""}
+                aria-label="Pays"
+                defaultOptionLabel="Choisissez un pays"
+                onChange={(val) => field.onChange(val)}
                 valueType="short"
                 className="w-full h-10 px-3 py-2 text-sm border rounded-md border-line focus:outline-none focus:ring-2 focus:ring-accent"
               />
             )}
           />
           {errors.country && <p className="text-negative text-xs">{errors.country.message}</p>}
+        </div>
+
+        {/* Time zone, beside the country it usually follows */}
+        <div className="space-y-2">
+          <Label htmlFor="timezone">Fuseau horaire</Label>
+          <Controller
+            name="timezone"
+            control={control}
+            render={({ field }) => (
+              <Select onValueChange={field.onChange} value={field.value || undefined}>
+                <SelectTrigger id="timezone">
+                  <SelectValue placeholder="Choisissez le fuseau de vos matchs" />
+                </SelectTrigger>
+                <SelectContent>
+                  {TIMEZONES.map((t) => (
+                    <SelectItem key={t.zone} value={t.zone}>
+                      {timezoneLabel(t.zone, true)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+          />
+          <p className="text-xs text-ink-muted">Les heures publiées sur le site de la ligue suivent ce fuseau.</p>
         </div>
 
         {/* isActive (Status) - Refactored to Select for consistency, but kept Switch logic for reference */}

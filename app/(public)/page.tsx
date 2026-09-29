@@ -236,14 +236,14 @@ export default function LandingPage() {
       <section className={`${wrap} reveal py-16 sm:py-24`}>
         <p className="text-xs font-semibold uppercase tracking-wider text-accent-text">Pourquoi DXScores</p>
         <h2 className="mt-3 max-w-2xl text-title font-bold text-ink">{fr('Chaque journée, la même corvée.')}</h2>
-        {/* The answer leads on a wide screen, on the left; the problem sits beside it as prose. On a
-            phone the problem comes first, so the page still reads problem, then answer. */}
-        <div className="mt-10 grid items-center gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:gap-14">
+        {/* Problem, then answer — left to right on a wide screen, top to bottom on a phone. The
+            problem is prose beside a rule; the answer is the card, and the wider column. */}
+        <div className="mt-10 grid items-center gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:gap-14">
           <div className="border-l-2 border-line-strong pl-6">
             <p className="text-xs font-semibold uppercase tracking-wider text-ink-subtle">Aujourd’hui</p>
             <p className="mt-4 text-xl italic leading-relaxed text-ink-muted sm:text-2xl">{fr(problem)}</p>
           </div>
-          <div className="rounded-2xl border border-accent-line bg-accent-soft/50 p-6 shadow-e1 sm:p-10 lg:order-first">
+          <div className="rounded-2xl border border-accent-line bg-accent-soft/50 p-6 shadow-e1 sm:p-10">
             <p className="text-xs font-semibold uppercase tracking-wider text-accent-text">Avec DXScores</p>
             <ul className="mt-6 space-y-5">
               {withDx.map((t) => (
