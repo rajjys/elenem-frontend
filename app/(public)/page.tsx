@@ -175,10 +175,6 @@ export default function LandingPage() {
           className="pointer-events-none absolute inset-0 bg-gradient-to-b from-accent-soft/50 via-canvas to-canvas"
         />
         <div className={`${wrap} relative pt-16 text-center sm:pt-24`}>
-          <p className="inline-flex items-center gap-2 rounded-full border border-line bg-surface px-3 py-1 text-xs font-medium text-ink-muted">
-            <span className="h-1.5 w-1.5 rounded-full bg-positive" aria-hidden />
-            Gratuit · pour les ligues et fédérations sportives
-          </p>
           {/* Two sentences, two lines: the first says what the product is (management), the second
               what it does that nothing else does. Broken anywhere else it read as one run-on. */}
           <h1 className="mx-auto mt-6 max-w-5xl text-balance text-display font-bold text-ink">

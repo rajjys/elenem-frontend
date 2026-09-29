@@ -296,7 +296,7 @@ proof. Copy below is a **draft in French** for the owner to edit, not final text
 
 ### 6.1 Hero
 
-- Eyebrow: **Pour les ligues et fédérations sportives**
+
 - H1: **Le classement se calcule tout seul.**
 - Lead: *DXScores tient le calendrier de votre ligue, calcule le classement à partir des
   résultats et publie tout sur le site de votre ligue — prêt à partager sur WhatsApp.*
