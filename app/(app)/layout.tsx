@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
+import { AppProviders } from '@/components/providers/app-providers';
 
 /**
  * The app behind the login is never indexed. robots.txt already disallows these paths; this is the
@@ -10,5 +11,5 @@ export const metadata: Metadata = {
 };
 
 export default function AppGroupLayout({ children }: { children: ReactNode }) {
-  return children;
+  return <AppProviders>{children}</AppProviders>;
 }

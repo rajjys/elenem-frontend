@@ -5,9 +5,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next"
 // app/layout.tsx (if this is the root layout) or a specific public group layout
 import React, { ReactNode } from 'react';
 import { Inter } from 'next/font/google'; // Example font
-import { Toaster } from "sonner";
-import { QueryProvider } from "@/components/providers/query-provider";
-import { ThemeProvider, themeInitScript } from "@/components/providers/theme-provider";
+import { themeInitScript } from "@/components/providers/theme-provider";
 
 const inter = Inter({ subsets: ['latin'] , variable: '--font-inter'});
 
@@ -46,12 +44,10 @@ export default function PublicLayout({ children }: { children: ReactNode }) {
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>
       <body>
-        <ThemeProvider>
-          <QueryProvider>
-            {children}
-          </QueryProvider>
-        </ThemeProvider>
-        <Toaster position="top-center" richColors closeButton theme="system" />
+        {/* The app's providers — data cache, theme switch, toasts — live in the layouts that use
+            them (components/providers/app-providers.tsx), so the landing and the league sites
+            do not load them. */}
+        {children}
         <Analytics/>
         <SpeedInsights/>
         {/* No AdSense. It loaded on every page — the admin app and every league site included —

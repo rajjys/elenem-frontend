@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
+import { AppProviders } from '@/components/providers/app-providers';
 
 /**
  * Sign-in, sign-up and their siblings are doors, not destinations: nobody searches for a login
@@ -11,5 +12,5 @@ export const metadata: Metadata = {
 };
 
 export default function AuthGroupLayout({ children }: { children: ReactNode }) {
-  return children;
+  return <AppProviders>{children}</AppProviders>;
 }
