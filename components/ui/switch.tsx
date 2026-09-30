@@ -25,6 +25,8 @@ export const Switch = React.forwardRef<HTMLInputElement, SwitchProps>(
             id={name}
             name={name}
             type="checkbox"
+            // Announced as the on/off switch it looks like, not as a checkbox.
+            role="switch"
             ref={ref}
             checked={checked}
             onChange={handleChange}
