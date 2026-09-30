@@ -698,7 +698,30 @@ Shipped as frontend `047ece1` (+ `6c0a5e2`), verified on production against the 
 **Done when:** LIPROBAKIN's home shows this week's games and last weekend's results (not August),
 and a club page shows its record, next match, results and roster.
 
-### 5B.5: Conditional sections (≈ 1 day)
+### 5B.5: Conditional sections (≈ 1 day) — **done 2026-09-30**
+
+Shipped as backend `214b05d` and frontend `246adad`, verified on production (demo: Actualités and
+both articles, Marqueurs; Phase finale 404 as it has no knockout) and locally (LIBAGO: Marqueurs +
+Phase finale; EUBABUNIA: Phase finale; LIPROBAKIN, LIBUK: none, 404 behind each). No old page is left
+on a league site. What later sprints inherit:
+
+- **Posts written in the app were blank on the site.** The organisers' form (Lexical) saves
+  `richContent` and leaves `content` empty; the API sent only `content`. It now sends both, derives
+  a card excerpt when none was written, and `PostBody` renders the Lexical document on the server
+  (Markdown as the fallback; links only http(s)/mailto; no HTML string).
+- **Marqueurs** states its coverage (« N des M matchs joués ont une feuille de marque ») and lists
+  only competitions with scoresheets that publish names.
+- **Phase finale** is a list per round; rounds named from the end when a phase has several.
+- **Open item — intermittent hydration error #418 in production.** About one load in five on any
+  page, the landing included, so it predates 5B.5. Not reproducible on the dev server or on a local
+  `next start`; blocking Vercel Analytics/Speed Insights reduces it (5/18 → 2/18) without removing
+  it. React recovers by rendering the page in the browser, so readers see the page, at the cost of
+  speed. Needs a non-minified reading from Vercel's environment (a preview with React's dev build,
+  or `onRecoverableError` logging) to find the mismatching node.
+- `.../[tenantSlug]/playoffs` is the rebuilt page; the old components (`components/public/*`,
+  `PublicTenantHeader/Footer`, `game-public-card`…) and the old `public-*` backend controllers are
+  now unused by the league site — their deletion is 5B.7.
+
 
 Marqueurs (check against LIBAGO), Phase finale (LIBAGO, EUBABUNIA), Actualités.
 
