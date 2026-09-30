@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { cn } from '@/utils/cn';
 import type { PublicScorers } from '@/lib/public-site/api';
 
@@ -42,7 +43,13 @@ export function ScorersTable({ board }: { board: PublicScorers }) {
                   <span className="flex items-center gap-2">
                     <span className="w-6 shrink-0 text-center text-ink-muted">{r.rank}</span>
                     <span className="min-w-0 max-w-[9.5rem] sm:max-w-[18rem]">
-                      <span className="block truncate font-medium text-ink">{r.name ?? `n° ${r.jerseyNumber ?? '–'}`}</span>
+                      {r.slug ? (
+                        <Link href={`/players/${r.slug}`} className="block truncate font-medium text-ink hover:underline">
+                          {r.name}
+                        </Link>
+                      ) : (
+                        <span className="block truncate font-medium text-ink">{r.name ?? `n° ${r.jerseyNumber ?? '–'}`}</span>
+                      )}
                       <span className="block truncate text-xs text-ink-muted">{r.club?.name ?? ''}</span>
                     </span>
                   </span>

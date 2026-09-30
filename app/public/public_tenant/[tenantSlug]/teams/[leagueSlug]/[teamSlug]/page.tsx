@@ -13,6 +13,7 @@ import { ClubMark } from '@/components/league-site/club-mark';
 import { HomeSection } from '@/components/league-site/home-section';
 import { MatchRow } from '@/components/league-site/match-row';
 import { ClubGameRow } from '@/components/league-site/club-game-row';
+import { RosterTable } from '@/components/league-site/roster-table';
 import { isPlayed } from '@/components/league-site/status-badge';
 
 /**
@@ -163,28 +164,7 @@ export default async function ClubPage(props: Props) {
 
       {club.rosterShown && club.roster.length > 0 && (
         <HomeSection title="Effectif">
-          <div className="overflow-hidden rounded-xl border border-line bg-surface">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="text-[0.7rem] font-semibold uppercase tracking-wide text-ink-subtle">
-                  <th scope="col" className="w-14 py-2.5 pl-4 text-left font-semibold">N°</th>
-                  <th scope="col" className="py-2.5 text-left font-semibold">Joueur</th>
-                  <th scope="col" className="py-2.5 pr-4 text-right font-semibold">Poste</th>
-                </tr>
-              </thead>
-              <tbody>
-                {club.roster.map((p, i) => (
-                  <tr key={`${p.jerseyNumber ?? 'x'}-${i}`}>
-                    <td className="border-t border-line py-2.5 pl-4 tabular-nums text-ink-subtle">{p.jerseyNumber ?? '–'}</td>
-                    <td className="border-t border-line py-2.5 font-medium text-ink">
-                      {p.name ?? (p.jerseyNumber !== null ? `n° ${p.jerseyNumber}` : 'Joueur')}
-                    </td>
-                    <td className="border-t border-line py-2.5 pr-4 text-right text-ink-muted">{p.position ?? ''}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <RosterTable club={club} />
         </HomeSection>
       )}
 

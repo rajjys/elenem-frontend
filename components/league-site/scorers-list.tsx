@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { PublicScorers } from '@/lib/public-site/api';
 import { ClubMark } from './club-mark';
 
@@ -12,7 +13,13 @@ export function ScorersList({ board, limit = 5 }: { board: PublicScorers; limit?
           <span className="w-5 text-center text-sm tabular-nums text-ink-muted">{r.rank}</span>
           {r.club && <ClubMark club={r.club} size="sm" />}
           <span className="min-w-0 flex-1">
-            <span className="block truncate font-medium text-ink">{r.name ?? `n° ${r.jerseyNumber ?? '–'}`}</span>
+            {r.slug ? (
+              <Link href={`/players/${r.slug}`} className="block truncate font-medium text-ink hover:underline">
+                {r.name}
+              </Link>
+            ) : (
+              <span className="block truncate font-medium text-ink">{r.name ?? `n° ${r.jerseyNumber ?? '–'}`}</span>
+            )}
             <span className="block truncate text-xs text-ink-muted">
               {r.club?.name ?? ''} · {r.gamesPlayed} match{r.gamesPlayed > 1 ? 's' : ''}
             </span>

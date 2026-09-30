@@ -11,6 +11,7 @@ import { buildTenantUrl } from '@/utils/tenant-url';
 import { JsonLd } from '@/components/league-site/json-ld';
 import { ScoreHeader } from '@/components/league-site/score-header';
 import { BoxScoreTable } from '@/components/league-site/box-score-table';
+import { TeamComparison } from '@/components/league-site/team-comparison';
 import { isPlayed } from '@/components/league-site/status-badge';
 
 /**
@@ -106,7 +107,8 @@ export default async function GamePage(props: Props) {
 
       {game.boxScore ? (
         <div className="space-y-6">
-          <h2 className="text-lg font-bold text-ink">Feuille de marque</h2>
+          <TeamComparison box={game.boxScore} />
+          <h2 className="pt-2 text-lg font-bold text-ink">Feuille de marque</h2>
           <BoxScoreTable side={game.boxScore.home} columns={game.boxScore.columns} totalAbbr={game.boxScore.totalAbbr} />
           <BoxScoreTable side={game.boxScore.away} columns={game.boxScore.columns} totalAbbr={game.boxScore.totalAbbr} />
         </div>

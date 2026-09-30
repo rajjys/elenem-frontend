@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { Star } from 'lucide-react';
 import type { PublicGame } from '@/lib/public-site/api';
 
@@ -47,9 +48,15 @@ export function BoxScoreTable({ side, columns, totalAbbr }: { side: Side; column
                   <td className={`${pinned} border-t border-line py-2.5 pl-3 pr-3`}>
                     <span className="flex max-w-[9.5rem] items-center gap-2 sm:max-w-none">
                       <span className="w-6 shrink-0 text-right text-ink-subtle">{line.jerseyNumber ?? '–'}</span>
-                      <span className="truncate text-ink">
-                        {line.name ?? (line.jerseyNumber !== null ? `n° ${line.jerseyNumber}` : 'Joueur')}
-                      </span>
+                      {line.slug ? (
+                        <Link href={`/players/${line.slug}`} className="truncate text-ink hover:underline">
+                          {line.name}
+                        </Link>
+                      ) : (
+                        <span className="truncate text-ink">
+                          {line.name ?? (line.jerseyNumber !== null ? `n° ${line.jerseyNumber}` : 'Joueur')}
+                        </span>
+                      )}
                       {line.topScorer && (
                         <Star className="h-3.5 w-3.5 shrink-0 fill-caution text-caution" aria-label="Meilleur marqueur" />
                       )}

@@ -53,3 +53,4 @@ export type PublicClub = ApiSchema<'PublicClubDto'>;
 export type PublicClubListItem = ApiSchema<'PublicClubListItemDto'>;
 export type PublicPost = ApiSchema<'PublicPostDto'>;
 export type PublicKnockout = ApiSchema<'PublicKnockoutDto'>;
+export type PublicPlayer = ApiSchema<'PublicPlayerDto'>;

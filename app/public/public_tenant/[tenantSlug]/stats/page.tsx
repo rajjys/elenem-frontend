@@ -8,6 +8,7 @@ import { shortCompetitionNames } from '@/lib/public-site/nav';
 import { PageTitle } from '@/components/league-site/page-title';
 import { Chips } from '@/components/league-site/chips';
 import { ScorersTable } from '@/components/league-site/scorers-table';
+import { Pager } from '@/components/league-site/pager';
 
 /**
  * Marqueurs (PHASE5B_LEAGUE_SITES §6): the scorers of a competition that has scoresheets and
@@ -30,7 +31,9 @@ async function load({ params, searchParams }: Props) {
   const chosen = eligible.find((c) => c.slug === param(sp.c)) ?? eligible[0];
   if (!chosen) return null;
   const stage = param(sp.stage);
-  const board = await siteGet<PublicScorers>(tenantSlug, '/scorers', { c: chosen.slug, stage });
+  const asked = param(sp.page);
+  const page = asked && /^[1-9]\d{0,3}$/.test(asked) ? asked : undefined;
+  const board = await siteGet<PublicScorers>(tenantSlug, '/scorers', { c: chosen.slug, stage, page });
   return board ? { site, eligible, chosen, stage, board } : null;
 }
 
@@ -78,7 +81,14 @@ export default async function ScorersPage(props: Props) {
       <div>
         <h2 className="mb-2 text-sm font-semibold text-ink">{board.competition.name}</h2>
         {board.rows.length > 0 ? (
-          <ScorersTable board={board} />
+          <div className="space-y-4">
+            <ScorersTable board={board} />
+            <Pager
+              page={board.page}
+              pages={board.pages}
+              hrefOf={(p) => withParams('/stats', { c: chosen.slug, stage }, { page: p > 1 ? String(p) : undefined })}
+            />
+          </div>
         ) : (
           <p className="rounded-xl border border-line bg-surface px-6 py-12 text-center text-ink-muted">
             Aucune feuille de marque n’a encore été publiée.

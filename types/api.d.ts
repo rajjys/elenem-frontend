@@ -1178,6 +1178,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/public/sites/{slug}/players/{player}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A player: identity and every game of the season. 404 unless the player may be named (§4.9). */
+        get: operations["PublicSiteController_player"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/public/sites/{slug}/knockout": {
         parameters: {
             query?: never;
@@ -4207,6 +4224,8 @@ export interface components {
             jerseyNumber: number | null;
             /** @description Null when the player is shown by number only (§4.9). */
             name: string | null;
+            /** @description Their page, /players/<slug> — only when named. */
+            slug: string | null;
             position: string | null;
             stats: {
                 [key: string]: number;
@@ -4254,6 +4273,13 @@ export interface components {
             /** @description Null until a scoresheet is entered. */
             boxScore: components["schemas"]["PublicBoxScoreDto"] | null;
         };
+        PublicClubRecordDto: {
+            rank: number;
+            points: number;
+            gamesPlayed: number;
+            wins: number;
+            losses: number;
+        };
         PublicClubListItemDto: {
             name: string;
             shortCode: string | null;
@@ -4261,12 +4287,23 @@ export interface components {
             slug: string | null;
             logoUrl: string | null;
             competition: components["schemas"]["PublicCompetitionRefDto"];
+            /** @description Null before the first result. */
+            record: components["schemas"]["PublicClubRecordDto"] | null;
         };
         PublicRosterLineDto: {
             jerseyNumber: number | null;
             /** @description Null when shown by number only. */
             name: string | null;
+            /** @description Their page — only when named. */
+            slug: string | null;
             position: string | null;
+            /** @description Games with a scoresheet line this season. */
+            gamesPlayed: number;
+            total: number;
+            average: number;
+            stats: {
+                [key: string]: number;
+            };
         };
         PublicClubDto: {
             club: components["schemas"]["PublicClubRefDto"];
@@ -4280,6 +4317,9 @@ export interface components {
             /** @description False when the competition does not publish its players (§4.9). */
             rosterShown: boolean;
             roster: components["schemas"]["PublicRosterLineDto"][];
+            /** @description The sport’s scoresheet columns, for the roster’s figures. */
+            columns: components["schemas"]["PublicStatColumnDto"][];
+            totalAbbr: string;
         };
         PublicPhaseOptionDto: {
             id: string;
@@ -4289,6 +4329,8 @@ export interface components {
             rank: number;
             /** @description Null when shown by number only. */
             name: string | null;
+            /** @description Their page — only when named. */
+            slug: string | null;
             jerseyNumber: number | null;
             club: components["schemas"]["PublicClubRefDto"] | null;
             gamesPlayed: number;
@@ -4308,8 +4350,44 @@ export interface components {
             totalLabel: string;
             gamesCompleted: number;
             gamesWithSheet: number;
-            /** @description At most 100. */
+            /** @description One page: at most `pageSize` rows. */
             rows: components["schemas"]["PublicScorerRowDto"][];
+            /** @description Players on the table, all pages. */
+            total: number;
+            page: number;
+            pageSize: number;
+            pages: number;
+        };
+        PublicPlayerTotalsDto: {
+            gamesPlayed: number;
+            total: number;
+            average: number;
+            stats: {
+                [key: string]: number;
+            };
+        };
+        PublicPlayerGameDto: {
+            game: components["schemas"]["PublicGameRowDto"];
+            /** @description Whether the player’s club was at home. */
+            atHome: boolean;
+            stats: {
+                [key: string]: number;
+            };
+            total: number;
+        };
+        PublicPlayerDto: {
+            name: string;
+            slug: string;
+            jerseyNumber: number | null;
+            position: string | null;
+            club: components["schemas"]["PublicClubRefDto"] | null;
+            competition: components["schemas"]["PublicCompetitionRefDto"];
+            season: components["schemas"]["PublicSeasonOptionDto"] | null;
+            columns: components["schemas"]["PublicStatColumnDto"][];
+            totalAbbr: string;
+            totals: components["schemas"]["PublicPlayerTotalsDto"];
+            /** @description Newest first: every game with a scoresheet line. */
+            games: components["schemas"]["PublicPlayerGameDto"][];
         };
         PublicPlannedFixtureDto: {
             /** @description « Vainqueur demi 1 », as the organiser wrote it. */
@@ -8350,6 +8428,8 @@ export interface operations {
                 season?: string;
                 /** @description Phase id. Empty means the whole season. */
                 stage?: string;
+                /** @description Page of 25, from 1. */
+                page?: string;
             };
             header?: never;
             path: {
@@ -8365,6 +8445,28 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PublicScorersDto"];
+                };
+            };
+        };
+    };
+    PublicSiteController_player: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+                player: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublicPlayerDto"];
                 };
             };
         };

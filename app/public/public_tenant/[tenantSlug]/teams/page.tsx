@@ -60,6 +60,18 @@ export default async function TeamsPage({ params, searchParams }: Props) {
                     <ClubMark club={club} size="md" />
                     <span className="text-sm font-semibold leading-snug text-ink">{club.name}</span>
                     {club.shortCode && <span className="text-xs text-ink-subtle">{club.shortCode}</span>}
+                    {/* Where it stands, from the current table: rank, points, won and lost. */}
+                    {club.record && (
+                      <span className="mt-1 flex flex-wrap items-center justify-center gap-1.5 text-xs tabular-nums">
+                        <span className="rounded-full bg-surface-sunk px-2 py-0.5 font-semibold text-ink">
+                          {club.record.rank === 1 ? '1er' : `${club.record.rank}e`}
+                        </span>
+                        <span className="text-ink-muted">{club.record.points} pts</span>
+                        <span className="text-ink-subtle">
+                          <span className="text-positive">{club.record.wins}V</span> <span className="text-negative">{club.record.losses}D</span>
+                        </span>
+                      </span>
+                    )}
                   </Link>
                 </li>
               ))}
