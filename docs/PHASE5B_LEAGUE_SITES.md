@@ -610,7 +610,28 @@ The original list:
 - a 23:30 game in Goma lands on the right day;
 - `bc-hirondelles` resolves per organisation.
 
-### 5B.2: The frame (≈ 1 day)
+### 5B.2: The frame (≈ 1 day) — **done 2026-09-30**
+
+Shipped as frontend `8a3b971` (+ `d9322e1`), verified on production: demo.dxscores.app's frame, every
+link 200, unknown league and unknown page 404, the two 308s, robots and a 214-address sitemap, and
+lfk.dxscores.app as the empty state. What differs, and what later sprints inherit:
+
+- **`lib/public-site/`** holds the server fetchers (`siteGet`, typed from the generated contract —
+  no hand-written schemas), `getSite` (React `cache`), `format.ts`, `palette.ts` and `nav.ts`.
+  Components are in `components/league-site/`. The `complete-card` of §8 was built in 5B.1 as
+  `components/dashboard/timezone-card.tsx`.
+- **The segment's `loading.tsx` is gone, on purpose:** its boundary sent pages as 200 before they
+  could call `notFound()`. New pages must not add one back.
+- **An unknown page inside a league** goes through a catch-all `[...rest]` route to the in-frame
+  404; `app/public/public_tenant/not-found.tsx` is the « Aucune ligue à cette adresse » page.
+- **The active tab reads the route segment** (`useSelectedLayoutSegment`), not the URL, which the
+  rewrite makes differ.
+- **The palette** is eight colours checked at AA; unset, the site uses the product's accent. The
+  picker belongs to 5B.7, with the settings rebuild.
+- **No OG image yet** on league pages: the layout sets its own `openGraph`, which drops the root
+  image (see 5A.3's note). The league and match cards are 5B.6.
+- The pages inside the frame are still the old client pages until 5B.3 and 5B.4.
+
 
 - The server layout, `notFound()`, the branded 404 and the empty-site state.
 - Header, bottom nav, footer and share button.
