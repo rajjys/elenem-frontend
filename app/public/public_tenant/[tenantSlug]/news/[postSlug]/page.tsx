@@ -1,184 +1,63 @@
-"use client";
+import type { Metadata } from 'next';
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
+import { ChevronLeft } from 'lucide-react';
+import { siteGet, type PublicPost } from '@/lib/public-site/api';
+import { getSite } from '@/lib/public-site/site';
+import { formatDay } from '@/lib/public-site/format';
+import { PostBody } from '@/components/league-site/post-body';
 
-import React, { useState, useEffect, use } from "react";
-import { useRouter } from "next/navigation";
-import { api, isAxiosError } from '@/services/api';
-import { PostResponseDto } from "@/schemas";
-import { LexicalRenderer, LoadingSpinner } from "@/components/ui";
-import { toast } from "sonner";
-import Image from "next/image";
-import { Calendar, User, Building2 } from "lucide-react";
+/**
+ * One article or communiqué (PHASE5B_LEAGUE_SITES §6): its label and date, its title, its lead,
+ * and its body rendered on the server. No hero image until media storage exists (§6).
+ */
 
-/* ----------------------------------------------------------
- * Helper Components & Utils
- * ---------------------------------------------------------- */
+type Props = { params: Promise<{ tenantSlug: string; postSlug: string }> };
 
-const TenantBadge = ({ post }: { post: PostResponseDto }) => (
-  <div className="flex items-center space-x-3 bg-surface-sunk p-3 rounded-xl shadow-inner">
-    {post.tenant?.businessProfile?.logoAsset?.url ? (
-      <Image
-        src={post.tenant.businessProfile.logoAsset.url}
-        alt={`${post.tenant.name} Logo`}
-        width={40}
-        height={40}
-        className="rounded-full object-cover"
-      />
-    ) : (
-      <Building2 className="w-8 h-8 text-accent-text " />
-    )}
-    <div>
-      <p className="font-semibold text-xs text-ink-muted ">
-        Published by
-      </p>
-      <p className="text-md font-bold text-accent-text ">
-        {post.tenant?.name || "Unknown Organization"}
-      </p>
-    </div>
-  </div>
-);
-
-const formatDate = (dateString?: string) => {
-  if (!dateString) return "N/A";
-  return new Date(dateString).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
+const load = async ({ params }: Props) => {
+  const { tenantSlug, postSlug } = await params;
+  const [site, post] = await Promise.all([
+    getSite(tenantSlug),
+    siteGet<PublicPost>(tenantSlug, `/posts/${encodeURIComponent(postSlug)}`),
+  ]);
+  return site && post ? { site, post } : null;
 };
 
-/* ----------------------------------------------------------
- * API
- * ---------------------------------------------------------- */
+export async function generateMetadata(props: Props): Promise<Metadata> {
+  const loaded = await load(props);
+  if (!loaded) return {};
+  const { post } = loaded;
+  return {
+    title: post.title,
+    description: (post.excerpt ?? '').slice(0, 155) || undefined,
+    openGraph: { type: 'article', title: post.title, description: post.excerpt ?? undefined, publishedTime: post.publishedAt },
+  };
+}
 
-const fetchPublicPost = async (
-  tenantSlug: string,
-  postSlug: string
-): Promise<PostResponseDto> => {
-  const response = await api.get<PostResponseDto>(
-    `/public-posts/${tenantSlug}/${postSlug}`
-  );
-  return response.data;
-};
-
-/* ----------------------------------------------------------
- * Page Component
- * ---------------------------------------------------------- */
-
-export default function PublicPostPage({
-  params,
-}: {
-  params: Promise<{ tenantSlug: string; postSlug: string }>
-}) {
-  const router = useRouter();
-  const { tenantSlug, postSlug } = use(params);
-
-  const [postData, setPostData] = useState<PostResponseDto | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const loadPost = async () => {
-      try {
-        const data = await fetchPublicPost(tenantSlug, postSlug);
-        setPostData(data);
-      } catch (error) {
-        let message = "Unexpected error occurred.";
-        if (isAxiosError(error)) {
-          message =
-            error.response?.status === 404
-              ? "Post not found or not published."
-              : "Failed to load post.";
-        }
-        toast.error(message);
-        setPostData(null);
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadPost();
-  }, [tenantSlug, postSlug]);
-
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center h-screen bg-surface-sunk ">
-        <LoadingSpinner message="Loading blog post..." />
-      </div>
-    );
-  }
-
-  if (!postData) {
-    return (
-      <div className="max-w-3xl mx-auto my-24 p-10 text-center bg-surface rounded-xl shadow-2xl">
-        <h1 className="text-3xl font-extrabold text-negative mb-4">
-          404 - Post Not Found
-        </h1>
-        <p className="text-lg text-ink mb-6">
-          We could not find the blog post you were looking for. It may have been
-          removed or the address is incorrect.
-        </p>
-        <button
-          onClick={() => router.push("/")}
-          className="px-6 py-3 bg-accent hover:bg-accent-hover text-white font-semibold rounded-lg shadow-md transition duration-200"
-        >
-          Go to Homepage
-        </button>
-      </div>
-    );
-  }
+export default async function PostPage(props: Props) {
+  const loaded = await load(props);
+  if (!loaded) notFound();
+  const { site, post } = loaded;
 
   return (
-    <article className="min-h-screen bg-surface text-ink transition-colors duration-300">
-      {/* Hero Image */}
-      {postData.heroImage?.url && (
-        <div className="relative w-full h-80 sm:h-96 overflow-hidden">
-          <Image
-            src={postData.heroImage.url}
-            alt={postData.title}
-            fill
-            style={{ objectFit: "cover" }}
-            priority
-            className="shadow-lg"
-          />
-        </div>
-      )}
-
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 -mt-20 relative z-10">
-        {/* Header */}
-        <div className="bg-surface p-6 sm:p-8 rounded-2xl shadow-xl border border-line ">
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-ink mb-4">
-            {postData.title}
-          </h1>
-
-          <div className="flex flex-wrap items-center gap-4 text-sm text-ink-muted mb-6 border-b pb-4 border-line ">
-            <TenantBadge post={postData} />
-
-            <div className="flex items-center space-x-1">
-              <Calendar className="w-4 h-4 text-accent-text" />
-              <span>{formatDate(postData.publishedAt || postData.createdAt)}</span>
-            </div>
-
-            <div className="flex items-center space-x-1">
-              <User className="w-4 h-4 text-accent-text" />
-              <span>{postData.createdBy?.username || "System Author"}</span>
-            </div>
-          </div>
-
-          {postData.excerpt && (
-            <p className="text-lg text-ink-muted italic">
-              {postData.excerpt}
-            </p>
-          )}
-        </div>
-
-        {/* Lexical Renderer */}
-        <div className="mt-8 prose max-w-none">
-          <LexicalRenderer richContent={postData.richContent} />
-        </div>
-
-        {/* Footer */}
-        <div className="mt-12 pt-8 border-t border-line text-center text-ink-muted ">
-          <p>This post is brought to you by {postData.tenant?.name}.</p>
-        </div>
+    <article className="mx-auto max-w-2xl px-4 py-6 sm:px-6 sm:py-10">
+      <Link href="/news" className="inline-flex items-center gap-1 text-sm font-medium text-ink-muted hover:text-ink">
+        <ChevronLeft className="h-4 w-4" aria-hidden />
+        Actualités
+      </Link>
+      <header className="mt-6">
+        <p className="text-xs font-semibold uppercase tracking-wide text-ink-subtle">
+          {post.communique && <span className="text-[var(--site-accent)]">Communiqué · </span>}
+          <time dateTime={post.publishedAt}>{formatDay(post.publishedAt, site.timezone)}</time>
+        </p>
+        <h1 className="mt-3 text-balance text-2xl font-bold leading-tight tracking-tight text-ink sm:text-3xl">{post.title}</h1>
+        {post.excerpt && <p className="mt-4 text-lg leading-relaxed text-ink-muted">{post.excerpt}</p>}
+        <span aria-hidden className="mt-6 block h-1 w-10 rounded-full bg-[var(--site-accent)]" />
+      </header>
+      <div className="mt-8">
+        <PostBody rich={post.richContent} markdown={post.content} />
       </div>
+      <p className="mt-10 border-t border-line pt-4 text-sm text-ink-muted">Publié par {site.name}</p>
     </article>
   );
 }

@@ -4353,8 +4353,12 @@ export interface components {
             /** @description An official communiqué rather than an article. */
             communique: boolean;
             publishedAt: string;
-            /** @description Markdown. */
+            /** @description Markdown — posts written before the rich editor, or through the API. */
             content: string | null;
+            /** @description The rich editor’s document (Lexical JSON). What the organisers’ post form saves; `content` is then empty. */
+            richContent: {
+                [key: string]: unknown;
+            } | null;
         };
         PublicSitemapEntryDto: {
             /** @description The path on the league site, e.g. /teams/messieurs/aigles-bc. */

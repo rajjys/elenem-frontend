@@ -51,3 +51,5 @@ export type PublicScorers = ApiSchema<'PublicScorersDto'>;
 export type PublicPostSummary = ApiSchema<'PublicPostSummaryDto'>;
 export type PublicClub = ApiSchema<'PublicClubDto'>;
 export type PublicClubListItem = ApiSchema<'PublicClubListItemDto'>;
+export type PublicPost = ApiSchema<'PublicPostDto'>;
+export type PublicKnockout = ApiSchema<'PublicKnockoutDto'>;
