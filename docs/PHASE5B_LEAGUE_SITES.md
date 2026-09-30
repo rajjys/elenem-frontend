@@ -645,7 +645,26 @@ lfk.dxscores.app as the empty state. What differs, and what later sprints inheri
 - `view-source` of the home page contains the league's name;
 - no link in the frame 404s.
 
-### 5B.3: Classement and Matchs (≈ 1.5 days)
+### 5B.3: Classement and Matchs (≈ 1.5 days) — **done 2026-09-30**
+
+Shipped as frontend `940d2ce` (+ `6ab68f0`, and the badge fix), verified on production against the
+demo league: 12-club table, a week with a postponed game (« Reporté », with its reason on the match
+page), a match with its scoresheet. Designed at 390 px first. What later sprints inherit:
+
+- **The table pins rank + club on the left and PTS on the right**; the columns between scroll on a
+  phone. The same pattern pins player + total on the scoresheet. Reuse it for the scorers table.
+- **Links, not state:** competition, phase, pool and week are query parameters (`withParams` in
+  `lib/public-site/query.ts`), so every view has an address to share and no client JavaScript.
+- **Short competition labels** (`shortCompetitionNames`): the words every competition starts with
+  are dropped in chips and rows (« Dames », « Messieurs »). When nothing is shared (LIBAGO), the
+  full names stay and the active chip can sit off-screen on a phone; the heading above names it.
+- **JavaScript budget, measured on production (gzip):** 190 KB per league page, 196 KB for the
+  landing. The app's providers (React Query, theme, toasts) moved out of the root layout into
+  `components/providers/app-providers.tsx`, mounted by `(app)`, `(auth)` and `admin`; they were
+  ~25 KB on every public page. Next and React are ~140 KB of what remains.
+- The match page's slug keeps the date the game was first created for; a moved game's page shows
+  its real date. Canonical URLs and JSON-LD are 5B.6.
+
 
 The two pages fans open most, plus the match page with its box score.
 
