@@ -1,276 +1,168 @@
-// app/(public)/teams/[leagueSlug]/[teamSlug]/page.tsx
-"use client";
+import type { Metadata } from 'next';
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
+import { ChevronLeft } from 'lucide-react';
+import { siteGet, type PublicClub } from '@/lib/public-site/api';
+import { getSite } from '@/lib/public-site/site';
+import { dayLabel, formatDate, todayIn } from '@/lib/public-site/format';
+import { withParams } from '@/lib/public-site/query';
+import { ClubMark } from '@/components/league-site/club-mark';
+import { HomeSection } from '@/components/league-site/home-section';
+import { MatchRow } from '@/components/league-site/match-row';
+import { ClubGameRow } from '@/components/league-site/club-game-row';
+import { isPlayed } from '@/components/league-site/status-badge';
 
-import React, { useState, useEffect, useCallback, use } from "react";
-import { api } from "@/services/api";
-import { toast } from "sonner";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
-import Link from "next/link";
-import GamePublicCard from "@/components/game/game-public-card";
-import DateCarousel from "@/components/game/date-carousel";
-import { GameDetails, TeamDetails } from "@/schemas";
-import Image from "next/image";
-import { ArrowRight } from "lucide-react";
+/**
+ * A club (PHASE5B_LEAGUE_SITES §6): where it stands, its next game, its season game by game, and
+ * its roster — the roster only when the competition publishes its players' names (§4.9), and a
+ * player the league has not made public by number only.
+ */
 
-interface TenantWithGames {
-  tenantId: string;
-  logoUrl?: string | null;
-  tenantName: string;
-  tenantSlug: string;
-  games: GameDetails[];
-}
-interface Standing {
-  team: {
-    id: string;
-    name: string;
-    shortCode: string;
-    slug: string;
-    businessProfile: {
-      logoAsset?: { url: string | null } | null;
-    },
+type Props = { params: Promise<{ tenantSlug: string; leagueSlug: string; teamSlug: string }> };
+
+const load = async ({ params }: Props) => {
+  const { tenantSlug, leagueSlug, teamSlug } = await params;
+  const [site, club] = await Promise.all([
+    getSite(tenantSlug),
+    siteGet<PublicClub>(tenantSlug, `/teams/${encodeURIComponent(leagueSlug)}/${encodeURIComponent(teamSlug)}`),
+  ]);
+  return site && club ? { site, club } : null;
+};
+
+const ordinal = (n: number) => (n === 1 ? '1er' : `${n}e`);
+
+export async function generateMetadata(props: Props): Promise<Metadata> {
+  const loaded = await load(props);
+  if (!loaded) return {};
+  const { club } = loaded;
+  const s = club.standing;
+  const next = club.nextGame;
+  const opponent = next ? (next.home.name === club.club.name ? next.away.name : next.home.name) : null;
+  return {
+    title: `${club.club.name} — calendrier, résultats, effectif`,
+    description: [
+      s ? `${ordinal(s.rank)} du ${club.competition.name} avec ${s.points} points.` : club.competition.name,
+      next && opponent ? `Prochain match : ${formatDate(next.localDate)} contre ${opponent}.` : null,
+    ]
+      .filter(Boolean)
+      .join(' ')
+      .slice(0, 155),
   };
-  rank: number;
-  points: number;
-  form?: string | null;
-  gamesPlayed: number;
-  wins: number;
-  losses: number;
 }
-export default function TeamLandingPage({ params }: { params: Promise<{ leagueSlug: string; teamSlug: string }> }) {
-  const { leagueSlug, teamSlug } = use(params);
 
-  const [team, setTeam] = useState<TeamDetails | null>(null);
-  const [availableDates, setAvailableDates] = useState<string[]>([]);
-  const [selectedDate, setSelectedDate] = useState<string>("");
-  const [games, setGames] = useState<GameDetails[]>([]);
-  const [standings, setStandings] = useState<Standing | null>(null);
-  const [loadingTeam, setLoadingTeam] = useState(true);
-  const [loadingGames, setLoadingGames] = useState(false);
-  const [loadingStandings, setLoadingStandings] = useState(false);
+export default async function ClubPage(props: Props) {
+  const loaded = await load(props);
+  if (!loaded) notFound();
+  const { site, club } = loaded;
+  const today = todayIn(site.timezone);
+  const s = club.standing;
 
-  // --- Fetch team profile ---
-  const fetchTeam = useCallback(async () => {
-    setLoadingTeam(true);
-    try {
-      const res = await api.get<TeamDetails>(`/public-teams/${teamSlug}`);
-      setTeam(res.data);
-    } catch (err) {
-      console.error(err);
-      toast.error("Impossible de charger le profil de l'équipe.");
-    } finally {
-      setLoadingTeam(false);
-    }
-  }, [teamSlug]);
-
-  // --- Fetch available dates ---
-  const fetchDates = useCallback(async () => {
-    if (!team) return;
-    try {
-      const res = await api.get<string[]>(`/public-games/dates`, {
-        params: { tenantSlug: team.tenant.slug, leagueSlug, teamSlug },
-      });
-      const dates = res.data;
-      setAvailableDates(dates);
-      if (dates.length > 0) {
-        const today = new Date().toISOString().split("T")[0];
-        setSelectedDate(dates.includes(today) ? today : dates[0]);
-      }
-    } catch (err) {
-      console.error(err);
-      toast.error("Impossible de charger les dates des matchs.");
-    }
-  }, [team, leagueSlug, teamSlug]);
-
-  // --- Fetch games ---
-  const fetchGames = useCallback(
-    async (date: string) => {
-      if (!team || !date) return;
-      setLoadingGames(true);
-      try {
-        const response = await api.get<TenantWithGames[]>(`/public-games`, {
-          params: { tenantSlug: team.tenant.slug, leagueSlug, teamSlug, date },
-        });
-        const tenantsWithGames = response.data;
-        const onlyTenant = tenantsWithGames[0];
-        setGames(onlyTenant.games);
-      } catch (err) {
-        console.error(err);
-        toast.error("Impossible de charger les matchs.");
-      } finally {
-        setLoadingGames(false);
-      }
-    },
-    [team, leagueSlug, teamSlug]
-  );
-  
-const fetchStandings = useCallback(async () => {
-    setLoadingStandings(true);
-    try {
-        const standingsResponse = await api.get<Standing[]>(`/public-games/standings/${leagueSlug}`,
-          { params: { teamSlug }}
-        );
-        setStandings(standingsResponse.data[0]);
-    } catch (err) {
-        console.error("Failed to fetch standings:", err);
-        setStandings(null); // Clear standings on error
-    } finally {
-        setLoadingStandings(false);
-    }
-}, [leagueSlug, teamSlug]); 
-
-  useEffect(() => {
-    fetchTeam();
-  }, [fetchTeam]);
-
-  useEffect(() => {
-    if (team) {
-      fetchDates();
-    }
-  }, [team, fetchDates]);
-
-  useEffect(() => {
-    if (selectedDate) {
-      fetchGames(selectedDate);
-    }
-  }, [selectedDate, fetchGames]);
-
-  useEffect(() => {
-    if(team){
-      fetchStandings();
-    }
-  },[fetchStandings, team]);
-  if (loadingTeam) {
-    return (
-      <div className="container mx-auto p-6">
-        <Skeleton className="h-48 w-full rounded-lg mb-6" />
-        <Skeleton className="h-10 w-1/3 mb-4" />
-        <Skeleton className="h-6 w-1/4" />
-      </div>
-    );
-  }
-
-  if (!team) {
-    return (
-      <div className="text-center py-20">
-        <h2 className="text-xl font-semibold">Équipe introuvable</h2>
-        <p className="text-ink-muted mt-2">Vérifiez le lien ou réessayez plus tard.</p>
-      </div>
-    );
-  }
+  const played = club.games.filter((g) => isPlayed(g.status)).reverse();
+  const upcoming = club.games.filter((g) => !isPlayed(g.status) && g !== club.nextGame && g.slug !== club.nextGame?.slug);
 
   return (
-    <div className="min-h-screen max-w-4xl mx-auto">
-      <div className="container mx-auto space-y-10">
-        {/* Header */}
-        <div className="relative">
-          {team.businessProfile?.bannerAsset?.url ? (
-            <Image
-              src={team.businessProfile.bannerAsset.url}
-              alt="Team banner"
-              width={736}
-              height={480}
-              className="w-full h-60 object-cover rounded-lg"
-            />
-          ) : (
-            <div className="w-full h-48 bg-line rounded-lg" />
-          )}
-          <div className="absolute bottom-0 left-4 flex items-center gap-4">
-            {team.businessProfile?.logoAsset?.url ? (
-              <Image
-                src={team.businessProfile.logoAsset.url}
-                alt={team.name}
-                width={50}
-                height={50}
-                className="w-20 h-20 rounded-full border-4 border-white shadow-md"
-              />
-            ) :
-            (
-              <div className="h-20 w-20 rounded-full bg-line border-4 border-white" />
-            )
-            }
-            <div className="text-white drop-shadow-md">
-              <h1 className="text-2xl font-bold">{team.name}</h1>
-              <p className="text-sm">{team.shortCode}</p>
-            </div>
+    <div className="mx-auto max-w-3xl space-y-8 px-4 py-6 sm:px-6 sm:py-10">
+      <Link
+        href={withParams('/teams', {}, { c: club.competition.slug })}
+        className="inline-flex items-center gap-1 text-sm font-medium text-ink-muted hover:text-ink"
+      >
+        <ChevronLeft className="h-4 w-4" aria-hidden />
+        Équipes
+      </Link>
+
+      <section className="overflow-hidden rounded-2xl border border-line bg-surface shadow-e1">
+        <div className="flex items-center gap-4 px-5 py-6 sm:px-8">
+          <ClubMark club={club.club} size="lg" />
+          <div className="min-w-0">
+            <h1 className="text-balance text-2xl font-bold tracking-tight text-ink sm:text-3xl">{club.club.name}</h1>
+            <p className="mt-1 text-sm text-ink-muted">
+              {club.competition.name}
+              {club.season && ` · ${club.season.name}`}
+            </p>
           </div>
         </div>
+        {s && (
+          <dl className="grid grid-cols-5 divide-x divide-line border-t border-line bg-surface-sunk text-center">
+            {[
+              ['Rang', ordinal(s.rank)],
+              ['Points', s.points],
+              ['Joués', s.gamesPlayed],
+              ['Gagnés', s.wins],
+              ['Perdus', s.losses],
+            ].map(([label, value]) => (
+              <div key={label} className="px-1 py-3">
+                <dt className="text-[0.65rem] font-semibold uppercase tracking-wide text-ink-subtle">{label}</dt>
+                <dd className="mt-0.5 text-lg font-bold tabular-nums text-ink">{value}</dd>
+              </div>
+            ))}
+          </dl>
+        )}
+      </section>
 
-        {/* Team Stats */}
-        <Card className="py-2">
-          <CardHeader>
-            <CardTitle className="px-2 flex justify-between pb-1">
-              <span className="text-ink">Statistiques de l&apos;équipe</span>
-              <Link href='/standings' className="flex justify-center items-center text-ink-muted hover:text-ink transition-colors duration-300 ease-in-out">
-                Classememnts <ArrowRight className="h-4 w-4"/>
-              </Link>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="">
-            {
-              loadingStandings ? 
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 text-center">
-                <Skeleton className="h-6 w-12 p-4" />
-                <Skeleton className="h-6 w-12" />
-                <Skeleton className="h-6 w-12" />
-                <Skeleton className="h-6 w-12" />
-              </div>
-              :
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 text-center">
-                <div className="">
-                  <p className="text-2xl font-bold">{standings?.rank}</p>
-                  <p className="text-sm text-ink-muted">Rang</p>
-                </div>
-                <div>
-                  <p className="text-2xl font-bold">{standings?.points}</p>
-                  <p className="text-sm text-ink-muted">Points</p>
-                </div>
-                <div>
-                  <p className="text-2xl font-bold">{standings?.wins}</p>
-                  <p className="text-sm text-ink-muted">Victoires</p>
-                </div>
-                <div>
-                  <p className="text-2xl font-bold">{standings?.losses}</p>
-                  <p className="text-sm text-ink-muted">Défaites</p>
-                </div>
-              </div>
-            }
-          </CardContent>
-        </Card>
+      {s && (
+        <p className="-mt-5 px-1 text-sm">
+          <Link href={withParams('/standings', {}, { c: club.competition.slug })} className="font-medium text-[var(--site-accent)] hover:underline">
+            Voir le classement complet
+          </Link>
+        </p>
+      )}
 
-        {/* Games Section */}
-        <Card className="pb-2">
-          <CardHeader>
-            <CardTitle className="text-ink">Matchs</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {availableDates.length > 0 && (
-              <DateCarousel
-                dates={availableDates}
-                selectedDate={selectedDate}
-                onDateSelect={setSelectedDate}
-              />
-            )}
-            {loadingGames ? (
-              <div className="grid gap-4 mt-4">
-                {Array.from({ length: 2 }).map((_, i) => (
-                  <Skeleton key={i} className="h-24 w-full rounded-lg" />
+      {club.nextGame && (
+        <HomeSection title="Prochain match">
+          <ul className="overflow-hidden rounded-xl border border-line bg-surface">
+            {/* The row's small label carries the day: « Demain », or the date. */}
+            <MatchRow game={club.nextGame} competitionLabel={dayLabel(club.nextGame.localDate, today)} />
+          </ul>
+        </HomeSection>
+      )}
+
+      {played.length > 0 && (
+        <HomeSection title="Résultats">
+          <ul className="divide-y divide-line overflow-hidden rounded-xl border border-line bg-surface">
+            {played.map((g) => (
+              <ClubGameRow key={g.slug} game={g} club={club.club} />
+            ))}
+          </ul>
+        </HomeSection>
+      )}
+
+      {upcoming.length > 0 && (
+        <HomeSection title="Calendrier">
+          <ul className="divide-y divide-line overflow-hidden rounded-xl border border-line bg-surface">
+            {upcoming.map((g) => (
+              <ClubGameRow key={g.slug} game={g} club={club.club} />
+            ))}
+          </ul>
+        </HomeSection>
+      )}
+
+      {club.rosterShown && club.roster.length > 0 && (
+        <HomeSection title="Effectif">
+          <div className="overflow-hidden rounded-xl border border-line bg-surface">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="text-[0.7rem] font-semibold uppercase tracking-wide text-ink-subtle">
+                  <th scope="col" className="w-14 py-2.5 pl-4 text-left font-semibold">N°</th>
+                  <th scope="col" className="py-2.5 text-left font-semibold">Joueur</th>
+                  <th scope="col" className="py-2.5 pr-4 text-right font-semibold">Poste</th>
+                </tr>
+              </thead>
+              <tbody>
+                {club.roster.map((p, i) => (
+                  <tr key={`${p.jerseyNumber ?? 'x'}-${i}`}>
+                    <td className="border-t border-line py-2.5 pl-4 tabular-nums text-ink-subtle">{p.jerseyNumber ?? '–'}</td>
+                    <td className="border-t border-line py-2.5 font-medium text-ink">
+                      {p.name ?? (p.jerseyNumber !== null ? `n° ${p.jerseyNumber}` : 'Joueur')}
+                    </td>
+                    <td className="border-t border-line py-2.5 pr-4 text-right text-ink-muted">{p.position ?? ''}</td>
+                  </tr>
                 ))}
-              </div>
-            ) : games.length > 0 ? (
-              <div className="grid gap-4 mt-4">
-                {games.map((game) => (
-                  <Link key={game.id} href={`/games/${game.league.slug}/${game.slug}`}>
-                    <GamePublicCard game={game} />
-                  </Link>
-                ))}
-              </div>
-            ) : (
-              <p className="text-center text-ink-muted mt-6">Aucun match trouvé.</p>
-            )}
-          </CardContent>
-        </Card>
-      </div>
+              </tbody>
+            </table>
+          </div>
+        </HomeSection>
+      )}
+
     </div>
   );
 }

@@ -1,164 +1,66 @@
-// app/(public)/teams/page.tsx
-"use client";
+import type { Metadata } from 'next';
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
+import { siteGet, type PublicClubListItem } from '@/lib/public-site/api';
+import { getSite } from '@/lib/public-site/site';
+import { param, withParams } from '@/lib/public-site/query';
+import { shortCompetitionNames } from '@/lib/public-site/nav';
+import { PageTitle } from '@/components/league-site/page-title';
+import { Chips } from '@/components/league-site/chips';
+import { ClubMark } from '@/components/league-site/club-mark';
 
-import React, { useState, useEffect, useCallback, use } from "react";
-import Link from "next/link";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
-import { api } from "@/services/api";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowRight } from "lucide-react";
-import Image from "next/image";
-import { LeagueDetails, PaginatedLeaguesResponseDto, TeamDetails } from "@/schemas";
+/** Équipes (PHASE5B_LEAGUE_SITES §6): the league's clubs, by competition, each opening its page. */
 
-export default function PublicTeamsPage({ params }: { params: Promise<{ tenantSlug: string }> }) {
-  const { tenantSlug } = use(params);
+type Props = {
+  params: Promise<{ tenantSlug: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+};
 
-  const [teams, setTeams] = useState<TeamDetails[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [search, setSearch] = useState("");
-  const [selectedLeague, setSelectedLeague] = useState<string | undefined>();
-  const [leagues, setLeagues] = useState<LeagueDetails[]>([]);
+export const metadata: Metadata = { title: 'Équipes' };
 
-  // fetch leagues for dropdown
-  const fetchLeagues = useCallback(async () => {
-    try {
-      const res = await api.get<PaginatedLeaguesResponseDto>("/public-leagues", { params: { tenantSlug } });
-      const sortedLeagues = res.data.data.sort((a: LeagueDetails, b: LeagueDetails) => {
-            if (a.parentLeagueId === null && b.parentLeagueId !== null) return -1;
-            if (a.parentLeagueId !== null && b.parentLeagueId === null) return 1;
-            return 0;
-        })
-      setLeagues(sortedLeagues);
-    } catch (err) {
-      console.error(err);
-      //toast.error("Impossible de charger les ligues.");
-    }
-  }, [tenantSlug]);
-  // fetch teams
-  const fetchTeams = useCallback(async () => {
-    setLoading(true);
-    try {
-      const res = await api.get("/public-teams", {
-        params: {
-          tenantSlug,
-          q: search || undefined,
-          leagueSlug: selectedLeague || undefined,
-        },
-      });
-      setTeams(res.data.data);
-    } catch (err) {
-      console.error(err);
-      //toast.error("Impossible de charger les équipes.");
-    } finally {
-      setLoading(false);
-    }
-  }, [tenantSlug, search, selectedLeague]);
+export default async function TeamsPage({ params, searchParams }: Props) {
+  const { tenantSlug } = await params;
+  const c = param((await searchParams).c);
+  const [site, clubs] = await Promise.all([getSite(tenantSlug), siteGet<PublicClubListItem[]>(tenantSlug, '/teams')]);
+  if (!site || !clubs) notFound();
 
-  useEffect(() => {
-    fetchLeagues();
-  }, [fetchLeagues]);
-
-  useEffect(() => {
-    fetchTeams();
-  }, [fetchTeams]);
+  const short = shortCompetitionNames(site.competitions.map((x) => x.name));
+  const shown = site.competitions.filter((x) => !c || x.slug === c);
+  const chips = [
+    { label: 'Toutes', href: '/teams', active: !c },
+    ...site.competitions.map((x, i) => ({ label: short[i], href: withParams('/teams', {}, { c: x.slug }), active: x.slug === c })),
+  ];
 
   return (
-    <div className="min-h-screen max-w-6xl mx-auto">
-      <div className="container mx-auto p-4 sm:p-6 space-y-8">
-        <header>
-          <h1 className="text-2xl font-bold tracking-tight text-ink">
-            Équipes
-          </h1>
-          <p className="mt-2 text-md text-ink-muted">
-            Explorez les équipes affiliées.
-          </p>
-        </header>
-        {/* Filters */}
-        <div className="flex flex-col sm:flex-row gap-4">
-          <div className="flex-grow">
-            <Input
-              placeholder="Rechercher une équipe..."
-              type="search"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full py-2 pl-10 rounded-full border border-line"
-            />
-          </div>
-          <Select
-            value={selectedLeague}
-            onValueChange={(val) => setSelectedLeague(val === "all" ? undefined : val)}
-          >
-            <SelectTrigger className="w-full sm:w-[200px]">
-              <SelectValue placeholder="Filtrer par ligue" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Toutes les ligues</SelectItem>
-              {leagues.map((league) => (
-                <SelectItem key={league.slug} value={league.slug}>
-                  {league.name}
-                </SelectItem>
+    <div className="mx-auto max-w-5xl space-y-6 px-4 py-6 sm:px-6 sm:py-10">
+      <PageTitle>Équipes</PageTitle>
+      <Chips label="Compétitions" items={site.competitions.length > 1 ? chips : []} />
+
+      {shown.map((competition) => {
+        const list = clubs.filter((x) => x.competition.slug === competition.slug);
+        if (list.length === 0) return null;
+        return (
+          <section key={competition.slug} aria-labelledby={`c-${competition.slug}`}>
+            <h2 id={`c-${competition.slug}`} className="mb-3 text-sm font-semibold text-ink">
+              {competition.name} <span className="font-normal text-ink-muted">· {list.length} clubs</span>
+            </h2>
+            <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+              {list.map((club) => (
+                <li key={club.slug}>
+                  <Link
+                    href={`/teams/${competition.slug}/${club.slug}`}
+                    className="flex h-full flex-col items-center gap-2.5 rounded-xl border border-line bg-surface px-3 py-5 text-center transition-colors hover:border-line-strong"
+                  >
+                    <ClubMark club={club} size="md" />
+                    <span className="text-sm font-semibold leading-snug text-ink">{club.name}</span>
+                    {club.shortCode && <span className="text-xs text-ink-subtle">{club.shortCode}</span>}
+                  </Link>
+                </li>
               ))}
-            </SelectContent>
-          </Select>
-        </div>
-        {/* Teams List */}
-        {loading ? (
-          <div className="grid gap-4">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <Card key={i} className="overflow-hidden">
-                <CardHeader>
-                  <Skeleton className="h-6 w-1/3" />
-                </CardHeader>
-                <CardContent className="flex items-center gap-4">
-                  <Skeleton className="h-12 w-12 rounded-full" />
-                  <Skeleton className="h-6 w-1/2" />
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        ) : teams.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {teams.map((team) => (
-              <Link href={`/teams/${team.league.slug}/${team.slug}`} key={team.slug}>
-                <Card key={team.slug} className="overflow-hidden hover:shadow-md transition bg-line hover:bg-surface-sunk">
-                  <CardContent className="flex items-center justify-between p-3">
-                    <div className="flex items-center gap-4">
-                      {team.businessProfile?.logoAsset?.url ? (
-                        <Image
-                          src={team.businessProfile.logoAsset.url}
-                          alt={team.name}
-                          height={30}
-                          width={30}
-                          className="h-8 w-8 rounded-full object-cover"
-                        />
-                      ) : (
-                        <div className="h-8 w-8 rounded-full bg-line" />
-                      )}
-                      <div>
-                        <h3 className="font-semibold">{team.name}</h3>
-                        <p className="text-sm text-ink-muted">{team.shortCode}</p>
-                      </div>
-                    </div>
-                    <div>
-                      <ArrowRight className="h-4 w-4 text-ink-muted" />
-                    </div>
-                  </CardContent>
-                </Card>
-              </Link>
-              
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-16 bg-surface rounded-lg border">
-            <h3 className="text-xl font-semibold">Aucune équipe trouvée</h3>
-            <p className="text-ink-muted mt-2">
-              Essayez de modifier vos filtres ou votre recherche.
-            </p>
-          </div>
-        )}
-      </div>
+            </ul>
+          </section>
+        );
+      })}
     </div>
   );
 }

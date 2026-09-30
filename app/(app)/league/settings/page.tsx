@@ -1,13 +1,14 @@
 'use client';
 
 import { useRouter, useSearchParams } from 'next/navigation';
-import { ListOrdered, ShieldAlert, Trophy } from 'lucide-react';
+import { Globe, ListOrdered, ShieldAlert, Trophy } from 'lucide-react';
 import { ContextRequired, PageHeader, PageShell } from '@/components/ui';
 import { useScopeContext } from '@/hooks/useScopeContext';
 import { useLeague } from '@/services/leagues';
 import { IdentityPanel } from '@/components/league/settings/identity-panel';
 import { RankingPanel } from '@/components/league/settings/ranking-panel';
 import { DangerPanel } from '@/components/league/settings/danger-panel';
+import { PublicSitePanel } from '@/components/league/settings/public-site-panel';
 import { cn } from '@/utils';
 
 /**
@@ -32,6 +33,7 @@ import { cn } from '@/utils';
 const TABS = [
   { key: 'identite', label: 'Identité', icon: Trophy },
   { key: 'classement', label: 'Classement', icon: ListOrdered },
+  { key: 'site', label: 'Site public', icon: Globe },
   { key: 'danger', label: 'Zone de danger', icon: ShieldAlert },
 ] as const;
 
@@ -93,6 +95,7 @@ export default function LeagueSettingsPage() {
 
       {tab === 'identite' && <IdentityPanel leagueId={leagueId} />}
       {tab === 'classement' && <RankingPanel leagueId={leagueId} />}
+      {tab === 'site' && <PublicSitePanel leagueId={leagueId} />}
       {tab === 'danger' && <DangerPanel leagueId={leagueId} />}
     </PageShell>
   );

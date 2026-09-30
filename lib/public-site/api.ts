@@ -47,3 +47,7 @@ export type PublicGameRow = ApiSchema<'PublicGameRowDto'>;
 export type PublicGame = ApiSchema<'PublicGameDto'>;
 export type PublicClubRef = ApiSchema<'PublicClubRefDto'>;
 export type PublicGameStatus = ApiSchema<'PublicGameStatus'>;
+export type PublicScorers = ApiSchema<'PublicScorersDto'>;
+export type PublicPostSummary = ApiSchema<'PublicPostSummaryDto'>;
+export type PublicClub = ApiSchema<'PublicClubDto'>;
+export type PublicClubListItem = ApiSchema<'PublicClubListItemDto'>;

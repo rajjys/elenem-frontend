@@ -11,6 +11,7 @@ function clubInitials(name: string, shortCode: string | null): string {
 const SIZES = {
   xs: 'h-5 w-5 text-[0.55rem]',
   sm: 'h-7 w-7 text-[0.65rem]',
+  md: 'h-11 w-11 text-xs',
   lg: 'h-14 w-14 text-base sm:h-16 sm:w-16 sm:text-lg',
 } as const;
 

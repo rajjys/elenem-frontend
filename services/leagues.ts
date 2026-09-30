@@ -125,3 +125,31 @@ export function useDeleteLeague() {
     onSuccess: () => qc.invalidateQueries({ queryKey: leagueKeys.all }),
   });
 }
+
+/**
+ * What a competition's public site shows (PHASE5B_LEAGUE_SITES §4.9): for now, whether it names
+ * the players. Read from and written to the competition's settings, which the API merges.
+ */
+const LeagueSiteSettingsSchema = z.object({ publicPlayerIdentity: z.boolean() });
+
+export function useLeagueSiteSettings(leagueId?: string) {
+  return useQuery({
+    queryKey: [...leagueKeys.all, 'site-settings', leagueId],
+    queryFn: async () => {
+      const res = await api.get(`/leagues/${leagueId}/settings`);
+      return parseResponse(LeagueSiteSettingsSchema, { publicPlayerIdentity: res.data?.publicPlayerIdentity ?? true });
+    },
+    enabled: !!leagueId,
+  });
+}
+
+export function useUpdateLeagueSiteSettings() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, publicPlayerIdentity }: { id: string; publicPlayerIdentity: boolean }) => {
+      const res = await api.put(`/leagues/${id}/settings`, { publicPlayerIdentity });
+      return res.data;
+    },
+    onSuccess: (_d, { id }) => qc.invalidateQueries({ queryKey: [...leagueKeys.all, 'site-settings', id] }),
+  });
+}

@@ -61,3 +61,8 @@ export function mondayOf(localDate: string): string {
 export function formatShortDate(localDate: string): string {
   return new Intl.DateTimeFormat('fr-FR', { timeZone: 'UTC', day: 'numeric', month: 'short' }).format(asDay(localDate));
 }
+
+/** « 29 septembre » — an instant's calendar day on the league's clock, for a post's date. */
+export function formatDay(instant: string, zone: string): string {
+  return new Intl.DateTimeFormat('fr-FR', { timeZone: zone, day: 'numeric', month: 'long' }).format(new Date(instant));
+}
