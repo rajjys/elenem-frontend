@@ -14,15 +14,20 @@ const LABELS: Partial<Record<PublicGameStatus, { text: string; tone: string }>> 
   AWAITING_RESULT: { text: 'Résultat à venir', tone: 'bg-surface-sunk text-ink-muted' },
 };
 
-export function StatusBadge({ status, className }: { status: PublicGameStatus; className?: string }) {
+/**
+ * `compact`: in a narrow column (a match row's time column on a phone), where « Résultat à venir »
+ * wraps onto two lines — so the badge is squarer and centred rather than a pill clipped at its edge.
+ */
+export function StatusBadge({ status, className, compact }: { status: PublicGameStatus; className?: string; compact?: boolean }) {
   const label = LABELS[status];
   if (!label) return null;
   const pill = status !== 'COMPLETED';
   return (
     <span
       className={cn(
-        'inline-block whitespace-nowrap text-[0.7rem] font-semibold leading-tight',
-        pill && 'rounded-full px-2 py-0.5',
+        'inline-block text-[0.7rem] font-semibold leading-tight',
+        compact ? 'max-w-full text-center' : 'whitespace-nowrap',
+        pill && (compact ? 'rounded-md px-1.5 py-0.5' : 'rounded-full px-2 py-0.5'),
         label.tone,
         className,
       )}

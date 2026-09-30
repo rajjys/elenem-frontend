@@ -25,7 +25,7 @@ export function MatchRow({ game, competitionLabel }: { game: PublicGameRow; comp
           <span className={cn('text-sm tabular-nums', played ? 'text-ink-subtle' : 'font-semibold text-ink')}>
             {formatTime(game.localTime)}
           </span>
-          {game.status !== 'COMPLETED' && <StatusBadge status={game.status} />}
+          {game.status !== 'COMPLETED' && <StatusBadge status={game.status} compact />}
         </div>
         <div className="min-w-0 space-y-1.5">
           {competitionLabel && (
