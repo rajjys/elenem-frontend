@@ -33,7 +33,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   // Generated from the data and kept short: WhatsApp shows about eighty characters (§9).
   const names = site.competitions.map((c) => c.name).join(', ');
   const description = (
-    names ? `Calendrier, résultats et classement : ${names}.` : `Le calendrier de ${site.name} arrive bientôt.`
+    names ? `Calendrier, résultats et classement : ${names}.` : `${site.name} — calendrier, résultats et classement : bientôt en ligne.`
   ).slice(0, 155);
 
   return {
