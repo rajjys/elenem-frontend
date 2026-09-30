@@ -674,7 +674,26 @@ The two pages fans open most, plus the match page with its box score.
 - at 390 px the table reads without horizontal scrolling for rank, club and PTS;
 - each page's JavaScript stays under 200 KB compressed (5A §6), with no UI-kit barrel imports.
 
-### 5B.4: Accueil and Équipes (≈ 1 day)
+### 5B.4: Accueil and Équipes (≈ 1 day) — **done 2026-09-30**
+
+Shipped as frontend `047ece1` (+ `6c0a5e2`), verified on production against the demo league (home,
+Équipes, Aigles BC's page; 190 KB of JavaScript each). What differs, and what later sprints inherit:
+
+- **Accueil shows the next six games and the last six results**, grouped by day, not « the next
+  date » and « the last date »: with one game a day (the demo), a single date is a single game.
+- **The home's top-eight table** is `MiniStandings` (rank, club, MJ, PTS — no scroll on a phone);
+  the club page's strip reads from the club's own row. Competition chips on the home page use
+  `?c=`.
+- **Competition labels** shorten per group of names sharing a first word (`shortCompetitionNames`):
+  LIBAGO reads « D1 Dames », « D1 Messieurs », « D2 Messieurs », « Tournoi U-16 ».
+- **The §4.9 switch** is a « Site public » tab in the competition's settings, saved like any settings
+  section; tested on production (off: no names, no roster, no scorers page; on: restored). The
+  shared `Switch` now carries `role="switch"`.
+- **Club rows** put home/away (and the kickoff) under the date so the opponent's name has room on
+  a phone; the whole row is the link.
+- The Marqueurs (`/stats`), Phase finale (`/playoffs`) and Actualités (`/news`) pages are still the
+  old ones — 5B.5.
+
 
 **Done when:** LIPROBAKIN's home shows this week's games and last weekend's results (not August),
 and a club page shows its record, next match, results and roster.
