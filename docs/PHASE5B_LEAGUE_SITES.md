@@ -727,7 +727,24 @@ Marqueurs (check against LIBAGO), Phase finale (LIBAGO, EUBABUNIA), Actualités.
 
 **Done when:** each appears only for the leagues that have data for it.
 
-### 5B.6: Sharing (≈ 1 day)
+### 5B.6: Sharing (≈ 1 day) — **done 2026-09-30**
+
+Shipped as frontend `b2ca4e1`, verified on production: a match link, a standings link and the home
+page each carry their own og:title and an og:image on the league's host (all three cards 200
+image/png, 36–54 KB, tags within the first 2.2 KB of HTML). The standings card — the stretch goal —
+is in. What later work inherits:
+
+- **Cards are route handlers** under `/og` (`league`, `game/<c>/<game>`, `standings?c=`), drawn by
+  `lib/public-site/og.tsx` in Inter; `next.config` traces `assets/fonts` into them. A card's URL
+  carries a version (game state and score; the table's computation time), so it is cached a day
+  and a shared link never shows a stale score. Logos are fetched with a 3 s timeout and embedded.
+- **Every league page's metadata goes through `leagueMeta()`** (`lib/public-site/meta.ts`): title,
+  description, canonical, og:* with an absolute image. A new league page must use it.
+- **JSON-LD** through `components/league-site/json-ld.tsx` (escapes `<`): SportsOrganization on the
+  home page, SportsEvent + BreadcrumbList on a game, SportsTeam + BreadcrumbList on a club.
+- Not done: the Search Console Domain property for `*.dxscores.app` (a DNS TXT at Vercel — the
+  owner's step), and the Vercel function region next to Railway (§4.1).
+
 
 OG route handlers (league card, match card), JSON-LD, share button everywhere it belongs, and the
 standings card if time allows.
