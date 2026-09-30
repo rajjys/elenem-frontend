@@ -1,40 +1,5 @@
 @import "tailwindcss";
 
-/*
-  These @source inline() directives are the correct way to tell Tailwind v4
-  to generate the dynamic class names that are constructed in your
-  TenantHeroSection.tsx component.
-
-  This version has been updated to include all requested colors and shades.
-*/
-
-/*
-  Generates all `bg` classes for the specified colors and shades, including
-  hover variants.
-  Colors: green, red, orange, blue, indigo, yellow, emerald, pink, purple, violet, gray, gold
-  Shades: 100 through 900
-*/
-@source inline("{hover:,}bg-{green,red,orange,blue,indigo,yellow,emerald,pink,purple,violet,gray,gold}-{100..900..100}");
-
-/*
-  Generates all `from` classes for the specified colors and shades.
-  Colors: green, red, orange, blue, indigo, yellow, emerald, pink, purple, violet, gray, gold
-  Shades: 100 through 900
-*/
-@source inline("from-{green,red,orange,blue,indigo,yellow,emerald,pink,purple,violet,gray,gold}-{100..900..100}");
-
-/*
-  Generates all `border` classes for the specified colors and shades, including
-  hover variants.
-  Colors: green, red, orange, blue, indigo, yellow, emerald, pink, purple, violet, gray, gold
-  Shades: 100 through 900
-*/
-@source inline("{hover:,}border-{green,red,orange,blue,indigo,yellow,emerald,pink,purple,violet,gray,gold}-{100..900..100}");
-
-@source inline("{hover:,}text-{green,red,orange,blue,indigo,yellow,emerald,pink,purple,violet,gray,gold}-{100..900..100}");
-
-@source inline("via-{green,red,orange,blue,indigo,yellow,emerald,pink,purple,violet,gray,gold}-{900}");
-
 /* Utility class for hiding scrollbar while keeping the scroll functionality*/
 @layer utilities {
   .no-scrollbar {
