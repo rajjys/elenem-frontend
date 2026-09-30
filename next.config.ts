@@ -28,6 +28,14 @@ async rewrites() {
    * Browsers and crawlers still ask for /favicon.ico by name. The icon is now generated
    * (app/icon.tsx), so that name points at it — on every host, which is what a favicon wants.
    */
+  /**
+   * The league sites' share cards read Inter from assets/fonts at request time (lib/public-site/og.tsx).
+   * A dynamic route's files are only deployed if they are traced, so they are named here.
+   */
+  outputFileTracingIncludes: {
+    '/public/public_tenant/[tenantSlug]/og/**': ['./assets/fonts/**'],
+  },
+
   async redirects() {
     return [{ source: '/favicon.ico', destination: '/icon', permanent: false }];
   },

@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { siteGet, type PublicKnockout } from '@/lib/public-site/api';
 import { getSite } from '@/lib/public-site/site';
 import { param, withParams } from '@/lib/public-site/query';
+import { leagueMeta } from '@/lib/public-site/meta';
 import { shortCompetitionNames } from '@/lib/public-site/nav';
 import { PageTitle } from '@/components/league-site/page-title';
 import { Chips } from '@/components/league-site/chips';
@@ -32,7 +33,14 @@ async function load({ params, searchParams }: Props) {
 
 export async function generateMetadata(props: Props): Promise<Metadata> {
   const loaded = await load(props);
-  return loaded ? { title: `Phase finale ${loaded.bracket.competition.name}` } : {};
+  if (!loaded) return {};
+  const { tenantSlug } = await props.params;
+  return leagueMeta({
+    slug: tenantSlug,
+    site: loaded.site,
+    title: `Phase finale ${loaded.bracket.competition.name}`,
+    path: `/playoffs?c=${loaded.chosen.slug}`,
+  });
 }
 
 export default async function PlayoffsPage(props: Props) {

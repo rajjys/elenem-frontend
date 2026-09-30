@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { siteGet, type PublicStandings } from '@/lib/public-site/api';
 import { getSite } from '@/lib/public-site/site';
 import { param, withParams } from '@/lib/public-site/query';
+import { leagueMeta } from '@/lib/public-site/meta';
 import { shortCompetitionNames } from '@/lib/public-site/nav';
 import { PageTitle } from '@/components/league-site/page-title';
 import { Chips } from '@/components/league-site/chips';
@@ -32,16 +33,22 @@ async function load({ params, searchParams }: Props) {
 }
 
 export async function generateMetadata(props: Props): Promise<Metadata> {
-  const { table } = await load(props);
-  if (!table) return {};
-  const title = `Classement ${table.competition.name} ${table.season.name}`;
+  const { site, table } = await load(props);
+  if (!site || !table) return {};
+  const { tenantSlug } = await props.params;
   const leader = table.rows[0];
-  return {
-    title,
+  const c = table.competition.slug;
+  return leagueMeta({
+    slug: tenantSlug,
+    site,
+    title: `Classement ${table.competition.name} ${table.season.name}`,
     description: leader
       ? `${leader.club.name} en tête avec ${leader.points} points après ${table.gamesCounted} matchs. ${table.rules.formula}.`.slice(0, 155)
       : `Le classement ${table.competition.name}, mis à jour à chaque résultat.`,
-  };
+    path: `/standings?c=${c}`,
+    // The card's address changes with the table, so a shared link never shows yesterday's order.
+    image: `/og/standings?c=${c}&v=${table.updatedAt ? Date.parse(table.updatedAt) : 0}`,
+  });
 }
 
 export default async function StandingsPage(props: Props) {

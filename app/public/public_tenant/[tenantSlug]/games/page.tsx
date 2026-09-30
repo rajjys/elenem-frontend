@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import { siteGet, type PublicGameRow, type PublicGames } from '@/lib/public-site/api';
 import { getSite } from '@/lib/public-site/site';
 import { param, withParams } from '@/lib/public-site/query';
+import { leagueMeta } from '@/lib/public-site/meta';
 import { shortCompetitionNames } from '@/lib/public-site/nav';
 import { addDays, dayLabel, formatDate, formatShortDate, mondayOf, todayIn } from '@/lib/public-site/format';
 import { PageTitle } from '@/components/league-site/page-title';
@@ -46,11 +47,15 @@ async function load({ params, searchParams }: Props) {
 export async function generateMetadata(props: Props): Promise<Metadata> {
   const loaded = await load(props);
   if (!loaded) return {};
-  const { data } = loaded;
-  return {
+  const { site, data } = loaded;
+  const { tenantSlug } = await props.params;
+  return leagueMeta({
+    slug: tenantSlug,
+    site,
     title: 'Matchs',
     description: `Calendrier et résultats du ${formatShortDate(data.from)} au ${formatShortDate(data.to)} : ${data.games.length} match${data.games.length > 1 ? 's' : ''}.`,
-  };
+    path: '/games',
+  });
 }
 
 export default async function GamesPage(props: Props) {

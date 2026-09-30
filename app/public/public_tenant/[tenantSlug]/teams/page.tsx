@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import { siteGet, type PublicClubListItem } from '@/lib/public-site/api';
 import { getSite } from '@/lib/public-site/site';
 import { param, withParams } from '@/lib/public-site/query';
+import { leagueMeta } from '@/lib/public-site/meta';
 import { shortCompetitionNames } from '@/lib/public-site/nav';
 import { PageTitle } from '@/components/league-site/page-title';
 import { Chips } from '@/components/league-site/chips';
@@ -16,7 +17,12 @@ type Props = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
 
-export const metadata: Metadata = { title: 'Équipes' };
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { tenantSlug } = await params;
+  const site = await getSite(tenantSlug);
+  if (!site) return {};
+  return leagueMeta({ slug: tenantSlug, site, title: 'Équipes', description: `Les clubs de ${site.name}, par compétition.`, path: '/teams' });
+}
 
 export default async function TeamsPage({ params, searchParams }: Props) {
   const { tenantSlug } = await params;

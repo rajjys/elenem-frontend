@@ -5,6 +5,7 @@ import { getSite } from '@/lib/public-site/site';
 import { siteNav } from '@/lib/public-site/nav';
 import { siteColourVars } from '@/lib/public-site/palette';
 import { buildTenantUrl } from '@/utils/tenant-url';
+import { leagueMeta } from '@/lib/public-site/meta';
 import { SiteHeader } from '@/components/league-site/site-header';
 import { SiteFooter } from '@/components/league-site/site-footer';
 import { BottomNav } from '@/components/league-site/site-nav';
@@ -38,13 +39,12 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 
   return {
     metadataBase: new URL(buildTenantUrl(tenantSlug)),
+    // The home page's, and the fallback for any page that sets none: the league's own card.
+    ...leagueMeta({ slug: tenantSlug, site, title, description, path: '/', absoluteTitle: true }),
     // `absolute`: the product's own « %s · DXScores » template stops here; below, it is the league's.
     title: { absolute: title, template: `%s · ${site.name}` },
-    description,
     // PRIVATE organisations and sites with nothing in them yet stay out of search (§9).
     robots: site.indexable && site.competitions.length > 0 ? undefined : { index: false, follow: true },
-    openGraph: { type: 'website', siteName: site.name, locale: 'fr_FR', title, description },
-    twitter: { card: 'summary', title, description },
   };
 }
 

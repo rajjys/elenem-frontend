@@ -5,6 +5,7 @@ import { ChevronLeft } from 'lucide-react';
 import { siteGet, type PublicPost } from '@/lib/public-site/api';
 import { getSite } from '@/lib/public-site/site';
 import { formatDay } from '@/lib/public-site/format';
+import { leagueMeta } from '@/lib/public-site/meta';
 import { PostBody } from '@/components/league-site/post-body';
 
 /**
@@ -26,12 +27,16 @@ const load = async ({ params }: Props) => {
 export async function generateMetadata(props: Props): Promise<Metadata> {
   const loaded = await load(props);
   if (!loaded) return {};
-  const { post } = loaded;
-  return {
+  const { site, post } = loaded;
+  const { tenantSlug } = await props.params;
+  return leagueMeta({
+    slug: tenantSlug,
+    site,
     title: post.title,
     description: (post.excerpt ?? '').slice(0, 155) || undefined,
-    openGraph: { type: 'article', title: post.title, description: post.excerpt ?? undefined, publishedTime: post.publishedAt },
-  };
+    path: `/news/${post.slug}`,
+    type: 'article',
+  });
 }
 
 export default async function PostPage(props: Props) {

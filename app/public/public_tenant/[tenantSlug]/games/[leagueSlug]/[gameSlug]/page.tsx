@@ -5,6 +5,10 @@ import { ChevronLeft } from 'lucide-react';
 import { siteGet, type PublicGame } from '@/lib/public-site/api';
 import { formatDate, formatTime, mondayOf } from '@/lib/public-site/format';
 import { withParams } from '@/lib/public-site/query';
+import { leagueMeta } from '@/lib/public-site/meta';
+import { getSite } from '@/lib/public-site/site';
+import { buildTenantUrl } from '@/utils/tenant-url';
+import { JsonLd } from '@/components/league-site/json-ld';
 import { ScoreHeader } from '@/components/league-site/score-header';
 import { BoxScoreTable } from '@/components/league-site/box-score-table';
 import { isPlayed } from '@/components/league-site/status-badge';
@@ -25,8 +29,9 @@ const load = async ({ params }: Props) => {
 const code = (c: PublicGame['home']) => c.shortCode ?? c.name;
 
 export async function generateMetadata(props: Props): Promise<Metadata> {
-  const game = await load(props);
-  if (!game) return {};
+  const { tenantSlug } = await props.params;
+  const [game, site] = await Promise.all([load(props), getSite(tenantSlug)]);
+  if (!game || !site) return {};
   const played = isPlayed(game.status);
   const title = played
     ? `${code(game.home)} ${game.homeScore}–${game.awayScore} ${code(game.away)} · ${game.competition.name}`
@@ -34,13 +39,30 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
   const description = played
     ? `${game.home.name} ${game.homeScore}, ${game.away.name} ${game.awayScore}. ${game.competition.name}, ${formatDate(game.localDate, 'long')}.`
     : `${game.home.name} contre ${game.away.name}, ${formatDate(game.localDate, 'long')} à ${formatTime(game.localTime)}${game.hall ? `, ${game.hall}` : ''}.`;
-  return { title, description: description.slice(0, 155) };
+  const path = `/games/${game.competition.slug}/${game.slug}`;
+  return leagueMeta({
+    slug: tenantSlug,
+    site,
+    title,
+    description: description.slice(0, 155),
+    path,
+    // The card's address carries the game's state and score: a link shared before the game and one
+    // shared after it are two different images, and neither is served from the other's cache.
+    image: `/og/game/${game.competition.slug}/${game.slug}?v=${game.status}-${game.homeScore ?? ''}-${game.awayScore ?? ''}`,
+  });
 }
 
+const EVENT_STATUS: Record<string, string> = {
+  POSTPONED: 'https://schema.org/EventPostponed',
+  CANCELLED: 'https://schema.org/EventCancelled',
+};
+
 export default async function GamePage(props: Props) {
+  const { tenantSlug } = await props.params;
   const game = await load(props);
   if (!game) notFound();
   const played = isPlayed(game.status);
+  const url = buildTenantUrl(tenantSlug, `/games/${game.competition.slug}/${game.slug}`);
 
   return (
     <div className="mx-auto max-w-3xl space-y-6 px-4 py-6 sm:px-6 sm:py-10">
@@ -52,6 +74,34 @@ export default async function GamePage(props: Props) {
         Matchs de la semaine
       </Link>
 
+      {/* A game, for search engines (§9): no rich result is expected — Google's score boxes come
+          from licensed partners — but the event, its teams and its hall are stated plainly. */}
+      <JsonLd
+        data={{
+          '@context': 'https://schema.org',
+          '@graph': [
+            {
+              '@type': 'SportsEvent',
+              name: `${game.home.name} – ${game.away.name}`,
+              url,
+              startDate: game.instant,
+              eventStatus: EVENT_STATUS[game.status] ?? 'https://schema.org/EventScheduled',
+              homeTeam: { '@type': 'SportsTeam', name: game.home.name },
+              awayTeam: { '@type': 'SportsTeam', name: game.away.name },
+              ...(game.hall ? { location: { '@type': 'Place', name: game.hall } } : {}),
+              superEvent: { '@type': 'SportsEvent', name: game.competition.name },
+            },
+            {
+              '@type': 'BreadcrumbList',
+              itemListElement: [
+                { '@type': 'ListItem', position: 1, name: 'Accueil', item: buildTenantUrl(tenantSlug, '/') },
+                { '@type': 'ListItem', position: 2, name: 'Matchs', item: buildTenantUrl(tenantSlug, '/games') },
+                { '@type': 'ListItem', position: 3, name: `${game.home.name} – ${game.away.name}`, item: url },
+              ],
+            },
+          ],
+        }}
+      />
       <ScoreHeader game={game} />
 
       {game.boxScore ? (

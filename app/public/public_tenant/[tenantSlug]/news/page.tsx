@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { siteGet, type PublicPostSummary } from '@/lib/public-site/api';
 import { getSite } from '@/lib/public-site/site';
+import { leagueMeta } from '@/lib/public-site/meta';
 import { PageTitle } from '@/components/league-site/page-title';
 import { PostCard } from '@/components/league-site/post-card';
 
@@ -12,7 +13,12 @@ import { PostCard } from '@/components/league-site/post-card';
 
 type Props = { params: Promise<{ tenantSlug: string }> };
 
-export const metadata: Metadata = { title: 'Actualités' };
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { tenantSlug } = await params;
+  const site = await getSite(tenantSlug);
+  if (!site) return {};
+  return leagueMeta({ slug: tenantSlug, site, title: 'Actualités', description: `Communiqués et articles de ${site.name}.`, path: '/news' });
+}
 
 export default async function NewsPage({ params }: Props) {
   const { tenantSlug } = await params;

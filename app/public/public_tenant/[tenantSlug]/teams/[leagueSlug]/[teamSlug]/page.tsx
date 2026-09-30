@@ -6,6 +6,9 @@ import { siteGet, type PublicClub } from '@/lib/public-site/api';
 import { getSite } from '@/lib/public-site/site';
 import { dayLabel, formatDate, todayIn } from '@/lib/public-site/format';
 import { withParams } from '@/lib/public-site/query';
+import { leagueMeta } from '@/lib/public-site/meta';
+import { buildTenantUrl } from '@/utils/tenant-url';
+import { JsonLd } from '@/components/league-site/json-ld';
 import { ClubMark } from '@/components/league-site/club-mark';
 import { HomeSection } from '@/components/league-site/home-section';
 import { MatchRow } from '@/components/league-site/match-row';
@@ -34,11 +37,15 @@ const ordinal = (n: number) => (n === 1 ? '1er' : `${n}e`);
 export async function generateMetadata(props: Props): Promise<Metadata> {
   const loaded = await load(props);
   if (!loaded) return {};
-  const { club } = loaded;
+  const { site, club } = loaded;
+  const { tenantSlug } = await props.params;
   const s = club.standing;
   const next = club.nextGame;
   const opponent = next ? (next.home.name === club.club.name ? next.away.name : next.home.name) : null;
-  return {
+  return leagueMeta({
+    slug: tenantSlug,
+    site,
+    path: `/teams/${club.competition.slug}/${club.club.slug}`,
     title: `${club.club.name} — calendrier, résultats, effectif`,
     description: [
       s ? `${ordinal(s.rank)} du ${club.competition.name} avec ${s.points} points.` : club.competition.name,
@@ -47,14 +54,16 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
       .filter(Boolean)
       .join(' ')
       .slice(0, 155),
-  };
+  });
 }
 
 export default async function ClubPage(props: Props) {
   const loaded = await load(props);
   if (!loaded) notFound();
   const { site, club } = loaded;
+  const { tenantSlug } = await props.params;
   const today = todayIn(site.timezone);
+  const url = buildTenantUrl(tenantSlug, `/teams/${club.competition.slug}/${club.club.slug}`);
   const s = club.standing;
 
   const played = club.games.filter((g) => isPlayed(g.status)).reverse();
@@ -70,6 +79,22 @@ export default async function ClubPage(props: Props) {
         Équipes
       </Link>
 
+      <JsonLd
+        data={{
+          '@context': 'https://schema.org',
+          '@graph': [
+            { '@type': 'SportsTeam', name: club.club.name, url, memberOf: { '@type': 'SportsOrganization', name: site.name } },
+            {
+              '@type': 'BreadcrumbList',
+              itemListElement: [
+                { '@type': 'ListItem', position: 1, name: 'Accueil', item: buildTenantUrl(tenantSlug, '/') },
+                { '@type': 'ListItem', position: 2, name: 'Équipes', item: buildTenantUrl(tenantSlug, '/teams') },
+                { '@type': 'ListItem', position: 3, name: club.club.name, item: url },
+              ],
+            },
+          ],
+        }}
+      />
       <section className="overflow-hidden rounded-2xl border border-line bg-surface shadow-e1">
         <div className="flex items-center gap-4 px-5 py-6 sm:px-8">
           <ClubMark club={club.club} size="lg" />

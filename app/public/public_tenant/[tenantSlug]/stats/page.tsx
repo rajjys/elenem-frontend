@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { siteGet, type PublicScorers } from '@/lib/public-site/api';
 import { getSite } from '@/lib/public-site/site';
 import { param, withParams } from '@/lib/public-site/query';
+import { leagueMeta } from '@/lib/public-site/meta';
 import { shortCompetitionNames } from '@/lib/public-site/nav';
 import { PageTitle } from '@/components/league-site/page-title';
 import { Chips } from '@/components/league-site/chips';
@@ -37,10 +38,14 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
   const loaded = await load(props);
   if (!loaded) return {};
   const top = loaded.board.rows[0];
-  return {
+  const { tenantSlug } = await props.params;
+  return leagueMeta({
+    slug: tenantSlug,
+    site: loaded.site,
     title: `Marqueurs ${loaded.board.competition.name}`,
     description: top?.name ? `${top.name} en tête avec ${top.total} points en ${top.gamesPlayed} matchs.` : undefined,
-  };
+    path: `/stats?c=${loaded.chosen.slug}`,
+  });
 }
 
 export default async function ScorersPage(props: Props) {

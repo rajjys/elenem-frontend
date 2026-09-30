@@ -17,6 +17,8 @@ import { ScorersList } from '@/components/league-site/scorers-list';
 import { PostCard } from '@/components/league-site/post-card';
 import { Chips } from '@/components/league-site/chips';
 import { SiteMark } from '@/components/league-site/site-mark';
+import { JsonLd } from '@/components/league-site/json-ld';
+import { buildTenantUrl } from '@/utils/tenant-url';
 
 /**
  * Accueil (PHASE5B_LEAGUE_SITES §6): what a supporter opens a league's site for, in the order they
@@ -66,6 +68,19 @@ export default async function LeagueHome({ params, searchParams }: Props) {
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 sm:py-10">
+      {/* The league, for search engines (§9): the realistic target is a search for its own name. */}
+      <JsonLd
+        data={{
+          '@context': 'https://schema.org',
+          '@type': 'SportsOrganization',
+          name: site.name,
+          url: buildTenantUrl(tenantSlug, '/'),
+          ...(site.logoUrl ? { logo: site.logoUrl } : {}),
+          ...(site.city ? { location: { '@type': 'Place', address: { '@type': 'PostalAddress', addressLocality: site.city } } } : {}),
+          ...(site.contact.email ? { email: site.contact.email } : {}),
+          ...(Object.values(site.socialLinks).length ? { sameAs: Object.values(site.socialLinks) } : {}),
+        }}
+      />
       <div className="flex items-center gap-4">
         <SiteMark name={site.name} logoUrl={site.logoUrl} size="lg" />
         <div className="min-w-0">
