@@ -1,158 +1,141 @@
-// app/(public)/games/page.tsx
-"use client";
-
-import React, { useState, useEffect, useCallback, use } from 'react';
+import type { Metadata } from 'next';
 import Link from 'next/link';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
-import { api } from '@/services/api';
-import { toast } from 'sonner';
-import { GameDetails } from '@/schemas';
-import GamePublicCard from '@/components/game/game-public-card';
-import { format } from 'date-fns';
-import GamesPageSkeleton from '@/components/game/games-page-skeleton';
-import DateCarousel from '@/components/game/date-carousel';
-import { fr } from 'date-fns/locale';
+import { notFound } from 'next/navigation';
+import { siteGet, type PublicGameRow, type PublicGames } from '@/lib/public-site/api';
+import { getSite } from '@/lib/public-site/site';
+import { param, withParams } from '@/lib/public-site/query';
+import { shortCompetitionNames } from '@/lib/public-site/nav';
+import { addDays, dayLabel, formatDate, formatShortDate, mondayOf, todayIn } from '@/lib/public-site/format';
+import { PageTitle } from '@/components/league-site/page-title';
+import { Chips } from '@/components/league-site/chips';
+import { WeekPager } from '@/components/league-site/week-pager';
+import { MatchRow } from '@/components/league-site/match-row';
 
+/**
+ * Matchs (PHASE5B_LEAGUE_SITES §6): one week at a time on the league's clock, grouped by day. With
+ * no week asked for, this week — or, when this week has nothing, the next week that does, so the
+ * page never opens on an empty screen mid-season.
+ */
 
-interface TenantWithGames {
-  tenantId: string;
-  logoUrl?: string | null;
-  tenantName: string;
-  tenantSlug: string;
-  games: GameDetails[];
+type Props = {
+  params: Promise<{ tenantSlug: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+};
+
+const LOCAL_DATE = /^\d{4}-\d{2}-\d{2}$/;
+
+async function load({ params, searchParams }: Props) {
+  const { tenantSlug } = await params;
+  const sp = await searchParams;
+  const c = param(sp.c);
+  const asked = param(sp.week);
+  const week = asked && LOCAL_DATE.test(asked) ? mondayOf(asked) : undefined;
+
+  const site = await getSite(tenantSlug);
+  if (!site) return null;
+  const fetchWeek = (from?: string) =>
+    siteGet<PublicGames>(tenantSlug, '/games', { c, from, to: from ? addDays(from, 6) : undefined });
+
+  let data = await fetchWeek(week);
+  if (data && !week && data.games.length === 0 && data.nextDate) {
+    data = (await fetchWeek(mondayOf(data.nextDate))) ?? data;
+  }
+  return data ? { site, data, c } : null;
 }
 
-export default function PublicGamesPage({ params }: { params: Promise<{ tenantSlug: string }> }) {
-  const { tenantSlug } = use(params);
-  const [availableDates, setAvailableDates] = useState<string[]>([]);
-  const [selectedDate, setSelectedDate] = useState<string>('');
-  const [tenantData, setTenantdata] = useState<TenantWithGames>();
-  const [loadingDates, setLoadingDates] = useState(true);
-  const [loadingGames, setLoadingGames] = useState(false);
-  
-  //const ROOT_DOMAIN = process.env.NODE_ENV === 'development' ? process.env.NEXT_PUBLIC_HOME_URL_LOCAL : process.env.NEXT_PUBLIC_HOME_URL;
-  //const handler = (process.env.NODE_ENV === 'development' ) ? 'http://' : 'https://';
+export async function generateMetadata(props: Props): Promise<Metadata> {
+  const loaded = await load(props);
+  if (!loaded) return {};
+  const { data } = loaded;
+  return {
+    title: 'Matchs',
+    description: `Calendrier et résultats du ${formatShortDate(data.from)} au ${formatShortDate(data.to)} : ${data.games.length} match${data.games.length > 1 ? 's' : ''}.`,
+  };
+}
 
-  // Fetch available dates on initial load
-  const fetchDates = useCallback(async () => {
-      try {
-          const response = await api.get<string[]>(`/public-games/dates`, { params: { tenantSlug } });
-          const dates = response.data;
-          if (!dates || dates.length === 0) {
-            //toast.error("Aucune date de match disponible.");
-            console.warn("Aucune date disponible.");
-            return;
-          }
-          setAvailableDates(dates);
-          if (dates.length > 0) {
-          // Select today's date if available, otherwise the first available date
-          const today = format(new Date(), 'yyyy-MM-dd');
-          setSelectedDate(dates.includes(today) ? today : dates[0]);
-        }
-      }
-      catch(error){
-        //toast.error("Failed to load game dates.");
-        console.warn(error);
-      }
-      finally{
-          setLoadingDates(false)
-      }
-    }, [tenantSlug]);
-  // Fetch games when a date is selected
-  const fetchGames = useCallback(async (date: string) => {
-    if (!date) return;
-    setLoadingGames(true);
-    try {
-      const response = await api.get<TenantWithGames[]>('/public-games', { params: { date, tenantSlug } });
-      const tenantsWithGames = response.data;
-      const onlyTenant = tenantsWithGames[0];
-      setTenantdata(onlyTenant);
-    } catch (error) {
-        toast.error(`Failed to load games for ${date}.`);
-        console.log(error);
-    }
-    finally{
-        setLoadingGames(false)
-    }
-  }, [tenantSlug]);
+export default async function GamesPage(props: Props) {
+  const loaded = await load(props);
+  if (!loaded) notFound();
+  const { site, data, c } = loaded;
 
-  useEffect(() => {
-     fetchDates(); 
-  }, [fetchDates]);
+  const today = todayIn(site.timezone);
+  const short = shortCompetitionNames(site.competitions.map((x) => x.name));
+  const chips = [
+    { label: 'Toutes', href: withParams('/games', { week: data.from }), active: !c },
+    ...site.competitions.map((x, i) => ({
+      label: short[i],
+      href: withParams('/games', { week: data.from }, { c: x.slug }),
+      active: x.slug === c,
+    })),
+  ];
 
-  useEffect(() => {
-      fetchGames(selectedDate);
-  }, [selectedDate, fetchGames]);
-  
-  const todayISO = new Date().toISOString().split('T')[0];
-    useEffect(() => {
-        if (availableDates.length) {
-            const futureOrToday = availableDates.find(d => d >= todayISO) ?? availableDates[0];
-            setSelectedDate(futureOrToday);
-        }
-    }, [availableDates, todayISO]);
-
-  if (loadingDates) {
-      return (
-          <div className="container max-w-2xl mx-auto p-4 sm:p-6">
-              <GamesPageSkeleton />
-          </div>
-      );
-  }
+  const days = groupByDay(data.games);
+  // With every competition on screen, each row says which it belongs to — in the chips' short form.
+  const labelOf = new Map(site.competitions.map((x, i) => [x.slug, short[i]]));
+  const mixed = !c && site.competitions.length > 1;
 
   return (
-    <div className="min-h-screen max-w-2xl mx-auto">
-      <div className="container mx-auto p-4 sm:p-6 space-y-8">
-        <header>
-          <h1 className="text-2xl font-bold tracking-tight text-ink">Matchs et Résultats: {tenantData?.tenantName}</h1>
-          <p className="mt-2 text-md text-ink-muted">Parcourez les Matchs publics de: {tenantData?.tenantName}.</p>
-        </header>
-        <Card className="overflow-hidden shadow-sm">
-          <CardHeader>
-            <CardTitle className='text-ink-muted text-base px-2'>Selectionner une date</CardTitle>
-          </CardHeader>
-          <CardContent className="grid gap-4 md:gap-6 grid-cols-1">
-            <DateCarousel dates={availableDates} selectedDate={selectedDate} onDateSelect={setSelectedDate} />
-          </CardContent>
-        </Card>
-        {loadingGames ? (
-            <div className="space-y-8">
-                 {Array.from({ length: 2 }).map((_, i) => (
-                     <Card key={i} className="overflow-hidden">
-                        <CardHeader><Skeleton className="h-7 w-1/3" /></CardHeader>
-                        <CardContent className="grid gap-4 md:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-                            <Skeleton className="h-48 w-full rounded-lg" />
-                            <Skeleton className="h-48 w-full rounded-lg" />
-                            <Skeleton className="h-48 w-full rounded-lg" />
-                        </CardContent>
-                    </Card>
-                 ))}
-            </div>
-        ) : tenantData ? (
-          <div className="space-y-8">
-              <Card className="overflow-hidden shadow-sm bg-ink-subtle pb-2">
-                <CardHeader>
-                  <CardTitle className='text-white text-center font-semibold text-lg'>
-                    Matchs du {selectedDate ? format(new Date(selectedDate), 'dd MMMM yyyy', { locale: fr }) : 'Sélectionnez une date'}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="grid gap-2 grid-cols-1">
-                  {tenantData.games.map((game) => (
-                    <Link key={game.id} href={`/games/${game.league.slug}/${game.slug}`} rel="noopener noreferrer">
-                        <GamePublicCard game={game}/>
-                    </Link>
+    <div className="mx-auto max-w-3xl space-y-5 px-4 py-6 sm:px-6 sm:py-10">
+      <PageTitle>Matchs</PageTitle>
+
+      <Chips label="Compétitions" items={site.competitions.length > 1 ? chips : []} />
+
+      <WeekPager
+        from={data.from}
+        to={data.to}
+        current={data.from === mondayOf(today)}
+        prevHref={data.previousDate ? withParams('/games', { c }, { week: mondayOf(data.previousDate) }) : null}
+        nextHref={data.nextDate ? withParams('/games', { c }, { week: mondayOf(data.nextDate) }) : null}
+        todayHref={withParams('/games', { c }, { week: mondayOf(today) })}
+      />
+
+      {days.length === 0 ? (
+        <div className="rounded-xl border border-line bg-surface px-6 py-12 text-center">
+          <p className="text-ink-muted">Aucun match cette semaine.</p>
+          {data.nextDate && (
+            <Link
+              href={withParams('/games', { c }, { week: mondayOf(data.nextDate) })}
+              className="mt-3 inline-block text-sm font-medium text-[var(--site-accent)] hover:underline"
+            >
+              Prochains matchs : {formatDate(data.nextDate, 'long')}
+            </Link>
+          )}
+        </div>
+      ) : (
+        <div className="space-y-6">
+          {days.map(([date, games]) => {
+            const label = dayLabel(date, today);
+            const relative = label !== formatDate(date);
+            return (
+              <section key={date} aria-labelledby={`day-${date}`}>
+                {/* Sticky under the site header, so a long Saturday keeps its date in view. */}
+                <h2
+                  id={`day-${date}`}
+                  className="sticky top-[58px] z-10 -mx-4 bg-canvas/95 px-4 py-2 text-sm font-semibold text-ink backdrop-blur sm:mx-0 sm:px-1"
+                >
+                  {relative ? label : formatDate(date, 'long')}
+                  {relative && <span className="font-normal text-ink-muted"> · {formatDate(date, 'long')}</span>}
+                </h2>
+                <ul className="divide-y divide-line overflow-hidden rounded-xl border border-line bg-surface">
+                  {games.map((g) => (
+                    <MatchRow
+                      key={`${g.competition.slug}/${g.slug}`}
+                      game={g}
+                      competitionLabel={mixed ? (labelOf.get(g.competition.slug) ?? g.competition.name) : undefined}
+                    />
                   ))}
-                </CardContent>
-              </Card>
-          </div>
-        ) : (
-            <div className="text-center py-16 bg-surface rounded-lg border">
-                <h3 className="text-xl font-semibold">Pas des Matchs Disponible</h3>
-                <p className="text-ink-muted mt-2">Pas de matchs Disponible a la date selectionnee.</p>
-            </div>
-        )}
-      </div>
+                </ul>
+              </section>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
+}
+
+function groupByDay(games: PublicGameRow[]): [string, PublicGameRow[]][] {
+  const days = new Map<string, PublicGameRow[]>();
+  for (const g of games) days.set(g.localDate, [...(days.get(g.localDate) ?? []), g]);
+  return [...days.entries()];
 }

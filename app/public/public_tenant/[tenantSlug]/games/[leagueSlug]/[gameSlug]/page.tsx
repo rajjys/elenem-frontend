@@ -1,217 +1,72 @@
-// app/(public)/leagues/[leagueSlug]/games/[gameSlug]/page.tsx
-"use client";
+import type { Metadata } from 'next';
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
+import { ChevronLeft } from 'lucide-react';
+import { siteGet, type PublicGame } from '@/lib/public-site/api';
+import { formatDate, formatTime, mondayOf } from '@/lib/public-site/format';
+import { withParams } from '@/lib/public-site/query';
+import { ScoreHeader } from '@/components/league-site/score-header';
+import { BoxScoreTable } from '@/components/league-site/box-score-table';
+import { isPlayed } from '@/components/league-site/status-badge';
 
-import React, { useState, useEffect, useCallback, use } from "react";
-import { api } from "@/services/api";
-import { toast } from "sonner";
-import { Card, CardContent } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
-import { GameDetails, GameStatus } from "@/schemas";
-import Image from "next/image";
-import { formatDateFr } from "@/utils";
-import { ListBulletsIcon } from "@phosphor-icons/react";
-import Link from "next/link";
-import { getStatusBadge } from "@/components/ui";
+/**
+ * One game (PHASE5B_LEAGUE_SITES §6, Match): the score, where and when, and the scoresheet when
+ * the officials have entered one. Its title says the result once there is one — that is what a
+ * link to it shows in a WhatsApp group.
+ */
 
-interface Standing {
-  teamSlug: string;
-  rank: number;
-  wins: number;
-  losses: number;
-  forfeits: number;
+type Props = { params: Promise<{ tenantSlug: string; leagueSlug: string; gameSlug: string }> };
+
+const load = async ({ params }: Props) => {
+  const { tenantSlug, leagueSlug, gameSlug } = await params;
+  return siteGet<PublicGame>(tenantSlug, `/games/${encodeURIComponent(leagueSlug)}/${encodeURIComponent(gameSlug)}`);
+};
+
+const code = (c: PublicGame['home']) => c.shortCode ?? c.name;
+
+export async function generateMetadata(props: Props): Promise<Metadata> {
+  const game = await load(props);
+  if (!game) return {};
+  const played = isPlayed(game.status);
+  const title = played
+    ? `${code(game.home)} ${game.homeScore}–${game.awayScore} ${code(game.away)} · ${game.competition.name}`
+    : `${code(game.home)} – ${code(game.away)} · ${formatDate(game.localDate)} ${formatTime(game.localTime)}`;
+  const description = played
+    ? `${game.home.name} ${game.homeScore}, ${game.away.name} ${game.awayScore}. ${game.competition.name}, ${formatDate(game.localDate, 'long')}.`
+    : `${game.home.name} contre ${game.away.name}, ${formatDate(game.localDate, 'long')} à ${formatTime(game.localTime)}${game.hall ? `, ${game.hall}` : ''}.`;
+  return { title, description: description.slice(0, 155) };
 }
 
-export default function GamePage({
-  params,
-}: {
-  params: Promise<{ leagueSlug: string; gameSlug: string }>;
-}) {
-  const { leagueSlug, gameSlug } = use(params);
-
-  const [game, setGame] = useState<GameDetails | null>(null);
-  const [loadingGame, setLoadingGame] = useState(true);
-  const [homeStanding, setHomeStanding] = useState<Standing | null>(null);
-  const [awayStanding, setAwayStanding] = useState<Standing | null>(null);
-  const [loadingStandings, setLoadingStandings] = useState(true);
-
-  // Fetch game details
-  const fetchGame = useCallback(async () => {
-    setLoadingGame(true);
-    try {
-      const res = await api.get<GameDetails>(
-        `/public-games/${leagueSlug}/${gameSlug}`
-      );
-      setGame(res.data);
-    } catch (err) {
-      console.error(err);
-      toast.error("Impossible de charger le match.");
-    } finally {
-      setLoadingGame(false);
-    }
-  }, [leagueSlug, gameSlug]);
-
-  // Fetch standings for both teams
-  const fetchStandings = useCallback(
-    async (homeSlug: string, awaySlug: string) => {
-      setLoadingStandings(true);
-      try {
-        const [homeRes, awayRes] = await Promise.all([
-          api.get<Standing[]>(`/public-games/standings/${leagueSlug}`, {
-            params: { teamSlug: homeSlug },
-          }),
-          api.get<Standing[]>(`/public-games/standings/${leagueSlug}`, {
-            params: { teamSlug: awaySlug },
-          }),
-        ]);
-        setHomeStanding(homeRes.data[0]);
-        setAwayStanding(awayRes.data[0]);
-      } catch (err) {
-        console.error("Failed to fetch standings:", err);
-        setHomeStanding(null);
-        setAwayStanding(null);
-      } finally {
-        setLoadingStandings(false);
-      }
-    },
-    [leagueSlug]
-  );
-
-  useEffect(() => {
-    fetchGame();
-  }, [fetchGame]);
-
-  useEffect(() => {
-    if (game) {
-      fetchStandings(game.homeTeam.slug, game.awayTeam.slug);
-    }
-  }, [game, fetchStandings]);
-
-  if (loadingGame) {
-    return (
-      <div className="container mx-auto p-6 space-y-6">
-        <Skeleton className="h-48 w-full rounded-lg" />
-        <Skeleton className="h-10 w-1/3" />
-        <Skeleton className="h-6 w-1/4" />
-      </div>
-    );
-  }
-
-  if (!game) {
-    return (
-      <div className="text-center py-20">
-        <h2 className="text-xl font-semibold">Match introuvable</h2>
-        <p className="text-ink-muted mt-2">Vérifiez le lien ou réessayez plus tard.</p>
-      </div>
-    );
-  }
+export default async function GamePage(props: Props) {
+  const game = await load(props);
+  if (!game) notFound();
+  const played = isPlayed(game.status);
 
   return (
-    <div className="min-h-screen max-w-5xl mx-auto">
-      {/* Banner */}
-      <div className="relative" hidden>
-        {game.bannerImageUrl ? (
-          <Image
-            src={game.bannerImageUrl}
-            alt="Banner"
-            height={480}
-            width={736}
-            className="w-full h-56 object-cover rounded-lg"
-          />
-        ) : (
-          <div className="w-full h-56 bg-line rounded-lg" />
-        )}
-      </div>
+    <div className="mx-auto max-w-3xl space-y-6 px-4 py-6 sm:px-6 sm:py-10">
+      <Link
+        href={withParams('/games', {}, { week: mondayOf(game.localDate), c: game.competition.slug })}
+        className="inline-flex items-center gap-1 text-sm font-medium text-ink-muted hover:text-ink"
+      >
+        <ChevronLeft className="h-4 w-4" aria-hidden />
+        Matchs de la semaine
+      </Link>
 
-      {/* Main game card */}
-      <Card className="mt-6 shadow-md">
-        <CardContent className="p-6">
-          {/* Teams row */}
-          <div className="grid grid-cols-3 gap-3 items-center">
-            {/* Home Team */}
-            <div className="text-center">
-              {homeStanding && <span className="text-center text-base text-positive font-semibold py-1 flex items-center justify-center gap-1">
-                {homeStanding.rank}
-                <ListBulletsIcon/>
-              </span>}
-              {game.homeTeam.businessProfile.logoAsset?.url ? (
-                <Image
-                  src={game.homeTeam.businessProfile.logoAsset.url}
-                  alt={game.homeTeam.name}
-                  height={60}
-                  width={60}
-                  className="w-20 h-20 mx-auto rounded-full"
-                />
-              ) :
-                <div className="h-20 w-20 rounded-full bg-line mx-auto border-4 border-white" />}
-              <Link href={`/teams/${leagueSlug}/${game.homeTeam.slug}`}>
-                <h3 className="mt-2 font-bold hover:text-positive transition-colors duration-300 ease-in-out">
-                  {game.homeTeam.name}
-                </h3>
-              </Link>
-              <p className="text-sm text-ink-muted">{game.homeTeam.shortCode}</p>
-              {loadingStandings ? (
-                <Skeleton className="h-4 w-20 mx-auto mt-1" />
-              ) : homeStanding ? (
-                <p className="text-xs text-ink-muted mt-1">
-                  {homeStanding.wins}-{homeStanding.losses}-{homeStanding.forfeits}
-                </p>
-              ) : null}
-            </div>
-            {/* Score & status */}
-            <div className="text-center">
-              <p className="text-base md:text-lg font-semibold">{getStatusBadge(game.status)}</p>
-              {(game.status === GameStatus.LIVE ||
-                game.status === GameStatus.COMPLETED) && (
-                <p className="text-2xl md:text-3xl font-bold my-2">
-                  {game.homeScore ?? "-"} : {game.awayScore ?? "-"}
-                </p>
-              )}
-              <p className="text-sm text-ink-muted">
-                  {formatDateFr(game.dateTime)}
-              </p>
-              {game.round && (
-                <p className="text-xs text-ink-muted mt-1">Round {game.round}</p>
-              )}
-            </div>
+      <ScoreHeader game={game} />
 
-            {/* Away Team */}
-            <div className="text-center">
-              {awayStanding && <span className="text-center text-base text-positive font-semibold py-1 flex items-center justify-center gap-1">{awayStanding.rank}<ListBulletsIcon/></span>}
-              {game.awayTeam.businessProfile.logoAsset?.url ? (
-                <Image
-                  src={game.awayTeam.businessProfile.logoAsset.url}
-                  alt={game.awayTeam.name}
-                  height={60}
-                  width={60}
-                  className="w-20 h-20 mx-auto rounded-full"
-                />
-              ) :
-                <div className="h-20 w-20 rounded-full bg-line mx-auto border-4 border-white" />
-              }
-              <Link href={`/teams/${leagueSlug}/${game.awayTeam.slug}`}>
-                <h3 className="mt-2 font-bold hover:text-positive transition-colors duration-300 ease-in-out">
-                  {game.awayTeam.name}
-                </h3>
-              </Link>
-              <p className="text-sm text-ink-muted">{game.awayTeam.shortCode}</p>
-              {loadingStandings ? (
-                <Skeleton className="h-4 w-20 mx-auto mt-1" />
-              ) : awayStanding ? (
-                <p className="text-xs text-ink-muted mt-1">
-                  {awayStanding.wins}-{awayStanding.losses}-{awayStanding.forfeits}
-                </p>
-              ) : null}
-            </div>
-          </div>
-
-          {/* Venue / notes */}
-          <div className="mt-6 text-center text-sm text-ink-muted">
-            {game.homeVenue?.name && <p>Lieu: {game.homeVenue.name}</p>}
-            {game.location && <p>Adresse: {game.location}</p>}
-            {game.notes && <p className="italic mt-2">{game.notes}</p>}
-          </div>
-        </CardContent>
-      </Card>
+      {game.boxScore ? (
+        <div className="space-y-6">
+          <h2 className="text-lg font-bold text-ink">Feuille de marque</h2>
+          <BoxScoreTable side={game.boxScore.home} columns={game.boxScore.columns} totalAbbr={game.boxScore.totalAbbr} />
+          <BoxScoreTable side={game.boxScore.away} columns={game.boxScore.columns} totalAbbr={game.boxScore.totalAbbr} />
+        </div>
+      ) : (
+        played && (
+          <p className="rounded-xl border border-line bg-surface px-5 py-6 text-center text-sm text-ink-muted">
+            La feuille de marque de ce match n’a pas été publiée.
+          </p>
+        )
+      )}
     </div>
   );
 }

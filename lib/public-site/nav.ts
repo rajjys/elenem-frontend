@@ -48,3 +48,16 @@ export function initialsOf(name: string): string {
     .filter((w) => w && !/^(de|du|des|la|le|les|d|l|et|of|the)$/i.test(w));
   return (words.slice(0, 3).map((w) => w[0]).join('') || name.slice(0, 2)).toUpperCase();
 }
+
+/**
+ * Chip labels for a league's competitions: the words they all start with are dropped, so
+ * « Championnat Provincial Kinshasa Dames » and « … Messieurs » read « Dames » and « Messieurs »
+ * on a phone. When they share nothing, or a label would be left empty, the full names stay.
+ */
+export function shortCompetitionNames(names: string[]): string[] {
+  if (names.length < 2) return names;
+  const split = names.map((n) => n.split(/\s+/));
+  let common = 0;
+  while (split.every((w) => w.length > common + 1 && w[common] === split[0][common])) common++;
+  return common === 0 ? names : split.map((w) => w.slice(common).join(' '));
+}

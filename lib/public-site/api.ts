@@ -39,3 +39,11 @@ export async function siteGet<T>(
   if (!res.ok) throw new Error(`League site API answered ${res.status} for ${slug}${path}`);
   return (await res.json()) as T;
 }
+
+export type PublicStandings = ApiSchema<'PublicStandingsDto'>;
+export type PublicStandingsRow = ApiSchema<'PublicStandingsRowDto'>;
+export type PublicGames = ApiSchema<'PublicGamesDto'>;
+export type PublicGameRow = ApiSchema<'PublicGameRowDto'>;
+export type PublicGame = ApiSchema<'PublicGameDto'>;
+export type PublicClubRef = ApiSchema<'PublicClubRefDto'>;
+export type PublicGameStatus = ApiSchema<'PublicGameStatus'>;

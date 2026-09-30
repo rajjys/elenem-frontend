@@ -45,3 +45,19 @@ export function formatInstant(instant: string, zone: string): string {
   const time = new Intl.DateTimeFormat('en-GB', { timeZone: zone, hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).format(at);
   return `${date} à ${formatTime(time)}`;
 }
+
+/** yyyy-mm-dd moved by whole days. */
+export function addDays(localDate: string, days: number): string {
+  return new Date(asDay(localDate).getTime() + days * 86_400_000).toISOString().slice(0, 10);
+}
+
+/** The Monday of a local date's week: a league's week runs Monday to Sunday. */
+export function mondayOf(localDate: string): string {
+  const weekday = asDay(localDate).getUTCDay();
+  return addDays(localDate, -((weekday + 6) % 7));
+}
+
+/** « 28 sept. », without the weekday, for ranges. */
+export function formatShortDate(localDate: string): string {
+  return new Intl.DateTimeFormat('fr-FR', { timeZone: 'UTC', day: 'numeric', month: 'short' }).format(asDay(localDate));
+}

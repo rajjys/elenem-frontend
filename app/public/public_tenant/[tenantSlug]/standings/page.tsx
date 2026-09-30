@@ -1,148 +1,134 @@
-"use client";
+import type { Metadata } from 'next';
+import { notFound } from 'next/navigation';
+import { siteGet, type PublicStandings } from '@/lib/public-site/api';
+import { getSite } from '@/lib/public-site/site';
+import { param, withParams } from '@/lib/public-site/query';
+import { shortCompetitionNames } from '@/lib/public-site/nav';
+import { PageTitle } from '@/components/league-site/page-title';
+import { Chips } from '@/components/league-site/chips';
+import { StandingsTable } from '@/components/league-site/standings-table';
+import { TrustLine } from '@/components/league-site/trust-line';
 
-import React, { useEffect, useState, use } from "react";
-import { api } from "@/services/api";
-import { Card, CardContent, CardTitle } from "@/components/ui";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import StandingsTable from "@/components/public/standings-table";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Gender, StandingsBasic } from "@/schemas";
+/**
+ * Classement (PHASE5B_LEAGUE_SITES §6): the competition's table — the same one the federation
+ * signs, from `buildStandingsView` — with competition, phase, pool and season as links, each shown
+ * only when there is more than one to choose from.
+ */
 
-interface PublicTenantDetails {
-  id: string;
-  slug: string;
-  name: string;
-  leagues: {
-    id: string;
-    name: string;
-    slug: string;
-    parentLeagueId: string | null;
-  }[];
-}
-
-const TenantStandingsPage = ({ params }: { params: Promise<{ tenantSlug: string }> }) => {
-  const { tenantSlug } = use(params);
-  const [tenant, setTenant] = useState<PublicTenantDetails | null>(null);
-  const [mainLeagues, setMainLeagues] = useState<{ id: string; name: string; slug: string; division: string; gender: Gender}[]>([]);
-  const [selectedLeagueSlug, setSelectedLeagueSlug] = useState<string | null>(null);
-  const [standings, setStandings] = useState<StandingsBasic[]>([]);
-  const [loadingTenant, setLoadingTenant] = useState(true);
-  const [loadingStandings, setLoadingStandings] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchTenant = async () => {
-      if (!tenantSlug) return;
-      setLoadingTenant(true);
-      try {
-        const response = await api.get(`/public-tenants/${tenantSlug}`);
-        const tenantData = response.data;
-        setTenant(tenantData);
-
-        const leagues = tenantData.leagues
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          .sort((a: any, b: any) => {
-            if (a.parentLeagueId === null && b.parentLeagueId !== null) return -1;
-            if (a.parentLeagueId !== null && b.parentLeagueId === null) return 1;
-            if (a.gender === Gender.MALE && b.gender !== Gender.MALE) return -1;
-            if (a.gender !== Gender.MALE && b.gender === Gender.MALE) return 1;
-            return 0;
-          })
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          .map((league: any) => ({
-            id: league.id,
-            name: league.name,
-            slug: league.slug,
-            division: league.division,
-            gender: league.gender,
-          }));
-
-        setMainLeagues(leagues);
-        if (leagues.length > 0) {
-          setSelectedLeagueSlug(leagues[0].slug);
-        }
-      } catch (err) {
-        console.error("Failed to fetch tenant:", err);
-        setError("Erreur lors du chargement du tenant.");
-      } finally {
-        setLoadingTenant(false);
-      }
-    };
-
-    fetchTenant();
-  }, [tenantSlug]);
-
-  useEffect(() => {
-    const fetchStandings = async () => {
-      if (!selectedLeagueSlug) {
-        setStandings([]);
-        return;
-      }
-
-      setLoadingStandings(true);
-      try {
-        const response = await api.get(`/public-games/standings/${selectedLeagueSlug}`);
-        setStandings(response.data);
-      } catch (err) {
-        console.error("Failed to fetch standings:", err);
-        setStandings([]);
-      } finally {
-        setLoadingStandings(false);
-      }
-    };
-
-    fetchStandings();
-  }, [selectedLeagueSlug]);
-
-  if (loadingTenant) {
-    return (
-      <div className="p-8 space-y-4">
-        <Skeleton className="h-12 w-1/2" />
-        <Skeleton className="h-96 w-full" />
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <p className="text-red text-xl">{error}</p>
-      </div>
-    );
-  }
-
-  return (
-    <div className="py-8 px-4 md:px-16">
-      <Card className="max-w-3xl mx-auto">
-        <CardTitle className="text-center text-2xl font-bold py-4">
-          Classements {tenant?.name}
-        </CardTitle>
-        <CardContent>
-          {mainLeagues.length > 0 ? (
-            <Tabs value={selectedLeagueSlug || ""} onValueChange={setSelectedLeagueSlug}>
-              <TabsList className="flex justify-around items-center flex-wrap gap-2">
-                {mainLeagues.map((league) => (
-                  <TabsTrigger key={league.id} value={league.slug}>
-                    {league.division} - {league.gender === Gender.MALE ? 'M' : league.gender === Gender.FEMALE ? 'F' : 'X'}
-                  </TabsTrigger>
-                ))}
-              </TabsList>
-              {mainLeagues.map((league) => (
-                <TabsContent key={league.id} value={league.slug} className="mt-6">
-                  <StandingsTable standings={standings} isLoading={loadingStandings} />
-                </TabsContent>
-              ))}
-            </Tabs>
-          ) : (
-            <div className="text-center py-16">
-              <h3 className="text-xl font-semibold">Pas de Classements Disponibles</h3>
-              <p className="mt-2 text-ink-muted">Aucun classement n&apos;est disponible pour le moment.</p>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-    </div>
-  );
+type Props = {
+  params: Promise<{ tenantSlug: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
 
-export default TenantStandingsPage;
+async function load({ params, searchParams }: Props) {
+  const { tenantSlug } = await params;
+  const sp = await searchParams;
+  const query = { c: param(sp.c), season: param(sp.season), stage: param(sp.stage), group: param(sp.group) };
+  const [site, table] = await Promise.all([
+    getSite(tenantSlug),
+    siteGet<PublicStandings>(tenantSlug, '/standings', query),
+  ]);
+  return { site, table, query };
+}
+
+export async function generateMetadata(props: Props): Promise<Metadata> {
+  const { table } = await load(props);
+  if (!table) return {};
+  const title = `Classement ${table.competition.name} ${table.season.name}`;
+  const leader = table.rows[0];
+  return {
+    title,
+    description: leader
+      ? `${leader.club.name} en tête avec ${leader.points} points après ${table.gamesCounted} matchs. ${table.rules.formula}.`.slice(0, 155)
+      : `Le classement ${table.competition.name}, mis à jour à chaque résultat.`,
+  };
+}
+
+export default async function StandingsPage(props: Props) {
+  const { site, table, query } = await load(props);
+  if (!site || !table) notFound();
+
+  const here = { c: table.competition.slug, season: query.season, stage: query.stage, group: query.group };
+  const short = shortCompetitionNames(site.competitions.map((c) => c.name));
+  const competitions = site.competitions.map((c, i) => ({
+    label: short[i],
+    href: withParams('/standings', {}, { c: c.slug }),
+    active: c.slug === table.competition.slug,
+  }));
+  const stages = table.tableStages.map((s) => ({
+    label: s.name,
+    href: withParams('/standings', here, { stage: s.id, group: undefined }),
+    active: s.id === table.stage.id,
+  }));
+  const groups = table.groups.map((g) => ({
+    label: g.name,
+    href: withParams('/standings', here, { group: g.id }),
+    active: g.id === table.group?.id,
+  }));
+
+  return (
+    <div className="mx-auto max-w-5xl space-y-5 px-4 py-6 sm:px-6 sm:py-10">
+      <PageTitle
+        aside={
+          table.seasons.length > 1 ? (
+            <SeasonPicker seasons={table.seasons} current={table.season.slug} here={here} />
+          ) : (
+            <span className="text-sm text-ink-muted">{table.season.name}</span>
+          )
+        }
+      >
+        Classement
+      </PageTitle>
+
+      <div className="space-y-3">
+        <Chips label="Compétitions" items={competitions} />
+        <Chips label="Phases" items={stages} />
+        <Chips label="Poules" items={groups} />
+      </div>
+
+      <div>
+        <h2 className="mb-2 text-sm font-semibold text-ink">
+          {table.competition.name}
+          {table.tableStages.length > 1 && <span className="font-normal text-ink-muted"> · {table.stage.name}</span>}
+          {table.group && <span className="font-normal text-ink-muted"> · {table.group.name}</span>}
+        </h2>
+        <StandingsTable table={table} competition={table.competition.slug} />
+      </div>
+
+      <TrustLine table={table} zone={site.timezone} />
+    </div>
+  );
+}
+
+/** More than one season: a native disclosure, so choosing one needs no JavaScript. */
+function SeasonPicker({
+  seasons,
+  current,
+  here,
+}: {
+  seasons: PublicStandings['seasons'];
+  current: string;
+  here: Record<string, string | undefined>;
+}) {
+  const name = seasons.find((s) => s.slug === current)?.name ?? seasons[0].name;
+  return (
+    <details className="relative">
+      <summary className="flex cursor-pointer list-none items-center gap-1.5 rounded-full border border-line bg-surface px-3.5 py-1.5 text-sm text-ink [&::-webkit-details-marker]:hidden">
+        {name}
+        <span aria-hidden className="text-ink-subtle">▾</span>
+      </summary>
+      <ul className="absolute right-0 z-20 mt-2 w-48 rounded-lg border border-line bg-elevated p-1 text-sm shadow-e2">
+        {seasons.map((s) => (
+          <li key={s.slug}>
+            <a
+              href={withParams('/standings', here, { season: s.slug, stage: undefined, group: undefined })}
+              className="block rounded-md px-3 py-2 text-ink hover:bg-surface-sunk"
+            >
+              {s.name}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </details>
+  );
+}
