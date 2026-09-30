@@ -12,3 +12,13 @@ export function buildTenantUrl(slug: string, path = ''): string {
   const tenantDomain = process.env.NEXT_PUBLIC_TENANT_DOMAIN || process.env.NEXT_PUBLIC_ROOT_DOMAIN || 'dxscores.app';
   return `${protocol}${slug}.${tenantDomain}${path}`;
 }
+
+/**
+ * The absolute URL of a page on the product itself, dxscores.com — for links out of a league
+ * site (« Espace organisateur », « Propulsé par DXScores »), where a relative path would stay on
+ * the league's host.
+ */
+export function buildAppUrl(path = ''): string {
+  if (process.env.NODE_ENV === 'development') return `http://localhost:3000${path}`;
+  return `https://${process.env.NEXT_PUBLIC_APP_DOMAIN || 'dxscores.com'}${path}`;
+}

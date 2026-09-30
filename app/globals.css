@@ -631,3 +631,25 @@ select:-webkit-autofill {
     display: none !important;
   }
 }
+
+/* ------------------------------------------------------------------------------------------------
+   League sites: the league's own two colours (PHASE5B_LEAGUE_SITES §4.6).
+   The frame sets --site-band / --site-band-ink / --site-accent-light / --site-accent-dark inline,
+   from a curated palette (lib/public-site/palette.ts). The accent switches with the theme exactly
+   as the tokens above do; a league that has chosen nothing falls back to the product's accent.
+   ------------------------------------------------------------------------------------------------ */
+.league-site {
+  --site-accent: var(--site-accent-light, var(--color-accent-text));
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .league-site {
+    --site-accent: var(--site-accent-dark, var(--color-accent-text));
+  }
+}
+:root[data-theme="dark"] .league-site {
+  --site-accent: var(--site-accent-dark, var(--color-accent-text));
+}
+/* Hover on the coloured header band: its own ink, faintly. */
+.site-band-hover:hover {
+  background-color: color-mix(in srgb, var(--site-band-ink, currentColor) 12%, transparent);
+}

@@ -44,6 +44,12 @@ const LEGACY_REDIRECTS: Record<string, string> = {
 };
 const LEGACY_TO_HOME = /^\/(games|tenants|news|about|api|docs|leagues|standings|teams|players|upload2?|welcome|health)(\/.*)?$/;
 
+/** Old league-site addresses: the playoff page is plural now, and players are listed by club. */
+const LEAGUE_REDIRECTS: Record<string, string> = {
+  '/playoff': '/playoffs',
+  '/players': '/teams',
+};
+
 /** Where a signed-in reader who asks for the landing, the login or the sign-up page is sent. */
 const SIGNED_IN_SKIPS = new Set(['/', '/login', '/register']);
 
@@ -73,6 +79,10 @@ export async function middleware(request: NextRequest) {
   // --- 4. League sites: rewrite into the league tree ---
   const tenantSlug = resolveTenantSlugFromHostname(hostname);
   if (tenantSlug && !['www', 'localhost'].includes(tenantSlug)) {
+    // Two addresses the old site used, kept alive for links already shared (PHASE5B §5).
+    if (LEAGUE_REDIRECTS[pathname]) {
+      return NextResponse.redirect(new URL(`${LEAGUE_REDIRECTS[pathname]}${search}`, request.url), 308);
+    }
     const newPath = url.pathname === '/'
     ? `/public/public_tenant/${tenantSlug}/`
     : `/public/public_tenant/${tenantSlug}${url.pathname}/`;
