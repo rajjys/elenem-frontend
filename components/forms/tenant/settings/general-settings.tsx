@@ -23,13 +23,19 @@ import { UpdateTenantSchema, VisibilityLevel, TenantDetails, SportType, TenantTy
 import { Loader2 } from "lucide-react"; // Add Loader2 import
 import { buildTenantUrl } from '@/utils/tenant-url';
 import { TIMEZONES, timezoneLabel } from '@/utils/timezones';
+import { SiteColourPicker, SiteColourPreview } from './site-colours';
 
 /**
  * The organisation's fields, plus its time zone. The zone lives on the business profile, but it
  * belongs beside the country here: it is the clock every time on the league's site is shown in
  * (PHASE5B_LEAGUE_SITES §4.4), and the dashboard's one-off card is not the place to correct it.
  */
-const GeneralSettingsSchema = UpdateTenantSchema.extend({ timezone: z.string().optional() });
+const GeneralSettingsSchema = UpdateTenantSchema.extend({
+  timezone: z.string().optional(),
+  // The league site's two colours, palette keys ('' for none), on the business profile too.
+  primaryColor: z.string().optional(),
+  secondaryColor: z.string().optional(),
+});
 type FormValues = z.infer<typeof GeneralSettingsSchema>;
 
 interface TenantGeneralSettingsProps {
@@ -50,6 +56,8 @@ function buildDefaultValues(tenant: TenantDetails): FormValues {
     visibility: tenant.visibility,
     ownerId: tenant.ownerId, // Include ownerId
     timezone: tenant.businessProfile?.timezone ?? '',
+    primaryColor: (tenant.businessProfile?.brandingTheme as { primaryColor?: string } | null)?.primaryColor ?? '',
+    secondaryColor: (tenant.businessProfile?.brandingTheme as { secondaryColor?: string } | null)?.secondaryColor ?? '',
   } as FormValues; // cast - your UpdateTenantSchema determines exact optionality
 }
 
@@ -114,9 +122,17 @@ export default function TenantGeneralSettings({ tenant, onSuccess  }: TenantGene
       toast.info("No changes detected to save.");
       return;
     }
-    // The zone is a profile field: sent under businessProfile, which accepts a partial update.
-    const { timezone, ...tenantDelta } = deltaPayload;
-    const payload = timezone === undefined ? tenantDelta : { ...tenantDelta, businessProfile: { timezone } };
+    // The zone and the colours are profile fields: sent under businessProfile, which accepts a
+    // partial update. The colours always go as a pair, since the theme is stored whole.
+    const { timezone, primaryColor, secondaryColor, ...tenantDelta } = deltaPayload;
+    const coloursChanged = primaryColor !== undefined || secondaryColor !== undefined;
+    const profile = {
+      ...(timezone !== undefined ? { timezone } : {}),
+      ...(coloursChanged
+        ? { brandingTheme: { primaryColor: currentValues.primaryColor || null, secondaryColor: currentValues.secondaryColor || null } }
+        : {}),
+    };
+    const payload = Object.keys(profile).length ? { ...tenantDelta, businessProfile: profile } : tenantDelta;
     try {
       // call backend with partial payload. The backend should accept partial updates (PATCH/PUT semantics)
       await api.put(`/tenants/${tenant.id}`, payload);
@@ -343,6 +359,36 @@ export default function TenantGeneralSettings({ tenant, onSuccess  }: TenantGene
             )}
           />
           {errors.tenantType && <p className="text-negative text-xs">{errors.tenantType.message}</p>}
+        </div>
+      </div>
+
+      {/* The league site's colours (PHASE5B §4.6), beside a preview of its header. */}
+      <div className="grid gap-6 border-t border-line pt-6 md:grid-cols-[1fr_16rem]">
+        <div className="space-y-5">
+          <div>
+            <p className="font-semibold text-ink">Couleurs du site</p>
+            <p className="text-sm text-ink-muted">
+              Celles du site public de votre ligue, choisies dans une palette lisible en mode clair comme en mode sombre.
+            </p>
+          </div>
+          <Controller
+            name="primaryColor"
+            control={control}
+            render={({ field }) => (
+              <SiteColourPicker name="primaryColor" label="Couleur principale" hint="Le bandeau en haut du site." value={field.value ?? ''} onChange={field.onChange} />
+            )}
+          />
+          <Controller
+            name="secondaryColor"
+            control={control}
+            render={({ field }) => (
+              <SiteColourPicker name="secondaryColor" label="Couleur d’accent" hint="Liens, onglet actif, soulignements. Par défaut, la principale." value={field.value ?? ''} onChange={field.onChange} />
+            )}
+          />
+        </div>
+        <div>
+          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-ink-subtle">Aperçu</p>
+          <SiteColourPreview name={tenant.name} primary={watch('primaryColor') ?? ''} accent={watch('secondaryColor') ?? ''} />
         </div>
       </div>
 

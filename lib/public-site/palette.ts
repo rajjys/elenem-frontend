@@ -26,6 +26,9 @@ export const SITE_PALETTE = {
 
 export type SiteColour = keyof typeof SITE_PALETTE;
 
+/** The text on a band: every band colour above is checked against it at AA or better. */
+export const BAND_INK = '#ffffff';
+
 const colour = (key: string | null | undefined) =>
   key && key in SITE_PALETTE ? SITE_PALETTE[key as SiteColour] : null;
 
@@ -37,7 +40,7 @@ export function siteColourVars(primary: string | null, accent: string | null): C
   const band = colour(primary);
   const link = colour(accent) ?? band;
   return {
-    ...(band ? { '--site-band': band.band, '--site-band-ink': '#ffffff' } : {}),
+    ...(band ? { '--site-band': band.band, '--site-band-ink': BAND_INK } : {}),
     ...(link ? { '--site-accent-light': link.light, '--site-accent-dark': link.dark } : {}),
   } as CSSProperties;
 }
