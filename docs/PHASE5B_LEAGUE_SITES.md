@@ -752,7 +752,43 @@ standings card if time allows.
 **Done when:** a match link and a standings link pasted into WhatsApp show the right title,
 description and image.
 
-### 5B.7: Clean up and brand (≈ 0.5 day)
+### 5B.7: Clean up and brand (≈ 0.5 day) — **done 2026-09-30**
+
+Shipped as backend `2151bcb`, `f786d1b` and frontend `e25fb90`, `f6d83ca`, verified on production.
+
+- **The old public API is gone.** public-tenants, public-leagues, public-teams, public/players,
+  public/seasons, public-games and public-posts, with their services and public-only methods (cut
+  with the TypeScript parser). Every anonymous read is now a `/public/sites/:slug` route. The seed
+  script and the tenants e2e test use the new API.
+- **The old frontend is gone.** PublicTenantHeader/Footer, `components/public/*`,
+  game-public-card, date-carousel, vertical-blogpost-card, generalSearchDialog.
+- **The `globals.css` safelist is gone.** The CSS drops from about 180 KB to 105 KB on every page.
+- **Colours.** « Couleurs du site » in the organisation settings' General tab, with the eight
+  palette colours or « Aucune » for each of the two, and a live preview built on the site's own
+  variables. `brandingTheme` was validated with `@IsJSON()` (a JSON *string*), which refused the
+  object; it is now a `BrandingThemeDto` of palette keys. Tested on production: the demo's header
+  and share card took Vert/Or within 30 s, then went back to no colours (the demo's colours are
+  the owner's call).
+- The §4.9 switch shipped in 5B.4.
+
+### 5B.5b: Players' statistics (owner's request, 2026-09-30) — **done**
+
+Shipped as backend `f04a1f1` and frontend `d3b466a`. It reopens the player pages §4.8 deferred, as
+its « revisit when players ask » foresaw:
+
+- `/players/<slug>`: identity, season strip, and « Match par match ». Only for a named player
+  (§4.9); 404 otherwise. Named players link to it from every table.
+- The team comparison on a game page, as in the back office: top scorers, then a bar per column.
+- Marqueurs is paged, 25 at a time, in the API as well as on the page.
+- The club roster carries each player's season figures, from the same leaderboard derivation.
+- Équipes cards show rank, points and won/lost.
+- Player pages are not in the sitemap; they are reached from the site's own links.
+
+**Note for later sessions:** heavy scripted traffic to `dxscores.com` got the checking machine's
+address challenged by the Vercel Security Checkpoint (403 « We're verifying your browser ») on
+2026-09-30. The league sites and the API were unaffected, and a real browser passes the check.
+Verify through the API or with lighter traffic.
+
 
 - Delete the old frontend code and the old `public-*` controllers.
 - Remove the `globals.css` safelist.
