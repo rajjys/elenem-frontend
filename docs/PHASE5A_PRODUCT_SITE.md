@@ -480,6 +480,19 @@ only when it means something. What marketing adds is small:
   3.75rem)`, tight leading, `-0.02em` tracking) and `--text-title` (≈ `clamp(1.5rem, 3vw, 2.25rem)`).
 - **Section rhythm:** one `marketing-section` utility (`py-16 sm:py-24`) and one container width
   (`max-w-6xl px-4 sm:px-6`).
+- **Grounds** (added 2026-10-01, after the owner noted every section was white or near-white). The
+  brand has one colour (§8.2), so a section stands out by that colour as a ground, not by a second
+  hue. Four grounds, each with a job, both themes defined in `globals.css`:
+  - `bg-canvas`: the default.
+  - `bg-surface`: a quiet band (the founder's word).
+  - `bg-wash` (new): the brand navy as a pale ground, for the **one** section that carries the
+    product (Fonctionnalités), and the hero's top light. Text tokens keep AA on it (ink-subtle
+    4.56:1 light, 4.82:1 dark).
+  - `bg-accent`: the call to act (the final CTA band).
+
+  Pictures stand straight on their ground in a `.halo` (a soft light of `--t-halo` behind them),
+  never in a bordered box. A section with halos clips them (`overflow-hidden`). Not for the app,
+  where a tint means "selected".
 - **Motion, CSS only:**
   - Hover: buttons and cards move `-1px` and go from `shadow-e1` to `shadow-e2`, and `border-line`
     becomes `border-line-strong`, over 150–200 ms.
@@ -679,6 +692,14 @@ owner on 2026-09-29. Deviations from the list below:
   picture, then points. `scripts/capture-landing.mjs` retakes the day panel and the standings
   from production (read-only; it needs `playwright-core`, installed with `--no-save`). Three
   points per module instead of four or five.
+  *Then, on the owner's review (same day):* Organisation shows the « Ajouter un match » dialog,
+  filled in (the owner's capture): a game placed with its hall, hour and score, and « Déjà ce
+  jour-là » listing the day's other games. The day panel it replaces was a list; the dialog is the
+  gesture itself. The WhatsApp bubbles come from a second capture, both Championnat Messieurs. The
+  grey box behind each picture is gone: the section is the `bg-wash` band, its heading centred,
+  each picture in a `.halo`, and the modules are labelled « 01 — Organisation » rather than with
+  filled squares, which belong to « Comment ça marche ». `capture-landing.mjs` now retakes only the
+  standings, which are public, so it no longer signs in.
 - **The demo league is partial on production** (8 men's teams, 56 games, 11 results). The *Voir la
   démo* link stays hidden (`site.demoUrl: null`) until `scripts/seed-demo-league.mjs` (backend) has
   finished it. The script is resumable and needs the demo account's password.

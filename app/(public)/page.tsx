@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { ArrowRight, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/utils/cn';
-import { DayPanelShot, StandingsShot, WhatsAppShots } from '@/components/marketing/module-visuals';
+import { AddGameShot, StandingsShot, WhatsAppShots } from '@/components/marketing/module-visuals';
 import { HeroScreens } from '@/components/marketing/hero-screens';
 import { VideoFacade } from '@/components/marketing/video-facade';
 import { ShowcaseLeagues, Testimonials } from '@/components/marketing/social-proof';
@@ -86,7 +86,7 @@ const modules = [
       'Un conflit de salle ou d’équipe est signalé avant qu’il n’arrive.',
       'Les étapes de la saison, des poules à la phase finale ; les reports, avec leur motif.',
     ],
-    Visual: DayPanelShot,
+    Visual: AddGameShot,
   },
   {
     label: 'Points',
@@ -164,7 +164,7 @@ export default function LandingPage() {
       <section className="relative overflow-hidden border-b border-line">
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0 bg-gradient-to-b from-accent-soft/50 via-canvas to-canvas"
+          className="pointer-events-none absolute inset-0 bg-gradient-to-b from-wash via-canvas to-canvas"
         />
         <div className={`${wrap} relative pt-16 text-center sm:pt-24`}>
           {/* Two sentences, two lines: the first says what the product is (management), the second
@@ -247,9 +247,11 @@ export default function LandingPage() {
       </section>
 
       {/* ---------- The three modules ---------- */}
-      <section id="fonctionnalites" className="scroll-mt-20 border-y border-line bg-surface">
+      {/* The page's one band in the brand's colour (`bg-wash`): the section that shows the product.
+          The pictures stand on it in a halo, with no box; `overflow-hidden` clips the halos. */}
+      <section id="fonctionnalites" className="scroll-mt-20 overflow-hidden bg-wash">
         <div className={`${wrap} py-16 sm:py-24`}>
-          <div className="reveal max-w-2xl">
+          <div className="reveal mx-auto max-w-2xl text-center">
             <p className="text-xs font-semibold uppercase tracking-wider text-accent-text">Fonctionnalités</p>
             <h2 className="mt-3 text-title font-bold text-ink">Trois modules, une seule saison.</h2>
             <p className="mt-4 text-lg leading-relaxed text-ink-muted">
@@ -268,24 +270,27 @@ export default function LandingPage() {
                 className="reveal grid gap-8 lg:grid-cols-2 lg:grid-rows-[1fr_auto_auto_1fr] lg:gap-x-16 lg:gap-y-0"
               >
                 <header className={cn('lg:row-start-2', i % 2 ? 'lg:col-start-2' : 'lg:col-start-1')}>
+                  {/* « 01 — Organisation »: a figure and a rule rather than a filled square, so the
+                      three modules do not read like the numbered steps further down. */}
                   <p className="flex items-center gap-3 text-xs font-semibold uppercase tracking-wider text-accent-text">
-                    <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-accent text-sm tabular-nums text-accent-ink">
-                      {i + 1}
+                    <span aria-hidden className="text-sm tabular-nums">
+                      {String(i + 1).padStart(2, '0')}
                     </span>
+                    <span aria-hidden className="h-px w-8 bg-accent-line" />
                     {m.label}
                   </p>
                   <h3 className="mt-4 text-balance text-2xl font-bold text-ink sm:text-3xl">{fr(m.title)}</h3>
                   <p className="mt-3 max-w-xl text-lg leading-relaxed text-ink-muted">{fr(m.lead)}</p>
                 </header>
-                {/* A backdrop the width of the column, so the picture is the row's other half
-                    rather than a small card floating in white space. */}
                 <div
                   className={cn(
-                    'flex items-center justify-center rounded-2xl border border-line bg-canvas px-4 py-8 sm:px-10 sm:py-12 lg:row-span-4 lg:row-start-1',
+                    'flex items-center justify-center py-2 lg:row-span-4 lg:row-start-1 lg:py-6',
                     i % 2 ? 'lg:col-start-1' : 'lg:col-start-2',
                   )}
                 >
-                  <m.Visual />
+                  <div className="halo flex w-full justify-center">
+                    <m.Visual />
+                  </div>
                 </div>
                 <div className={cn('lg:row-start-3 lg:pt-6', i % 2 ? 'lg:col-start-2' : 'lg:col-start-1')}>
                   <ul className="space-y-3">

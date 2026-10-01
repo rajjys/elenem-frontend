@@ -147,6 +147,15 @@
   --t-accent-soft:   #e6edf9;   /* selected rows, active nav, subtle tints */
   --t-accent-line:   #aec6ea;
 
+  /* Grounds for the product site (dxscores.com; PHASE5A_PRODUCT_SITE §8.1). The brand has one
+     colour, and these are that colour as a ground, so a section can stand out without a second hue.
+     Not for the app, where a tint means "selected". Text tokens keep AA on the wash in both themes
+     (ink-subtle 4.56:1 here, 4.82:1 dark).
+       wash — the one band that carries the product (Fonctionnalités) and the hero's top light
+       halo — the light behind a picture standing on a ground (`.halo`), in place of a box */
+  --t-wash:          #ebf1fb;
+  --t-halo:          #c6d6f0;
+
   /* Semantic. A colour appears only when it means something:
      a win, a loss, something that needs attention. */
   --t-positive:      #15803d;
@@ -247,6 +256,9 @@
     --t-accent-soft:   #15263c;
     --t-accent-line:   #2c4a72;
 
+    --t-wash:          #111e31;
+    --t-halo:          #1d3459;
+
     --t-positive:      #5cc98d;
     --t-positive-soft: #10281c;
     --t-negative:      #f08a8a;
@@ -292,6 +304,9 @@
   --t-accent-soft:   #15263c;
   --t-accent-line:   #2c4a72;
 
+  --t-wash:          #111e31;
+  --t-halo:          #1d3459;
+
   --t-positive:      #5cc98d;
   --t-positive-soft: #10281c;
   --t-negative:      #f08a8a;
@@ -325,6 +340,8 @@
   --color-accent-text:  var(--t-accent-text);
   --color-accent-soft:  var(--t-accent-soft);
   --color-accent-line:  var(--t-accent-line);
+
+  --color-wash:         var(--t-wash);
 
   --color-positive:      var(--t-positive);
   --color-positive-soft: var(--t-positive-soft);
@@ -535,6 +552,22 @@ select:-webkit-autofill {
 }
 @media (prefers-reduced-motion: reduce) {
   .link-grow { transition: none; }
+}
+
+/* A soft light behind a picture that stands on a ground: depth without a box (PHASE5A §8.1). The
+   picture keeps its own edge and shadow; the halo only says "this is the thing to look at". It
+   reaches past its element, so the section that holds it clips (`overflow-hidden`). */
+.halo {
+  position: relative;
+  isolation: isolate;
+}
+.halo::before {
+  content: '';
+  position: absolute;
+  inset: -12% -16%;
+  z-index: -1;
+  background: radial-gradient(closest-side, var(--t-halo), transparent);
+  pointer-events: none;
 }
 
 /* Fade-in animation for flyouts */
