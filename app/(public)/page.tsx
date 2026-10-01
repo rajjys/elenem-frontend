@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { Fragment } from 'react';
 import Link from 'next/link';
 import { ArrowRight, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -67,7 +68,7 @@ const problem =
 const withDx = [
   'Calendrier, résultats et classement au même endroit, publiés sur le site de la ligue.',
   'Le classement se met à jour à chaque score saisi.',
-  'Le classement officiel s’exporte en image, prêt pour WhatsApp.',
+  'Le classement officiel s’exporte en image, prêt pour les réseaux sociaux.',
   'Chaque point se retrace jusqu’au match qui l’a donné.',
 ];
 
@@ -105,7 +106,7 @@ const modules = [
     lead: 'Ce que vous saisissez est publié aussitôt, sur le site de votre ligue et dans les formats que l’on partage.',
     points: [
       'Le site de votre ligue, votre-ligue.dxscores.app : classement, calendrier, résultats, communiqués.',
-      'Un lien partagé sur WhatsApp montre le score ou le classement avant même d’être ouvert.',
+      'Un lien partagé sur les réseaux sociaux montre le score ou le classement avant même d’être ouvert.',
       'Le classement officiel en PDF, avec en-tête, cachet et signature ; en Excel pour vos archives.',
     ],
     Visual: WhatsAppShots,
@@ -175,7 +176,7 @@ export default function LandingPage() {
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-ink-muted">
             {fr(
-              'Calendrier, salles, résultats, feuilles de marque : DXScores tient toute la saison de votre ligue, la publie sur le site de la ligue et produit le classement officiel, prêt à partager sur WhatsApp.',
+              'Calendrier, salles, résultats, feuilles de marque : DXScores tient toute la saison de votre ligue, la publie sur le site de la ligue et produit le classement officiel, prêt à partager sur les réseaux sociaux.',
             )}
           </p>
           <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
@@ -262,54 +263,60 @@ export default function LandingPage() {
           </div>
           <div className="mt-14 space-y-16 sm:mt-20 sm:space-y-24">
             {modules.map((m, i) => (
-              // On a phone: the title, the picture, then the points — the picture is the proof, so
-              // it does not wait under a list. From lg: text in one column, centred beside the
-              // picture in the other, alternating sides.
-              <article
-                key={m.label}
-                className="reveal grid gap-8 lg:grid-cols-2 lg:grid-rows-[1fr_auto_auto_1fr] lg:gap-x-16 lg:gap-y-0"
-              >
-                <header className={cn('lg:row-start-2', i % 2 ? 'lg:col-start-2' : 'lg:col-start-1')}>
-                  {/* « 01 — Organisation »: a figure and a rule rather than a filled square, so the
-                      three modules do not read like the numbered steps further down. */}
-                  <p className="flex items-center gap-3 text-xs font-semibold uppercase tracking-wider text-accent-text">
-                    <span aria-hidden className="text-sm tabular-nums">
-                      {String(i + 1).padStart(2, '0')}
-                    </span>
-                    <span aria-hidden className="h-px w-8 bg-accent-line" />
-                    {m.label}
-                  </p>
-                  <h3 className="mt-4 text-balance text-2xl font-bold text-ink sm:text-3xl">{fr(m.title)}</h3>
-                  <p className="mt-3 max-w-xl text-lg leading-relaxed text-ink-muted">{fr(m.lead)}</p>
-                </header>
-                <div
-                  className={cn(
-                    'flex items-center justify-center py-2 lg:row-span-4 lg:row-start-1 lg:py-6',
-                    i % 2 ? 'lg:col-start-1' : 'lg:col-start-2',
-                  )}
+              <Fragment key={m.label}>
+                {/* Between two modules, a hairline that fades at both ends: it divides without
+                    boxing anything in. */}
+                {i > 0 && (
+                  <div aria-hidden className="mx-auto h-px max-w-3xl bg-gradient-to-r from-transparent via-accent-line to-transparent" />
+                )}
+                {/* On a phone: the title, the picture, then the points — the picture is the proof, so
+                    it does not wait under a list. From lg: text in one column, centred beside the
+                    picture in the other, alternating sides. */}
+                <article
+                  className="reveal grid gap-8 lg:grid-cols-2 lg:grid-rows-[1fr_auto_auto_1fr] lg:gap-x-16 lg:gap-y-0"
                 >
-                  <div className="halo flex w-full justify-center">
-                    <m.Visual />
+                  <header className={cn('lg:row-start-2', i % 2 ? 'lg:col-start-2' : 'lg:col-start-1')}>
+                    {/* « 01 — Organisation »: a figure and a rule rather than a filled square, so the
+                        three modules do not read like the numbered steps further down. */}
+                    <p className="flex items-center gap-3 text-xs font-semibold uppercase tracking-wider text-accent-text">
+                      <span aria-hidden className="text-sm tabular-nums">
+                        {String(i + 1).padStart(2, '0')}
+                      </span>
+                      <span aria-hidden className="h-px w-8 bg-accent-line" />
+                      {m.label}
+                    </p>
+                    <h3 className="mt-4 text-balance text-2xl font-bold text-ink sm:text-3xl">{fr(m.title)}</h3>
+                    <p className="mt-3 max-w-xl text-lg leading-relaxed text-ink-muted">{fr(m.lead)}</p>
+                  </header>
+                  <div
+                    className={cn(
+                      'flex items-center justify-center py-2 lg:row-span-4 lg:row-start-1 lg:py-6',
+                      i % 2 ? 'lg:col-start-1' : 'lg:col-start-2',
+                    )}
+                  >
+                    <div className="halo flex w-full justify-center">
+                      <m.Visual />
+                    </div>
                   </div>
-                </div>
-                <div className={cn('lg:row-start-3 lg:pt-6', i % 2 ? 'lg:col-start-2' : 'lg:col-start-1')}>
-                  <ul className="space-y-3">
-                    {m.points.map((t) => (
-                      <li key={t} className="flex items-start gap-3 text-ink">
-                        <Check className="mt-0.5 h-5 w-5 shrink-0 text-positive" aria-hidden />
-                        <span>{fr(t)}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  {m.demoLink && site.demoUrl && (
-                    <Button asChild variant="outline" size="lg" className="mt-8">
-                      <a href={site.demoUrl} target="_blank" rel="noopener noreferrer">
-                        Visiter le site de démonstration
-                      </a>
-                    </Button>
-                  )}
-                </div>
-              </article>
+                  <div className={cn('lg:row-start-3 lg:pt-6', i % 2 ? 'lg:col-start-2' : 'lg:col-start-1')}>
+                    <ul className="space-y-3">
+                      {m.points.map((t) => (
+                        <li key={t} className="flex items-start gap-3 text-ink">
+                          <Check className="mt-0.5 h-5 w-5 shrink-0 text-positive" aria-hidden />
+                          <span>{fr(t)}</span>
+                        </li>
+                      ))}
+                    </ul>
+                    {m.demoLink && site.demoUrl && (
+                      <Button asChild variant="outline" size="lg" className="mt-8">
+                        <a href={site.demoUrl} target="_blank" rel="noopener noreferrer">
+                          Visiter le site de démonstration
+                        </a>
+                      </Button>
+                    )}
+                  </div>
+                </article>
+              </Fragment>
             ))}
           </div>
         </div>
