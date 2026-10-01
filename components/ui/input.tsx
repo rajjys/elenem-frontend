@@ -134,11 +134,17 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
     };
 
     const isSearchType = type === 'search';
+    // The caller's id wins, and `name` is only the fallback. It used to be `id={name}` after the
+    // spread, which replaced every explicit id: a field registered as `name` (react-hook-form)
+    // got id="name" whatever the page said, so `<Label htmlFor="leagueName">` pointed at nothing,
+    // and a field with no name had no id at all. Tapping such a label did not focus its field,
+    // and a screen reader could not tell which label was whose.
+    const inputId = props.id ?? name;
 
     return (
       <div className="">
         {label && (
-          <label htmlFor={name} className="block text-sm font-medium text-ink mb-1">
+          <label htmlFor={inputId} className="block text-sm font-medium text-ink mb-1">
             {label}
             {required && <span className="text-negative ml-1">*</span>}
           </label>
@@ -151,7 +157,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
           )}
           <input
             {...props}
-            id={name}
+            id={inputId}
             name={name}
             ref={ref}
             type={type}
