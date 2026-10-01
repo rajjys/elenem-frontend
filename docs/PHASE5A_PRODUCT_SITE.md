@@ -658,9 +658,20 @@ owner on 2026-09-29. Deviations from the list below:
   (`components/marketing/product-preview.tsx`: a laptop calendar, a phone standings table, a day
   panel), captioned *Exemple illustratif*. They cost no image bytes and stay sharp in both themes.
   Real screenshots replace them once the demo league is complete.
+  *Update 2026-10-01:* the hero now shows two of the owner's captures of the demo league
+  (`components/marketing/hero-screens.tsx`): the admin calendar in a browser window and a match
+  page of the league site in a phone, captioned *Captures de la ligue de démonstration — clubs et
+  joueurs fictifs*. Differences from §6.1: the phone shows a finished match (score and team
+  comparison), not the standings; plain `<img>` with `srcset` instead of `next/image`, which would
+  add a client component for files already resized and compressed (WebP, 22–70 KB, in
+  `public/landing/`); high fetch priority on the calendar, the larger image. The phone's frame is
+  drawn in CSS on tokens; the owner's PNGs stay outside the repository. The three module panels
+  are still drawn.
 - **The demo league is partial on production** (8 men's teams, 56 games, 11 results). The *Voir la
   démo* link stays hidden (`site.demoUrl: null`) until `scripts/seed-demo-league.mjs` (backend) has
   finished it. The script is resumable and needs the demo account's password.
+  *Update 2026-10-01:* finished (12 men's and 8 women's clubs, results and scoresheets), and the
+  league site is rebuilt (5B). *Voir un exemple* opens `https://demo.dxscores.app` in a new tab.
 - The video slot is built and hidden until `presentationVideoId` is set.
 - `/` ships 176 KB of compressed JavaScript on production, down from 666 KB.
 

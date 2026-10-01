@@ -25,10 +25,10 @@ export const site = {
   presentationVideoId: null as string | null,
 
   /**
-   * The demo league's site (§3.4). `null` until it is filled with fictional data and the league
-   * site is rebuilt (5B): until then, "Voir un exemple" would show the old site.
+   * The demo league's site (§3.4): fictional clubs on the production league site. "Voir un
+   * exemple" opens it in a new tab; `null` would put « Comment ça marche » back in its place.
    */
-  demoUrl: null as string | null,
+  demoUrl: 'https://demo.dxscores.app' as string | null,
 
   /** Real quotes only, with the person's agreement. Empty hides the section. */
   testimonials: [] as Testimonial[],

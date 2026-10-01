@@ -2,13 +2,8 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowRight, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import {
-  DayPanel,
-  DesktopCalendar,
-  PhoneStandings,
-  PointsPanel,
-  PublishPanel,
-} from '@/components/marketing/product-preview';
+import { DayPanel, PointsPanel, PublishPanel } from '@/components/marketing/product-preview';
+import { HeroScreens } from '@/components/marketing/hero-screens';
 import { VideoFacade } from '@/components/marketing/video-facade';
 import { ShowcaseLeagues, Testimonials } from '@/components/marketing/social-proof';
 import { site } from '@/content/site';
@@ -217,18 +212,14 @@ export default function LandingPage() {
           </p>
         </div>
 
-        {/* The organiser's side and the supporter's side: the calendar on a laptop, the standings
-            on a phone. Drawn for now (fictional clubs); the demo league's real screens replace it
-            once the league site is rebuilt. On a phone only the phone is shown — a laptop drawn
-            at that width would be unreadable. */}
-        <figure className="relative mx-auto mt-14 max-w-4xl px-4 pb-16 sm:px-6 sm:pb-24">
-          {/* The phone overlaps the laptop with a negative margin, in the flow — positioned
-              absolutely it reserved no height and ran off the bottom of the section. */}
-          <div className="flex items-start justify-center">
-            <DesktopCalendar className="hidden md:block" />
-            <PhoneStandings className="relative z-10 md:-ml-28 md:mt-14" />
-          </div>
-          <figcaption className="mt-4 text-center text-xs text-ink-subtle">Exemple illustratif</figcaption>
+        {/* The organiser's side and the supporter's side, both real: the demo league's calendar in
+            a browser, one of its matches on a phone. The phone overlaps on every width — at 390px
+            the calendar is too small to read, but it still says « and there is a back office ». */}
+        <figure className="relative mx-auto mt-12 max-w-5xl px-4 pb-16 sm:mt-14 sm:px-6 sm:pb-24">
+          <HeroScreens />
+          <figcaption className="mt-4 text-center text-xs text-ink-subtle">
+            Captures de la ligue de démonstration — clubs et joueurs fictifs
+          </figcaption>
         </figure>
       </section>
 
