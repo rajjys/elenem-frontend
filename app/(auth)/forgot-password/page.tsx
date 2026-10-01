@@ -2,13 +2,15 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { toast } from 'sonner';
-import { Mail, KeyRound, Lock, ArrowLeft, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, CheckCircle2 } from 'lucide-react';
+import { AuthShell } from '@/components/auth/auth-shell';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { PasswordInput } from '@/components/ui/password-input';
 import { OtpInput } from '@/components/ui/otp-input';
+import { PasswordChecklist, passwordMeetsRules } from '@/components/ui/password-checklist';
 import { toastApiError } from '@/utils';
 import { useForgotPassword, useVerifyResetOtp, useResetPassword } from '@/services/auth';
 import { useCooldown } from '@/hooks/useCooldown';
@@ -16,6 +18,10 @@ import { useCooldown } from '@/hooks/useCooldown';
 type Step = 'email' | 'otp' | 'password';
 const STEPS: Step[] = ['email', 'otp', 'password'];
 
+/**
+ * « Mot de passe oublié », on the same frame as sign-in and sign-up (PHASE5A_PRODUCT_SITE §8.3):
+ * an e-mail, the 6-digit code it receives, then a new password under the same rule as sign-up.
+ */
 export default function ForgotPasswordPage() {
   const router = useRouter();
   const [step, setStep] = useState<Step>('email');
@@ -23,6 +29,7 @@ export default function ForgotPasswordPage() {
   const [otp, setOtp] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirm, setConfirm] = useState('');
+  const [tried, setTried] = useState(false);
 
   const forgot = useForgotPassword();
   const verifyOtp = useVerifyResetOtp();
@@ -68,6 +75,8 @@ export default function ForgotPasswordPage() {
   // Step 3 — set the new password.
   const submitReset = (e: React.FormEvent) => {
     e.preventDefault();
+    setTried(true);
+    if (!passwordMeetsRules(newPassword)) return;
     if (newPassword !== confirm) {
       toast.error('Les mots de passe ne correspondent pas.');
       return;
@@ -87,83 +96,108 @@ export default function ForgotPasswordPage() {
   const stepIndex = STEPS.indexOf(step);
 
   return (
-    <div className="flex min-h-[70vh] items-center justify-center px-4 py-10">
-      <div className="w-full max-w-md rounded-2xl border border-line bg-surface p-8 shadow-xl">
-        {/* header */}
-        <div className="mb-6 flex flex-col items-center text-center">
-          <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-accent-soft text-accent-text">
-            {step === 'email' ? <Mail size={22} /> : step === 'otp' ? <KeyRound size={22} /> : <Lock size={22} />}
-          </div>
-          <h1 className="text-xl font-semibold text-ink">Mot de passe oublié</h1>
-          <p className="mt-1 text-sm text-ink-muted">
-            {step === 'email' && 'Entrez votre email pour recevoir un code à 6 chiffres.'}
-            {step === 'otp' && `Entrez le code envoyé à ${email}.`}
-            {step === 'password' && 'Choisissez un nouveau mot de passe.'}
-          </p>
-        </div>
-
-        {/* step indicator */}
-        <div className="mb-6 flex items-center justify-center gap-2">
-          {STEPS.map((s, i) => (
-            <div
-              key={s}
-              className={`h-1.5 w-10 rounded-full transition-colors ${
-                i <= stepIndex ? 'bg-accent' : 'bg-line'
-              }`}
-            />
-          ))}
-        </div>
-
-        {step === 'email' && (
-          <form onSubmit={requestCode} className="space-y-4">
-            <Input type="email" placeholder="votre@email.com" value={email} onChange={(e) => setEmail(e.target.value)} required autoFocus />
-            <Button type="submit" variant="primary" className="w-full" disabled={forgot.isPending}>
-              {forgot.isPending ? 'Envoi…' : 'Envoyer le code'}
-            </Button>
-          </form>
-        )}
-
-        {step === 'otp' && (
-          <form onSubmit={checkCode} className="space-y-4">
-            <OtpInput value={otp} onChange={setOtp} autoFocus />
-            <Button type="submit" variant="primary" className="w-full" disabled={verifyOtp.isPending}>
-              {verifyOtp.isPending ? 'Vérification…' : 'Vérifier le code'}
-            </Button>
-            <div className="flex items-center justify-between text-sm">
-              <button type="button" className="flex items-center gap-1 text-ink-muted hover:text-ink" onClick={() => setStep('email')}>
-                <ArrowLeft size={14} /> Changer l&apos;email
-              </button>
-              <button
-                type="button"
-                disabled={cooldown.remaining > 0 || forgot.isPending}
-                className="text-accent-text hover:text-accent-text disabled:cursor-not-allowed disabled:text-ink-subtle"
-                onClick={resendCode}
-              >
-                {cooldown.remaining > 0 ? `Renvoyer (${cooldown.remaining}s)` : 'Renvoyer'}
-              </button>
-            </div>
-          </form>
-        )}
-
-        {step === 'password' && (
-          <form onSubmit={submitReset} className="space-y-4">
-            <div className="flex items-center gap-2 rounded-lg bg-positive-soft px-3 py-2 text-sm text-positive">
-              <CheckCircle2 size={16} /> Code vérifié
-            </div>
-            <PasswordInput placeholder="Nouveau mot de passe" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required autoFocus />
-            <PasswordInput placeholder="Confirmer le mot de passe" value={confirm} onChange={(e) => setConfirm(e.target.value)} required />
-            <Button type="submit" variant="primary" className="w-full" disabled={reset.isPending}>
-              {reset.isPending ? 'Réinitialisation…' : 'Réinitialiser le mot de passe'}
-            </Button>
-          </form>
-        )}
-
-        <div className="mt-6 border-t border-line pt-4 text-center text-sm">
-          <Link href="/login" className="text-accent-text hover:text-accent-text">
-            Retour à la connexion
-          </Link>
-        </div>
+    <AuthShell
+      title="Mot de passe oublié"
+      subtitle={
+        step === 'email'
+          ? 'Entrez votre adresse email : vous recevrez un code à 6 chiffres.'
+          : step === 'otp'
+            ? `Entrez le code envoyé à ${email}.`
+            : 'Choisissez un nouveau mot de passe.'
+      }
+      crossLink={{ prompt: 'Vous vous en souvenez ?', label: 'Connectez-vous', href: '/login' }}
+    >
+      {/* Where the reader is in three steps. */}
+      <div className="mb-6 flex items-center gap-2" aria-hidden>
+        {STEPS.map((s, i) => (
+          <div
+            key={s}
+            className={`h-1.5 w-10 rounded-full transition-colors ${i <= stepIndex ? 'bg-accent' : 'bg-line'}`}
+          />
+        ))}
       </div>
-    </div>
+
+      {step === 'email' && (
+        <form onSubmit={requestCode} className="space-y-5">
+          <div className="space-y-1.5">
+            <Label htmlFor="email">Adresse email</Label>
+            <Input
+              id="email"
+              type="email"
+              autoComplete="email"
+              placeholder="votre@email.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              autoFocus
+            />
+          </div>
+          <Button type="submit" variant="primary" className="h-11 w-full" disabled={forgot.isPending}>
+            {forgot.isPending ? 'Envoi…' : 'Envoyer le code'}
+          </Button>
+        </form>
+      )}
+
+      {step === 'otp' && (
+        <form onSubmit={checkCode} className="space-y-5">
+          <OtpInput value={otp} onChange={setOtp} autoFocus />
+          <Button type="submit" variant="primary" className="h-11 w-full" disabled={verifyOtp.isPending}>
+            {verifyOtp.isPending ? 'Vérification…' : 'Vérifier le code'}
+          </Button>
+          <div className="flex items-center justify-between text-sm">
+            <button
+              type="button"
+              className="flex items-center gap-1 text-ink-muted hover:text-ink"
+              onClick={() => setStep('email')}
+            >
+              <ArrowLeft size={14} /> Changer l&apos;email
+            </button>
+            <button
+              type="button"
+              disabled={cooldown.remaining > 0 || forgot.isPending}
+              className="text-accent-text disabled:cursor-not-allowed disabled:text-ink-subtle"
+              onClick={resendCode}
+            >
+              {cooldown.remaining > 0 ? `Renvoyer (${cooldown.remaining}s)` : 'Renvoyer'}
+            </button>
+          </div>
+        </form>
+      )}
+
+      {step === 'password' && (
+        <form onSubmit={submitReset} className="space-y-5">
+          <div className="flex items-center gap-2 rounded-lg bg-positive-soft px-3 py-2 text-sm text-positive">
+            <CheckCircle2 size={16} /> Code vérifié
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="new-password">Nouveau mot de passe</Label>
+            <PasswordInput
+              id="new-password"
+              autoComplete="new-password"
+              placeholder="••••••••"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              required
+              autoFocus
+            />
+            <PasswordChecklist value={newPassword} showFailures={tried} />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="confirm-password">Confirmer le mot de passe</Label>
+            <PasswordInput
+              id="confirm-password"
+              autoComplete="new-password"
+              placeholder="••••••••"
+              value={confirm}
+              onChange={(e) => setConfirm(e.target.value)}
+              required
+            />
+          </div>
+          <Button type="submit" variant="primary" className="h-11 w-full" disabled={reset.isPending}>
+            {reset.isPending ? 'Réinitialisation…' : 'Réinitialiser le mot de passe'}
+          </Button>
+        </form>
+      )}
+    </AuthShell>
   );
 }

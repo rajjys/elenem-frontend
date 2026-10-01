@@ -2,16 +2,23 @@
 
 import { Suspense, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import Link from 'next/link';
 import { toast } from 'sonner';
-import { KeyRound, Lock, CheckCircle2 } from 'lucide-react';
+import { CheckCircle2 } from 'lucide-react';
+import { AuthShell } from '@/components/auth/auth-shell';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { PasswordInput } from '@/components/ui/password-input';
 import { OtpInput } from '@/components/ui/otp-input';
+import { PasswordChecklist, passwordMeetsRules } from '@/components/ui/password-checklist';
 import { toastApiError } from '@/utils';
 import { useVerifyResetOtp, useResetPassword } from '@/services/auth';
 
+/**
+ * An invited person activates their account, on the same frame as sign-in and sign-up
+ * (PHASE5A_PRODUCT_SITE §8.3): the code from the invitation, then a password under the same rule
+ * as sign-up.
+ */
 function AcceptInviteInner() {
   const router = useRouter();
   const emailFromQuery = useSearchParams().get('email') ?? '';
@@ -20,6 +27,7 @@ function AcceptInviteInner() {
   const [newPassword, setNewPassword] = useState('');
   const [confirm, setConfirm] = useState('');
   const [step, setStep] = useState<'code' | 'password'>('code');
+  const [tried, setTried] = useState(false);
 
   const verify = useVerifyResetOtp();
   const reset = useResetPassword();
@@ -37,6 +45,8 @@ function AcceptInviteInner() {
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
+    setTried(true);
+    if (!passwordMeetsRules(newPassword)) return;
     if (newPassword !== confirm) {
       toast.error('Les mots de passe ne correspondent pas.');
       return;
@@ -54,50 +64,71 @@ function AcceptInviteInner() {
   };
 
   return (
-    <div className="flex min-h-[70vh] items-center justify-center px-4 py-10">
-      <div className="w-full max-w-md rounded-2xl border border-line bg-surface p-8 shadow-xl">
-        <div className="mb-6 flex flex-col items-center text-center">
-          <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-accent-soft text-accent-text">
-            {step === 'code' ? <KeyRound size={22} /> : <Lock size={22} />}
-          </div>
-          <h1 className="text-xl font-semibold text-ink">Activez votre compte</h1>
-          <p className="mt-1 text-sm text-ink-muted">
-            {step === 'code'
-              ? 'Entrez le code reçu dans votre email d’invitation.'
-              : 'Choisissez un mot de passe pour votre compte.'}
-          </p>
-        </div>
-
-        {step === 'code' ? (
-          <form onSubmit={checkCode} className="space-y-4">
-            {!emailFromQuery && (
-              <Input type="email" placeholder="votre@email.com" value={email} onChange={(e) => setEmail(e.target.value)} required />
-            )}
-            <OtpInput value={otp} onChange={setOtp} autoFocus />
-            <Button type="submit" variant="primary" className="w-full" disabled={verify.isPending}>
-              {verify.isPending ? 'Vérification…' : 'Continuer'}
-            </Button>
-          </form>
-        ) : (
-          <form onSubmit={submit} className="space-y-4">
-            <div className="flex items-center gap-2 rounded-lg bg-positive-soft px-3 py-2 text-sm text-positive">
-              <CheckCircle2 size={16} /> Code vérifié
+    <AuthShell
+      title="Activez votre compte"
+      subtitle={
+        step === 'code'
+          ? 'Entrez le code reçu dans votre email d’invitation.'
+          : 'Choisissez un mot de passe pour votre compte.'
+      }
+      crossLink={{ prompt: 'Déjà activé ?', label: 'Connectez-vous', href: '/login' }}
+    >
+      {step === 'code' ? (
+        <form onSubmit={checkCode} className="space-y-5">
+          {!emailFromQuery && (
+            <div className="space-y-1.5">
+              <Label htmlFor="email">Adresse email</Label>
+              <Input
+                id="email"
+                type="email"
+                autoComplete="email"
+                placeholder="votre@email.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
             </div>
-            <PasswordInput placeholder="Mot de passe" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required autoFocus />
-            <PasswordInput placeholder="Confirmer le mot de passe" value={confirm} onChange={(e) => setConfirm(e.target.value)} required />
-            <Button type="submit" variant="primary" className="w-full" disabled={reset.isPending}>
-              {reset.isPending ? 'Activation…' : 'Activer mon compte'}
-            </Button>
-          </form>
-        )}
-
-        <div className="mt-6 border-t border-line pt-4 text-center text-sm">
-          <Link href="/login" className="text-accent-text hover:text-accent-text">
-            Retour à la connexion
-          </Link>
-        </div>
-      </div>
-    </div>
+          )}
+          <OtpInput value={otp} onChange={setOtp} autoFocus />
+          <Button type="submit" variant="primary" className="h-11 w-full" disabled={verify.isPending}>
+            {verify.isPending ? 'Vérification…' : 'Continuer'}
+          </Button>
+        </form>
+      ) : (
+        <form onSubmit={submit} className="space-y-5">
+          <div className="flex items-center gap-2 rounded-lg bg-positive-soft px-3 py-2 text-sm text-positive">
+            <CheckCircle2 size={16} /> Code vérifié
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="new-password">Mot de passe</Label>
+            <PasswordInput
+              id="new-password"
+              autoComplete="new-password"
+              placeholder="••••••••"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              required
+              autoFocus
+            />
+            <PasswordChecklist value={newPassword} showFailures={tried} />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="confirm-password">Confirmer le mot de passe</Label>
+            <PasswordInput
+              id="confirm-password"
+              autoComplete="new-password"
+              placeholder="••••••••"
+              value={confirm}
+              onChange={(e) => setConfirm(e.target.value)}
+              required
+            />
+          </div>
+          <Button type="submit" variant="primary" className="h-11 w-full" disabled={reset.isPending}>
+            {reset.isPending ? 'Activation…' : 'Activer mon compte'}
+          </Button>
+        </form>
+      )}
+    </AuthShell>
   );
 }
 

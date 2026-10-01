@@ -14,6 +14,14 @@ export function buildTenantUrl(slug: string, path = ''): string {
 }
 
 /**
+ * A league site's address as a person reads it — `liprobakin.dxscores.app`, without the protocol.
+ * Shown at sign-up, the moment the organiser sees their site exists (PHASE5A_PRODUCT_SITE §8.3).
+ */
+export function tenantHost(slug: string): string {
+  return buildTenantUrl(slug).replace(/^https?:\/\//, '');
+}
+
+/**
  * The absolute URL of a page on the product itself, dxscores.com — for links out of a league
  * site (« Espace organisateur », « Propulsé par DXScores »), where a relative path would stay on
  * the league's host.

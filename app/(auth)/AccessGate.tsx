@@ -19,7 +19,7 @@ export const AccessGate: React.FC<AccessGateProps> = ({ allowedRoles, children }
   
   // Wait for user to be loaded (null means loading, not unauthorized)
   if (userAuth === null) {
-    return <LoadingSpinner message='Loading User Informations'/> // Show a loading spinner while auth state is being determined
+    return <LoadingSpinner message="Chargement de votre compte…" /> // While the session is being read
   }
 
   const hasAccess = allowedRoles.some(role => currentUserRoles.includes(role))

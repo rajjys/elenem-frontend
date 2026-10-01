@@ -26,7 +26,7 @@ import {
   useRegisterOrganisation,
   type RegisterOrganisationValues,
 } from '@/services/onboarding';
-import { buildTenantUrl } from '@/utils/tenant-url';
+import { tenantHost } from '@/utils/tenant-url';
 
 /**
  * A first guess at the organiser's country, from their device's time zone.
@@ -296,7 +296,7 @@ export function SignUpFlow() {
             <PartyPopper className="h-5 w-5 shrink-0 text-positive" aria-hidden />
             <p className="text-sm text-ink">
               Votre adresse publique&nbsp;:{' '}
-              <span className="font-medium">{buildTenantUrl(created.tenantCode.toLowerCase())}</span>
+              <span className="font-medium">{tenantHost(created.tenantCode.toLowerCase())}</span>
             </p>
           </div>
 
@@ -335,7 +335,7 @@ export function SignUpFlow() {
       title={isAccount ? 'Créez votre organisation' : 'Votre organisation'}
       subtitle={
         isAccount
-          ? 'Deux étapes, et votre ligue est prête à recevoir ses équipes.'
+          ? 'Votre compte, votre organisation — puis votre première compétition.'
           : `Bienvenue${firstName ? `, ${firstName}` : ''}. Dites-nous quelle ligue ou fédération vous organisez.`
       }
       crossLink={
@@ -484,12 +484,12 @@ export function SignUpFlow() {
                 <FieldError message={formState.errors.tenantCode.message} />
               ) : codeStatus === 'taken' ? (
                 <p className="text-negative text-xs" role="alert">
-                  <span className="font-medium">{buildTenantUrl(previewCode)}</span> est déjà pris.
+                  <span className="font-medium">{tenantHost(previewCode)}</span> est déjà pris.
                   Choisissez un autre code.
                 </p>
               ) : codeStatus === 'reserved' ? (
                 <p className="text-negative text-xs" role="alert">
-                  <span className="font-medium">{buildTenantUrl(previewCode)}</span> est réservé — ce nom est utilisé par
+                  <span className="font-medium">{tenantHost(previewCode)}</span> est réservé — ce nom est utilisé par
                   la plateforme elle-même. Choisissez un autre code.
                 </p>
               ) : (
@@ -500,7 +500,7 @@ export function SignUpFlow() {
                       codeStatus === 'free' ? 'text-positive font-medium' : 'text-accent-text font-medium'
                     }
                   >
-                    {previewCode || 'votre-code'}
+                    {tenantHost(previewCode || 'votre-code')}
                   </span>
                   {codeStatus === 'free' && ' — disponible'}
                 </p>

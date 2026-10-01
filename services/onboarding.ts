@@ -24,12 +24,9 @@ export const AccountStepSchema = z.object({
   firstName: z.string().trim().min(2, 'Prénom requis'),
   lastName: z.string().trim().min(2, 'Nom requis'),
   email: z.string().trim().email('Adresse email invalide'),
-  password: z
-    .string()
-    .min(8, 'Au moins 8 caractères')
-    .regex(/(?=.*[a-z])/, 'Il manque une minuscule')
-    .regex(/(?=.*[A-Z])/, 'Il manque une majuscule')
-    .regex(/(?=.*[\d\W])/, 'Il manque un chiffre ou un symbole'),
+  // At least 8 characters and nothing more (PHASE5A_PRODUCT_SITE §8.3); the checklist under the
+  // field offers a capital and a digit as advice. The backend checks the same rule.
+  password: z.string().min(8, 'Au moins 8 caractères').max(128, '128 caractères au maximum'),
 });
 
 export const OrganisationStepSchema = z.object({

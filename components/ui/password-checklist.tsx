@@ -4,30 +4,35 @@ import { Check, Circle, X } from 'lucide-react';
 import { cn } from '@/utils';
 
 /**
- * The password rules, shown as four rows that go green as they are met.
+ * The password rule, and two pieces of advice, as rows that go green as they are met.
  *
- * A single sentence listing every requirement, backed by errors that appear one at a time —
- * "il manque une majuscule", fix it, submit, "il manque un chiffre" — makes the reader discover
- * the rules by failing them. All four are stated up front here and each answers itself while
- * they type, so nothing is learned by being refused.
+ * The rule is one: at least 8 characters (PHASE5A_PRODUCT_SITE §8.3, decided 2026-09-26). On a
+ * phone keyboard, composition rules are where people give up, and current guidance (NIST
+ * SP 800-63B) favours length. A capital and a digit or symbol still make a password stronger, so
+ * they stay on screen as advice: they tick when met, but they never block a submit and never turn
+ * red. The backend checks the same rule.
  */
 
 export interface PasswordRule {
   label: string;
   met: boolean;
+  /** Advice is shown and ticked, but a password without it is accepted. */
+  advice?: boolean;
 }
+
+export const PASSWORD_MIN = 8;
+export const PASSWORD_MAX = 128;
 
 export function passwordRules(value: string): PasswordRule[] {
   return [
-    { label: '8 caractères au minimum', met: value.length >= 8 },
-    { label: 'Une lettre majuscule', met: /[A-Z]/.test(value) },
-    { label: 'Une lettre minuscule', met: /[a-z]/.test(value) },
-    { label: 'Un chiffre ou un symbole', met: /[\d\W]/.test(value) },
+    { label: `${PASSWORD_MIN} caractères au minimum`, met: value.length >= PASSWORD_MIN },
+    { label: 'Une majuscule (conseillé)', met: /[A-Z]/.test(value), advice: true },
+    { label: 'Un chiffre ou un symbole (conseillé)', met: /[\d\W]/.test(value), advice: true },
   ];
 }
 
 export function passwordMeetsRules(value: string): boolean {
-  return passwordRules(value).every((r) => r.met);
+  return passwordRules(value).every((r) => r.met || r.advice);
 }
 
 export function PasswordChecklist({
@@ -41,9 +46,9 @@ export function PasswordChecklist({
   const rules = passwordRules(value);
 
   return (
-    <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-3 gap-y-1.5 pt-0.5">
+    <ul className="grid grid-cols-1 gap-x-3 gap-y-1.5 pt-0.5 sm:grid-cols-2">
       {rules.map((rule) => {
-        const failed = showFailures && !rule.met;
+        const failed = showFailures && !rule.met && !rule.advice;
         return (
           <li
             key={rule.label}
