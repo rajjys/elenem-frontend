@@ -20,7 +20,7 @@ export function SidebarUserMenu({
   email,
   isSidebarOpen,
   onLogout,
-  publicSiteHref = '/',
+  publicSiteHref = '/home',
   onNavigate,
 }: {
   name?: string | null;
@@ -92,6 +92,9 @@ export function SidebarUserMenu({
 
           <div className="my-1 border-t border-line" />
 
+          {/* The organisation's own league site, <code>.dxscores.app, in a new tab. Without one
+              (a system administrator) it falls back to the product's landing — never `/`, which
+              sends a signed-in reader straight back to their dashboard. */}
           <a
             href={publicSiteHref}
             target="_blank"

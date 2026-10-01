@@ -9,6 +9,7 @@ import { NavLink } from '.';
 import { SidebarBrand } from './sidebar-brand';
 import type { NavGroup } from './nav-items';
 import { SidebarUserMenu } from './sidebar-user-menu';
+import { buildTenantUrl } from '@/utils/tenant-url';
 import { useContextualLink } from '@/hooks';
 import { Roles } from '@/schemas';
 import { homeForRoles } from '@/utils';
@@ -72,6 +73,10 @@ function SidebarGroup({
 export default function AppLayout({ children, navItems }: AppLayoutProps) {
   const currentPath = usePathname();
   const { user: userAuth, logout } = useAuthStore();
+  // « Site public » in the account menu: the organisation's league site, as the sign-up promised
+  // it (<code>.dxscores.app). The menu falls back to /home when there is no organisation.
+  const tenantCode = userAuth?.tenant?.tenantCode;
+  const publicSiteHref = tenantCode ? buildTenantUrl(tenantCode.toLowerCase()) : undefined;
   const { buildLink } = useContextualLink();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -178,6 +183,7 @@ export default function AppLayout({ children, navItems }: AppLayoutProps) {
                   isSidebarOpen={isSidebarOpen}
                   onLogout={handleLogout}
                   buildLink={buildLink}
+                  publicSiteHref={publicSiteHref}
                 />
               </aside>
             )}
@@ -218,6 +224,7 @@ export default function AppLayout({ children, navItems }: AppLayoutProps) {
                 isSidebarOpen
                 onLogout={handleLogout}
                 buildLink={buildLink}
+                publicSiteHref={publicSiteHref}
                 onNavigate={closeMobileMenu}
               />
             </aside>
