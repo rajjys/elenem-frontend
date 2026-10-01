@@ -773,6 +773,30 @@ remain. Deviations and findings:
 - the new league's site is live at its subdomain;
 - the test organisation is then deleted.
 
+**Run on production, 2026-10-01** (frontend `609ea47`, `3d2831c`; backend `73d6aa6`), in a
+phone-sized browser (390 px, touch), as `rajjysrachid+5a4@gmail.com`, password `basket2026` (no
+capital: the new rule), organisation « Ligue Test Parcours » (`PARCOURS5A4`):
+
+- **The path works end to end, with no page error on any page** (no React #418 in this run):
+  landing → *Créer ma ligue* → account → organisation (preview « parcours5a4.dxscores.app —
+  disponible ») → « est créée » → wizard (competition, the suggested « Saison 2026-2027 », three
+  teams pasted as a list) → « Tout est prêt » → league dashboard, with the verify-email banner.
+- **The league site is live at its subdomain** (200, the league's name in the title). Right after
+  the wizard it still showed « bientôt en ligne » once: the site's one-minute cache serves its
+  stale copy while it refreshes. A reload shows the competition.
+- **The verification code and the reset code were sent** (`POST /auth/forgot-password` 200 in
+  2.6 s). Whether they reached the Gmail *inbox* is the owner's check.
+- **Found and fixed during the run** (`3d2831c`): `Input` replaced every explicit `id` with its
+  `name`, so the wizard's and the new reset page's `<Label htmlFor>` pointed at nothing.
+- **Environment:** `JWT_SECRET` is set on Vercel (a signed-in `/` redirects to the dashboard);
+  CORS accepts a league subdomain and refuses a stranger; **no Sentry DSN** is in production's
+  JavaScript, so `NEXT_PUBLIC_SENTRY_DSN` is unset or Sentry is off. `INFRASTRUCTURE.md` step 9
+  already names the `MAIL_*` variables.
+- **Slow writes:** every write took 4–5.5 s measured from Goma, and the wizard creates teams one
+  request at a time (three teams, 15 s). This connection's own share varies wildly (0.25 to 8 s
+  to connect), but the server's share is still 0.7–2.3 s per request: check that Railway's region
+  and Neon's are the same, and consider creating the wizard's teams in one request.
+
 ---
 
 ## 10. Growth readiness: what gets added, and when
