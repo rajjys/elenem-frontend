@@ -1,4 +1,5 @@
 import { cn } from '@/utils/cn';
+import { PhoneScreen } from '@/components/marketing/phone-screen';
 
 /**
  * The hero's two screens (PHASE5A_PRODUCT_SITE §6.1): the organiser's calendar in a browser, and
@@ -12,8 +13,7 @@ import { cn } from '@/utils/cn';
  *
  * Plain <img> with srcset: next/image would add a client component for two files already sized
  * and compressed (WebP, 22–70 KB). The browser window carries its own shadow in the file; the
- * phone's frame is drawn here, on tokens, so it follows the theme. Its corners are in percent
- * (width / height, so they stay round): a fixed radius ate the status bar's clock on a small phone.
+ * phone's frame is drawn (`PhoneScreen`), on tokens, so it follows the theme.
  */
 export function HeroScreens({ className }: { className?: string }) {
   return (
@@ -29,18 +29,15 @@ export function HeroScreens({ className }: { className?: string }) {
         alt="Le calendrier d’une ligue dans DXScores : les matchs de ses deux championnats sur une même grille, et le détail d’un match terminé."
         className="col-start-1 row-start-1 ml-[10%] h-auto w-[90%] md:ml-[13%] md:w-[87%]"
       />
-      <div className="z-10 col-start-1 row-start-1 mt-[16%] w-[40%] self-start rounded-[9.3%/4.4%] border border-line-strong bg-elevated p-1 shadow-e2 sm:p-1.5 md:mt-[11%] md:w-[24%]">
-        {/* eslint-disable-next-line @next/next/no-img-element -- see above */}
-        <img
-          src="/landing/result-phone-527.webp"
-          srcSet="/landing/result-phone-360.webp 360w, /landing/result-phone-527.webp 527w"
-          sizes="(min-width: 1024px) 235px, (min-width: 768px) 24vw, 40vw"
-          width={527}
-          height={1134}
-          alt="La page d’un match sur le site de la ligue, dans un téléphone : le score final et la comparaison des deux équipes."
-          className="h-auto w-full rounded-[7%/3.25%]"
-        />
-      </div>
+      <PhoneScreen
+        src="/landing/result-phone-527.webp"
+        srcSet="/landing/result-phone-360.webp 360w, /landing/result-phone-527.webp 527w"
+        sizes="(min-width: 1024px) 235px, (min-width: 768px) 24vw, 40vw"
+        width={527}
+        height={1134}
+        alt="La page d’un match sur le site de la ligue, dans un téléphone : le score final et la comparaison des deux équipes."
+        className="z-10 col-start-1 row-start-1 mt-[16%] w-[40%] self-start md:mt-[11%] md:w-[24%]"
+      />
     </div>
   );
 }

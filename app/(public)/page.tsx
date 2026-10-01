@@ -2,7 +2,8 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowRight, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { DayPanel, PointsPanel, PublishPanel } from '@/components/marketing/product-preview';
+import { cn } from '@/utils/cn';
+import { DayPanelShot, StandingsShot, WhatsAppShots } from '@/components/marketing/module-visuals';
 import { HeroScreens } from '@/components/marketing/hero-screens';
 import { VideoFacade } from '@/components/marketing/video-facade';
 import { ShowcaseLeagues, Testimonials } from '@/components/marketing/social-proof';
@@ -81,13 +82,11 @@ const modules = [
     title: 'Le calendrier, les salles, les imprévus.',
     lead: 'Toutes vos compétitions sur une seule grille, là où votre ligue se gère chaque semaine.',
     points: [
-      'Matchs, salles et horaires de toutes vos compétitions : messieurs, dames, jeunes.',
+      'Matchs, salles et horaires de toutes vos compétitions, et le programme de chaque équipe.',
       'Un conflit de salle ou d’équipe est signalé avant qu’il n’arrive.',
-      'Le programme de chaque équipe, de la première à la dernière journée.',
-      'Les étapes de la saison : saison régulière, poules, phase finale.',
-      'Reports et annulations, avec leur motif, gardés dans l’historique du match.',
+      'Les étapes de la saison, des poules à la phase finale ; les reports, avec leur motif.',
     ],
-    Visual: DayPanel,
+    Visual: DayPanelShot,
   },
   {
     label: 'Points',
@@ -97,9 +96,8 @@ const modules = [
       'Vos règles : points par victoire, défaite et forfait, départages, qualification et relégation.',
       'La feuille de marque par joueur, et le classement des marqueurs.',
       'En cours de saison, les matchs déjà joués s’importent depuis Excel.',
-      'Chaque point se retrace jusqu’au match qui l’a donné.',
     ],
-    Visual: PointsPanel,
+    Visual: StandingsShot,
   },
   {
     label: 'Publication',
@@ -107,11 +105,11 @@ const modules = [
     lead: 'Ce que vous saisissez est publié aussitôt, sur le site de votre ligue et dans les formats que l’on partage.',
     points: [
       'Le site de votre ligue, votre-ligue.dxscores.app : classement, calendrier, résultats, communiqués.',
-      'Le classement officiel en PDF, avec en-tête, cachet et signature.',
-      'En image pour WhatsApp, en Excel pour vos archives.',
-      'Lisible sur n’importe quel téléphone, sans rien installer.',
+      'Un lien partagé sur WhatsApp montre le score ou le classement avant même d’être ouvert.',
+      'Le classement officiel en PDF, avec en-tête, cachet et signature ; en Excel pour vos archives.',
     ],
-    Visual: PublishPanel,
+    Visual: WhatsAppShots,
+    demoLink: true,
   },
 ];
 
@@ -262,8 +260,14 @@ export default function LandingPage() {
           </div>
           <div className="mt-14 space-y-16 sm:mt-20 sm:space-y-24">
             {modules.map((m, i) => (
-              <article key={m.label} className="reveal grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
-                <div className={i % 2 ? 'lg:order-last' : undefined}>
+              // On a phone: the title, the picture, then the points — the picture is the proof, so
+              // it does not wait under a list. From lg: text in one column, centred beside the
+              // picture in the other, alternating sides.
+              <article
+                key={m.label}
+                className="reveal grid gap-8 lg:grid-cols-2 lg:grid-rows-[1fr_auto_auto_1fr] lg:gap-x-16 lg:gap-y-0"
+              >
+                <header className={cn('lg:row-start-2', i % 2 ? 'lg:col-start-2' : 'lg:col-start-1')}>
                   <p className="flex items-center gap-3 text-xs font-semibold uppercase tracking-wider text-accent-text">
                     <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-accent text-sm tabular-nums text-accent-ink">
                       {i + 1}
@@ -272,7 +276,19 @@ export default function LandingPage() {
                   </p>
                   <h3 className="mt-4 text-balance text-2xl font-bold text-ink sm:text-3xl">{fr(m.title)}</h3>
                   <p className="mt-3 max-w-xl text-lg leading-relaxed text-ink-muted">{fr(m.lead)}</p>
-                  <ul className="mt-6 space-y-3">
+                </header>
+                {/* A backdrop the width of the column, so the picture is the row's other half
+                    rather than a small card floating in white space. */}
+                <div
+                  className={cn(
+                    'flex items-center justify-center rounded-2xl border border-line bg-canvas px-4 py-8 sm:px-10 sm:py-12 lg:row-span-4 lg:row-start-1',
+                    i % 2 ? 'lg:col-start-1' : 'lg:col-start-2',
+                  )}
+                >
+                  <m.Visual />
+                </div>
+                <div className={cn('lg:row-start-3 lg:pt-6', i % 2 ? 'lg:col-start-2' : 'lg:col-start-1')}>
+                  <ul className="space-y-3">
                     {m.points.map((t) => (
                       <li key={t} className="flex items-start gap-3 text-ink">
                         <Check className="mt-0.5 h-5 w-5 shrink-0 text-positive" aria-hidden />
@@ -280,18 +296,13 @@ export default function LandingPage() {
                       </li>
                     ))}
                   </ul>
-                  {m.Visual === PublishPanel && site.demoUrl && (
+                  {m.demoLink && site.demoUrl && (
                     <Button asChild variant="outline" size="lg" className="mt-8">
                       <a href={site.demoUrl} target="_blank" rel="noopener noreferrer">
                         Visiter le site de démonstration
                       </a>
                     </Button>
                   )}
-                </div>
-                {/* A backdrop the width of the column, so the drawing is the row's other half
-                    rather than a small card floating in white space. */}
-                <div className="flex justify-center rounded-2xl border border-line bg-canvas px-4 py-10 sm:px-10 sm:py-14">
-                  <m.Visual />
                 </div>
               </article>
             ))}

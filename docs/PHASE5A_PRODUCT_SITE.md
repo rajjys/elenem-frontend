@@ -665,8 +665,20 @@ owner on 2026-09-29. Deviations from the list below:
   comparison), not the standings; plain `<img>` with `srcset` instead of `next/image`, which would
   add a client component for files already resized and compressed (WebP, 22–70 KB, in
   `public/landing/`); high fetch priority on the calendar, the larger image. The phone's frame is
-  drawn in CSS on tokens; the owner's PNGs stay outside the repository. The three module panels
-  are still drawn.
+  drawn in CSS on tokens; the owner's PNGs stay outside the repository.
+  *Update 2026-10-01 (5A.2b):* the three modules show captures too, and `product-preview.tsx` is
+  gone (`components/marketing/module-visuals.tsx`). Organisation: the day panel of 30 September,
+  three games in two halls. Points: the league site's standings in a phone, with the rule and the
+  tie-breaks under the table. Publication: the owner's two WhatsApp link previews (a game, the
+  standings), cut to the message bubbles — the chat around them was a real conversation with a
+  real company, and its name and logo do not go on our homepage. Still pictures, not GIFs or
+  loops: a readable GIF of the interface weighs megabytes on mobile data, goes stale with every
+  change, and repeats what the presentation video is for. Each picture is about a phone's width,
+  so it reads at its real size on a phone; all four load lazily, so the first screen costs
+  nothing more, and `/` still loads 195 KB of JavaScript. On a phone each module reads title,
+  picture, then points. `scripts/capture-landing.mjs` retakes the day panel and the standings
+  from production (read-only; it needs `playwright-core`, installed with `--no-save`). Three
+  points per module instead of four or five.
 - **The demo league is partial on production** (8 men's teams, 56 games, 11 results). The *Voir la
   démo* link stays hidden (`site.demoUrl: null`) until `scripts/seed-demo-league.mjs` (backend) has
   finished it. The script is resumable and needs the demo account's password.
