@@ -7,8 +7,8 @@ import { PhoneScreen } from '@/components/marketing/phone-screen';
  *
  * All below the fold, so they load lazily: the first screen costs nothing more. Plain <img> for
  * the reason given in hero-screens.tsx. The standings are retaken by scripts/capture-landing.mjs.
- * The « Ajouter un match » dialog and the WhatsApp previews came from the owner's devices; the
- * previews are cut to their message bubbles, leaving out the chat they were sent in.
+ * The « Ajouter un match » dialog and the WhatsApp conversation came from the owner's devices; the
+ * conversation is cut under its header, so the contact it was sent to does not appear.
  */
 
 /** Organisation: placing a game — its hall and hour, a result if it is already played, and the
@@ -46,35 +46,22 @@ export function StandingsShot() {
   );
 }
 
-/** Publication: what a league's WhatsApp group sees when a link is shared — before opening it. */
+/** Publication: what a league's WhatsApp group sees when links are shared — the score and the
+    table, before anyone opens them. The owner's capture of a real conversation, cut under its
+    header (the contact) and down to the message bar. */
 export function WhatsAppShots() {
-  const bubble = 'h-auto w-full max-w-[17rem] rounded-lg shadow-e2';
   return (
-    <div className="flex w-full max-w-[19rem] flex-col gap-2">
-      {/* eslint-disable-next-line @next/next/no-img-element -- see above */}
-      <img
-        src="/landing/whatsapp-game-776.webp"
-        srcSet="/landing/whatsapp-game-400.webp 400w, /landing/whatsapp-game-776.webp 776w"
-        sizes="272px"
-        width={776}
-        height={764}
-        loading="lazy"
-        decoding="async"
-        alt="Le lien d’un match partagé sur WhatsApp : l’aperçu montre le score final, 81–69."
-        className={`${bubble} self-start`}
-      />
-      {/* eslint-disable-next-line @next/next/no-img-element -- see above */}
-      <img
-        src="/landing/whatsapp-standings-777.webp"
-        srcSet="/landing/whatsapp-standings-400.webp 400w, /landing/whatsapp-standings-777.webp 777w"
-        sizes="272px"
-        width={777}
-        height={764}
-        loading="lazy"
-        decoding="async"
-        alt="Le lien du classement partagé sur WhatsApp : l’aperçu montre le haut du tableau du championnat."
-        className={`${bubble} self-end`}
-      />
-    </div>
+    // eslint-disable-next-line @next/next/no-img-element -- see above
+    <img
+      src="/landing/whatsapp-chat-720.webp"
+      srcSet="/landing/whatsapp-chat-540.webp 540w, /landing/whatsapp-chat-720.webp 720w, /landing/whatsapp-chat-1077.webp 1077w"
+      sizes="(min-width: 400px) 336px, calc(100vw - 2rem)"
+      width={1077}
+      height={1781}
+      loading="lazy"
+      decoding="async"
+      alt="Une conversation WhatsApp où deux liens de la ligue ont été partagés : l’aperçu du match montre le score final, 81–69, et celui du classement le haut du tableau."
+      className="h-auto w-full max-w-[21rem] rounded-2xl border border-line shadow-e2"
+    />
   );
 }

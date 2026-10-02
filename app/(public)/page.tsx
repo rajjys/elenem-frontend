@@ -261,7 +261,7 @@ export default function LandingPage() {
               )}
             </p>
           </div>
-          <div className="mt-14 space-y-16 sm:mt-20 sm:space-y-24">
+          <div className="mt-12 space-y-8 sm:mt-16 sm:space-y-12">
             {modules.map((m, i) => (
               <Fragment key={m.label}>
                 {/* Between two modules, a hairline that fades at both ends: it divides without
