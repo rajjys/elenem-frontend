@@ -718,6 +718,19 @@ on a league site. What later sprints inherit:
   it. React recovers by rendering the page in the browser, so readers see the page, at the cost of
   speed. Needs a non-minified reading from Vercel's environment (a preview with React's dev build,
   or `onRecoverableError` logging) to find the mismatching node.
+- **Open item, found 2026-10-02 (fix first): a page that becomes a 404 stays served from cache.**
+  `siteGet` caches through `fetch`'s data cache, and Next 16 stores a response only when its status
+  is 200 (`next/dist/server/lib/patch-fetch.js:626`). When a cached page's data turns into a 404,
+  the background refresh gets the 404 and does not store it, so the stale 200 is served again on
+  every visit, indefinitely. Seen on production: the deleted 5A.4 test organisation
+  (`parcours5a4.dxscores.app`) still serves its site, competition included, 15 minutes after its
+  deletion, while the API answers 404. The same holds for a deleted communiqué, match, club or
+  player page, and for a player page that the « noms des joueurs » switch should hide: a privacy
+  issue, not only a stale page. Fix: cache the parsed result instead of the response, so a `null`
+  replaces an old value (`unstable_cache` around a `no-store` fetch, same 60 s and `site:<slug>`
+  tag; errors still throw, so a down API keeps the last good page). Verify with a production build
+  against an API that turns 200 into 404. Until then, « Purge Data Cache » in the Vercel project
+  settings clears a page that must go now.
 - `.../[tenantSlug]/playoffs` is the rebuilt page; the old components (`components/public/*`,
   `PublicTenantHeader/Footer`, `game-public-card`…) and the old `public-*` backend controllers are
   now unused by the league site — their deletion is 5B.7.
