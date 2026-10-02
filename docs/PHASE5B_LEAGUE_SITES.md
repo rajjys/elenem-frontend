@@ -718,19 +718,17 @@ on a league site. What later sprints inherit:
   it. React recovers by rendering the page in the browser, so readers see the page, at the cost of
   speed. Needs a non-minified reading from Vercel's environment (a preview with React's dev build,
   or `onRecoverableError` logging) to find the mismatching node.
-- **Open item, found 2026-10-02 (fix first): a page that becomes a 404 stays served from cache.**
-  `siteGet` caches through `fetch`'s data cache, and Next 16 stores a response only when its status
-  is 200 (`next/dist/server/lib/patch-fetch.js:626`). When a cached page's data turns into a 404,
-  the background refresh gets the 404 and does not store it, so the stale 200 is served again on
-  every visit, indefinitely. Seen on production: the deleted 5A.4 test organisation
-  (`parcours5a4.dxscores.app`) still serves its site, competition included, 15 minutes after its
-  deletion, while the API answers 404. The same holds for a deleted communiqué, match, club or
-  player page, and for a player page that the « noms des joueurs » switch should hide: a privacy
-  issue, not only a stale page. Fix: cache the parsed result instead of the response, so a `null`
-  replaces an old value (`unstable_cache` around a `no-store` fetch, same 60 s and `site:<slug>`
-  tag; errors still throw, so a down API keeps the last good page). Verify with a production build
-  against an API that turns 200 into 404. Until then, « Purge Data Cache » in the Vercel project
-  settings clears a page that must go now.
+- **Fixed 2026-10-02: a page that became a 404 stayed served from cache.** `siteGet` cached
+  through `fetch`'s data cache, and Next 16 stores a response only when its status is 200
+  (`next/dist/server/lib/patch-fetch.js:626`): when a cached page's data turned into a 404, each
+  background refresh got the 404, did not store it, and the stale 200 was served again,
+  indefinitely. Seen on production with the deleted 5A.4 test organisation; the same held for a
+  deleted communiqué, match, club or player, and for a player page the « noms des joueurs » switch
+  should hide. `siteGet` now caches its parsed result with `unstable_cache` (same 60 s, same
+  `site:<slug>` tag, a no-store fetch inside), so `null` replaces what was there. Verified with a
+  production build against a stub API: a communiqué deleted at 0 s serves one stale 200 and then
+  404 from +70 s, where the old code still served 200 at +86 s after 7 refreshes; an API answering
+  500 keeps the last good page; a communiqué that comes back is served again after one stale load.
 - `.../[tenantSlug]/playoffs` is the rebuilt page; the old components (`components/public/*`,
   `PublicTenantHeader/Footer`, `game-public-card`…) and the old `public-*` backend controllers are
   now unused by the league site — their deletion is 5B.7.
