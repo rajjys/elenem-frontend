@@ -35,7 +35,7 @@ export default function TeamEditPage() {
     enabled: !!teamId,
   });
 
-  const [form, setForm] = useState({ name: '', shortCode: '', description: '', logoUrl: '' });
+  const [form, setForm] = useState({ name: '', shortCode: '', description: '' });
   const [seeded, setSeeded] = useState(false);
 
   useEffect(() => {
@@ -44,7 +44,6 @@ export default function TeamEditPage() {
       name: team.data.name ?? '',
       shortCode: team.data.shortCode ?? '',
       description: team.data.description ?? '',
-      logoUrl: team.data.logoUrl ?? team.data.businessProfile?.logoUrl ?? '',
     });
     setSeeded(true);
   }, [team.data, seeded]);
@@ -83,7 +82,6 @@ export default function TeamEditPage() {
     name: team.data.name ?? '',
     shortCode: team.data.shortCode ?? '',
     description: team.data.description ?? '',
-    logoUrl: team.data.logoUrl ?? team.data.businessProfile?.logoUrl ?? '',
   };
   const dirty = (Object.keys(form) as (keyof typeof form)[]).some((k) => form[k] !== original[k]);
 
@@ -143,22 +141,6 @@ export default function TeamEditPage() {
               setForm((f) => ({ ...f, description: e.target.value }))
             }
           />
-        </div>
-
-        <div>
-          <Label htmlFor="logoUrl">Logo (URL)</Label>
-          <Input
-            id="logoUrl"
-            value={form.logoUrl}
-            onChange={(e) => setForm((f) => ({ ...f, logoUrl: e.target.value }))}
-            placeholder="https://…"
-          />
-          {/* An address, not an upload, until item 17 wires S3. Saying so is better than a file
-              picker that cannot store the file it is handed. */}
-          <p className="mt-1 text-xs text-ink-subtle">
-            L&apos;envoi d&apos;un fichier arrive avec le site public ; en attendant, collez
-            l&apos;adresse d&apos;une image.
-          </p>
         </div>
 
         <div className="flex justify-end pt-1">

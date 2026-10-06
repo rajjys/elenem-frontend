@@ -51,10 +51,6 @@ export const CreateBusinessProfileSchema = z.object({
 
   // Brand Identity
   brandingTheme: z.any().optional().nullable(),
-
-  // Relations to MediaAsset
-  logoAssetId: z.string().optional().nullable(),
-  bannerAssetId: z.string().optional().nullable(),
 });
 
 export const BusinessProfileSchema = CreateBusinessProfileSchema.extend({

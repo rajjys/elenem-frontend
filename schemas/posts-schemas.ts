@@ -15,7 +15,6 @@ const CreatePostBase = z.object({
   type: PostTypeSchema,
   status: PostStatusSchema,
   scheduledAt: z.string().optional(),
-  heroImageId: z.string().optional().nullable(),
   targetType: PostTargetTypeSchema,
   targetId: z.string().optional(),
 }).merge(ContentShape);

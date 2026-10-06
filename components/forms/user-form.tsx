@@ -30,13 +30,11 @@ const userFormSchema = z.object({
   password: z.string().min(8, "Le mot de passe doit faire au moins 8 caractères.").optional().or(z.literal('')),
   firstName: z.string().min(1, "Le prénom est obligatoire."),
   lastName: z.string().min(1, "Le nom est obligatoire."),
-  profileImageUrl: z.string().url("Adresse invalide.").optional().or(z.literal('')),
   phone: z.string().optional().or(z.literal('')),
   dateOfBirth: z.string().optional(),
   nationality: z.string().optional().or(z.literal('')),
   gender: z.nativeEnum(Gender).optional(),
   bio: z.string().max(500, "La biographie ne peut pas dépasser 500 caractères.").optional().or(z.literal('')),
-  avatarUrl: z.string().url("Adresse invalide.").optional().or(z.literal('')),
   preferredLanguage: z.nativeEnum(SupportedLanguages).optional(),
   timezone: z.string().optional().or(z.literal('')),
   tenantId: z.string().cuid("Organisation invalide.").optional().or(z.literal("")),
@@ -84,13 +82,11 @@ export function UserForm({
       password: "",
       firstName: "",
       lastName: "",
-      profileImageUrl: "",
       phone: "",
       dateOfBirth: undefined,
       nationality: "",
       gender: undefined,
       bio: "",
-      avatarUrl: "",
       preferredLanguage: undefined,
       timezone: "",
       tenantId: "",
@@ -136,13 +132,11 @@ export function UserForm({
             password: "", // Never pre-fill password
             firstName: fetchedUser.firstName || "",
             lastName: fetchedUser.lastName || "",
-            profileImageUrl: fetchedUser.profileImageUrl || "",
             phone: fetchedUser.phone || "",
             dateOfBirth: fetchedUser.dateOfBirth ? new Date(fetchedUser.dateOfBirth).toISOString().split('T')[0] : undefined,
             nationality: fetchedUser.nationality || "",
             gender: fetchedUser.gender || undefined,
             bio: fetchedUser.bio || "",
-            avatarUrl: fetchedUser.avatarUrl || "",
             preferredLanguage: fetchedUser.preferredLanguage || undefined,
             timezone: fetchedUser.timezone || "",
             tenantId: fetchedUser.tenantId || "", // Set tenantId from fetched data
@@ -206,8 +200,6 @@ export function UserForm({
       nationality: data.nationality || undefined,
       gender: data.gender || undefined,
       bio: data.bio || undefined,
-      avatarUrl: data.avatarUrl || undefined,
-      profileImageUrl: data.profileImageUrl || undefined, // Ensure this is correctly mapped if your DTO uses it
       preferredLanguage: data.preferredLanguage || undefined,
       timezone: data.timezone || undefined,
       tenantId: data.tenantId === "" ? null : data.tenantId, // Convert empty string to null for backend DTO
@@ -424,14 +416,6 @@ export function UserForm({
       </div>
 
       <div>
-        <Label htmlFor="profileImageUrl">Profile Image URL</Label>
-        <Input id="profileImageUrl" type="url" {...register("profileImageUrl")} disabled={overallLoading} />
-        {errors.profileImageUrl && (
-          <p className="text-negative text-xs mt-1">{errors.profileImageUrl.message}</p>
-        )}
-      </div>
-
-      <div>
         <Label htmlFor="phone">Phone</Label>
         <Input id="phone" type="tel" {...register("phone")} disabled={overallLoading} />
         {errors.phone && (
@@ -491,14 +475,6 @@ export function UserForm({
         />
         {errors.bio && (
           <p className="text-negative text-xs mt-1">{errors.bio.message}</p>
-        )}
-      </div>
-
-      <div>
-        <Label htmlFor="avatarUrl">Avatar URL</Label>
-        <Input id="avatarUrl" type="url" {...register("avatarUrl")} disabled={overallLoading} />
-        {errors.avatarUrl && (
-          <p className="text-negative text-xs mt-1">{errors.avatarUrl.message}</p>
         )}
       </div>
 

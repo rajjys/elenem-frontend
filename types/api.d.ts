@@ -4,38 +4,6 @@
  */
 
 export interface paths {
-    "/uploads/presign": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["UploadController_presign"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/uploads/confirm": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["UploadController_confirm"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/auth/register": {
         parameters: {
             query?: never;
@@ -521,74 +489,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/public-leagues": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List public leagues (with filters & pagination) */
-        get: operations["PublicLeaguesController_listPublicLeagues"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/public-leagues/tenants": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List public tenants (with filters & pagination) */
-        get: operations["PublicLeaguesController_listPublicTenants"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/public-leagues/tenants/{tenantCode}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get public tenant details by code */
-        get: operations["PublicLeaguesController_getPublicTenantByCode"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/public-leagues/{slug}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get public league details by slug */
-        get: operations["PublicLeaguesController_getPublicLeagueBySlug"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/teams": {
         parameters: {
             query?: never;
@@ -655,40 +555,6 @@ export interface paths {
         post?: never;
         /** Unassign a team admin from a team (scope checked) */
         delete: operations["TeamsController_unassignTeamAdmin"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/public-teams": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List public teams (with filters & pagination) */
-        get: operations["PublicTeamsController_listPublicTeams"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/public-teams/{slug}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get public team details by slug */
-        get: operations["PublicTeamsController_getPublicTeamBySlug"];
-        put?: never;
-        post?: never;
-        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -792,40 +658,6 @@ export interface paths {
         get?: never;
         /** [Player] Update own player profile */
         put: operations["PlayersController_updateMyPlayerProfile"];
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/public/players": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List public players (with filters & pagination) */
-        get: operations["PublicPlayersController_listPublicPlayers"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/public/players/{slug}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get public player details by slug */
-        get: operations["PublicPlayersController_getPublicPlayerBySlug"];
-        put?: never;
         post?: never;
         delete?: never;
         options?: never;
@@ -968,40 +800,6 @@ export interface paths {
         put?: never;
         /** Move a season to another state (open, close, cancel, reopen) */
         post: operations["SeasonsController_transitionSeason"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/public/seasons": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List public seasons (with filters & pagination) */
-        get: operations["PublicSeasonsController_listPublicSeasons"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/public/seasons/{slug}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get public season details by slug */
-        get: operations["PublicSeasonsController_getPublicSeasonBySlug"];
-        put?: never;
-        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -1755,91 +1553,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/public-games/dates": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get a list of dates that have scheduled public games with optional filters */
-        get: operations["PublicGamesController_getGameDates"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/public-games/standings/{leagueSlug}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get public league standings by league slug, season, and/or team */
-        get: operations["PublicGamesController_getStandingsByLeagueSlug"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/public-games": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get all public games for a specific date, grouped by tenant, with optional filters */
-        get: operations["PublicGamesController_getGamesByDate"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/public-games/search": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Find public games by various filters using slugs */
-        get: operations["PublicGamesController_findPublicGames"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/public-games/{leagueSlug}/{slug}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get a single public game by its slug and league */
-        get: operations["PublicGamesController_getGameBySlug"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/sport-rules/{sportType}": {
         parameters: {
             query?: never;
@@ -1963,88 +1676,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/public-tenants": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List all public tenants with filtering and pagination */
-        get: operations["PublicTenantsController_listPublicTenants"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/public-tenants/{slug}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get a single public tenant by its slug */
-        get: operations["PublicTenantsController_getTenantBySlug"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/uploads2/proxy": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["Upload2Controller_proxy"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/uploads2/presign": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["Upload2Controller_presign"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/uploads2/get-url": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["Upload2Controller_getUrl"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/posts": {
         parameters: {
             query?: never;
@@ -2077,40 +1708,6 @@ export interface paths {
         post?: never;
         /** Soft delete a post (scope checked) */
         delete: operations["PostsController_deletePost"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/public-posts": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List public posts (global or filtered by tenant/league/team) */
-        get: operations["PublicPostsController_listPublicPosts"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/public-posts/{tenantSlug}/{slug}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get a public post by slug within a tenant */
-        get: operations["PublicPostsController_getPublicPostBySlug"];
-        put?: never;
-        post?: never;
-        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -2408,8 +2005,8 @@ export interface components {
              */
             email: string;
             /**
-             * @description The user's password (minimum 8 characters, must include upper, lower, number, and special character).
-             * @example StrongP@ssw0rd
+             * @description The user's password: at least 8 characters.
+             * @example basket2026
              */
             password: string;
             /**
@@ -2427,11 +2024,6 @@ export interface components {
              * @example +15551234567
              */
             phone?: string;
-            /**
-             * @description An optional URL to the user's profile picture.
-             * @example https://example.com/avatars/john.jpg
-             */
-            avatarUrl?: string;
             /**
              * Format: date-time
              * @description The user's date of birth in ISO 8601 format.
@@ -2510,7 +2102,10 @@ export interface components {
              * @example 123456
              */
             otp: string;
-            /** @example StrongP@ss1 */
+            /**
+             * @description At least 8 characters.
+             * @example basket2026
+             */
             newPassword: string;
         };
         UserTenantLiteDto: {
@@ -2597,11 +2192,6 @@ export interface components {
              */
             email?: string;
             /**
-             * @description URL to profile image
-             * @example https://example.com/profile.jpg
-             */
-            avatarUrl?: string;
-            /**
              * @description User's phone number
              * @example +1234567890
              */
@@ -2647,8 +2237,6 @@ export interface components {
             lastName: string;
             /** @description User's phone number (optional). */
             phone?: string;
-            /** @description URL to the user's profile image. */
-            profileImageUrl?: string;
             /** @description Date of birth (ISO 8601 string, e.g., YYYY-MM-DD). */
             dateOfBirth?: string;
             /** @description User's nationality (ISO 3166-1 alpha-2 code). */
@@ -2708,11 +2296,6 @@ export interface components {
              * @example newemail@example.com
              */
             email?: string;
-            /**
-             * @description URL to profile image
-             * @example https://example.com/profile.jpg
-             */
-            avatarUrl?: string;
             /**
              * @description User's phone number
              * @example +1234567890
@@ -2854,6 +2437,18 @@ export interface components {
             /** @description Custom rules for sport-specific scenarios. */
             customRules?: Record<string, never>;
         };
+        BrandingThemeDto: {
+            /**
+             * @description The header band.
+             * @enum {string|null}
+             */
+            primaryColor?: "bleu" | "vert" | "rouge" | "orange" | "or" | "violet" | "turquoise" | "ardoise" | null;
+            /**
+             * @description Links, the active tab, section rules.
+             * @enum {string|null}
+             */
+            secondaryColor?: "bleu" | "vert" | "rouge" | "orange" | "or" | "violet" | "turquoise" | "ardoise" | null;
+        };
         BusinessProfileDto: {
             /**
              * @description The display name for the business profile.
@@ -2933,16 +2528,8 @@ export interface components {
              * @example Africa/Kinshasa
              */
             timezone?: Record<string, never>;
-            /** @description URL to the business logo. */
-            logoUrl?: Record<string, never>;
-            /** @description URL to the business banner image. */
-            bannerImageUrl?: Record<string, never>;
-            /** @description Branding theme information in JSON format. */
-            brandingTheme?: Record<string, never>;
-            /** @description Optional logo asset ID. */
-            logoAssetId?: Record<string, never>;
-            /** @description Optional banner asset ID. */
-            bannerAssetId?: Record<string, never>;
+            /** @description The league site’s two palette colours. */
+            brandingTheme?: components["schemas"]["BrandingThemeDto"] | null;
             /**
              * @description Visibility of the business profile (public, private, or hidden).
              * @enum {string}
@@ -3072,16 +2659,8 @@ export interface components {
              * @example Africa/Kinshasa
              */
             timezone?: Record<string, never>;
-            /** @description URL to the business logo. */
-            logoUrl?: Record<string, never>;
-            /** @description URL to the business banner image. */
-            bannerImageUrl?: Record<string, never>;
-            /** @description Branding theme information in JSON format. */
-            brandingTheme?: Record<string, never>;
-            /** @description Optional logo asset ID. */
-            logoAssetId?: Record<string, never>;
-            /** @description Optional banner asset ID. */
-            bannerAssetId?: Record<string, never>;
+            /** @description The league site’s two palette colours. */
+            brandingTheme?: components["schemas"]["BrandingThemeDto"] | null;
             /**
              * @description Visibility of the business profile (public, private, or hidden).
              * @enum {string}
@@ -3234,10 +2813,6 @@ export interface components {
             shortCode?: string;
             /** @description New description for the team (optional). */
             description?: string;
-            /** @description New URL to the team logo (optional). */
-            logoUrl?: string;
-            /** @description New URL to the team banner image (optional). */
-            bannerImageUrl?: string;
             /** @description New ID of the team's primary home venue (optional). Set to null to unassign. */
             homeVenueId?: Record<string, never>;
             /**
@@ -3257,10 +2832,6 @@ export interface components {
             shortCode?: string;
             /** @description New description for the team (optional). */
             description?: string;
-            /** @description New URL to the team logo (optional). */
-            logoUrl?: string;
-            /** @description New URL to the team banner image (optional). */
-            bannerImageUrl?: string;
             /** @description Not editable by Team Admin. */
             readonly homeVenueId?: Record<string, never>;
             /**
@@ -3299,24 +2870,6 @@ export interface components {
              */
             userId: string;
         };
-        TeamPublicDto: {
-            /** @description Unique identifier of the team. */
-            id: string;
-            /** @description Unique slug for the team. */
-            slug: string;
-            /** @description Full name of the team. */
-            name: string;
-            /** @description Short code or abbreviation for the team. */
-            shortCode?: string;
-            /** @description ID of the league this team belongs to. */
-            leagueId: string;
-            /** @description Current visibility status of the team. */
-            visibility: string;
-            /** @description Details of the league this team belongs to. */
-            league: Record<string, never>;
-            /** @description Details of the league this team belongs to. */
-            tenant: Record<string, never>;
-        };
         UpdatePlayerByAdminDto: {
             /** @description Player first name */
             firstName?: string;
@@ -3354,8 +2907,6 @@ export interface components {
             preferredFoot?: string;
             /** @description Player preferred hand (LEFT, RIGHT, BOTH) */
             preferredHand?: string;
-            /** @description URL to player avatar image */
-            profileImageUrl?: string;
             /** @description Player brief public bio */
             bio?: string;
             /**
@@ -3391,8 +2942,6 @@ export interface components {
             preferredFoot?: string;
             /** @description Player preferred hand (LEFT, RIGHT, BOTH) */
             preferredHand?: string;
-            /** @description URL to player avatar image */
-            profileImageUrl?: string;
             /** @description Player brief public bio */
             bio?: string;
         };
@@ -3406,8 +2955,6 @@ export interface components {
              * @enum {string}
              */
             gender?: "MALE" | "FEMALE" | "MIXED" | "OTHER";
-            /** @description URL to player avatar image */
-            profileImageUrl?: string;
             /** @description Player brief public bio */
             bio?: string;
         };
@@ -3609,8 +3156,6 @@ export interface components {
             preferredFoot?: string;
             /** @description Player preferred hand (LEFT, RIGHT, BOTH) */
             preferredHand?: string;
-            /** @description URL to player avatar image */
-            profileImageUrl?: string;
             /** @description Player brief public bio */
             bio?: string;
             /**
@@ -3686,49 +3231,6 @@ export interface components {
             playerId: string;
             /** @description ID of the team to assign the player to. Set to null to unassign from current team. */
             teamId?: Record<string, never>;
-        };
-        PlayerPublicDto: {
-            /** @description Player ID */
-            id: string;
-            /** @description Player First Name */
-            firstName: string;
-            /** @description Player Last Name */
-            lastName: string;
-            /** @description Player external unique ID */
-            externalId: string;
-            /** @description Player public slug for friendly URLs */
-            slug: string;
-            /** @description URL to player avatar image */
-            profileImageUrl?: Record<string, never>;
-            /**
-             * @description Player gender
-             * @enum {string}
-             */
-            gender?: "MALE" | "FEMALE" | "MIXED" | "OTHER";
-            /** @description Player jersey number */
-            jerseyNumber?: Record<string, never>;
-            /** @description Player preferred position */
-            position?: Record<string, never>;
-            /** @description Player preferred foot (LEFT, RIGHT, BOTH) */
-            preferredFoot?: Record<string, never>;
-            /** @description Player preferred hand (LEFT, RIGHT, BOTH) */
-            preferredHand?: Record<string, never>;
-            /** @description Player brief public bio */
-            bio?: Record<string, never>;
-            /** @description Current team the player is assigned to */
-            currentTeam?: components["schemas"]["BasicTeamDto"];
-            /** @description Primary league the player is associated with */
-            primaryLeague?: components["schemas"]["BasicLeagueDto"];
-            /**
-             * @description Primary sport type of the player
-             * @enum {string}
-             */
-            sportType: "SOCCER" | "BASKETBALL" | "FOOTBALL" | "BASEBALL" | "TENNIS" | "HOCKEY" | "GOLF" | "CRICKET" | "RUGBY" | "VOLLEYBALL" | "OTHER";
-            /**
-             * @description Visibility status of the player profile. Defaults to PUBLIC.
-             * @enum {string}
-             */
-            visibility?: "PUBLIC" | "PRIVATE" | "RESERVED";
         };
         StageResponseDto: {
             id: string;
@@ -3845,10 +3347,6 @@ export interface components {
             endDate: string;
             /** @description Description of the season */
             description?: string;
-            /** @description URL to season logo image */
-            logoUrl?: string;
-            /** @description URL to season banner image */
-            bannerImageUrl?: string;
         };
         BasicTenantDto: {
             id: string;
@@ -3925,10 +3423,6 @@ export interface components {
             endDate?: string;
             /** @description Description of the season */
             description?: string;
-            /** @description URL to season logo image */
-            logoUrl?: string;
-            /** @description URL to season banner image */
-            bannerImageUrl?: string;
             /** @description Custom JSON for points system rules */
             pointsSystem?: Record<string, never>;
             /** @description Custom JSON for tiebreaker rules */
@@ -3942,35 +3436,6 @@ export interface components {
             status: "PLANNING" | "ACTIVE" | "COMPLETED" | "CANCELED";
             /** @description Why. Required for every move except opening a season — the others stop a result being recorded, void a table, or change a classification that has already been published. */
             reason?: string;
-        };
-        SeasonBasicDto: {
-            /** @description Season ID */
-            id: string;
-            /** @description Season external unique ID */
-            externalId: string;
-            /** @description Season name */
-            name: string;
-            /** @description Season slug for friendly URLs */
-            slug: string;
-            /**
-             * Format: date-time
-             * @description Start date of the season (ISO 8601)
-             */
-            startDate: string;
-            /**
-             * Format: date-time
-             * @description End date of the season (ISO 8601)
-             */
-            endDate: string;
-            /**
-             * @description Current status of the season
-             * @enum {string}
-             */
-            status: "PLANNING" | "ACTIVE" | "COMPLETED" | "CANCELED";
-            /** @description The league this season belongs to */
-            league: components["schemas"]["BasicLeagueDto"];
-            /** @description The tenant this season belongs to */
-            tenant: components["schemas"]["BasicTenantDto"];
         };
         DashboardCompetitionDto: {
             id: string;
@@ -4605,11 +4070,6 @@ export interface components {
             /** @description Which journée this fixture belongs to. */
             matchday?: number;
             /**
-             * @description (Optional) The URL of the banner image for the game.
-             * @example https://example.com/banner.jpg
-             */
-            bannerImageUrl?: string;
-            /**
              * @description (Optional) The URL of the highlights video for the game.
              * @example https://example.com/highlights.mp4
              */
@@ -4728,39 +4188,6 @@ export interface components {
             position?: string;
             /** @description Create the player even though somebody of the same name already exists in this organisation. Without it the request is refused with the matches, so the operator can transfer the existing player instead of forking them into two records — which is how a roster quietly acquires the same person twice. */
             force?: boolean;
-        };
-        StandingsResponseDto: Record<string, never>;
-        BasicSeasonDto: {
-            id: string;
-            name: string;
-        };
-        GamePublicResponseDto: {
-            id: string;
-            slug: string;
-            /** Format: date-time */
-            dateTime: string;
-            location?: Record<string, never>;
-            /** @enum {string} */
-            status: "DRAFT" | "SCHEDULED" | "CONFIRMED" | "LIVE" | "PAUSED" | "COMPLETED" | "CANCELLED" | "POSTPONED" | "RESCHEDULED";
-            homeScore?: Record<string, never>;
-            awayScore?: Record<string, never>;
-            notes?: Record<string, never>;
-            round?: Record<string, never>;
-            matchday?: Record<string, never>;
-            bannerImageUrl?: Record<string, never>;
-            highlightsUrl?: Record<string, never>;
-            isActive: boolean;
-            leagueId: string;
-            tenantId: string;
-            homeTeamId: string;
-            awayTeamId: string;
-            homeVenueId?: Record<string, never>;
-            homeTeam: components["schemas"]["BasicTeamDto"];
-            awayTeam: components["schemas"]["BasicTeamDto"];
-            league: components["schemas"]["BasicLeagueDto"];
-            season?: components["schemas"]["BasicSeasonDto"];
-            homeVenue?: components["schemas"]["BasicVenueDto"];
-            tenant: components["schemas"]["BasicTenantDto"];
         };
         PointRuleDto: {
             /** @description Identifier for the outcome (e.g., WIN, DRAW, LOSS, SCORED_3_GOALS) */
@@ -4977,32 +4404,6 @@ export interface components {
             /** @description Partial or full update of the detailed organization information. */
             businessProfile?: components["schemas"]["UpdateBusinessProfileDto"];
         };
-        PublicBusinessProfileResponseDto: {
-            id: string;
-            name: string;
-            slug?: string;
-            description?: Record<string, never> | null;
-            bannerImageUrl?: Record<string, never> | null;
-            logoUrl?: Record<string, never> | null;
-            /** @enum {string} */
-            visibility: "PUBLIC" | "PRIVATE" | "HIDDEN" | "ARCHIVED";
-            country?: Record<string, never> | null;
-            establishedYear?: Record<string, never> | null;
-        };
-        PublicTenantResponseDto: {
-            id: string;
-            externalId: string;
-            slug: string;
-            tenantCode: string;
-            /** @enum {string} */
-            sportType: "SOCCER" | "BASKETBALL" | "FOOTBALL" | "BASEBALL" | "TENNIS" | "HOCKEY" | "GOLF" | "CRICKET" | "RUGBY" | "VOLLEYBALL" | "OTHER";
-            businessProfile: components["schemas"]["PublicBusinessProfileResponseDto"];
-            leagues?: string[] | null;
-            teams?: string[] | null;
-            _count: Record<string, never>;
-        };
-        ProxyDto: Record<string, never>;
-        PresignDto: Record<string, never>;
         CreatePostDto: {
             /** @description Title of the post (optional for status updates). */
             title?: string;
@@ -5033,8 +4434,6 @@ export interface components {
             targetId?: string;
             /** @description Scheduled publish date (for scheduled posts). */
             scheduledAt?: string;
-            /** @description Optional hero image asset ID. */
-            heroImageId?: string;
         };
         BasicAssetDto: {
             id: string;
@@ -5097,8 +4496,6 @@ export interface components {
             targetId?: string;
             /** @description Scheduled publish date (for scheduled posts). */
             scheduledAt?: string;
-            /** @description Optional hero image asset ID. */
-            heroImageId?: string;
         };
         VenueCourtDto: {
             id: string;
@@ -5204,7 +4601,7 @@ export interface components {
             lastName: string;
             /** @example jean.bisimwa@example.cd */
             email: string;
-            /** @description At least 8 characters, with upper, lower, and a digit or symbol. */
+            /** @description At least 8 characters. */
             password: string;
             /** @example Ligue Provinciale de Basketball de Kinshasa */
             organisationName: string;
@@ -5419,40 +4816,6 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
-    UploadController_presign: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    UploadController_confirm: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
     AuthController_register: {
         parameters: {
             query?: never;
@@ -6692,85 +6055,6 @@ export interface operations {
             };
         };
     };
-    PublicLeaguesController_listPublicLeagues: {
-        parameters: {
-            query: {
-                q: string;
-                tenantSlug: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    PublicLeaguesController_listPublicTenants: {
-        parameters: {
-            query: {
-                q: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    PublicLeaguesController_getPublicTenantByCode: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description Tenant code */
-                tenantCode: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    PublicLeaguesController_getPublicLeagueBySlug: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description League slug */
-                slug: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
     TeamsController_listTeams: {
         parameters: {
             query?: {
@@ -7098,72 +6382,6 @@ export interface operations {
                 content?: never;
             };
             /** @description Team or user not found. */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    PublicTeamsController_listPublicTeams: {
-        parameters: {
-            query?: {
-                /** @description Search term for team name, short code, or slug. */
-                q?: string;
-                /** @description Filter by league Slug. */
-                leagueSlug?: string;
-                /** @description Filter by tenant Slug. */
-                tenantSlug?: string;
-                /** @description Page number (pagination). */
-                page?: number;
-                /** @description Page size (pagination). */
-                pageSize?: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description A paginated list of public teams. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description League or Tenant not found when filtered. */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    PublicTeamsController_getPublicTeamBySlug: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description Team slug */
-                slug: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Team details. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["TeamPublicDto"];
-                };
-            };
-            /** @description Team not found or not public. */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -7590,76 +6808,6 @@ export interface operations {
             };
             /** @description Conflict (e.g., duplicate username). */
             409: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    PublicPlayersController_listPublicPlayers: {
-        parameters: {
-            query?: {
-                /** @description Search term for player name, email, bio, or position. */
-                q?: string;
-                /** @description Filter by league ID. */
-                leagueId?: string;
-                /** @description Filter by team ID. */
-                teamId?: string;
-                /** @description Filter by tenant ID. */
-                tenantId?: string;
-                /** @description Records to skip (pagination). */
-                skip?: number;
-                /** @description Records to take (pagination). */
-                take?: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description A list of public players. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PlayerPublicDto"][];
-                };
-            };
-            /** @description Associated entity not found when filtering. */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    PublicPlayersController_getPublicPlayerBySlug: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description Player slug */
-                slug: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Player details. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PlayerPublicDto"];
-                };
-            };
-            /** @description Player not found or not public. */
-            404: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -8126,76 +7274,6 @@ export interface operations {
             };
             /** @description That move is not legal from this state. */
             409: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    PublicSeasonsController_listPublicSeasons: {
-        parameters: {
-            query?: {
-                /** @description Search term for season name or description. */
-                q?: string;
-                /** @description Filter by league ID. */
-                leagueId?: string;
-                /** @description Filter by tenant ID. */
-                tenantId?: string;
-                /** @description Filter by season status. */
-                status?: "PLANNING" | "ACTIVE" | "COMPLETED" | "CANCELED";
-                /** @description Records to skip (pagination). */
-                skip?: number;
-                /** @description Records to take (pagination). */
-                take?: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description A list of public seasons. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SeasonBasicDto"][];
-                };
-            };
-            /** @description Associated entity not found when filtering. */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    PublicSeasonsController_getPublicSeasonBySlug: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description Season slug */
-                slug: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Season details. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SeasonBasicDto"];
-                };
-            };
-            /** @description Season not found or not public. */
-            404: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -9367,189 +8445,6 @@ export interface operations {
             };
         };
     };
-    PublicGamesController_getGameDates: {
-        parameters: {
-            query?: {
-                /** @description Slug of the tenant */
-                tenantSlug?: string;
-                /** @description Slug of the league */
-                leagueSlug?: string;
-                /** @description Slug of a team (either home or away) */
-                teamSlug?: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description An array of dates in YYYY-MM-DD format. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": string[];
-                };
-            };
-        };
-    };
-    PublicGamesController_getStandingsByLeagueSlug: {
-        parameters: {
-            query?: {
-                /** @description Slug of the season (optional) */
-                seasonSlug?: string;
-                /** @description Slug of the team (optional) */
-                teamSlug?: string;
-            };
-            header?: never;
-            path: {
-                leagueSlug: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description A list of league standings. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["StandingsResponseDto"][];
-                };
-            };
-            /** @description League not found or no standings available. */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    PublicGamesController_getGamesByDate: {
-        parameters: {
-            query: {
-                /** @description The date to fetch games for in YYYY-MM-DD format. */
-                date: string;
-                /** @description Number of items to skip (offset) */
-                skip?: number;
-                /** @description Number of items to take (limit) */
-                take?: number;
-                /** @description Current page number */
-                page?: number;
-                /** @description Page size */
-                pageSize?: number;
-                /** @description Field to sort by */
-                sortBy?: string;
-                /** @description Sort order (asc/desc) */
-                sortOrder?: "asc" | "desc";
-                /** @description Slug of the tenant */
-                tenantSlug?: string;
-                /** @description Slug of the league */
-                leagueSlug?: string;
-                /** @description Slug of a team (either home or away) */
-                teamSlug?: string;
-                /** @description Slug of the season to filter by. */
-                seasonSlug?: string;
-                /** @description Slug of the home venue to filter by. */
-                venueSlug?: string;
-                /** @description Status of the game to filter by. */
-                status?: "DRAFT" | "SCHEDULED" | "CONFIRMED" | "LIVE" | "PAUSED" | "COMPLETED" | "CANCELLED" | "POSTPONED" | "RESCHEDULED";
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description A list of tenants, each with their games for the day. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    PublicGamesController_findPublicGames: {
-        parameters: {
-            query?: {
-                /** @description Number of items to skip (offset) */
-                skip?: number;
-                /** @description Number of items to take (limit) */
-                take?: number;
-                /** @description Current page number */
-                page?: number;
-                /** @description Page size */
-                pageSize?: number;
-                /** @description Field to sort by */
-                sortBy?: string;
-                /** @description Sort order (asc/desc) */
-                sortOrder?: "asc" | "desc";
-                /** @description Slug of the tenant */
-                tenantSlug?: string;
-                /** @description Slug of the league */
-                leagueSlug?: string;
-                /** @description Slug of a team (either home or away) */
-                teamSlug?: string;
-                /** @description Slug of the season */
-                seasonSlug?: string;
-                /** @description Slug of the home venue to filter by. */
-                venueSlug?: string;
-                /** @description Filter by game status */
-                status?: "DRAFT" | "SCHEDULED" | "CONFIRMED" | "LIVE" | "PAUSED" | "COMPLETED" | "CANCELLED" | "POSTPONED" | "RESCHEDULED";
-                /** @description Date to filter by (YYYY-MM-DD). */
-                date?: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description A list of games matching the filters. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["GamePublicResponseDto"][];
-                };
-            };
-        };
-    };
-    PublicGamesController_getGameBySlug: {
-        parameters: {
-            query: {
-                /** @description Slug of the league */
-                leagueSlug: string;
-            };
-            header?: never;
-            path: {
-                slug: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description The details of the game. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Game not found. */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
     SportRulesController_getSportRules: {
         parameters: {
             query?: never;
@@ -9971,129 +8866,6 @@ export interface operations {
             };
         };
     };
-    PublicTenantsController_listPublicTenants: {
-        parameters: {
-            query?: {
-                /** @description Page number for pagination. */
-                page?: number;
-                /** @description Number of items per page. */
-                pageSize?: number;
-                /** @description Search term for tenant name or code. */
-                search?: string;
-                /** @description Filter by sport type. */
-                sportType?: "SOCCER" | "BASKETBALL" | "FOOTBALL" | "BASEBALL" | "TENNIS" | "HOCKEY" | "GOLF" | "CRICKET" | "RUGBY" | "VOLLEYBALL" | "OTHER";
-                /** @description Filter by country code (e.g., US, GB). */
-                country?: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description A paginated list of public tenants. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PaginatedResponseDto"] & {
-                        data?: components["schemas"]["PublicTenantResponseDto"][];
-                    };
-                };
-            };
-        };
-    };
-    PublicTenantsController_getTenantBySlug: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                slug: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description The details of the tenant. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PublicTenantResponseDto"];
-                };
-            };
-            /** @description Tenant not found or is not currently active. */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    Upload2Controller_proxy: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ProxyDto"];
-            };
-        };
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    Upload2Controller_presign: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["PresignDto"];
-            };
-        };
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    Upload2Controller_getUrl: {
-        parameters: {
-            query: {
-                key: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
     PostsController_listPosts: {
         parameters: {
             query?: {
@@ -10303,67 +9075,6 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
-            };
-        };
-    };
-    PublicPostsController_listPublicPosts: {
-        parameters: {
-            query?: {
-                /** @description Filter by tenant slug. */
-                tenantSlug?: string;
-                /** @description Filter by league slug. */
-                leagueSlug?: string;
-                /** @description Filter by team slug. */
-                teamSlug?: string;
-                /** @description Filter by post type. */
-                type?: "BLOG" | "STATUS" | "ANNOUNCEMENT" | "MATCH_REPORT";
-                /** @description Search term (title/content). */
-                search?: string;
-                /** @description Page number (default 1). */
-                page?: number;
-                /** @description Page size (default 10). */
-                pageSize?: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description A paginated list of public posts. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PaginatedResponseDto"] & {
-                        data?: components["schemas"]["PostResponseDto"][];
-                    };
-                };
-            };
-        };
-    };
-    PublicPostsController_getPublicPostBySlug: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description Tenant slug */
-                tenantSlug: string;
-                /** @description Post slug */
-                slug: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PostResponseDto"];
-                };
             };
         };
     };

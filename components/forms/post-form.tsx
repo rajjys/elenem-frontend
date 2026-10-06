@@ -6,10 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
-import { useUploadAndConfirm } from "@/hooks/useUploadAndConfirm";
 import { api } from "@/services/api";
 import { toast } from "sonner";
-import Image from "next/image";
 import slugify from 'slugify'; // For generating slugs
 
 // Import your schemas and types (assuming they are correctly updated as in the conceptual file)
@@ -43,9 +41,6 @@ export function PostForm({ initialData, onSuccess, onCancel }: PostFormProps) {
   // Determine if we are in Edit mode
   const isEditMode = !!initialData?.id;
 
-  // useUploadAndConfirm handles new uploads, 'asset' is the newly uploaded image.
-  const { upload, uploading, progress, asset } = useUploadAndConfirm();
-  
   // Define default values based on mode
   const defaultValues = isEditMode
     ? {
@@ -60,7 +55,6 @@ export function PostForm({ initialData, onSuccess, onCancel }: PostFormProps) {
         targetType: initialData.targetType,
         targetId: initialData.targetId || undefined,
         scheduledAt: formatDateForInput(initialData.scheduledAt),
-        // heroImageId is managed by the upload logic below
       }
     : {
         // Create mode defaults
@@ -78,21 +72,15 @@ export function PostForm({ initialData, onSuccess, onCancel }: PostFormProps) {
     defaultValues: defaultValues, // Cast to any because the types are slightly different
   });
   
-  // Watch the image input (if a NEW image is uploaded, 'asset' will be populated)
-  const uploadedAsset = asset;
-  
-  // The current active hero image ID, prioritizing new upload over existing data
-  const currentHeroImageId = uploadedAsset?.id || initialData?.heroImageId;
-
   // 3. Update onSubmit logic (POST vs. PUT)
   async function onSubmit(values: CreatePostFormValues | UpdatePostFormValues) {
     try {
-      // Build the payload, overriding the image ID if a new asset was uploaded
       if (!values.title) return; // Basic safeguard
+      // No hero image until posts get an image slot (IMAGES_AND_STORAGE §2): the API no longer takes
+      // an asset id from the browser.
       const payload = { 
         ...values, 
         slug: slugify(values.title, { lower: true, strict: true }),
-        heroImageId: currentHeroImageId || null // Ensure null is sent if removed/empty
       };
 
       if (isEditMode && initialData?.id) {
@@ -114,9 +102,6 @@ export function PostForm({ initialData, onSuccess, onCancel }: PostFormProps) {
 
   // 4. Determine button text
   const buttonText = isEditMode ? "Enregistrer" : "Publier";
-
-  // Display the existing hero image if no new file is being uploaded
-  const existingImage = !uploadedAsset && initialData?.heroImage?.url;
 
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -158,48 +143,6 @@ export function PostForm({ initialData, onSuccess, onCancel }: PostFormProps) {
             </p>
         )}
       </div>
-      {/* Hero Image */}
-      <div>
-        <Label htmlFor="heroImage">Image de couverture</Label>
-        
-        <label
-          htmlFor="heroImage"
-          className="inline-flex items-center px-4 py-2 bg-accent text-white rounded cursor-pointer hover:bg-accent-hover transition-colors duration-300">
-          Select Image
-        </label>
-        
-        <input
-          id="heroImage"
-          type="file"
-          accept="image/*"
-          className="hidden"
-          onChange={async (e) => {
-            if (e.target.files?.[0]) {
-              await upload(e.target.files[0]);
-            }
-          }}
-        />
-
-        {uploading && (
-          <p className="text-sm mt-1 text-ink-muted">Uploading... {progress}%</p>
-        )}
-
-        {(uploadedAsset || existingImage) && (
-          <div className="mt-2">
-            <Image
-              src={uploadedAsset?.url || initialData?.heroImage?.url || ""}
-              alt=""
-              width={400}
-              height={280}
-              className="rounded object-cover h-84 w-full border border-line shadow-sm"
-            />
-            <p className="text-xs text-ink-muted mt-1">
-              Current Image ID: {currentHeroImageId}
-            </p>
-          </div>
-        )}
-      </div>
-
       {/* Type & Status */}
       <div className="grid grid-cols-2 gap-4">
         <div>
@@ -283,7 +226,7 @@ export function PostForm({ initialData, onSuccess, onCancel }: PostFormProps) {
         </Button>
         <Button 
             type="submit" 
-            disabled={form.formState.isSubmitting || uploading}
+            disabled={form.formState.isSubmitting}
         >
           {form.formState.isSubmitting ? `${isEditMode ? "Enregistrement…" : "Publication…"}...` : buttonText}
         </Button>
