@@ -1,5 +1,6 @@
 'use client';
 
+import { mediaSrc } from '@/lib/media';
 import { Check } from 'lucide-react';
 import { cn } from '@/utils/cn';
 import { BAND_INK, SITE_PALETTE, siteColourVars, type SiteColour } from '@/lib/public-site/palette';
@@ -60,16 +61,31 @@ export function SiteColourPicker({
  * What the league's site header will look like with these two colours — drawn with the site's own
  * variables and `league-site` class, so the accent switches with the theme exactly as it will there.
  */
-export function SiteColourPreview({ name, primary, accent }: { name: string; primary: string; accent: string }) {
+export function SiteColourPreview({
+  name,
+  primary,
+  accent,
+  logoUrl,
+}: {
+  name: string;
+  primary: string;
+  accent: string;
+  logoUrl?: string | null;
+}) {
   const banded = !!primary && primary in SITE_PALETTE;
   return (
     <div aria-hidden className="league-site overflow-hidden rounded-lg border border-line" style={siteColourVars(primary || null, accent || null)}>
       <div
         className={cn('flex items-center gap-2 px-3 py-2.5 text-sm font-bold', banded ? 'bg-[var(--site-band)] text-[var(--site-band-ink)]' : 'bg-surface text-ink')}
       >
-        <span className="flex h-6 w-6 items-center justify-center rounded bg-surface-sunk text-[0.6rem] text-ink">
-          {name.slice(0, 2).toUpperCase()}
-        </span>
+        {logoUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={mediaSrc(logoUrl, 'sm') ?? ''} alt="" width={24} height={24} className="h-6 w-6 rounded bg-surface object-contain" />
+        ) : (
+          <span className="flex h-6 w-6 items-center justify-center rounded bg-surface-sunk text-[0.6rem] text-ink">
+            {name.slice(0, 2).toUpperCase()}
+          </span>
+        )}
         <span className="truncate">{name}</span>
       </div>
       <div className="h-0.5 bg-[var(--site-accent)]" />

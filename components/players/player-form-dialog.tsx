@@ -6,6 +6,7 @@ import { Button } from '@/components/ui';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useCreatePlayer, useUpdatePlayer } from '@/services/players';
 import { toastApiError } from '@/utils';
+import { ImageField } from '@/components/media/image-field';
 import type { Player } from '@/schemas/player-schemas';
 import { Field, LeaguePicker, TeamPicker, useResolvedScope } from './player-scope-fields';
 
@@ -103,6 +104,17 @@ export function PlayerFormDialog({
         </DialogHeader>
 
         <div className="space-y-4">
+          {/* Saved on its own when the crop is confirmed; « Enregistrer » below is for the rest. */}
+          {isEdit && player && (
+            <ImageField
+              slot="player-photo"
+              entityId={player.id}
+              value={player.profileImageUrl}
+              name={`${player.firstName} ${player.lastName}`}
+              className="border-b border-line pb-4"
+            />
+          )}
+
           <div className="grid grid-cols-2 gap-3">
             <Field label="Prénom" value={firstName} onChange={setFirstName} required />
             <Field label="Nom" value={lastName} onChange={setLastName} required />

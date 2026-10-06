@@ -8,6 +8,7 @@ import { useScopeContext } from '@/hooks/useScopeContext';
 import { useAuthStore } from '@/store/auth.store';
 import { api } from '@/services/api';
 import { toastApiError } from '@/utils';
+import { ImageField } from '@/components/media/image-field';
 
 /**
  * A club's own details.
@@ -92,6 +93,15 @@ export default function TeamEditPage() {
         Le nom et l&apos;abréviation utilisés partout dans l&apos;application — sur le calendrier, au
         classement et sur la feuille de match.
       </p>
+
+      <div className="mb-4 rounded-xl border border-line bg-surface p-5">
+        <ImageField
+          slot="team-logo"
+          entityId={teamId}
+          value={team.data.logoUrl ?? team.data.businessProfile?.logoUrl}
+          name={team.data.name ?? ''}
+        />
+      </div>
 
       <form
         className="space-y-4 rounded-xl border border-line bg-surface p-5"

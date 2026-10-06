@@ -1713,6 +1713,78 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/tenants/{tenantId}/logo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Replace the organisation’s logo */
+        put: operations["MediaController_putTenantLogo"];
+        post?: never;
+        /** Remove the organisation’s logo */
+        delete: operations["MediaController_deleteTenantLogo"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/leagues/{leagueId}/logo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Replace a competition’s logo */
+        put: operations["MediaController_putLeagueLogo"];
+        post?: never;
+        /** Remove a competition’s logo */
+        delete: operations["MediaController_deleteLeagueLogo"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/teams/{teamId}/logo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Replace a club’s crest */
+        put: operations["MediaController_putTeamLogo"];
+        post?: never;
+        /** Remove a club’s crest */
+        delete: operations["MediaController_deleteTeamLogo"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/players/{playerId}/photo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Replace a player’s photo */
+        put: operations["MediaController_putPlayerPhoto"];
+        post?: never;
+        /** Remove a player’s photo */
+        delete: operations["MediaController_deletePlayerPhoto"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/venues": {
         parameters: {
             query?: never;
@@ -4496,6 +4568,13 @@ export interface components {
             targetId?: string;
             /** @description Scheduled publish date (for scheduled posts). */
             scheduledAt?: string;
+        };
+        ImageResponseDto: {
+            /**
+             * @description The image at 512 px (md.webp), or null once removed. sm.webp (128 px) and lg.webp (1024 px) sit beside it, and md.png for logos.
+             * @example https://media.dxscores.com/t/cm…/team-logo/2f1c…/md.webp
+             */
+            url: string | null;
         };
         VenueCourtDto: {
             id: string;
@@ -9075,6 +9154,214 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    MediaController_putTenantLogo: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                tenantId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /**
+                     * Format: binary
+                     * @description JPEG, PNG or WebP, at most 5 MB, at least 128 × 128 px.
+                     */
+                    file: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImageResponseDto"];
+                };
+            };
+        };
+    };
+    MediaController_deleteTenantLogo: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                tenantId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImageResponseDto"];
+                };
+            };
+        };
+    };
+    MediaController_putLeagueLogo: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                leagueId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /**
+                     * Format: binary
+                     * @description JPEG, PNG or WebP, at most 5 MB, at least 128 × 128 px.
+                     */
+                    file: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImageResponseDto"];
+                };
+            };
+        };
+    };
+    MediaController_deleteLeagueLogo: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                leagueId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImageResponseDto"];
+                };
+            };
+        };
+    };
+    MediaController_putTeamLogo: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                teamId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /**
+                     * Format: binary
+                     * @description JPEG, PNG or WebP, at most 5 MB, at least 128 × 128 px.
+                     */
+                    file: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImageResponseDto"];
+                };
+            };
+        };
+    };
+    MediaController_deleteTeamLogo: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                teamId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImageResponseDto"];
+                };
+            };
+        };
+    };
+    MediaController_putPlayerPhoto: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                playerId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /**
+                     * Format: binary
+                     * @description JPEG, PNG or WebP, at most 5 MB, at least 128 × 128 px.
+                     */
+                    file: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImageResponseDto"];
+                };
+            };
+        };
+    };
+    MediaController_deletePlayerPhoto: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                playerId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImageResponseDto"];
+                };
             };
         };
     };

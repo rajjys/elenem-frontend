@@ -6,6 +6,7 @@ import { Loader2 } from 'lucide-react';
 import { Button, Input, Label, SelectField, Switch } from '@/components/ui';
 import { useLeague, useUpdateLeague } from '@/services/leagues';
 import { toastApiError } from '@/utils';
+import { ImageField } from '@/components/media/image-field';
 import { SettingsSection } from './settings-section';
 
 const GENDERS = [
@@ -153,6 +154,13 @@ export function IdentityPanel({ leagueId }: { leagueId: string }) {
             </p>
           </div>
         </div>
+      </SettingsSection>
+
+      <SettingsSection
+        title="Logo"
+        description="Celui de la compétition, sur ses écrans et ses classements. Sans logo, ses initiales le remplacent."
+      >
+        <ImageField slot="league-logo" entityId={leagueId} value={league.businessProfile?.logoUrl} name={league.name} />
       </SettingsSection>
 
       <SettingsSection

@@ -27,6 +27,8 @@ export const TenantDetailsSchema = z.object({
   country: z.string().optional(), // ISO 2-letter code; omitted by the list projection, present on detail
   businessProfile: CreateBusinessProfileSchema.extend({
     id: z.string(),
+    // Read-only: written by the media service (IMAGES_AND_STORAGE §4), never sent back.
+    logoUrl: z.string().nullable().optional(),
     logoAsset: z.object({ url: z.string().nullable().optional() }).optional().nullable(),
     bannerAsset: z.object({ url: z.string().nullable().optional() }).optional().nullable(),
   }),

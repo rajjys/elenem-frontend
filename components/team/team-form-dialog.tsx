@@ -6,6 +6,7 @@ import { Button, Input, Label, Modal, SelectField } from '@/components/ui';
 import { useStandingsLeagues } from '@/services/standings';
 import { useCreateTeam, useUpdateTeam, suggestShortCode, type TeamListItem } from '@/services/teams';
 import { toastApiError } from '@/utils';
+import { ImageField } from '@/components/media/image-field';
 
 /**
  * Registering one club.
@@ -180,9 +181,21 @@ export function TeamFormDialog({
           </div>
         )}
 
+        {/* Saved on its own when the crop is confirmed; « Enregistrer » below is for the name. */}
+        {isEdit && team && (
+          <ImageField
+            slot="team-logo"
+            entityId={team.id}
+            value={team.businessProfile?.logoUrl}
+            name={team.name}
+            className="border-t border-line pt-4"
+          />
+        )}
+
         {!isEdit && (
           <p className="text-xs text-ink-subtle">
-            Ville, année de fondation et logo se renseignent ensuite sur la fiche du club.
+            Le logo s’ajoute ensuite, en modifiant le club ; la ville et l’année de fondation, sur sa
+            fiche.
           </p>
         )}
       </form>

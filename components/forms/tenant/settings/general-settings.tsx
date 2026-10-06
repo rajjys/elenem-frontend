@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -24,6 +24,7 @@ import { Loader2 } from "lucide-react"; // Add Loader2 import
 import { buildTenantUrl } from '@/utils/tenant-url';
 import { TIMEZONES, timezoneLabel } from '@/utils/timezones';
 import { SiteColourPicker, SiteColourPreview } from './site-colours';
+import { ImageField } from '@/components/media/image-field';
 
 /**
  * The organisation's fields, plus its time zone. The zone lives on the business profile, but it
@@ -87,6 +88,9 @@ function computeDelta(oldObj: Partial<FormValues>, newObj: Partial<FormValues>) 
 export default function TenantGeneralSettings({ tenant, onSuccess  }: TenantGeneralSettingsProps) {
   // initial values stored in a ref so we can update it after successful saves
   const initialRef = useRef<FormValues>(buildDefaultValues(tenant));
+  // Kept here, not in the form: the logo saves itself, and the preview follows it at once.
+  const [logoUrl, setLogoUrl] = useState<string | null>(tenant.businessProfile?.logoUrl ?? null);
+  useEffect(() => setLogoUrl(tenant.businessProfile?.logoUrl ?? null), [tenant]);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(GeneralSettingsSchema),
@@ -362,6 +366,11 @@ export default function TenantGeneralSettings({ tenant, onSuccess  }: TenantGene
         </div>
       </div>
 
+      {/* The logo saves on its own, the moment its crop is confirmed — not with « Save Changes ». */}
+      <div className="border-t border-line pt-6">
+        <ImageField slot="tenant-logo" entityId={tenant.id} value={logoUrl} name={tenant.name} onChange={setLogoUrl} />
+      </div>
+
       {/* The league site's colours (PHASE5B §4.6), beside a preview of its header. */}
       <div className="grid gap-6 border-t border-line pt-6 md:grid-cols-[1fr_16rem]">
         <div className="space-y-5">
@@ -388,7 +397,7 @@ export default function TenantGeneralSettings({ tenant, onSuccess  }: TenantGene
         </div>
         <div>
           <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-ink-subtle">Aperçu</p>
-          <SiteColourPreview name={tenant.name} primary={watch('primaryColor') ?? ''} accent={watch('secondaryColor') ?? ''} />
+          <SiteColourPreview name={tenant.name} primary={watch('primaryColor') ?? ''} accent={watch('secondaryColor') ?? ''} logoUrl={logoUrl} />
         </div>
       </div>
 
