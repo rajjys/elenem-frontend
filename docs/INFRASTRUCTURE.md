@@ -161,7 +161,13 @@ a precondition for anything.
   are written, and egress is what makes object storage expensive everywhere else.
 - **S3-compatible API**, so `@aws-sdk/client-s3` works against it unchanged and nothing in the code
   is R2-specific.
-- **No card at signup** — confirmed by the owner opening an account on 2026-09-10.
+- **No card to open the Cloudflare account** — confirmed by the owner on 2026-09-10. **But
+  activating R2 asks for a payment method** (card or PayPal), even on the free tier. *Corrected
+  2026-10-06* (`IMAGES_AND_STORAGE.md` §1.1): this line used to read "no card", which was the
+  reason AWS lost. Within the free allowance nothing is charged. Past it, R2 bills rather than
+  stops, which is the failure mode §1 rejects. The amounts are cents ($0.015 per GB-month), and
+  the protection is our own: the upload rate limit, images re-encoded to a few hundred KB, and a
+  per-organisation cap when it is needed.
 
 Public reads go through a custom domain on the `.com` (`media.<name>.com`). The
 `pub-<hash>.r2.dev` URL exists but is rate-limited and documented as not for production.
@@ -226,7 +232,8 @@ infrastructure needs. Enforced server-side, next to the existing slug generation
 
 ### 4.3 The storage adapter
 
-There is no S3 code yet, which is fortunate — nothing has to be unpicked. What lands should be an
+The two AWS-shaped experiments (`src/upload`, `src/upload2`) were deleted on 2026-10-06, so there is
+again no storage code; the plan is `IMAGES_AND_STORAGE.md`. What lands should be an
 **`@aws-sdk/client-s3` client pointed at R2's endpoint**, behind a small interface, so the product
 never names its provider. That is the same rule the sport columns follow (`PLAYERS_AND_STATS` §1)
 and it is what keeps a move cheap if R2's terms ever change.
@@ -238,7 +245,7 @@ and it is what keeps a move cheap if R2's terms ever change.
 | Date | Decision | Because |
 |---|---|---|
 | 2026-09-11 | **Not AWS S3** | Card required; 5 GB free expires at 12 months; overage bills immediately even inside the free year |
-| 2026-09-11 | **Cloudflare R2** for object storage | 10 GB free with no expiry, zero egress, S3-compatible, no card |
+| 2026-09-11 | **Cloudflare R2** for object storage | 10 GB free with no expiry, zero egress, S3-compatible. *Corrected 2026-10-06:* activating R2 does need a card or PayPal on file |
 | 2026-09-11 | **Two domains**, `.com` app / `.app` tenants | Vercel wildcard needs Vercel NS; R2 custom domain needs Cloudflare NS; one apex cannot do both |
 | 2026-09-11 | **Wildcard, not manual subdomains** | Self-serve onboarding is a Phase 5 goal; a tenant cannot wait on a human adding DNS |
 | 2026-09-11 | **Neon, not Supabase** | Elenem uses none of Supabase's extras; a free Supabase project pauses after 7 days idle needing a manual restore, Neon resumes in under a second |
@@ -528,7 +535,8 @@ than a DNS error. It will show whatever your middleware does with an unknown ten
 
 ### Step 8 — Cloudflare R2 (images)
 
-1. Cloudflare dashboard → **Storage & databases** → **R2**.
+1. Cloudflare dashboard → **Storage & databases** → **R2**. The first time, Cloudflare asks for a
+   payment method (card or PayPal) to activate R2. Nothing is charged within the free tier.
 2. **Create bucket**: `dxscores-media`. Location: **Automatic** or **EU**.
 3. **Public access** → *Custom domain* → add `media.dxscores.com`.
    Cloudflare creates the DNS record for you, **orange-clouded**. Leave it orange — that one is
@@ -542,12 +550,15 @@ than a DNS error. It will show whatever your middleware does with an unknown ten
    ```
 5. Add them to **Railway**'s environment:
    ```
-   R2_ACCOUNT_ID        = ...
+   R2_ENDPOINT          = https://<account-id>.r2.cloudflarestorage.com
    R2_ACCESS_KEY_ID     = ...
    R2_SECRET_ACCESS_KEY = ...
    R2_BUCKET            = dxscores-media
    R2_PUBLIC_URL        = https://media.dxscores.com
    ```
+
+Copy the endpoint from the bucket's settings rather than typing it: an EU-jurisdiction bucket has
+a different one. Development uses its own bucket and token (`IMAGES_AND_STORAGE.md` §6).
 
 **Worked when:** you upload a file through the R2 dashboard and it loads at
 `https://media.dxscores.com/<filename>`.
