@@ -259,7 +259,7 @@ URL, before any key exists.
   each role.
 - Backend tests and lint are no worse than before.
 
-#### Sprint 0 — done 2026-10-06 (not yet committed or deployed)
+#### Sprint 0 — done 2026-10-06 (committed: frontend `d5d921e`, `433f6fc`; backend `8a08f6e`; not deployed)
 
 **Done, beyond the list above.** Two more ways to attach an image were found and removed:
 - `businessProfile.logoAssetId` / `bannerAssetId` on organisation, league and club creation and
@@ -328,6 +328,63 @@ would get a 400 on every post save, because it always sends `heroImageId: null`.
 - Replacing an image deletes the previous objects.
 - The ledger rows are correct in the database.
 
+#### Sprint 1 — done 2026-10-07 (backend, not deployed)
+
+**Built**, in `src/media/`:
+- `image-slots.ts`: the four slots, the two kinds (logo, photo) and the three sizes.
+- `image-processor.ts`: sharp, one image at a time.
+- `storage.service.ts`: the S3 client pointed at R2.
+- `media.service.ts`, `media.controller.ts` and `upload-image.decorator.ts`: the eight routes,
+  with the 5 MB limit, the 20-a-minute rate limit and multer's errors in French.
+
+Also:
+- **Boot check.** `env.validation.ts` refuses half of the five `R2_*` variables, and an endpoint
+  with the bucket left on the end (the mistake the bucket page invites). `.env.example` documents
+  the five.
+- **Dependencies.** sharp 0.34.5 is in; the lockfile carries its Linux build for Railway.
+  `@aws-sdk/lib-storage` and `@aws-sdk/s3-request-presigner` are out, being unused since sprint 0.
+
+**Beyond the plan:**
+- **A change made meanwhile is refused (409), not overwritten.** The pointer moves only if it still
+  shows what was read, and the loser's new files are deleted.
+- **Removing works without storage configured**: it clears the pointer, and the files go once
+  storage is back.
+- **Deleting never leaves the entity's own organisation.** The previous image's prefix is read from
+  the URL's path and must start `t/<that organisation>/`, whatever the entity pointed at.
+
+**Verified:**
+- **40 new unit tests**, 268 in all, all passing:
+  - the processor (15): a sideways phone photo with GPS comes out upright with no metadata; SVG,
+    GIF, HEIC, a renamed program, a truncated JPEG, 26 MP and 40 px are refused; logos are never
+    cut and keep their transparency;
+  - the service (20): the order of writes, rollback, the 409, the permission matrix for all eight
+    roles and scopes, and that deletion stays inside the organisation;
+  - the boot check (5).
+- **44 end-to-end checks** against the real development bucket, on a throwaway database and API
+  (dropped afterwards; the dev database's counts identical before and after; the bucket empty at
+  the start and again at the end):
+  - every role refused outside its scope, with nothing written;
+  - files served with the right type, size and year-long cache;
+  - the club reading its crest through the existing read path;
+  - replacement deleting the old files;
+  - the ledger right;
+  - the refusals in French;
+  - two simultaneous saves giving 200 and 409;
+  - removal;
+  - the rate limit.
+- **Memory.** The worst file accepted (25 MP) adds **22 MB** at peak and takes 4.2 s on this Mac.
+  The upload is not the risk. The API itself idles at **350–400 MB** in dev mode, which on Railway's
+  0.5 GB is thin headroom with or without images. **Sprint 4 must read Railway's memory graph.**
+- **Lint and types.** Lint is back to 878 errors and 39 warnings; tsc is clean.
+
+**About the development bucket** (`dxscores-media-dev`, created by the owner on 2026-10-06):
+- Its token can read and write objects in that one bucket and nothing else; it cannot even read
+  the bucket's settings, which is the right scope.
+- It has no CORS rule yet. That is needed for sprint 3 (the standings export).
+- Its `r2.dev` address has no edge cache. Production's own domain will.
+- The owner's `.env` was tidied to the five `R2_*` names: the endpoint lost its bucket path, and
+  the Cloudflare API token stays only as a comment, since the app never reads it.
+
 ### Sprint 2 — Uploading (frontend)
 
 **What.**
@@ -370,7 +427,8 @@ width, with:
 **Verify.**
 - An image uploaded on production loads from `media.dxscores.com`, and shows
   `cf-cache-status: HIT` on the second load.
-- Memory stays well under 0.5 GB.
+- Memory stays well under 0.5 GB. Sprint 1 measured an upload at +22 MB at worst, and the API idling at
+  350–400 MB in dev mode, so the number to read is the idle one.
 
 ### Sprint 5 — Images for the demo and dev leagues
 
@@ -397,7 +455,7 @@ test. It is resumable, like the demo seed, because Railway's free instance drops
 ### Later — written down, not planned
 
 - Account avatars (§1.4).
-- Post hero images.
+- Post hero images: **wide, not square** (D3); proposed at 16:9, to confirm when posts get their slot.
 - Re-crop without re-upload.
 - A per-organisation cap and a storage gauge in `/admin`.
 - A sweep for `REMOVED` assets and orphaned objects.
@@ -414,7 +472,7 @@ Almost none of this comes from Railway: R2 lives in Cloudflare. Railway is only 
 production keys get pasted. **Never send a secret in chat.** Paste secrets into the `.env` file
 or the Railway dashboard yourself, and send me only the non-secret values marked below.
 
-### A — before sprint 1 (development only)
+### A — before sprint 1 (development only) — done 2026-10-06
 
 1. **R2 activated** on the Cloudflare account, which asks for a card or PayPal (§1.1). If that is
    not possible, stop here and tell me.
@@ -424,6 +482,18 @@ or the Railway dashboard yourself, and send me only the non-secret values marked
 3. **An API token**: *Object Read & Write*, scoped to **that bucket only**. Paste the access key
    ID and the secret into `elenem-backend/.env` yourself; sprint 1 adds the empty lines.
 4. **A CORS rule** on the bucket. I will send the JSON to paste.
+
+### When the production bucket, and whether Cloudflare's MCP would help (answered 2026-10-07)
+
+- **Create `dxscores-media` when sprint 4 starts, not before, and never reuse the development
+  one.**
+  - Keys that live on a laptop must never be able to touch production files.
+  - Test uploads stay out of what the public sees.
+  - Nothing in sprints 2 and 3 needs it.
+- **No MCP.** Cloudflare's MCP would need an account-wide token (DNS, Workers, every bucket) to
+  save three clicks in the dashboard: a CORS rule, a custom domain and a token. The token made for
+  development can touch objects in one bucket and nothing else, which is the right reach for a
+  coding session. Revisit if Cloudflare work becomes routine.
 
 ### B — before sprint 4 (production)
 
@@ -440,7 +510,12 @@ or the Railway dashboard yourself, and send me only the non-secret values marked
 
 ### Decisions
 
-- **D1.** Is a card or PayPal on Cloudflare acceptable? (§1.1)
-- **D2.** Does "profile pictures" mean players and crests, with account avatars later? (§1.4)
-- **D3.** Square everywhere? (§1.3)
+- **D1. Yes.** The owner added a card on 2026-10-06 (§1.1).
+- **D2. Decided as recommended, at the owner's request.** v1 is the organisation, league and club
+  logos and the player photos. Account avatars come later: they appear only in the account menu,
+  on no public page.
+  - When they come: a `user-avatar` slot on `User.avatarUrl`, and `User.profileImageUrl` (a
+    duplicate) dropped.
+  - Cost: about thirty minutes once sprint 2's upload control exists.
+- **D3. Yes: 1:1 everywhere, except blog posts.** A post's hero image will be wide (see "Later").
 - **D4.** Player photos for the demo: decided at sprint 5. The recommendation is in §5.
