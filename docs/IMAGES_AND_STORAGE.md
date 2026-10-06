@@ -400,6 +400,59 @@ width, with:
 - a delete;
 - each refusal message, in French.
 
+#### Sprint 2 — done 2026-10-07 (frontend, not deployed)
+
+**Built:**
+- `components/media/image-field.tsx`, the one upload control:
+  - the image in the shape it is shown in (round for clubs and players, a rounded square for
+    organisations and leagues), with initials when there is none or when it fails to load;
+  - « Ajouter un logo » / « Changer » / « Retirer », and a confirmation before removing;
+  - it saves on its own when the crop is confirmed, whatever form it sits in.
+- `components/media/crop-dialog.tsx` (react-easy-crop 5.5.7, MIT):
+  - a photo fills the square and is dragged to centre the face;
+  - a logo opens fitted whole, and can be zoomed out further with transparent sides;
+  - a live preview at a table-row size and a page size;
+  - upload progress, then « Préparation des différentes tailles… ».
+  - It loads only when a file is picked: an 8 KB gzipped chunk that no page loads up front.
+- `components/media/crop-image.ts`: the browser crops and scales to at most 1024 px before
+  sending, as PNG for a logo and JPEG for a photo. The phone's GPS never leaves the device; the API
+  strips it again anyway.
+- `services/media.ts` (the mutations) and `lib/media.ts` (`mediaSrc`, ready for sprint 3).
+
+**Mounted in five places:**
+- organisation settings, General tab, above « Couleurs du site », whose site preview now shows the
+  logo;
+- league settings, Identité tab, as a « Logo » section;
+- the « Modifier le club » dialog, which is how organisation and league admins reach a club;
+- `/team/edit` for the club's own admin;
+- the « Modifier le joueur » dialog, with « Cette photo sera visible sur le site public de la
+  ligue ».
+
+**Refused in the browser before anything is sent**, with the same French wording as the API: SVG,
+GIF, HEIC, other formats, over 20 MB, and a picture under 128 px (a photo's short side, a logo's
+long side).
+
+**Verified** in a real browser against a throwaway database and API, writing to the development
+bucket. 22 checks, as an organisation admin and a league admin at desktop width and a club admin at
+phone width:
+- each of the five places saves and removes;
+- the refusals send nothing;
+- a stored wide logo is square and uncut;
+- a sideways phone photo is stored upright with no EXIF;
+- the club dialog stays open under the crop dialog.
+
+Afterwards: 17 assets created and removed, the bucket empty, the dev database unchanged.
+`next build` passes; tsc and lint are clean on the changed files.
+
+**Found on the way:**
+1. **Fixed: an empty circle right after « Logo enregistré ».** The stored image takes a moment to
+   arrive (0.4–0.9 s here, seconds on 3G). The field now shows the crop it just sent until then;
+   checked on an emulated slow 3G.
+2. **Not fixed, predates this work:** the player dialog's scope lookup (`player-scope-fields.tsx`)
+   asks for `GET /leagues/:id`, which a club admin is refused (403, retried three times). Its sport
+   then falls back to « BASKETBALL », harmless for a basketball organisation and wrong for any
+   other.
+
 ### Sprint 3 — Showing them (both domains)
 
 **What.**
@@ -472,7 +525,7 @@ Almost none of this comes from Railway: R2 lives in Cloudflare. Railway is only 
 production keys get pasted. **Never send a secret in chat.** Paste secrets into the `.env` file
 or the Railway dashboard yourself, and send me only the non-secret values marked below.
 
-### A — before sprint 1 (development only) — done 2026-10-06
+### A — before sprint 1 (development only) — done 2026-10-06, except item 4 (needed from sprint 3)
 
 1. **R2 activated** on the Cloudflare account, which asks for a card or PayPal (§1.1). If that is
    not possible, stop here and tell me.
@@ -481,7 +534,19 @@ or the Railway dashboard yourself, and send me only the non-secret values marked
    EU-jurisdiction bucket has a different endpoint, so copy it rather than typing it.
 3. **An API token**: *Object Read & Write*, scoped to **that bucket only**. Paste the access key
    ID and the secret into `elenem-backend/.env` yourself; sprint 1 adds the empty lines.
-4. **A CORS rule** on the bucket. I will send the JSON to paste.
+4. **A CORS rule** on the bucket, needed from sprint 3 (the standings export reads images from the
+   page). R2 → `dxscores-media-dev` → Settings → CORS Policy → paste:
+   ```json
+   [
+     {
+       "AllowedOrigins": ["http://localhost:3000", "http://localhost:3001"],
+       "AllowedMethods": ["GET", "HEAD"],
+       "AllowedHeaders": ["*"],
+       "MaxAgeSeconds": 86400
+     }
+   ]
+   ```
+   Production's bucket gets the same rule with `https://dxscores.com` instead.
 
 ### When the production bucket, and whether Cloudflare's MCP would help (answered 2026-10-07)
 
