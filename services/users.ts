@@ -82,6 +82,22 @@ export function useDeleteUser() {
   });
 }
 
+/** Lift a cool-down or an administrator's lock. The API forgets the wrong passwords with it. */
+export async function unblockUserSignIn(id: string): Promise<void> {
+  await api.put(`/users/${id}`, { accountLocked: false });
+}
+
+export function useUnblockUserSignIn() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: unblockUserSignIn,
+    onSuccess: (_data, id) => {
+      qc.invalidateQueries({ queryKey: userKeys.detail(id) });
+      qc.invalidateQueries({ queryKey: userKeys.lists() });
+    },
+  });
+}
+
 export function useSetUserEmailVerified() {
   const qc = useQueryClient();
   return useMutation({

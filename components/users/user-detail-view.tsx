@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 import { ArrowLeft, Pencil, Trash2, MailCheck } from 'lucide-react';
 import { Button, LoadingSpinner, Modal, ConfirmDialog } from '@/components/ui';
 import { UserSummary } from './user-summary';
+import { UserSignInAccess } from './user-sign-in-access';
 import { UserForm } from '@/components/forms/user-form';
 import { useUser, useDeleteUser, useSetUserEmailVerified, userKeys } from '@/services/users';
 import { useIsSystemAdmin } from '@/hooks';
@@ -57,6 +58,9 @@ export function UserDetailView({ userId, backHref }: { userId: string; backHref:
             </div>
           </div>
           <UserSummary user={user} />
+          <div className="mt-6">
+            <UserSignInAccess user={user} />
+          </div>
         </div>
       )}
 

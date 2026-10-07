@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useDebounce } from 'use-debounce';
 import { toast } from 'sonner';
-import { MailWarning, Trash2, UserPlus, Users as UsersIcon } from 'lucide-react';
+import { Lock, Trash2, UserPlus, Users as UsersIcon } from 'lucide-react';
 import {
   Button,
   ConfirmDialog,
@@ -18,6 +18,7 @@ import type { UserFilterParams } from '@/schemas/user-schemas';
 import { meaningfulRoles, roleLabel, ROLE_LABELS } from '@/utils/role-labels';
 import { formatDateFr, toastApiError } from '@/utils';
 import { UserQuickView } from './user-quick-view';
+import { currentSignInLock, lockUntilLabel } from './user-sign-in-access';
 
 const PAGE_SIZE = 20;
 
@@ -189,6 +190,7 @@ export function UsersListView({
             <tbody className="divide-y divide-line">
               {users.map((u) => {
                 const name = `${u.firstName} ${u.lastName}`.trim() || u.username;
+                const lock = currentSignInLock(u.signInLock);
                 return (
                   <tr key={u.id} className="hover:bg-surface-sunk">
                     <td className="px-4 py-3">
@@ -199,17 +201,29 @@ export function UsersListView({
                       >
                         {name}
                       </button>
-                      <p className="flex items-center gap-1.5 text-xs text-ink-subtle">
+                      <p className="flex flex-wrap items-center gap-x-1.5 text-xs text-ink-subtle">
                         {u.email}
-                        {/* The commonest reason somebody cannot get in, said on the row rather
-                            than only inside the record. */}
-                        {!u.isEmailVerified && (
+                        {/* Why somebody cannot get in, said on the row rather than only inside
+                            the record. The one colour on the row, because it is the one thing
+                            here that needs somebody to act. */}
+                        {lock && (
                           <span
-                            className="inline-flex items-center gap-1 text-caution"
-                            title="Adresse non vérifiée — cette personne ne peut pas se connecter."
+                            className="inline-flex items-center gap-1 font-medium text-caution"
+                            title={
+                              lock.reason === 'ADMIN'
+                                ? `Verrouillé par un administrateur, ${lockUntilLabel(lock.until)}`
+                                : `Connexion bloquée ${lockUntilLabel(lock.until)} : trop de mots de passe erronés`
+                            }
                           >
-                            <MailWarning className="h-3 w-3 shrink-0" aria-hidden />
-                            non vérifiée
+                            <Lock className="h-3 w-3 shrink-0" aria-hidden />
+                            {lock.reason === 'ADMIN' ? 'verrouillé' : 'bloqué'}
+                          </span>
+                        )}
+                        {/* Stated, not alarmed: sign-in never checks it. It used to sit here in
+                            the warning colour, saying the person could not connect. */}
+                        {!u.isEmailVerified && (
+                          <span title="Sans effet sur la connexion ; requise seulement pour inviter d’autres personnes.">
+                            · non vérifiée
                           </span>
                         )}
                       </p>

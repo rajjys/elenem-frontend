@@ -2180,6 +2180,18 @@ export interface components {
              */
             newPassword: string;
         };
+        SignInLockDto: {
+            /**
+             * @description FAILED_ATTEMPTS: a cool-down after wrong passwords. ADMIN: an administrator closed the account.
+             * @enum {string}
+             */
+            reason: "FAILED_ATTEMPTS" | "ADMIN";
+            /**
+             * Format: date-time
+             * @description When sign-in opens again by itself. Null: only an administrator can open it.
+             */
+            until: string | null;
+        };
         UserTenantLiteDto: {
             id: string;
             name: string;
@@ -2221,6 +2233,7 @@ export interface components {
             updatedAt?: string | null;
             /** Format: date-time */
             lastLoginAt?: string | null;
+            signInLock?: components["schemas"]["SignInLockDto"] | null;
             tenant?: components["schemas"]["UserTenantLiteDto"] | null;
             managingLeague?: components["schemas"]["ManagingLeagueResponseDto"] | null;
             managingTeam?: components["schemas"]["ManagingTeamResponseDto"] | null;
@@ -2238,9 +2251,9 @@ export interface components {
             timezone?: Record<string, never> | null;
             profileVisibility?: Record<string, never> | null;
             notificationPreferences?: Record<string, never> | null;
-            tenantId?: Record<string, never> | null;
-            managingLeagueId?: Record<string, never> | null;
-            managingTeamId?: Record<string, never> | null;
+            tenantId?: string | null;
+            managingLeagueId?: string | null;
+            managingTeamId?: string | null;
         };
         UpdateUserProfileDto: {
             /**

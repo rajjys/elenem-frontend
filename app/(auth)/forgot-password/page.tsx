@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { Suspense, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
 import { ArrowLeft, CheckCircle2 } from 'lucide-react';
 import { AuthShell } from '@/components/auth/auth-shell';
@@ -21,11 +21,16 @@ const STEPS: Step[] = ['email', 'otp', 'password'];
 /**
  * « Mot de passe oublié », on the same frame as sign-in and sign-up (PHASE5A_PRODUCT_SITE §8.3):
  * an e-mail, the 6-digit code it receives, then a new password under the same rule as sign-up.
+ *
+ * The code e-mail links here with `?email=`, and that opens at the code step: the code may have
+ * been sent by an administrator from the users screen, and asking for the address again would send
+ * a second one and void the first.
  */
-export default function ForgotPasswordPage() {
+function ForgotPasswordInner() {
   const router = useRouter();
-  const [step, setStep] = useState<Step>('email');
-  const [email, setEmail] = useState('');
+  const emailFromLink = useSearchParams().get('email') ?? '';
+  const [step, setStep] = useState<Step>(emailFromLink ? 'otp' : 'email');
+  const [email, setEmail] = useState(emailFromLink);
   const [otp, setOtp] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirm, setConfirm] = useState('');
@@ -199,5 +204,13 @@ export default function ForgotPasswordPage() {
         </form>
       )}
     </AuthShell>
+  );
+}
+
+export default function ForgotPasswordPage() {
+  return (
+    <Suspense>
+      <ForgotPasswordInner />
+    </Suspense>
   );
 }

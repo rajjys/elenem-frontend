@@ -1,9 +1,10 @@
 'use client';
 
 import Link from 'next/link';
-import { ArrowRight, Loader2, MailCheck, MailWarning, ShieldCheck } from 'lucide-react';
+import { ArrowRight, Loader2, MailCheck, MailQuestion, ShieldCheck } from 'lucide-react';
 import { Button, Modal } from '@/components/ui';
 import { useUser } from '@/services/users';
+import { UserSignInAccess } from './user-sign-in-access';
 import { ROLE_HINTS, meaningfulRoles, roleLabel } from '@/utils/role-labels';
 import { formatDateFr } from '@/utils';
 
@@ -20,9 +21,10 @@ import { formatDateFr } from '@/utils';
  * exists, and it was previously printed as `GENERAL_USER, LEAGUE_ADMIN` in a column too narrow to
  * finish the word.
  *
- * **An unverified e-mail is stated, not hidden.** It is the single commonest reason somebody
- * cannot get in, and « je n'arrive pas à me connecter » is the message the organiser actually
- * receives.
+ * **Why somebody cannot get in is the lock, not the address.** « je n'arrive pas à me connecter »
+ * is the message the organiser actually receives, and this dialog used to answer it with « adresse
+ * non vérifiée », which stops nobody — sign-in never checks it. The real answer, wrong passwords
+ * or an administrator's lock, is `UserSignInAccess`, with what to do about it.
  */
 export function UserQuickView({
   userId,
@@ -100,8 +102,13 @@ export function UserQuickView({
             <Fact
               label="Adresse e-mail"
               value={user.isEmailVerified ? 'Vérifiée' : 'Non vérifiée'}
-              tone={user.isEmailVerified ? 'default' : 'caution'}
-              icon={user.isEmailVerified ? MailCheck : MailWarning}
+              tone={user.isEmailVerified ? 'default' : 'quiet'}
+              icon={user.isEmailVerified ? MailCheck : MailQuestion}
+              hint={
+                user.isEmailVerified
+                  ? undefined
+                  : 'Sans effet sur la connexion ; requise seulement pour inviter d’autres personnes.'
+              }
             />
             <Fact
               label="Dernière connexion"
@@ -114,12 +121,7 @@ export function UserQuickView({
             />
           </section>
 
-          {!user.isEmailVerified && (
-            <p className="rounded-lg border border-caution/40 bg-caution-soft px-3.5 py-2.5 text-sm text-ink">
-              Tant que l&apos;adresse n&apos;est pas vérifiée, cette personne ne peut pas se
-              connecter.
-            </p>
-          )}
+          <UserSignInAccess user={user} />
         </div>
       )}
     </Modal>
@@ -131,11 +133,14 @@ function Fact({
   value,
   tone = 'default',
   icon: Icon,
+  hint,
 }: {
   label: string;
   value: string;
   tone?: 'default' | 'caution' | 'quiet';
   icon?: React.ComponentType<{ className?: string }>;
+  /** What the value means for this person, when that is not obvious. Printed, not hovered: phones. */
+  hint?: string;
 }) {
   return (
     <div className="rounded-lg border border-line px-3 py-2">
@@ -152,6 +157,7 @@ function Fact({
         {Icon && <Icon className="h-3.5 w-3.5 shrink-0" />}
         {value}
       </p>
+      {hint && <p className="mt-0.5 text-xs text-ink-subtle">{hint}</p>}
     </div>
   );
 }

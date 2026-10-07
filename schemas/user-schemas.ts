@@ -18,11 +18,20 @@ export const UserBasicSchema = z.object({
   roles: z.array((RoleSchema)).default([Roles.GENERAL_USER]), // User can have multiple roles
   isActive: z.boolean(),
   /**
-   * Both are on the list payload and both are on the list *screen*: an unverified address is the
-   * commonest reason somebody cannot sign in, and « jamais connecté » is how you spot an account
-   * that was created and never used.
+   * An unverified address does **not** stop anybody signing in — sign-in never checks it, and on
+   * 2026-10-07 four of the six unverified accounts in production had signed in. It only holds back
+   * inviting other people. The comment here used to say the opposite, and the screen repeated it.
    */
   isEmailVerified: z.boolean().optional().default(false),
+  /**
+   * What actually stops somebody signing in: a cool-down after wrong passwords, or an
+   * administrator's lock. Derived by the API (`sign-in-lock.ts`); the raw columns never leave it.
+   * `until` stays the ISO text the API sends — the list is not parsed, so a `Date` type would lie.
+   */
+  signInLock: z
+    .object({ reason: z.enum(['FAILED_ATTEMPTS', 'ADMIN']), until: z.string().nullable() })
+    .nullable()
+    .optional(),
   // `z.coerce.date()` rather than a hand-rolled `preprocess`: it parses the ISO text the API sends
   // and infers `Date` cleanly, where the preprocess form infers an empty object under zod 4 and
   // every read of it becomes a type error.
