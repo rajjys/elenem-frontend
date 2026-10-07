@@ -589,6 +589,42 @@ is set), so the PNG carries it.
 - The exported PNG includes the logo.
 - With the youth switch off, no photo appears in the page or in the API response.
 
+#### Sprint 3 follow-up — the league site's images, Marqueurs first (owner, 2026-10-07)
+
+The owner asked that team and player images show correctly across the public side, above all on
+`/stats` (« Marqueurs »), where an image should stand out when there is one.
+
+**Marqueurs:**
+- **The top three stand out above the table, on the first page.**
+  - Each card shows the player's photo, or their club's crest when they have none, or initials.
+  - The leader's card carries the one accent.
+  - On a phone each card is a row and the name runs to two lines rather than being cut; wider,
+    the three cards stand side by side.
+  - Shown only when one of the three has a photo or a crest, so a league with no images keeps
+    the plain table rather than three cards of initials.
+- **In the table:** a 32 px photo beside each name that has one, and the crest beside each
+  club's name. Rows without a photo keep an invisible slot, so names align without a column of
+  empty discs.
+- **The API:** `PublicScorerRowDto` gains `photoUrl`, only for a named player (the same rule as
+  the roster). `/scorers` already answers 404 for a competition that hides names.
+
+**Elsewhere on the league site:**
+- the home page's scorers list shows the photo when there is one, otherwise the crest;
+- the player page shows the crest beside the club's name;
+- the box score heads each club's sheet with its crest, and the team comparison too;
+- one server component, `PlayerPhoto`, draws every player photo on the league site.
+
+**Verified** on a production build served on :3001 against a throwaway API, with real uploads:
+- #1 and #3 with photos, #2 without, so its club's crest stands in;
+- both widths;
+- on a phone on 3G, all of `/stats`'s images weigh 19.2 KB (6 images);
+- the home, player, club and game pages;
+- 21 checks.
+
+The only console errors were `/_vercel/insights` and `/_vercel/speed-insights`, which exist only
+on Vercel. Afterwards the bucket held only the owner's two crests, and the dev database was
+unchanged.
+
 ### Sprint 4 — Production
 
 **What.**
@@ -682,6 +718,18 @@ or the Railway dashboard yourself, and send me only the non-secret values marked
   coding session. Revisit if Cloudflare work becomes routine.
 
 ### B — before sprint 4 (production)
+
+**2026-10-07: the owner reports the bucket and the five Railway variables in place.**
+- `media.dxscores.com` answers through Cloudflare with a valid certificate: a 404 on an empty
+  bucket, as expected.
+- **Before the push**, check the three non-secret production values (`R2_ENDPOINT`, `R2_BUCKET`,
+  `R2_PUBLIC_URL`). The API now refuses to boot on an incomplete set, or on an endpoint with the
+  bucket on the end, so a typo would stop production rather than surface later.
+
+**The development token's value was printed in a session transcript on 2026-10-07**, through a
+read of `.env` whose filter let a commented-out line through. It is scoped to
+`dxscores-media-dev` only. The owner is to roll it in Cloudflare and paste the new keys into
+`.env`; the commented lines were removed from `.env`.
 
 5. **A bucket `dxscores-media`**, with:
    - the custom domain `media.dxscores.com` (orange cloud);
