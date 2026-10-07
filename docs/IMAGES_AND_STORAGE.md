@@ -641,6 +641,30 @@ unchanged.
 - Memory stays well under 0.5 GB. Sprint 1 measured an upload at +22 MB at worst, and the API idling at
   350–400 MB in dev mode, so the number to read is the idle one.
 
+#### Sprint 4 — deployed 2026-10-07 (frontend `f77eee0`, backend `19baa58`)
+
+**The push, in order:**
+- the frontend first, live on Vercel about 90 s later;
+- then the backend, live on Railway about 4 minutes later.
+
+**The public API answered 200 throughout**, so there was no downtime.
+
+**Checked from outside:**
+- `dxscores.com/team/edit` answers 308 to `/team/settings`.
+- The landing page, the login page, and the demo league's home, standings and Marqueurs answer
+  200.
+- On the API, `/uploads2/*` and `/uploads/*` are 404, and the image routes ask for a login
+  (401).
+- **sharp loads on Railway.** It is imported when the API starts, so the API being up proves the
+  native library installed.
+
+**Left to the owner:**
+- the boot log line « Images stored in dxscores-media, served from https://media.dxscores.com »;
+- an upload from a phone, served from `media.dxscores.com` (with `cf-cache-status: HIT` on a
+  second load);
+- the standings export carrying the logo through Cloudflare's cache;
+- Railway's memory graph.
+
 ### Sprint 5 — Images for the demo and dev leagues
 
 **What.** `scripts/seed-images.mjs` uploads through the **real API**, as each organisation's own
