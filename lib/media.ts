@@ -39,3 +39,21 @@ export function mediaSrc(
   const match = OURS.exec(url);
   return match ? `${match[1]}${size}.${format}` : url;
 }
+
+/**
+ * What an image falls back to: two letters, read the way a club sheet abbreviates. « Aigles BC » is
+ * « AB », « Lionnes » is « LI », and the little words of French names are skipped.
+ */
+export function initials(name: string | null | undefined): string {
+  const words = (name ?? '').split(/[\s'’-]+/).filter((w) => w && !/^(de|du|des|la|le|les|d|l|et)$/i.test(w));
+  return ((words[0]?.[0] ?? '') + (words[1]?.[0] ?? words[0]?.[1] ?? '')).toUpperCase();
+}
+
+/**
+ * The `srcset` for an image the API stored, so a 40 px avatar on a 2× phone fetches the 128 px file
+ * and a page header the 512 px one. Null for any other URL, which is then used as it is.
+ */
+export function mediaSrcSet(url: string | null | undefined): string | null {
+  if (!url || mediaSrc(url, 'sm') === url) return null;
+  return `${mediaSrc(url, 'sm')} 128w, ${mediaSrc(url, 'md')} 512w`;
+}

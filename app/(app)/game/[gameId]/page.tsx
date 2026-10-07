@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
-import Image from 'next/image';
+import { mediaSrc } from '@/lib/media';
 import {
   ArrowLeft,
   ArrowLeftRight,
@@ -680,7 +680,7 @@ function TeamSide({
   align,
   href,
 }: {
-  team: { name: string; shortCode?: string | null; logoUrl?: string | null };
+  team: { name: string; shortCode?: string | null; logoUrl?: string | null; businessProfile?: { logoUrl?: string | null } | null };
   role: string;
   align: 'start' | 'end';
   href: string;
@@ -697,13 +697,14 @@ function TeamSide({
           score is furniture that has to be looked past; the short code is the thing the league's
           own paperwork uses anyway. */}
       <span className="hidden h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full bg-surface/15 text-sm font-semibold tracking-wide text-surface/70 sm:flex">
-        {team.logoUrl ? (
-          <Image
-            src={team.logoUrl}
+        {(team.businessProfile?.logoUrl ?? team.logoUrl) ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={mediaSrc(team.businessProfile?.logoUrl ?? team.logoUrl, 'sm') ?? ''}
             alt=""
             width={48}
             height={48}
-            className="h-full w-full object-cover"
+            className="h-full w-full bg-surface object-contain"
           />
         ) : (
           (team.shortCode ?? team.name.slice(0, 3)).toUpperCase().slice(0, 3)

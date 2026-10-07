@@ -1,6 +1,6 @@
 'use client';
 
-import Image from 'next/image';
+import { mediaSrc } from '@/lib/media';
 import { cn } from '@/utils';
 import type { StandingsView } from '@/services/standings';
 
@@ -111,14 +111,10 @@ export function StandingsDocument({
           {fields.showLogo && (
             <span className="flex h-[20mm] w-[20mm] shrink-0 items-center justify-center overflow-hidden rounded-full bg-surface-sunk">
               {logoUrl ? (
-                <Image
-                  src={logoUrl}
-                  alt=""
-                  width={120}
-                  height={120}
-                  className="h-full w-full object-contain"
-                  unoptimized
-                />
+                // The export draws this page onto a canvas (html-to-image), which only accepts an image
+                // fetched with CORS; the bucket answers for the app's origins.
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={mediaSrc(logoUrl, 'md') ?? logoUrl} alt="" crossOrigin="anonymous" className="h-full w-full object-contain" />
               ) : (
                 <span className="px-1 text-center text-[8pt] font-semibold leading-tight text-ink-subtle">
                   {(institutions[institutions.length - 1] ?? data.organisationName)

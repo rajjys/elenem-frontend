@@ -82,6 +82,9 @@ const GameDetailSchema = z.object({
     slug: z.string().optional(),
     shortCode: z.string().nullable().optional(),
     logoUrl: z.string().nullable().optional(),
+    // Where the API actually sends the crest (written by the media service). Unlisted, zod dropped it,
+    // and the game page never showed a crest.
+    businessProfile: z.object({ logoUrl: z.string().nullable().optional() }).nullable().optional(),
   }),
   awayTeam: z.object({
     id: z.string(),
@@ -89,6 +92,9 @@ const GameDetailSchema = z.object({
     slug: z.string().optional(),
     shortCode: z.string().nullable().optional(),
     logoUrl: z.string().nullable().optional(),
+    // Where the API actually sends the crest (written by the media service). Unlisted, zod dropped it,
+    // and the game page never showed a crest.
+    businessProfile: z.object({ logoUrl: z.string().nullable().optional() }).nullable().optional(),
   }),
   league: z.object({ id: z.string(), name: z.string(), slug: z.string().optional() }),
   season: z.object({ id: z.string(), name: z.string() }).nullable().optional(),

@@ -15,7 +15,7 @@ import {
 import { Roles} from '@/schemas'; // Import enums
 import { TeamDetails } from '@/schemas'; // Adjust path to your DTOs
 import { ArrowUpDown, MoreVertical, Pencil, Trash } from 'lucide-react';
-import Image from 'next/image';
+import { EntityImage } from '@/components/media/entity-image';
 
 type SortableColumn = 'name' | 'shortCode' | 'leagueName' | 'tenantName' | 'country' | 'city' | 'establishedYear' | 'createdAt' | 'updatedAt';
 
@@ -152,20 +152,7 @@ export function TeamsTable({ teams, onSort, sortBy, sortOrder, onDelete, current
               </TableCell>
               <TableCell className="px-6 py-4 whitespace-nowrap">
                 <div className="flex items-center">
-                  {team.businessProfile.logoAsset?.url && (
-                    <div className="flex-shrink-0 h-10 w-10">
-                      <Image
-                        className='h-10 w-10 rounded-full object-cover border border-line-strong'
-                        src={team.businessProfile.logoAsset.url}
-                        height={60}
-                        width={60}
-                        placeholder="blur"
-                        blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkqAcAAIUAgUW0RjgAAAAASUVORK5CYII="
-                        alt={`${team.shortCode} Logo`}
-                        // onError={(e) => { e.currentTarget.src = `https://placehold.co/40x40/cccccc/333333?text=${team.name.charAt(0)}`; }}
-                      />
-                    </div>
-                  )}
+                  <EntityImage url={team.businessProfile?.logoUrl ?? team.businessProfile?.logoAsset?.url} name={team.name} size={40} />
                   <div className="ml-4">
                     <div className="text-sm font-medium text-ink">
                       <Link

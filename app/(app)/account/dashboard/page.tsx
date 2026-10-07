@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react'
 import { useAuthStore } from '@/store/auth.store';
 import { Card, CardContent, CardTitle, Skeleton, Button } from '@/components/ui';
-import Image from 'next/image';
+import { EntityImage } from '@/components/media/entity-image';
 import Link from 'next/link';
 import { LeagueDetails, Roles, TeamDetails, TeamDetailsSchema, TenantDetails } from '@/schemas';
 import { api } from '@/services/api';
@@ -93,13 +93,7 @@ const GeneralUserDashboard = () => {
             {(isGeneralUser && userAuth?.tenantId) || isTenantAdmin ? (
               <Card className='my-6 text-ink bg-line hover:bg-line transition-colors rounded-md w-auto max-w-xs text-center'>
                 <CardTitle className="flex items-center">
-                  <Image
-                    src={tenant?.businessProfile.logoAsset?.url || `https://placehold.co/40x40/4F46E5/FFFFFF?text=${tenant?.name || 'T'}`}
-                    alt="Tenant Logo"
-                    width={24}
-                    height={24}
-                    className="h-6 w-6 rounded-full object-contain"
-                  />
+                  <EntityImage url={tenant?.businessProfile?.logoUrl} name={tenant?.name} size={24} />
                   <span className="text-lg p-2">{tenant?.name || userAuth?.tenant?.name}</span>
                 </CardTitle>
                 <CardContent className='py-4'>

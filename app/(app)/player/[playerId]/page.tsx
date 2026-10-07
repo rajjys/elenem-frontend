@@ -1,5 +1,6 @@
 'use client';
 
+import { EntityImage } from '@/components/media/entity-image';
 import { useState } from 'react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
@@ -345,8 +346,8 @@ function Avatar({ url, name }: { url: string | null; name: string }) {
     .join('');
 
   if (url) {
-    // eslint-disable-next-line @next/next/no-img-element
-    return <img src={url} alt="" className="h-16 w-16 shrink-0 rounded-lg object-cover" />;
+    // Round, as it was framed when uploaded (components/media).
+    return <EntityImage url={url} name={name} size={64} kind="photo" />;
   }
   return (
     <div

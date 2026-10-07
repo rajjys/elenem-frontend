@@ -31,6 +31,8 @@ export const StandingsBasicSchema = z.object({
     slug: z.string(),
     logoUrl: z.string().nullable().optional(),
     businessProfile: z.object({
+        // Read-only, written by the media service (IMAGES_AND_STORAGE §4): the logo the API stores.
+        logoUrl: z.string().nullable().optional(),
         logoAsset: z.object({
             url: z.string()
         }).nullable().optional()

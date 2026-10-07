@@ -12,14 +12,14 @@ async rewrites() {
     ];
   },*/
   /**
-   * Remote image hosts. `images.domains` is deprecated, and most of the list served the mock news
-   * posts deleted in 5A.1 (Facebook CDN, graphassets) or an S3 bucket that was never used. What is
-   * left is the placeholder service still used for missing logos, and the R2 domain images will be
-   * served from once storage is wired (INFRASTRUCTURE §2).
+   * Remote image hosts for next/image. Logos and photos do not go through it: the API stores each at
+   * the sizes we show (components/media/entity-image.tsx), and next/image refused the development
+   * bucket's host, which crashed the standings (2026-10-07). What is left here is the production
+   * media domain, for the two post components that still use next/image until posts get their
+   * image slot. placehold.co is gone: missing logos show initials.
    */
   images: {
     remotePatterns: [
-      { protocol: 'https', hostname: 'placehold.co' },
       { protocol: 'https', hostname: 'media.dxscores.com' },
     ],
   },

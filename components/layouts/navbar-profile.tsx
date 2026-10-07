@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { Building2, Camera, LogOut, Mail, SquarePen } from 'lucide-react';
 import { useAuthStore } from '@/store/auth.store';
@@ -65,7 +64,8 @@ export function NavbarProfile({ onEditAvatar }: { onEditAvatar?: () => void }) {
         className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full border border-line bg-surface-sunk text-sm font-semibold text-ink-muted transition-colors hover:border-line-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
       >
         {avatar ? (
-          <Image src={avatar} alt="" width={36} height={36} className="h-full w-full object-cover" />
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={avatar} alt="" width={36} height={36} className="h-full w-full object-cover" />
         ) : (
           initial
         )}
@@ -77,7 +77,8 @@ export function NavbarProfile({ onEditAvatar }: { onEditAvatar?: () => void }) {
             <div className="relative">
               <span className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full bg-surface-sunk text-xl font-semibold text-ink-muted">
                 {avatar ? (
-                  <Image src={avatar} alt="" width={64} height={64} className="h-full w-full object-cover" />
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={avatar} alt="" width={64} height={64} className="h-full w-full object-cover" />
                 ) : (
                   initial
                 )}

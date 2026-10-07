@@ -55,6 +55,8 @@ export const CreateBusinessProfileSchema = z.object({
 
 export const BusinessProfileSchema = CreateBusinessProfileSchema.extend({
   //id: z.string().optional().nullable(),
+  // Read-only, written by the media service (IMAGES_AND_STORAGE §4): the logo the API stores.
+  logoUrl: z.string().nullable().optional(),
   logoAsset: z.object({
     url: z.string()
   }).optional().nullable(),

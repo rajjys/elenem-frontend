@@ -11,6 +11,8 @@ const TeamBasicSchema = z.object({
   rank: z.number().optional().nullable(),
   record: z.string().optional().nullable(),
   businessProfile: z.object({
+    // Read-only, written by the media service (IMAGES_AND_STORAGE §4): the logo the API stores.
+    logoUrl: z.string().nullable().optional(),
     logoAsset: z.object({
       url: z.string()
     }).optional().nullable()

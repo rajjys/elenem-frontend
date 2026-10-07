@@ -1,34 +1,12 @@
 'use client';
-import Image from "next/image";
-import React, { useState } from "react";
-// ...existing code...
+import { EntityImage } from '@/components/media/entity-image';
 
+/**
+ * An account's picture in a 40 px circle, or its initials. It used to fall back to an image from placehold.co —
+ * one more request to a third party on every row without a logo — and went through next/image,
+ * which refuses the development bucket's host.
+ */
 function UserAvatar({ src, alt, fallbackText }: { src?: string | null; alt: string; fallbackText: string }) {
-  const [imgError, setImgError] = useState(false);
-
-  if (!src || imgError) {
-    return (
-      <Image
-        src={`https://placehold.co/40x40/cccccc/333333?text=${fallbackText}`}
-        alt={alt}
-        width={40}
-        height={40}
-        className="h-10 w-10 rounded-full object-cover"
-        unoptimized
-      />
-    );
-  }
-
-  return (
-    <Image
-      src={src}
-      alt={alt}
-      width={40}
-      height={40}
-      className="h-10 w-10 rounded-full object-cover"
-      onError={() => setImgError(true)}
-      unoptimized
-    />
-  );
+  return <EntityImage url={src} name={alt || fallbackText} size={40} kind="photo" />;
 }
 export default UserAvatar;

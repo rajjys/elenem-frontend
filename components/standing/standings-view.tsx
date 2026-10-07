@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import Image from 'next/image';
+import { EntityImage } from '@/components/media/entity-image';
 import Link from 'next/link';
 import { toast } from 'sonner';
 import { AlertTriangle, FileDown, Loader2, RefreshCw, SlidersHorizontal, Trophy } from 'lucide-react';
@@ -323,17 +323,7 @@ export function StandingsView({
                         </td>
                         <td className="px-2 py-2">
                           <div className="flex items-center gap-2">
-                            <div className="hidden h-6 w-6 shrink-0 overflow-hidden rounded-full bg-surface-sunk sm:block">
-                              {row.logoUrl && (
-                                <Image
-                                  src={row.logoUrl}
-                                  alt=""
-                                  width={24}
-                                  height={24}
-                                  className="h-full w-full object-cover"
-                                />
-                              )}
-                            </div>
+                            <EntityImage url={row.logoUrl} name={row.teamName} size={24} className="hidden sm:flex" />
                             {/* The most obvious thing to want from a league table is the club you
                                 just read — but only where the reader may open it. A club
                                 administrator gets ten links to nine dashboards they are refused,
