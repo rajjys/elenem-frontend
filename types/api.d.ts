@@ -3003,6 +3003,10 @@ export interface components {
             userId?: Record<string, never>;
         };
         UpdatePlayerByTeamAdminDto: {
+            /** @description Player first name */
+            firstName?: string;
+            /** @description Player last name */
+            lastName?: string;
             /**
              * @description Player jersey number
              * @example 10
@@ -3833,6 +3837,8 @@ export interface components {
             name: string | null;
             /** @description Their page — only when named. */
             slug: string | null;
+            /** @description The photo (md.webp; sm.webp beside it), only when the player is named — a competition that hides names hides faces too. */
+            photoUrl: string | null;
             position: string | null;
             /** @description Games with a scoresheet line this season. */
             gamesPlayed: number;
@@ -3915,6 +3921,8 @@ export interface components {
         PublicPlayerDto: {
             name: string;
             slug: string;
+            /** @description The photo (md.webp; sm.webp beside it), or null. */
+            photoUrl: string | null;
             jerseyNumber: number | null;
             position: string | null;
             club: components["schemas"]["PublicClubRefDto"] | null;

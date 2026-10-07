@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { cn } from '@/utils/cn';
+import { mediaSrc } from '@/lib/media';
 import type { PublicClub } from '@/lib/public-site/api';
 
 /**
@@ -10,6 +11,9 @@ import type { PublicClub } from '@/lib/public-site/api';
  */
 export function RosterTable({ club }: { club: PublicClub }) {
   const withFigures = club.roster.some((p) => p.gamesPlayed > 0);
+  // A photo column only when someone has one, and then a slot on every row so the names line up.
+  // photoUrl is null for any player whose name is hidden, so a face never outlives its name.
+  const withPhotos = club.roster.some((p) => p.photoUrl);
   const left = 'sticky left-0 z-10 bg-surface shadow-[1px_0_0_var(--color-line)] md:shadow-none';
   const right = 'sticky right-0 z-10 bg-surface shadow-[-1px_0_0_var(--color-line)] md:shadow-none';
   const head = 'px-2 py-2.5 text-right font-semibold';
@@ -47,6 +51,21 @@ export function RosterTable({ club }: { club: PublicClub }) {
                   <td className={cn(left, 'border-t border-line py-2.5 pl-3 pr-3')}>
                     <span className="flex items-center">
                       <span className="w-7 shrink-0 text-ink-subtle">{p.jerseyNumber ?? '–'}</span>
+                      {withPhotos &&
+                        (p.photoUrl ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={mediaSrc(p.photoUrl, 'sm') ?? p.photoUrl}
+                            alt=""
+                            width={28}
+                            height={28}
+                            loading="lazy"
+                            decoding="async"
+                            className="mr-2.5 h-7 w-7 shrink-0 rounded-full bg-surface-sunk object-cover"
+                          />
+                        ) : (
+                          <span aria-hidden className="mr-2.5 h-7 w-7 shrink-0 rounded-full bg-surface-sunk" />
+                        ))}
                       <span className="min-w-0 max-w-[9rem] sm:max-w-[16rem]">
                         {p.slug ? (
                           <Link href={`/players/${p.slug}`} className="block truncate font-medium text-ink hover:underline">

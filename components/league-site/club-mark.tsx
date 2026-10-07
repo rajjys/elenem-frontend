@@ -1,3 +1,4 @@
+import { mediaSrc } from '@/lib/media';
 import { cn } from '@/utils/cn';
 import type { PublicClubRef } from '@/lib/public-site/api';
 
@@ -20,7 +21,7 @@ export function ClubMark({ club, size = 'sm' }: { club: PublicClubRef; size?: ke
   if (club.logoUrl) {
     return (
       // eslint-disable-next-line @next/next/no-img-element
-      <img src={club.logoUrl} alt="" loading="lazy" className={cn(SIZES[size], 'shrink-0 rounded-full bg-surface object-contain')} />
+      <img src={mediaSrc(club.logoUrl, 'sm') ?? club.logoUrl} alt="" loading="lazy" className={cn(SIZES[size], 'shrink-0 rounded-full bg-surface object-contain')} />
     );
   }
   return (

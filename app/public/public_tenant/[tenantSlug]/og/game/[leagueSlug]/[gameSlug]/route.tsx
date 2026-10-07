@@ -1,7 +1,8 @@
 import { ImageResponse } from 'next/og';
 import { siteGet, type PublicClubRef, type PublicGame, type PublicSite } from '@/lib/public-site/api';
 import { formatDate, formatTime } from '@/lib/public-site/format';
-import { CardFrame, Initials, OG_CACHE, OG_SIZE, bandOf, hostOf, initialsOf, ogFonts } from '@/lib/public-site/og';
+import { CardFrame, Initials, OG_CACHE, OG_SIZE, bandOf, hostOf, initialsOf, logoData, ogFonts } from '@/lib/public-site/og';
+import { mediaSrc } from '@/lib/media';
 
 /**
  * A game's card (PHASE5B_LEAGUE_SITES §9): the two clubs, and the score large once it is played —
@@ -25,6 +26,11 @@ export async function GET(
     siteGet<PublicGame>(tenantSlug, `/games/${encodeURIComponent(leagueSlug)}/${encodeURIComponent(gameSlug)}`),
   ]);
   if (!site || !game) return new Response('Match introuvable', { status: 404 });
+  // The two crests, as PNG. A club without one, or one that is slow to answer, keeps its initials.
+  const [homeLogo, awayLogo] = await Promise.all([
+    logoData(mediaSrc(game.home.logoUrl, 'md', 'png')),
+    logoData(mediaSrc(game.away.logoUrl, 'md', 'png')),
+  ]);
 
   const played = game.status === 'COMPLETED' || game.status === 'FORFEIT';
   const home = game.homeScore ?? 0;
@@ -40,7 +46,7 @@ export async function GET(
       <CardFrame band={bandOf(site.primaryColor)} league={site.name} host={hostOf(tenantSlug)}>
         <div style={{ display: 'flex', justifyContent: 'center', fontSize: 26, color: 'rgba(255,255,255,0.8)' }}>{context.join(' · ')}</div>
         <div style={{ display: 'flex', flex: 1, alignItems: 'center', justifyContent: 'space-between' }}>
-          <Club club={game.home} faded={played && home < away} />
+          <Club club={game.home} logo={homeLogo} faded={played && home < away} />
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             {played ? (
               <div style={{ display: 'flex', fontSize: 132, fontWeight: 800, letterSpacing: -4 }}>
@@ -60,7 +66,7 @@ export async function GET(
               </div>
             )}
           </div>
-          <Club club={game.away} faded={played && away < home} />
+          <Club club={game.away} logo={awayLogo} faded={played && away < home} />
         </div>
       </CardFrame>
     ),
@@ -68,10 +74,15 @@ export async function GET(
   );
 }
 
-function Club({ club, faded }: { club: PublicClubRef; faded: boolean }) {
+function Club({ club, logo, faded }: { club: PublicClubRef; logo: string | null; faded: boolean }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: 300, opacity: faded ? 0.6 : 1 }}>
-      <Initials text={initialsOf(club.name, 2)} size={132} radius={66} />
+      {logo ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={logo} width={132} height={132} alt="" style={{ borderRadius: 66, background: '#ffffff', objectFit: 'contain' }} />
+      ) : (
+        <Initials text={initialsOf(club.name, 2)} size={132} radius={66} />
+      )}
       <div style={{ display: 'flex', marginTop: 20, fontSize: 34, fontWeight: 800, textAlign: 'center', justifyContent: 'center', lineHeight: 1.15 }}>
         {club.name}
       </div>

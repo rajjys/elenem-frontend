@@ -1,3 +1,4 @@
+import { mediaSrc, mediaSrcSet } from '@/lib/media';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -79,12 +80,33 @@ export default async function PlayerPage(props: Props) {
 
       <section className="overflow-hidden rounded-2xl border border-line bg-surface shadow-e1">
         <div className="flex items-center gap-4 px-5 py-6 sm:px-8">
-          <span
-            aria-hidden
-            className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-ink text-2xl font-bold tabular-nums text-canvas sm:h-20 sm:w-20 sm:text-3xl"
-          >
-            {player.jerseyNumber ?? '–'}
-          </span>
+          {player.photoUrl ? (
+            // The photo, round as it was framed, with the shirt number pinned to it.
+            <span className="relative shrink-0">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={mediaSrc(player.photoUrl, 'sm') ?? player.photoUrl}
+                srcSet={mediaSrcSet(player.photoUrl) ?? undefined}
+                sizes="80px"
+                alt={`Photo de ${player.name}`}
+                width={80}
+                height={80}
+                className="h-16 w-16 rounded-full bg-surface-sunk object-cover sm:h-20 sm:w-20"
+              />
+              {player.jerseyNumber !== null && (
+                <span className="absolute -bottom-1 -right-1 rounded-lg bg-ink px-1.5 py-0.5 text-xs font-bold tabular-nums text-canvas ring-2 ring-surface">
+                  {player.jerseyNumber}
+                </span>
+              )}
+            </span>
+          ) : (
+            <span
+              aria-hidden
+              className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-ink text-2xl font-bold tabular-nums text-canvas sm:h-20 sm:w-20 sm:text-3xl"
+            >
+              {player.jerseyNumber ?? '–'}
+            </span>
+          )}
           <div className="min-w-0">
             <h1 className="text-balance text-2xl font-bold tracking-tight text-ink sm:text-3xl">{player.name}</h1>
             <p className="mt-1 flex flex-wrap items-center gap-x-2 text-sm text-ink-muted">

@@ -1,3 +1,4 @@
+import { mediaSrc } from '@/lib/media';
 import { ImageResponse } from 'next/og';
 import { siteGet, type PublicSite } from '@/lib/public-site/api';
 import { CardFrame, Initials, OG_CACHE, OG_SIZE, bandOf, hostOf, initialsOf, logoData, ogFonts } from '@/lib/public-site/og';
@@ -11,7 +12,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ tenantS
   const { tenantSlug } = await params;
   const site = await siteGet<PublicSite>(tenantSlug);
   if (!site) return new Response('Aucune ligue à cette adresse', { status: 404 });
-  const logo = await logoData(site.logoUrl);
+  const logo = await logoData(mediaSrc(site.logoUrl, 'md', 'png'));
 
   return new ImageResponse(
     (

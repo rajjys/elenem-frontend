@@ -1,3 +1,4 @@
+import { mediaSrc } from '@/lib/media';
 import { cn } from '@/utils/cn';
 import { initialsOf } from '@/lib/public-site/nav';
 
@@ -20,7 +21,7 @@ export function SiteMark({
       // A league's logo can live on any host, which next/image would refuse; it is small and
       // above the fold, so a plain image with its size set costs nothing.
       // eslint-disable-next-line @next/next/no-img-element
-      <img src={logoUrl} alt="" width={size === 'lg' ? 64 : 36} height={size === 'lg' ? 64 : 36} className={cn(box, 'shrink-0 bg-surface object-contain')} />
+      <img src={mediaSrc(logoUrl, 'sm') ?? logoUrl} alt="" width={size === 'lg' ? 64 : 36} height={size === 'lg' ? 64 : 36} className={cn(box, 'shrink-0 bg-surface object-contain')} />
     );
   }
   return (

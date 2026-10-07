@@ -1,3 +1,4 @@
+import { mediaSrc } from '@/lib/media';
 import { notFound } from 'next/navigation';
 import {
   siteGet,
@@ -75,7 +76,7 @@ export default async function LeagueHome({ params, searchParams }: Props) {
           '@type': 'SportsOrganization',
           name: site.name,
           url: buildTenantUrl(tenantSlug, '/'),
-          ...(site.logoUrl ? { logo: site.logoUrl } : {}),
+          ...(site.logoUrl ? { logo: mediaSrc(site.logoUrl, 'md', 'png') } : {}),
           ...(site.city ? { location: { '@type': 'Place', address: { '@type': 'PostalAddress', addressLocality: site.city } } } : {}),
           ...(site.contact.email ? { email: site.contact.email } : {}),
           ...(Object.values(site.socialLinks).length ? { sameAs: Object.values(site.socialLinks) } : {}),
