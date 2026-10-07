@@ -499,19 +499,82 @@ ships.
 - backend tests 272/272;
 - lint 877 errors and 39 warnings (from 878 and 39); frontend lint clean on the changed files.
 
-**Noticed, not changed (the owner's call):**
-- **Prisma logs every SQL statement in production** (`prisma.service.ts`: `log: ['query', …]`). No
-  values leak, since they show as ``. But it is a line per query on an API already measured
-  at 0.7–2.3 s a request. Recommended: queries in development only.
+**Noticed, and the owner's answers (2026-10-07):**
+- **Prisma logged every SQL statement in production.** No values leaked (they show as `$1`), but it
+  was a line per query. Now development only, at the owner's word.
 - **No form can clear a text field by sending `''`.** `SanitizeDtoInterceptor` maps it to
   `undefined` on every PUT/PATCH, so a cleared field quietly keeps its old value unless the form
   sends `null`. Fixed for the club description; other forms are unchecked.
-- **Two players of one organisation cannot share a name.** The slug is the name, and a clash is a
-  409. Two real namesakes would block each other; a suffix would fix it.
-- Still open from sprint 0: `POST /posts` without a slug is a 500, and a hard load of
-  `/admin/users/create` bounces to the dashboard.
+- **Namesakes.** The owner pointed out that creation already suffixes (`patient-kasereka-2`), and it
+  does. The rename path did not, and it was worse than reported: it re-derived the slug on *every*
+  edit, so the second namesake could not be edited at all, a shirt number included (409). Fixed:
+  the slug changes only with the name, through the same suffixing helper as creation.
+- **Posts** (the slug 500, cover images) wait until R2 is finished (owner). Still open, and also
+  not now: a hard load of `/admin/users/create` bounces to the dashboard.
+- **Layout (owner):** the logo sits at the top of each « Identité » card (club, competition) and
+  first in the organisation's General tab, and above the name in « Modifier le club », as in the
+  player dialog. The separate « Logo » sections are gone. All the settings pages get a later pass.
 
 ### Sprint 3 — Showing them (both domains)
+
+#### Sprint 3 — done 2026-10-07 (both repos, not deployed)
+
+**It started from a crash the owner hit.** After a crest upload, `/league/standings` failed with
+« Invalid src prop … hostname pub-….r2.dev is not configured ». next/image refuses any host not in
+next.config, and the development bucket's is not, and should not be.
+
+**One display component.** `components/media/entity-image.tsx` is a plain `<img>`:
+- `srcset` of the stored `sm`/`md` files, explicit size, lazy loading;
+- initials when there is no image or it fails to load.
+
+Through it now:
+- the standings table, the clubs table, the account dashboard;
+- `Avatar` (game cards, both dashboards), and `TenantLogo`, `LeagueLogo` and `UserAvatar`, which
+  each fetched a placeholder from placehold.co for every missing logo;
+- the player page and quick view, round as the photo was framed.
+
+The game page draws its crest on the dark band itself; the navbar avatar is a plain `<img>`.
+next.config now lists only `media.dxscores.com`, for the two post components that still use
+next/image.
+
+**Found: crests could never have shown on game screens.**
+- The games API (16 selects in `games.service.ts` and `game-results.service.ts`, and one in
+  `standings.service.ts`) sent only `logoAsset`, which nothing writes. They now send `logoUrl`.
+- The game page's schema dropped the `businessProfile` it arrives in.
+- The clubs table read `logoAsset`.
+
+All three are fixed.
+
+**League sites:**
+- `ClubMark` and `SiteMark` load the 128 px file.
+- The club page's roster and the player page show photos. The public API sends `photoUrl` only
+  for a named player: when a competition hides names, faces go with them, and the player page is
+  404 as before.
+- The scorers table and the box score stay text, to keep them light.
+- **The game share card shows both clubs' crests** (initials for a club without one).
+- The league card and the structured data use `md.png`.
+
+**The standings export** fetches the organisation's logo with CORS (the development bucket's rule
+is set), so the PNG carries it.
+
+**Verified:**
+- **9 public-API checks**, on a throwaway database and API: the photo on the roster and the player
+  page while names are shown; once the competition hides them, its URL is in no public response
+  and the player page is 404.
+- **16 browser checks**, as a league admin, an organisation admin and a club admin:
+  - the logos' new places;
+  - a crest uploaded from « Modifier le club », then loading in the standings (the 128 px file, no
+    next/image error) and on the game page;
+  - the organisation logo inside the exported PNG.
+- **6 read-only checks on the owner's dev data**, as an anonymous visitor on emulated 3G:
+  - AS Goma West's crest on libago's standings and club page, at 4.6 KB;
+  - its game share card drawn with the crest.
+- **Afterwards:** the bucket holds exactly the one image the dev database points to; every
+  throwaway upload was removed through the API.
+- **Tests:** backend 274/274, with 2 new tests for namesakes.
+- **Lint and types:** lint 873 errors and 39 warnings (from 877); tsc clean both sides; frontend
+  lint clean on every changed file.
+
 
 **What.**
 - `mediaSrc`, and one avatar component and one crest component replacing the six.
