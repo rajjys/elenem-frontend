@@ -16,8 +16,9 @@ Checked on 2026-10-06 against both repositories and the local database.
   `profileImageUrl`, zero `MediaAsset` rows. Production is almost certainly the same (to confirm
   through the public API, read-only). **Nothing has to be migrated, so the design is free.**
 - **Two upload experiments exist in the backend, both written for AWS, neither usable:**
-  - `src/upload2` (`/uploads2/*`) has **no auth guard at all**. Anyone on the internet can call
-    it. The client picks the folder, the proxy route takes 50 MB, and `get-url` signs a download
+  - `src/upload2` (`/uploads2/*`) has **no guard of its own**. *Corrected 2026-10-07:* the global
+    `JwtAuthGuard` (AuthModule) still required a login, so not « anyone on the internet » as first
+    written; production answered 401. But sign-up is open, so any account could call it. The client picks the folder, the proxy route takes 50 MB, and `get-url` signs a download
     for any key. It is harmless today only because there are no storage credentials. **The moment
     R2 keys go on Railway, it becomes an anonymous upload endpoint into our bucket.**
   - `src/upload` (`/uploads/presign`, `/uploads/confirm`) does require a login, but it trusts the
