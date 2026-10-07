@@ -7,6 +7,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { useCreatePlayer, useUpdatePlayer } from '@/services/players';
 import { toastApiError } from '@/utils';
 import { ImageField } from '@/components/media/image-field';
+import { useCurrentUser } from '@/hooks/useAuth';
+import { Roles } from '@/schemas';
 import type { Player } from '@/schemas/player-schemas';
 import { Field, LeaguePicker, TeamPicker, useResolvedScope } from './player-scope-fields';
 
@@ -28,6 +30,13 @@ export function PlayerFormDialog({
 }) {
   const isEdit = !!player;
   const scope = useResolvedScope({ leagueId, teamId, tenantId });
+  const user = useCurrentUser();
+  // A club's administrator may rename its players and change their number and position; moving a
+  // player and the e-mail (a login) belong to the organisation and the competition (backend
+  // UpdatePlayerByTeamAdminDto).
+  const clubAdminOnly =
+    !!user?.roles?.includes(Roles.TEAM_ADMIN) &&
+    !user.roles.some((r) => [Roles.SYSTEM_ADMIN, Roles.TENANT_ADMIN, Roles.LEAGUE_ADMIN].includes(r));
 
   const [firstName, setFirstName] = useState(player?.firstName ?? '');
   const [lastName, setLastName] = useState(player?.lastName ?? '');
@@ -49,17 +58,38 @@ export function PlayerFormDialog({
     const jerseyNumber = jersey.trim() ? Number(jersey) : undefined;
 
     if (isEdit && player) {
+      // Only what changed. The API refuses a field the caller may not change, so a form that sent
+      // everything every time would fail for a club administrator who only fixed a shirt number.
+      const next = {
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+        jerseyNumber: jerseyNumber ?? null,
+        position: position.trim() || null,
+        email: email.trim() || null,
+        teamId: pickedTeam || null,
+      };
+      const was = {
+        firstName: player.firstName,
+        lastName: player.lastName,
+        jerseyNumber: player.jerseyNumber ?? null,
+        position: player.position ?? null,
+        email: player.email ?? null,
+        teamId: player.currentTeam?.id ?? null,
+      };
+      const dto: Record<string, string | number | null> = {};
+      for (const key of Object.keys(next) as (keyof typeof next)[]) {
+        // An e-mail is set or changed here, never cleared: clearing one is not this form's job.
+        if (key === 'email' && !next.email) continue;
+        if (next[key] !== was[key]) dto[key] = next[key];
+      }
+      if (Object.keys(dto).length === 0) {
+        onOpenChange(false);
+        return;
+      }
       update.mutate(
         {
           id: player.id,
-          dto: {
-            firstName: firstName.trim(),
-            lastName: lastName.trim(),
-            jerseyNumber: jerseyNumber ?? null,
-            position: position.trim() || null,
-            email: email.trim() || undefined,
-            teamId: pickedTeam || null,
-          },
+          dto,
         },
         {
           onSuccess: () => {
@@ -132,6 +162,7 @@ export function PlayerFormDialog({
             <TeamPicker leagueId={effectiveLeagueId} value={pickedTeam} onChange={setPickedTeam} />
           )}
 
+          {!(isEdit && clubAdminOnly) && (
           <Field
             label="E-mail"
             value={email}
@@ -139,6 +170,7 @@ export function PlayerFormDialog({
             type="email"
             hint="Facultatif. Renseignez-le seulement si ce joueur doit pouvoir se connecter."
           />
+          )}
         </div>
 
         <div className="mt-6 flex justify-end gap-2">

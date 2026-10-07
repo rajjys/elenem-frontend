@@ -30,19 +30,21 @@ export function useResolvedScope({
     enabled: !!teamId && (!leagueId || !tenantId),
   });
 
-  // When only a league is known, look up its tenant and sport.
+  // When only a league is known, look up its tenant and sport. Not when a club is known: its own
+  // record already carries both, and a club's administrator may not read the competition — that
+  // request answered 403, was retried three times, and left the sport to the fallback below.
   const resolvedLeagueId = leagueId ?? team?.leagueId ?? user?.managingLeagueId ?? undefined;
   const { data: league } = useQuery({
     queryKey: ['league-scope', resolvedLeagueId],
     queryFn: async () => (await api.get(`/leagues/${resolvedLeagueId}`)).data,
-    enabled: !!resolvedLeagueId && !tenantId,
+    enabled: !!resolvedLeagueId && !tenantId && !teamId,
   });
 
   return {
     leagueId: resolvedLeagueId,
     tenantId: tenantId ?? team?.tenantId ?? league?.tenantId ?? user?.tenantId ?? undefined,
     // Players carry a sportType; it always matches the organisation's.
-    sportType: (league?.sportType ?? league?.tenant?.sportType ?? 'BASKETBALL') as string,
+    sportType: (league?.sportType ?? league?.tenant?.sportType ?? team?.tenant?.sportType ?? 'BASKETBALL') as string,
   };
 }
 
