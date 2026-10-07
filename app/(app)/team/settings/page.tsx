@@ -19,8 +19,8 @@ import { toastApiError } from '@/utils';
  * Scoped to what `UpdateTeamProfileByTaDto` lets a club administrator change: the name, the
  * abbreviation, the description and the logo. Status, visibility, the competition and the home venue
  * are a league administrator's, which is what that DTO says and what this screen therefore does not
- * offer. Each section saves on its own, as on the competition's settings: a logo and a name are not
- * the same decision.
+ * offer. The logo sits at the top of « Identité » and saves itself when its crop is confirmed; the
+ * fields under it save with « Enregistrer » (owner, 2026-10-07).
  */
 export default function TeamSettingsPage() {
   const qc = useQueryClient();
@@ -107,7 +107,7 @@ export default function TeamSettingsPage() {
       <div className="space-y-6">
         <SettingsSection
           title="Identité"
-          description="Le nom et l’abréviation utilisés partout : sur le calendrier, au classement et sur la feuille de match."
+          description="Le logo, le nom et l’abréviation utilisés partout : sur le calendrier, au classement et sur la feuille de match."
           footer={
             <div className="flex justify-end">
               <Button variant="primary" onClick={submit} disabled={!dirty || !complete} isLoading={save.isPending}>
@@ -116,6 +116,15 @@ export default function TeamSettingsPage() {
             </div>
           }
         >
+          {/* The logo saves itself when its crop is confirmed; « Enregistrer » is for the fields below. */}
+          <ImageField
+            slot="team-logo"
+            entityId={teamId}
+            value={team.data.businessProfile?.logoUrl}
+            name={team.data.name ?? ''}
+            className="mb-5 border-b border-line pb-5"
+          />
+
           <form
             className="space-y-4"
             onSubmit={(e) => {
@@ -161,17 +170,6 @@ export default function TeamSettingsPage() {
           </form>
         </SettingsSection>
 
-        <SettingsSection
-          title="Logo"
-          description="Celui du club, au classement, sur le calendrier et sur sa page. Sans logo, ses initiales le remplacent."
-        >
-          <ImageField
-            slot="team-logo"
-            entityId={teamId}
-            value={team.data.businessProfile?.logoUrl}
-            name={team.data.name ?? ''}
-          />
-        </SettingsSection>
       </div>
     </PageShell>
   );

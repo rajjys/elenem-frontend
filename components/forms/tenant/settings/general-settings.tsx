@@ -163,6 +163,17 @@ export default function TenantGeneralSettings({ tenant, onSuccess  }: TenantGene
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 p-6 shadow-md bg-surface rounded-lg">
+      {/* First, above the name (owner, 2026-10-07). It saves on its own the moment its crop is
+          confirmed, not with « Save Changes ». */}
+      <ImageField
+        slot="tenant-logo"
+        entityId={tenant.id}
+        value={logoUrl}
+        name={tenant.name}
+        onChange={setLogoUrl}
+        className="border-b border-line pb-6"
+      />
+
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
@@ -364,11 +375,6 @@ export default function TenantGeneralSettings({ tenant, onSuccess  }: TenantGene
           />
           {errors.tenantType && <p className="text-negative text-xs">{errors.tenantType.message}</p>}
         </div>
-      </div>
-
-      {/* The logo saves on its own, the moment its crop is confirmed — not with « Save Changes ». */}
-      <div className="border-t border-line pt-6">
-        <ImageField slot="tenant-logo" entityId={tenant.id} value={logoUrl} name={tenant.name} onChange={setLogoUrl} />
       </div>
 
       {/* The league site's colours (PHASE5B §4.6), beside a preview of its header. */}

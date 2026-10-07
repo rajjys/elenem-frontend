@@ -86,7 +86,7 @@ export function IdentityPanel({ leagueId }: { leagueId: string }) {
     <div className="space-y-6">
       <SettingsSection
         title="Identité"
-        description="Le nom sous lequel cette compétition est publiée, et la catégorie qu’elle regroupe."
+        description="Le logo et le nom sous lesquels cette compétition est publiée, et la catégorie qu’elle regroupe."
         footer={
           <div className="flex items-center justify-between gap-3">
             <p className="text-xs text-ink-subtle">
@@ -110,6 +110,15 @@ export function IdentityPanel({ leagueId }: { leagueId: string }) {
           </div>
         }
       >
+        {/* The logo saves itself when its crop is confirmed; « Enregistrer » is for the fields below. */}
+        <ImageField
+          slot="league-logo"
+          entityId={leagueId}
+          value={league.businessProfile?.logoUrl}
+          name={league.name}
+          className="mb-5 border-b border-line pb-5"
+        />
+
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="sm:col-span-2">
             <Label htmlFor="league-name">Nom de la compétition</Label>
@@ -154,13 +163,6 @@ export function IdentityPanel({ leagueId }: { leagueId: string }) {
             </p>
           </div>
         </div>
-      </SettingsSection>
-
-      <SettingsSection
-        title="Logo"
-        description="Celui de la compétition, sur ses écrans et ses classements. Sans logo, ses initiales le remplacent."
-      >
-        <ImageField slot="league-logo" entityId={leagueId} value={league.businessProfile?.logoUrl} name={league.name} />
       </SettingsSection>
 
       <SettingsSection

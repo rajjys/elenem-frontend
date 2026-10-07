@@ -135,6 +135,18 @@ export function TeamFormDialog({
           submit();
         }}
       >
+        {/* Above the name, as in the player dialog. Saved on its own when the crop is confirmed;
+            « Enregistrer » below is for the name and the abbreviation. */}
+        {isEdit && team && (
+          <ImageField
+            slot="team-logo"
+            entityId={team.id}
+            value={team.businessProfile?.logoUrl}
+            name={team.name}
+            className="border-b border-line pb-4"
+          />
+        )}
+
         <div>
           <Label htmlFor="team-name">Nom du club</Label>
           <Input
@@ -179,17 +191,6 @@ export function TeamFormDialog({
               options={leagueOptions.map((l) => ({ value: l.id, label: l.name }))}
             />
           </div>
-        )}
-
-        {/* Saved on its own when the crop is confirmed; « Enregistrer » below is for the name. */}
-        {isEdit && team && (
-          <ImageField
-            slot="team-logo"
-            entityId={team.id}
-            value={team.businessProfile?.logoUrl}
-            name={team.name}
-            className="border-t border-line pt-4"
-          />
         )}
 
         {!isEdit && (
