@@ -424,7 +424,7 @@ width, with:
   logo;
 - league settings, Identité tab, as a « Logo » section;
 - the « Modifier le club » dialog, which is how organisation and league admins reach a club;
-- `/team/edit` for the club's own admin;
+- `/team/edit` for the club's own admin (now `/team/settings`, see the follow-ups below);
 - the « Modifier le joueur » dialog, with « Cette photo sera visible sur le site public de la
   ligue ».
 
@@ -448,10 +448,68 @@ Afterwards: 17 assets created and removed, the bucket empty, the dev database un
 1. **Fixed: an empty circle right after « Logo enregistré ».** The stored image takes a moment to
    arrive (0.4–0.9 s here, seconds on 3G). The field now shows the crop it just sent until then;
    checked on an emulated slow 3G.
-2. **Not fixed, predates this work:** the player dialog's scope lookup (`player-scope-fields.tsx`)
-   asks for `GET /leagues/:id`, which a club admin is refused (403, retried three times). Its sport
-   then falls back to « BASKETBALL », harmless for a basketball organisation and wrong for any
-   other.
+2. **Fixed on 2026-10-07 (see below), predates this work:** the player dialog's scope lookup
+   (`player-scope-fields.tsx`) asked for `GET /leagues/:id`, which a club admin is refused (403,
+   retried three times). Its sport then fell back to « BASKETBALL ». That turned out to be harmless:
+   the backend does not store a player's sport.
+
+#### Follow-ups, 2026-10-07 (asked by the owner after reviewing sprint 2)
+
+**`/team/edit` is now `/team/settings`**, named and placed like the organisation's and the
+competition's settings:
+- The menu reads « Paramètres », last in a new « Administration » group (Utilisateurs, Actualités,
+  Paramètres), the same group, in the same order, as a competition's menu. « Mon club » keeps
+  « Effectif ».
+- The page has the league settings' layout: a « Paramètres » title over the club's name, and two
+  sections that save separately, « Identité » and « Logo ».
+- The middleware answers `/team/edit` with a 308 to `/team/settings`, **keeping the query**, which
+  carries the club context (`ctxTeamId`) of an organisation or league admin.
+
+**The bugs found in sprints 0 and 2, fixed:**
+1. **`PUT /teams/:id` and `PUT /players/:id` validate their body** against the caller's role's DTO,
+   through `validateBody` (backend `src/common/validation/`). It uses the same options as the global
+   pipe, which now reads them from the same constant. An image URL, a one-letter name or a number
+   sent as text is a 400 that names the field.
+2. **A club's description is saved.** It goes to its business profile, and the page reads it from
+   there. Clearing it works: the page sends `null`, because the API turns `''` into « not sent »
+   on every PUT (below).
+3. **The player dialog no longer asks for the competition when the club is known.** The club's
+   own record gives the organisation and the sport.
+4. **Found while fixing 1: a club admin could not save any change to a player.** The dialog always
+   sent the name and `teamId`, and the service refused them (403, « Team Admins cannot update
+   sensitive player details », in English). The fix:
+   - **A club admin may now correct a player's name** (players are roster entries, ROADMAP_V2 §6),
+     as well as the number, position, preferred foot and hand, and bio.
+   - **Moving a player and the e-mail (a login) stay with the organisation and the league.** The
+     dialog hides the e-mail field from a club admin.
+   - **The dialog sends only what changed.**
+
+**Fixed, found by watching the logs: passwords were written to the API log in clear.**
+`SanitizeDtoInterceptor` printed every PUT and PATCH body before and after sanitising it. That
+includes `PUT /users/me/password` (current and new password) and `PUT /users/:id` (an admin setting
+one). Proven with a canary password on a throwaway API, and gone after the fix. **On production,
+any password changed since the API was deployed is in Railway's logs.** Those logs are visible
+only to the project's members, but the owner may want to change their own password after this
+ships.
+
+**Verified:**
+- 16 API checks and 12 browser checks, as a club admin, a league admin and an organisation admin,
+  on a throwaway database and API;
+- the dev database unchanged;
+- backend tests 272/272;
+- lint 877 errors and 39 warnings (from 878 and 39); frontend lint clean on the changed files.
+
+**Noticed, not changed (the owner's call):**
+- **Prisma logs every SQL statement in production** (`prisma.service.ts`: `log: ['query', …]`). No
+  values leak, since they show as ``. But it is a line per query on an API already measured
+  at 0.7–2.3 s a request. Recommended: queries in development only.
+- **No form can clear a text field by sending `''`.** `SanitizeDtoInterceptor` maps it to
+  `undefined` on every PUT/PATCH, so a cleared field quietly keeps its old value unless the form
+  sends `null`. Fixed for the club description; other forms are unchecked.
+- **Two players of one organisation cannot share a name.** The slug is the name, and a clash is a
+  409. Two real namesakes would block each other; a suffix would fix it.
+- Still open from sprint 0: `POST /posts` without a slug is a 500, and a hard load of
+  `/admin/users/create` bounces to the dashboard.
 
 ### Sprint 3 — Showing them (both domains)
 
