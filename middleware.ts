@@ -41,6 +41,8 @@ const LEGACY_REDIRECTS: Record<string, string> = {
   '/pricing': '/#gratuit',
   '/plans': '/#gratuit',
   '/tenant/create': '/register',
+  // A club's settings live where the organisation's and the competition's do (2026-10-07).
+  '/team/edit': '/team/settings',
 };
 const LEGACY_TO_HOME = /^\/(games|tenants|news|about|api|docs|leagues|standings|teams|players|upload2?|welcome|health)(\/.*)?$/;
 
@@ -101,7 +103,10 @@ export async function middleware(request: NextRequest) {
   }
 
   if (LEGACY_REDIRECTS[pathname]) {
-    return NextResponse.redirect(new URL(LEGACY_REDIRECTS[pathname], request.url), 308);
+    const target = LEGACY_REDIRECTS[pathname];
+    // An in-app page keeps its query: it carries the scope (`ctxTeamId`…) an organisation or league
+    // administrator arrived with. An anchor target is a marketing section and takes none.
+    return NextResponse.redirect(new URL(target.includes('#') ? target : `${target}${search}`, request.url), 308);
   }
   if (LEGACY_TO_HOME.test(pathname)) {
     return NextResponse.redirect(new URL('/', request.url), 308);

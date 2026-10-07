@@ -16,7 +16,7 @@ import { ImageField } from '@/components/media/image-field';
  * server will accept with **a name and a competition**. An organiser adding a club that turned up
  * in week three has none of that to hand and does not need it to register them.
  *
- * What the old form collected is not lost, it is *later*: `/team/edit` is where a club's details go
+ * What the old form collected is not lost, it is *later*: `/team/settings` is where a club's details go
  * once the club exists, which is the only order in which anybody actually has them
  * (`UI_CONVENTIONS` §7).
  *
@@ -33,7 +33,7 @@ export function TeamFormDialog({
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  /** Present when editing. Only name and abbreviation — the rest is `/team/edit`. */
+  /** Present when editing. Name, abbreviation and logo — the description is `/team/settings`. */
   team?: TeamListItem | null;
   /** Pinned when the screen is already inside one competition. */
   leagueId?: string;
@@ -194,8 +194,7 @@ export function TeamFormDialog({
 
         {!isEdit && (
           <p className="text-xs text-ink-subtle">
-            Le logo s’ajoute ensuite, en modifiant le club ; la ville et l’année de fondation, sur sa
-            fiche.
+            Le logo s’ajoute ensuite, en modifiant le club.
           </p>
         )}
       </form>

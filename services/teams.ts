@@ -91,7 +91,7 @@ export function useTeams(params: TeamFilterParams, enabled = true) {
  * logo, a banner, a founding year, a contact e-mail, a website, a tax number and bank details, on
  * a screen an organiser opens to add a club that turned up in week three.
  *
- * Those are not lost, they are *later*: `/team/edit` is where a club's details are filled in once
+ * Those are not lost, they are *later*: `/team/settings` is where a club's details are filled in once
  * the club exists, which is the only order in which anybody actually has them.
  */
 export function useCreateTeam() {

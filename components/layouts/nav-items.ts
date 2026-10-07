@@ -188,15 +188,11 @@ export const teamNavItems: NavGroup[] = [
     ],
   },
   {
-    // What is the club's own, and what it can change. Six links in one undifferentiated pile is
-    // what this was, and a club's two questions — « qui est dans mon effectif » and « où en
-    // sommes-nous » — are not the same question.
+    // A club's two questions — « qui est dans mon effectif » and « où en sommes-nous » — are not the
+    // same question, so they are two groups.
     label: 'Mon club',
     items: [
     { label: 'Effectif', basePath: '/team/roster', icon: UserSquare2 },
-    { label: 'Actualités', basePath: '/team/posts', icon: Newspaper },
-    { label: 'Utilisateurs', basePath: '/team/users', icon: Users },
-    { label: 'Informations', basePath: '/team/edit', icon: Settings },
     ],
   },
   {
@@ -208,6 +204,17 @@ export const teamNavItems: NavGroup[] = [
     { label: 'Calendrier', basePath: '/team/calendar', icon: CalendarDays },
     { label: 'Classement', basePath: '/team/standings', icon: ListOrdered },
     { label: 'Statistiques', basePath: '/team/stats', icon: BarChart3 },
+    ],
+  },
+  {
+    // The same last group, in the same order, as a competition's: who has access, what is
+    // published, and the settings. It was « Informations » at /team/edit, inside « Mon club »,
+    // which no other role's menu resembled.
+    label: 'Administration',
+    items: [
+    { label: 'Utilisateurs', basePath: '/team/users', icon: Users },
+    { label: 'Actualités', basePath: '/team/posts', icon: Newspaper },
+    { label: 'Paramètres', basePath: '/team/settings', icon: Settings },
     ],
   },
 ];
