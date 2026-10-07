@@ -722,9 +722,28 @@ or the Railway dashboard yourself, and send me only the non-secret values marked
 **2026-10-07: the owner reports the bucket and the five Railway variables in place.**
 - `media.dxscores.com` answers through Cloudflare with a valid certificate: a 404 on an empty
   bucket, as expected.
-- **Before the push**, check the three non-secret production values (`R2_ENDPOINT`, `R2_BUCKET`,
-  `R2_PUBLIC_URL`). The API now refuses to boot on an incomplete set, or on an endpoint with the
-  bucket on the end, so a typo would stop production rather than surface later.
+- **The three non-secret values, checked 2026-10-07:**
+  - `R2_ENDPOINT` is the bare account host, with a trailing slash that R2 accepts (tried with the
+    development keys);
+  - `R2_BUCKET` is `dxscores-media`;
+  - `R2_PUBLIC_URL` is `https://media.dxscores.com`.
+- **A bad image setting no longer stops the API** (backend `storage-config.ts`). It used to refuse
+  to boot, which would have taken the whole product down over a logo, against roadmap §13. Now:
+  - an incomplete or invalid set turns uploads off (503) and logs why;
+  - quotes and trailing slashes left by a paste are forgiven;
+  - with a good set, the boot log reads « Images stored in dxscores-media, served from
+    https://media.dxscores.com », the first line to look for after the deploy.
+- **CORS: only `https://dxscores.com`, and that is enough.**
+  - Only the standings export draws images into a canvas in the browser (html-to-image), and it
+    lives on the app domain.
+  - League sites on `*.dxscores.app` use plain `<img>` tags, which need no CORS.
+  - The share cards fetch logos from the server.
+  - `www.dxscores.com` redirects to the apex.
+- **One production-only check after the first upload:** Cloudflare caches the images, and a copy
+  first cached by a plain `<img>` load may lack the CORS header the export's fetch needs.
+  - The export busts the cache (`cacheBust`), so it should not matter; test it anyway.
+  - If it does matter, a Transform Rule on `media.dxscores.com` that sets
+    `Access-Control-Allow-Origin: *` fixes it. The images are public.
 
 **The development token's value was printed in a session transcript on 2026-10-07**, through a
 read of `.env` whose filter let a commented-out line through. It is scoped to
