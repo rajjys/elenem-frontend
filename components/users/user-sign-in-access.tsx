@@ -2,9 +2,9 @@
 
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { KeyRound, Lock, LockOpen } from 'lucide-react';
+import { KeyRound, Lock, LockOpen, UserCheck, UserX } from 'lucide-react';
 import { Button, ConfirmDialog } from '@/components/ui';
-import { useUnblockUserSignIn, type UserResponse } from '@/services/users';
+import { useSetUserActive, useUnblockUserSignIn, type UserResponse } from '@/services/users';
 import { useForgotPassword } from '@/services/auth';
 import { useCurrentUser, useHasRole } from '@/hooks';
 import { Roles } from '@/schemas';
@@ -45,17 +45,26 @@ export function lockUntilLabel(until: string | null): string {
  *   knows it, which is why it is offered ahead of typing one in « Modifier ». The new password
  *   lifts a cool-down after wrong passwords, never an administrator's lock.
  */
-export function UserSignInAccess({ user }: { user: UserResponse }) {
+/**
+ * May the viewer decide whether this person gets in — unblock, deactivate, reactivate? A system
+ * administrator, or an organisation's administrator for their own people: the rule the API applies
+ * (`assertCanManageAccess`), so a button never appears only to be refused.
+ */
+export function useCanManageAccess(user: Pick<UserResponse, 'tenantId'>): boolean {
   const me = useCurrentUser();
   const isSystemAdmin = useHasRole(Roles.SYSTEM_ADMIN);
   const isTenantAdmin = useHasRole(Roles.TENANT_ADMIN);
+  return isSystemAdmin || (isTenantAdmin && !!me?.tenantId && me.tenantId === user.tenantId);
+}
+
+export function UserSignInAccess({ user }: { user: UserResponse }) {
   const unblock = useUnblockUserSignIn();
+  const setActive = useSetUserActive();
   const sendCode = useForgotPassword();
   const [confirmCode, setConfirmCode] = useState(false);
 
   const lock = currentSignInLock(user.signInLock);
-  const canUnblock =
-    isSystemAdmin || (isTenantAdmin && !!me?.tenantId && me.tenantId === user.tenantId);
+  const canUnblock = useCanManageAccess(user);
   // The API sends nothing to a deactivated account, so offering it would be a button that lies;
   // and a new password does not open an administrator's lock, so it would be one there too.
   const canSendCode = user.isActive && lock?.reason !== 'ADMIN';
@@ -78,6 +87,47 @@ export function UserSignInAccess({ user }: { user: UserResponse }) {
       Envoyer un code de réinitialisation
     </Button>
   );
+
+  // Deactivated comes first: it is the decision that outranks a lock, and nothing below it applies
+  // until it is undone.
+  if (!user.isActive) {
+    return (
+      <section className="rounded-lg border border-line bg-surface-sunk px-3.5 py-3">
+        <p className="flex items-center gap-1.5 text-sm font-medium text-ink">
+          <UserX className="h-3.5 w-3.5 shrink-0 text-ink-muted" aria-hidden />
+          Compte désactivé
+        </p>
+        <p className="mt-1 text-sm text-ink-muted">
+          Cette personne ne peut plus se connecter. Rien n’a été supprimé : son compte et ce qui a
+          été saisi avec restent en place.
+        </p>
+        {canUnblock ? (
+          <Button
+            size="sm"
+            variant="primary"
+            className="mt-3"
+            disabled={setActive.isPending}
+            onClick={() =>
+              setActive.mutate(
+                { id: user.id, isActive: true },
+                {
+                  onSuccess: () => toast.success('Compte réactivé.'),
+                  onError: (e) => toastApiError(e),
+                },
+              )
+            }
+          >
+            <UserCheck className="mr-1.5 h-3.5 w-3.5" aria-hidden />
+            Réactiver
+          </Button>
+        ) : (
+          <p className="mt-2 text-xs text-ink-subtle">
+            Seul un administrateur de l’organisation peut le réactiver.
+          </p>
+        )}
+      </section>
+    );
+  }
 
   return (
     <>

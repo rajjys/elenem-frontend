@@ -13,6 +13,7 @@ export const PAGE_TITLES: Record<string, string> = {
   players: 'Joueurs',
   roster: 'Effectif',
   users: 'Utilisateurs',
+  journal: 'Journal',
   games: 'Matchs',
   calendar: 'Calendrier',
   generate: 'Génération',
@@ -66,5 +67,6 @@ export const BACK_PHRASES: Record<string, string> = {
   dashboard: 'au tableau de bord',
   posts: 'aux actualités',
   users: 'aux utilisateurs',
+  journal: 'au journal',
   settings: 'aux paramètres',
 };

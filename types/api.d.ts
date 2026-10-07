@@ -2061,6 +2061,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/journal": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** What happened, by whom and why — the whole platform for a system administrator, one organisation for its administrator */
+        get: operations["JournalController_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -4908,6 +4925,44 @@ export interface components {
             gameIds: string[];
             /** @description The explanation. */
             reason: string;
+        };
+        JournalActorDto: {
+            id: string;
+            name: string;
+        };
+        JournalSubjectDto: {
+            label: string;
+            /** @description Where it belongs: the competition, the season. */
+            context: string | null;
+        };
+        JournalEntryDto: {
+            id: string;
+            /** Format: date-time */
+            at: string;
+            action: string;
+            entityType: string;
+            entityId: string;
+            reason: string | null;
+            before: {
+                [key: string]: unknown;
+            } | null;
+            after: {
+                [key: string]: unknown;
+            } | null;
+            by: components["schemas"]["JournalActorDto"] | null;
+            subject: components["schemas"]["JournalSubjectDto"] | null;
+            /** @description The organisation, for system administrators. */
+            organisation: string | null;
+        };
+        JournalPageDto: {
+            data: components["schemas"]["JournalEntryDto"][];
+            totalItems: number;
+            totalPages: number;
+            currentPage: number;
+            pageSize: number;
+            venues: {
+                [key: string]: string;
+            };
         };
     };
     responses: never;
@@ -9827,6 +9882,34 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    JournalController_list: {
+        parameters: {
+            query?: {
+                page?: number;
+                pageSize?: number;
+                /** @description What this person did, and what was done to their account. */
+                userId?: string;
+                category?: "CALENDAR" | "SEASONS" | "PLAYERS" | "ACCOUNTS";
+                includeSignIns?: boolean;
+                /** @description System administrators only: one organisation. */
+                tenantId?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JournalPageDto"];
+                };
             };
         };
     };

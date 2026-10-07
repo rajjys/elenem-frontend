@@ -16,7 +16,7 @@ import { useUsers, useDeleteUser } from '@/services/users';
 import { Roles } from '@/schemas/enums';
 import type { UserFilterParams } from '@/schemas/user-schemas';
 import { meaningfulRoles, roleLabel, ROLE_LABELS } from '@/utils/role-labels';
-import { formatDateFr, toastApiError } from '@/utils';
+import { cn, formatDateFr, toastApiError } from '@/utils';
 import { UserQuickView } from './user-quick-view';
 import { currentSignInLock, lockUntilLabel } from './user-sign-in-access';
 
@@ -160,7 +160,7 @@ export function UsersListView({
             title="Supprimer ce compte ?"
             description={
               toDelete
-                ? `${toDelete.name} perdra l’accès à DXScores. Ce qui a été saisi avec ce compte — scores, feuilles de match — reste enregistré.`
+                ? `${toDelete.name} perdra l’accès à DXScores. Ce qui a été saisi avec ce compte — scores, feuilles de match — reste enregistré. Pour couper l’accès de façon réversible, désactivez plutôt le compte depuis sa fiche.`
                 : undefined
             }
             confirmLabel="Supprimer"
@@ -197,10 +197,16 @@ export function UsersListView({
                       <button
                         type="button"
                         onClick={() => setViewing(u.id)}
-                        className="text-left font-medium text-ink transition-colors hover:text-accent-text hover:underline hover:underline-offset-2"
+                        className={cn(
+                          'text-left font-medium transition-colors hover:text-accent-text hover:underline hover:underline-offset-2',
+                          u.isActive ? 'text-ink' : 'text-ink-subtle',
+                        )}
                       >
                         {name}
                       </button>
+                      {/* Said in words and in grey, not in the caution colour: it is a decision
+                          somebody made, not something waiting on anyone. */}
+                      {!u.isActive && <span className="ml-1.5 text-xs text-ink-subtle">désactivé</span>}
                       <p className="flex flex-wrap items-center gap-x-1.5 text-xs text-ink-subtle">
                         {u.email}
                         {/* Why somebody cannot get in, said on the row rather than only inside

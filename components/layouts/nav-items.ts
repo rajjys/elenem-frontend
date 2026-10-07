@@ -20,6 +20,7 @@ import {
   Settings,
   Building2,
   UserSquare2,
+  ScrollText,
 } from 'lucide-react';
 
 type IconType = React.ComponentType<React.SVGProps<SVGSVGElement>>;
@@ -62,6 +63,7 @@ export const adminNavItems: NavGroup[] = [
     items: [
     { label: 'Organisations', basePath: '/admin/tenants', icon: Building2 },
     { label: 'Users', basePath: '/admin/users', icon: Users },
+    { label: 'Journal', basePath: '/admin/journal', icon: ScrollText },
     ],
   },
   {
@@ -135,6 +137,9 @@ export const tenantNavItems: NavGroup[] = [
     label: 'Organisation',
     items: [
     { label: 'Utilisateurs', basePath: '/tenant/users', icon: Users },
+    // What happened, by whom, and why. Beside the people because « qui a fait ça » is the question
+    // it answers most, and an account's lock-out is the other.
+    { label: 'Journal', basePath: '/tenant/journal', icon: ScrollText },
     { label: 'Actualités', basePath: '/tenant/posts', icon: Newspaper },
     { label: 'Paramètres', basePath: '/tenant/settings', icon: Settings },
     ],

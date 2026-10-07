@@ -58,7 +58,7 @@ export function UserSummary({ user }: { user: UserResponse }) {
       </div>
 
       <div className="flex flex-wrap gap-3">
-        <StatusPill ok={user.isActive} okLabel="Actif" koLabel="Inactif" />
+        <StatusPill ok={user.isActive} okLabel="Actif" koLabel="Désactivé" />
         <StatusPill ok={user.isEmailVerified} okLabel="Email vérifié" koLabel="Email non vérifié" />
       </div>
 

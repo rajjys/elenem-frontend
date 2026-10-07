@@ -94,6 +94,28 @@ export function useUnblockUserSignIn() {
     onSuccess: (_data, id) => {
       qc.invalidateQueries({ queryKey: userKeys.detail(id) });
       qc.invalidateQueries({ queryKey: userKeys.lists() });
+      qc.invalidateQueries({ queryKey: ['journal'] });
+    },
+  });
+}
+
+/**
+ * Deactivate or reactivate: the reversible way to shut somebody out. The API ends their sessions
+ * on the way out and records who did it.
+ */
+export async function setUserActive(id: string, isActive: boolean): Promise<void> {
+  await api.put(`/users/${id}`, { isActive });
+}
+
+export function useSetUserActive() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, isActive }: { id: string; isActive: boolean }) => setUserActive(id, isActive),
+    onSuccess: (_data, vars) => {
+      qc.invalidateQueries({ queryKey: userKeys.detail(vars.id) });
+      qc.invalidateQueries({ queryKey: userKeys.lists() });
+      // The journal and the record's activity both gain a line.
+      qc.invalidateQueries({ queryKey: ['journal'] });
     },
   });
 }

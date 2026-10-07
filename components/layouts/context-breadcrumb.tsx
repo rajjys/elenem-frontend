@@ -44,6 +44,7 @@ const PAGE_TITLES: Record<string, string> = {
   players: 'Joueurs',
   roster: 'Effectif',
   users: 'Utilisateurs',
+  journal: 'Journal',
   games: 'Matchs',
   calendar: 'Calendrier',
   generate: 'Génération',

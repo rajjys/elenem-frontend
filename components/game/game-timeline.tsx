@@ -80,7 +80,7 @@ type Side = Record<string, unknown> | null | undefined;
 const num = (v: unknown) => (typeof v === 'number' ? v : null);
 const str = (v: unknown) => (typeof v === 'string' ? v : null);
 
-interface Rendered {
+export interface Rendered {
   icon: React.ElementType;
   /** The headline, e.g. "Match déplacé". */
   title: string;
@@ -94,8 +94,14 @@ interface Rendered {
  *
  * Falls back to the raw action rather than hiding an entry it does not recognise: a trail with a
  * gap in it is worse than a trail with one ugly line, because the gap is invisible.
+ *
+ * Exported for the journal, which tells a match's story in the same words as the match's own
+ * history tab — the argument `auditTitle` makes, one level up.
  */
-function render(entry: AuditEntry, venueName: (id: string | null) => string | null): Rendered {
+export function describeGameAudit(
+  entry: Pick<AuditEntry, 'action' | 'before' | 'after'>,
+  venueName: (id: string | null) => string | null,
+): Rendered {
   const before = entry.before as Side;
   const after = entry.after as Side;
   const action = entry.action;
@@ -195,7 +201,7 @@ function render(entry: AuditEntry, venueName: (id: string | null) => string | nu
   return { icon: Pencil, title: auditTitle(action) };
 }
 
-const TONE_RING: Record<NonNullable<Rendered['tone']>, string> = {
+export const TONE_RING: Record<NonNullable<Rendered['tone']>, string> = {
   neutral: 'bg-surface-sunk text-ink-subtle ring-line',
   positive: 'bg-positive-soft text-positive ring-positive/30',
   caution: 'bg-caution-soft text-caution ring-caution/30',
@@ -223,7 +229,7 @@ export function GameTimeline({
   return (
     <ol className="relative space-y-0">
       {entries.map((entry, i) => {
-        const r = render(entry, venueName);
+        const r = describeGameAudit(entry, venueName);
         const Icon = r.icon;
         const last = i === entries.length - 1;
         return (
