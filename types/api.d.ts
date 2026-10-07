@@ -3874,6 +3874,8 @@ export interface components {
             name: string | null;
             /** @description Their page — only when named. */
             slug: string | null;
+            /** @description The photo (md.webp; sm.webp beside it), only when named. */
+            photoUrl: string | null;
             jerseyNumber: number | null;
             club: components["schemas"]["PublicClubRefDto"] | null;
             gamesPlayed: number;

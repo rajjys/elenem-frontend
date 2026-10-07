@@ -1,4 +1,4 @@
-import { mediaSrc, mediaSrcSet } from '@/lib/media';
+import { PlayerPhoto } from '@/components/league-site/player-photo';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -83,16 +83,7 @@ export default async function PlayerPage(props: Props) {
           {player.photoUrl ? (
             // The photo, round as it was framed, with the shirt number pinned to it.
             <span className="relative shrink-0">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={mediaSrc(player.photoUrl, 'sm') ?? player.photoUrl}
-                srcSet={mediaSrcSet(player.photoUrl) ?? undefined}
-                sizes="80px"
-                alt={`Photo de ${player.name}`}
-                width={80}
-                height={80}
-                className="h-16 w-16 rounded-full bg-surface-sunk object-cover sm:h-20 sm:w-20"
-              />
+              <PlayerPhoto url={player.photoUrl} size={80} />
               {player.jerseyNumber !== null && (
                 <span className="absolute -bottom-1 -right-1 rounded-lg bg-ink px-1.5 py-0.5 text-xs font-bold tabular-nums text-canvas ring-2 ring-surface">
                   {player.jerseyNumber}
@@ -112,6 +103,7 @@ export default async function PlayerPage(props: Props) {
             <p className="mt-1 flex flex-wrap items-center gap-x-2 text-sm text-ink-muted">
               {player.position && <span>{player.position}</span>}
               {player.position && player.club && <span aria-hidden>·</span>}
+              {player.club && <ClubMark club={player.club} size="xs" />}
               {player.club &&
                 (player.club.slug ? (
                   <Link href={`/teams/${player.competition.slug}/${player.club.slug}`} className="font-medium text-ink hover:underline">

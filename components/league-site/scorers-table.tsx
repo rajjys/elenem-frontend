@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import { cn } from '@/utils/cn';
 import type { PublicScorers } from '@/lib/public-site/api';
+import { ClubMark } from './club-mark';
+import { PlayerPhoto } from './player-photo';
 
 /**
  * The scorers' table (PHASE5B_LEAGUE_SITES §6, Marqueurs): rank and player pinned on the left, the
@@ -10,6 +12,8 @@ import type { PublicScorers } from '@/lib/public-site/api';
 export function ScorersTable({ board }: { board: PublicScorers }) {
   const left = 'sticky left-0 z-10 bg-surface shadow-[1px_0_0_var(--color-line)] md:shadow-none';
   const right = 'sticky right-0 z-10 bg-surface shadow-[-1px_0_0_var(--color-line)] md:shadow-none';
+  // A photo slot on every row once one player has a photo, so the names line up.
+  const withPhotos = board.rows.some((r) => r.photoUrl);
   return (
     <div className="overflow-hidden rounded-xl border border-line bg-surface">
       <div className="overflow-x-auto">
@@ -42,6 +46,13 @@ export function ScorersTable({ board }: { board: PublicScorers }) {
                 <td className={cn(left, 'border-t border-line py-2.5 pl-3 pr-3')}>
                   <span className="flex items-center gap-2">
                     <span className="w-6 shrink-0 text-center text-ink-muted">{r.rank}</span>
+                    {withPhotos &&
+                      (r.photoUrl ? (
+                        <PlayerPhoto url={r.photoUrl} size={32} />
+                      ) : (
+                        // An invisible slot: the names stay aligned, without a column of empty discs to look past.
+                        <span aria-hidden className="h-8 w-8 shrink-0" />
+                      ))}
                     <span className="min-w-0 max-w-[9.5rem] sm:max-w-[18rem]">
                       {r.slug ? (
                         <Link href={`/players/${r.slug}`} className="block truncate font-medium text-ink hover:underline">
@@ -50,7 +61,12 @@ export function ScorersTable({ board }: { board: PublicScorers }) {
                       ) : (
                         <span className="block truncate font-medium text-ink">{r.name ?? `n° ${r.jerseyNumber ?? '–'}`}</span>
                       )}
-                      <span className="block truncate text-xs text-ink-muted">{r.club?.name ?? ''}</span>
+                      {r.club && (
+                        <span className="mt-0.5 flex items-center gap-1.5 text-xs text-ink-muted">
+                          <ClubMark club={r.club} size="xs" />
+                          <span className="truncate">{r.club.name}</span>
+                        </span>
+                      )}
                     </span>
                   </span>
                 </td>

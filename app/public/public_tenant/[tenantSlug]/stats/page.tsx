@@ -8,6 +8,7 @@ import { shortCompetitionNames } from '@/lib/public-site/nav';
 import { PageTitle } from '@/components/league-site/page-title';
 import { Chips } from '@/components/league-site/chips';
 import { ScorersTable } from '@/components/league-site/scorers-table';
+import { ScorersPodium } from '@/components/league-site/scorers-podium';
 import { Pager } from '@/components/league-site/pager';
 
 /**
@@ -82,6 +83,7 @@ export default async function ScorersPage(props: Props) {
         <h2 className="mb-2 text-sm font-semibold text-ink">{board.competition.name}</h2>
         {board.rows.length > 0 ? (
           <div className="space-y-4">
+            {board.page === 1 && <ScorersPodium board={board} />}
             <ScorersTable board={board} />
             <Pager
               page={board.page}

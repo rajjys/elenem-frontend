@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import type { PublicScorers } from '@/lib/public-site/api';
 import { ClubMark } from './club-mark';
+import { PlayerPhoto } from './player-photo';
 
 /** The leading scorers, for the home page: rank, player, club, points and per-game average. */
 export function ScorersList({ board, limit = 5 }: { board: PublicScorers; limit?: number }) {
@@ -11,7 +12,7 @@ export function ScorersList({ board, limit = 5 }: { board: PublicScorers; limit?
       {rows.map((r) => (
         <li key={`${r.rank}-${r.jerseyNumber}-${r.club?.name}`} className="flex items-center gap-3 px-4 py-2.5">
           <span className="w-5 text-center text-sm tabular-nums text-ink-muted">{r.rank}</span>
-          {r.club && <ClubMark club={r.club} size="sm" />}
+          {r.photoUrl ? <PlayerPhoto url={r.photoUrl} size={28} /> : r.club && <ClubMark club={r.club} size="sm" />}
           <span className="min-w-0 flex-1">
             {r.slug ? (
               <Link href={`/players/${r.slug}`} className="block truncate font-medium text-ink hover:underline">

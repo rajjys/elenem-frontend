@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Star } from 'lucide-react';
 import type { PublicGame } from '@/lib/public-site/api';
+import { ClubMark } from './club-mark';
 
 type BoxScore = NonNullable<PublicGame['boxScore']>;
 type Side = BoxScore['home'];
@@ -18,8 +19,11 @@ export function BoxScoreTable({ side, columns, totalAbbr }: { side: Side; column
   const pinnedRight = 'sticky right-0 z-10 bg-surface shadow-[-1px_0_0_var(--color-line)] md:shadow-none';
   return (
     <section aria-label={`Feuille de marque — ${side.club.name}`}>
-      <h3 className="mb-2 flex items-baseline justify-between gap-3 px-1">
-        <span className="truncate font-semibold text-ink">{side.club.name}</span>
+      <h3 className="mb-2 flex items-center justify-between gap-3 px-1">
+        <span className="flex min-w-0 items-center gap-2">
+          <ClubMark club={side.club} size="sm" />
+          <span className="truncate font-semibold text-ink">{side.club.name}</span>
+        </span>
         <span className="font-bold tabular-nums text-ink">{side.total}</span>
       </h3>
       <div className="overflow-hidden rounded-xl border border-line bg-surface">

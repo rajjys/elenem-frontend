@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { cn } from '@/utils/cn';
-import { mediaSrc } from '@/lib/media';
+import { PlayerPhoto } from './player-photo';
 import type { PublicClub } from '@/lib/public-site/api';
 
 /**
@@ -53,18 +53,10 @@ export function RosterTable({ club }: { club: PublicClub }) {
                       <span className="w-7 shrink-0 text-ink-subtle">{p.jerseyNumber ?? '–'}</span>
                       {withPhotos &&
                         (p.photoUrl ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img
-                            src={mediaSrc(p.photoUrl, 'sm') ?? p.photoUrl}
-                            alt=""
-                            width={28}
-                            height={28}
-                            loading="lazy"
-                            decoding="async"
-                            className="mr-2.5 h-7 w-7 shrink-0 rounded-full bg-surface-sunk object-cover"
-                          />
+                          <PlayerPhoto url={p.photoUrl} size={28} className="mr-2.5" />
                         ) : (
-                          <span aria-hidden className="mr-2.5 h-7 w-7 shrink-0 rounded-full bg-surface-sunk" />
+                          // An invisible slot: the names stay aligned, without a column of empty discs to look past.
+                          <span aria-hidden className="mr-2.5 h-7 w-7 shrink-0" />
                         ))}
                       <span className="min-w-0 max-w-[9rem] sm:max-w-[16rem]">
                         {p.slug ? (

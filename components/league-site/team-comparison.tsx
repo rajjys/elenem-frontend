@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import type { PublicGame } from '@/lib/public-site/api';
+import { ClubMark } from './club-mark';
 
 type BoxScore = NonNullable<PublicGame['boxScore']>;
 type Side = BoxScore['home'];
@@ -29,7 +30,10 @@ export function TeamComparison({ box }: { box: BoxScore }) {
             const top = [...side.lines].sort((x, y) => y.total - x.total)[0];
             return (
               <div key={side.club.name} className="min-w-0 px-4 py-3">
-                <p className="truncate text-[0.7rem] font-semibold uppercase tracking-wide text-ink-subtle">{side.club.name}</p>
+                <p className="flex items-center gap-1.5 text-[0.7rem] font-semibold uppercase tracking-wide text-ink-subtle">
+                  <ClubMark club={side.club} size="xs" />
+                  <span className="truncate">{side.club.name}</span>
+                </p>
                 {top && top.total > 0 ? (
                   <>
                     <p className="mt-1 truncate text-sm font-semibold text-ink">
