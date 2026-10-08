@@ -9,6 +9,18 @@ import type { JournalEntry } from '@/services/journal';
 import { cn } from '@/utils';
 import { describeJournalEntry } from './describe-entry';
 
+/**
+ * The name the entry itself recorded, for a record the API could not look up any more (a season
+ * deleted outright): what it was called when it went.
+ */
+function recordedName(e: JournalEntry): { label: string; context: string | null } | null {
+  const side = { ...(e.after ?? {}), ...(e.before ?? {}) } as Record<string, unknown>;
+  const s = (v: unknown) => (typeof v === 'string' && v ? v : null);
+  const label =
+    s(side.name) ?? s(side.title) ?? ([s(side.firstName), s(side.lastName)].filter(Boolean).join(' ') || null);
+  return label ? { label, context: null } : null;
+}
+
 /** « Aujourd’hui », « Hier », « Lundi 5 octobre » — the year only when it is not this one. */
 function dayLabel(d: Date): string {
   if (isToday(d)) return 'Aujourd’hui';
@@ -57,7 +69,11 @@ export function JournalList({
   }
 
   const subjectHref = (e: JournalEntry): string | null => {
+    // Nothing to open once it is gone.
+    if (e.action.endsWith('_DELETED')) return null;
     if (e.entityType === 'GAME') return surfaceLink(`/game/${e.entityId}`);
+    if (e.entityType === 'PLAYER') return surfaceLink(`/player/${e.entityId}`);
+    if (e.entityType === 'POST') return surfaceLink(`/post/${e.entityId}`);
     if (e.entityType === 'USER' && usersBasePath && e.entityId !== 'ANONYMOUS') {
       return `${usersBasePath}/${e.entityId}`;
     }
@@ -74,6 +90,7 @@ export function JournalList({
               const r = describeJournalEntry(e, venueName);
               const Icon = r.icon;
               const href = subjectHref(e);
+              const subject = e.subject ?? recordedName(e);
               // Signing in, resetting one's own password: the person is the subject and the actor,
               // and naming them twice reads as two people.
               const self = e.entityType === 'USER' && e.by?.id === e.entityId;
@@ -96,23 +113,24 @@ export function JournalList({
                   <div className="min-w-0 flex-1">
                     <p className="text-sm text-ink">
                       <span className="font-medium first-letter:uppercase">{r.title}</span>
-                      {e.subject && !(e.entityType === 'USER' && e.entityId === ownerId) && (
+                      {subject && !(e.entityType === 'USER' && e.entityId === ownerId) && (
                         <>
                           <span className="text-ink-subtle"> · </span>
                           {href ? (
                             <Link href={href} className="text-accent-text hover:underline hover:underline-offset-2">
-                              {e.subject.label}
+                              {subject.label}
                             </Link>
                           ) : (
-                            <span>{e.subject.label}</span>
+                            <span>{subject.label}</span>
                           )}
-                          {e.subject.context && (
-                            <span className="text-ink-subtle"> · {e.subject.context}</span>
+                          {subject.context && (
+                            <span className="text-ink-subtle"> · {subject.context}</span>
                           )}
                         </>
                       )}
                     </p>
-                    {r.detail && <p className="mt-0.5 text-sm text-ink-muted">{r.detail}</p>}
+                    {/* One line per changed field: « Nom : A → B ». */}
+                    {r.detail && <p className="mt-0.5 whitespace-pre-line text-sm text-ink-muted">{r.detail}</p>}
                     {e.reason && (
                       <p className="mt-1 border-l-2 border-line pl-2.5 text-sm italic text-ink-muted">
                         {e.reason}

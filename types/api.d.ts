@@ -299,6 +299,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/users/{id}/send-reset-code": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** E-mail a person a password-reset code on their behalf (an organisation's administrator, for their own people) */
+        post: operations["UsersController_sendResetCode"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/users/{id}/promote": {
         parameters: {
             query?: never;
@@ -5625,6 +5642,34 @@ export interface operations {
             };
         };
     };
+    UsersController_sendResetCode: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description User ID */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Code sent. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description The e-mail could not be sent. */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     UsersController_promoteUser: {
         parameters: {
             query?: never;
@@ -9892,7 +9937,7 @@ export interface operations {
                 pageSize?: number;
                 /** @description What this person did, and what was done to their account. */
                 userId?: string;
-                category?: "CALENDAR" | "SEASONS" | "PLAYERS" | "ACCOUNTS";
+                category?: "CALENDAR" | "SEASONS" | "CLUBS" | "PLAYERS" | "NEWS" | "ORGANISATION" | "ACCOUNTS";
                 includeSignIns?: boolean;
                 /** @description System administrators only: one organisation. */
                 tenantId?: string;

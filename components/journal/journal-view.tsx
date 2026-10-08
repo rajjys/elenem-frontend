@@ -8,19 +8,19 @@ import { useJournal, type JournalCategory } from '@/services/journal';
 import { useUser } from '@/services/users';
 import { useTenants } from '@/services/tenants';
 import { useIsSystemAdmin } from '@/hooks';
+import { de } from '@/utils/french';
 import { JournalList } from './journal-list';
 
 const PAGE_SIZE = 30;
 
-/** « de Jean », « d’Alphonse » — French elides before a vowel or a mute h. */
-function ofName(name: string): string {
-  return /^[aeiouyhàâäéèêëîïôöùûü]/i.test(name) ? `d’${name}` : `de ${name}`;
-}
 
 const CATEGORY_OPTIONS: { value: JournalCategory; label: string }[] = [
   { value: 'CALENDAR', label: 'Matchs et calendrier' },
-  { value: 'SEASONS', label: 'Saisons et classement' },
+  { value: 'SEASONS', label: 'Compétitions et saisons' },
+  { value: 'CLUBS', label: 'Clubs et salles' },
   { value: 'PLAYERS', label: 'Joueurs' },
+  { value: 'NEWS', label: 'Actualités' },
+  { value: 'ORGANISATION', label: 'Organisation' },
   { value: 'ACCOUNTS', label: 'Comptes' },
 ];
 
@@ -77,7 +77,7 @@ export function JournalView({ usersBasePath }: { usersBasePath: string }) {
         <div className="space-y-3">
           {userId && (
             <div className="inline-flex items-center gap-2 rounded-full border border-accent-line bg-accent-soft py-1 pl-3 pr-1 text-sm text-accent-text">
-              {personName ? `Activité ${ofName(personName)}` : 'Activité d’une personne'}
+              {personName ? `Activité ${de(personName)}` : 'Activité d’une personne'}
               <button
                 type="button"
                 onClick={() => router.replace(pathname)}

@@ -120,6 +120,20 @@ export function useSetUserActive() {
   });
 }
 
+/**
+ * « Envoyer un code de réinitialisation » from the users screen. Its own route rather than the
+ * public « Mot de passe oublié »: this one says whether the e-mail actually left, and puts the
+ * sender's name in the journal.
+ */
+export function useSendPasswordResetCode() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) =>
+      api.post(`/users/${id}/send-reset-code`).then((r) => r.data as { message: string }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['journal'] }),
+  });
+}
+
 export function useSetUserEmailVerified() {
   const qc = useQueryClient();
   return useMutation({

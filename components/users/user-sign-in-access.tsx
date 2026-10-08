@@ -4,8 +4,12 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 import { KeyRound, Lock, LockOpen, UserCheck, UserX } from 'lucide-react';
 import { Button, ConfirmDialog } from '@/components/ui';
-import { useSetUserActive, useUnblockUserSignIn, type UserResponse } from '@/services/users';
-import { useForgotPassword } from '@/services/auth';
+import {
+  useSendPasswordResetCode,
+  useSetUserActive,
+  useUnblockUserSignIn,
+  type UserResponse,
+} from '@/services/users';
 import { useCurrentUser, useHasRole } from '@/hooks';
 import { Roles } from '@/schemas';
 import { toastApiError } from '@/utils';
@@ -60,14 +64,15 @@ export function useCanManageAccess(user: Pick<UserResponse, 'tenantId'>): boolea
 export function UserSignInAccess({ user }: { user: UserResponse }) {
   const unblock = useUnblockUserSignIn();
   const setActive = useSetUserActive();
-  const sendCode = useForgotPassword();
+  const sendCode = useSendPasswordResetCode();
   const [confirmCode, setConfirmCode] = useState(false);
 
   const lock = currentSignInLock(user.signInLock);
   const canUnblock = useCanManageAccess(user);
   // The API sends nothing to a deactivated account, so offering it would be a button that lies;
-  // and a new password does not open an administrator's lock, so it would be one there too.
-  const canSendCode = user.isActive && lock?.reason !== 'ADMIN';
+  // and a new password does not open an administrator's lock, so it would be one there too. Who
+  // may send one is who may decide access (the API's rule).
+  const canSendCode = canUnblock && user.isActive && lock?.reason !== 'ADMIN';
 
   const onUnblock = () =>
     unblock.mutate(user.id, {
@@ -76,7 +81,7 @@ export function UserSignInAccess({ user }: { user: UserResponse }) {
     });
 
   const onSendCode = () =>
-    sendCode.mutate(user.email, {
+    sendCode.mutate(user.id, {
       onSuccess: () => toast.success(`Code envoyé à ${user.email}.`),
       onError: (e) => toastApiError(e, 'Impossible d’envoyer le code.'),
     });

@@ -32,7 +32,8 @@ const JournalPageSchema = z.object({
   venues: z.record(z.string(), z.string()),
 });
 
-export type JournalCategory = 'CALENDAR' | 'SEASONS' | 'PLAYERS' | 'ACCOUNTS';
+export type JournalCategory =
+  | 'CALENDAR' | 'SEASONS' | 'CLUBS' | 'PLAYERS' | 'NEWS' | 'ORGANISATION' | 'ACCOUNTS';
 
 export interface JournalParams {
   page?: number;
