@@ -506,6 +506,57 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/access/invite": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Invite a person by e-mail (or with a password), as a member or to run the organisation, a competition or a club */
+        post: operations["AccessController_invite"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/access/grant": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Give an existing person a role: the organisation, a competition or a club to run */
+        post: operations["AccessController_grant"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/access/revoke": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Take a role away, and with it what it ran */
+        post: operations["AccessController_revoke"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/teams": {
         parameters: {
             query?: never;
@@ -2872,6 +2923,52 @@ export interface components {
              * @example Doe
              */
             lastName?: string;
+        };
+        InviteDto: {
+            email: string;
+            /** @description Required when the address has no account yet. */
+            firstName?: string;
+            /** @description Required when the address has no account yet. */
+            lastName?: string;
+            /**
+             * @description MEMBER runs nothing; the others run what leagueId / teamId name.
+             * @enum {string}
+             */
+            role: "MEMBER" | "TENANT_ADMIN" | "LEAGUE_ADMIN" | "TEAM_ADMIN";
+            leagueId?: string;
+            teamId?: string;
+            password?: string;
+            /** @description System administrators only: the organisation, when no competition or club names it. */
+            tenantId?: string;
+        };
+        AccessPersonDto: {
+            id: string;
+            email: string;
+            firstName: string | null;
+            lastName: string | null;
+            roles: string[];
+            tenantId: string | null;
+            managingLeagueId: string | null;
+            managingTeamId: string | null;
+        };
+        InviteResultDto: {
+            person: components["schemas"]["AccessPersonDto"];
+            created: boolean;
+            invited: boolean;
+        };
+        GrantAccessDto: {
+            userId: string;
+            /** @enum {string} */
+            role: "TENANT_ADMIN" | "LEAGUE_ADMIN" | "TEAM_ADMIN";
+            /** @description Required for LEAGUE_ADMIN: the competition to run. */
+            leagueId?: string;
+            /** @description Required for TEAM_ADMIN: the club to run. */
+            teamId?: string;
+        };
+        RevokeAccessDto: {
+            userId: string;
+            /** @enum {string} */
+            role: "TENANT_ADMIN" | "LEAGUE_ADMIN" | "TEAM_ADMIN";
         };
         BasicVenueDto: {
             id: string;
@@ -6254,6 +6351,82 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    AccessController_invite: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["InviteDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InviteResultDto"];
+                };
+            };
+            /** @description code EMAIL_NOT_VERIFIED: the inviter's own address must be verified to send an invitation. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AccessController_grant: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GrantAccessDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AccessPersonDto"];
+                };
+            };
+        };
+    };
+    AccessController_revoke: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RevokeAccessDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AccessPersonDto"];
+                };
             };
         };
     };

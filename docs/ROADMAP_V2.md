@@ -667,3 +667,136 @@ API, outside research) found, among much else:
 The recommended order interleaves the two plans (`PHASE5B_LEAGUE_SITES.md` §12): leak, `.com`
 clean-up, landing, `.com` SEO, league site, then the landing's league-site proof and the
 end-to-end sign-up on production.
+
+---
+
+## 15. Who runs what: managing the people behind a competition (2026-10-08)
+
+### Done first, on 2026-10-07
+
+An organiser of the Goma league was locked out, and nothing on the users screens could say why.
+That day shipped, in order:
+
+- **The wrong-password lock**, rewritten (backend `f4747d3`): it forgives once it runs out, it no
+  longer signs people out of their other devices, and sign-in refusals are in French.
+- **Access on the user's record** (frontend `dcadef9`, `387ef52`): why a person cannot sign in,
+  « Débloquer », « Envoyer un code de réinitialisation », and « Désactiver / Réactiver » instead of
+  deleting.
+- **The journal** (`/tenant/journal`, `/admin/journal`, and « Activité » on each record): every
+  change an organiser can make, as a sentence, with who made it and why (backend `dbbcd12`,
+  `8de32c8`; frontend `387ef52`, `85b3fda`).
+
+### What is missing
+
+From the organisation's own screens, an organisation administrator **cannot**:
+
+- **add another administrator**, by creating the account or by invitation;
+- **put someone in charge** of a competition or of a club;
+- **take those rights away**.
+
+`/tenant/users` has no « Inviter » at all. Only a system administrator can create an account
+(`/admin/users/create`), and that form offers only roles that run nothing — its own comment says the
+administrator roles « are handled by their dedicated invite/promote flows ». **Those flows have
+backend routes and no screen.** Nothing in the frontend calls them.
+
+### What the API already does
+
+| To… | Route | Who may | Journal |
+|---|---|---|---|
+| Create or invite a person | `POST /users` (no password: an e-mailed set-password code, 3 days) | system admin; organisation admin; competition admin, for roles below their own | « Compte créé » / « Invitation envoyée » |
+| Make someone a competition's administrator | `POST /leagues/:id/admins/invite` (by e-mail; creates the account if new), `POST /leagues/:id/admins/assign` (an existing person) | system admin, organisation admin | « Nomination » |
+| Remove them | `DELETE /leagues/:id/admins/:userId` (never the competition's owner, never yourself) | same | « Fin de fonction » |
+| Make someone a club's administrator | `POST /teams/:id/admins` (**existing people only**) | system admin, organisation admin, competition admin | « Nomination » |
+| Remove them | `DELETE /teams/:id/admins/:userId` | same | « Fin de fonction » |
+| Change roles directly | `PUT /users/:id`, `PUT /users/:id/promote` | anyone who may edit the person | « Rôle changé » |
+| Make someone an organisation administrator | — | **system admin only** (`canAssignRole`) | — |
+
+So the work is mostly screens. But mapping it turned up rules that are wrong today, and a screen
+built on top of them would make them reachable.
+
+### Found while mapping — to fix before the screens
+
+1. **A competition can have only one administrator, and the database enforces it.**
+   `User.managingLeagueId` is `@unique`, so two people cannot manage the same competition — the
+   comment beside it says it means the opposite. A league with a secretary and a president can
+   name one of them. Lifting it is a migration, and Railway does not run migrations: it is a manual
+   `prisma migrate deploy` against Neon (`INFRASTRUCTURE.md`).
+2. **One competition and one club per person.** `managingLeagueId` and `managingTeamId` are single
+   columns. LIBAGO's secretary, who keeps three competitions, has to be an organisation
+   administrator instead. Clubs have a `TeamMembership` table; competitions have none.
+3. **Removing a role is not checked.** `checkUserUpdatePermissions` checks every role being
+   *granted* and none being *taken away*: through the API, an organisation administrator can
+   already strip another organisation administrator — the organisation's owner included — by
+   sending `roles: ['GENERAL_USER']`. No screen does it today. « Retirer les droits » would.
+4. **A role removed through `PUT /users/:id` leaves its scope behind.** `managingLeagueId` and
+   `managingTeamId` stay set, so the role and what it runs can disagree. The dedicated routes keep
+   them together; the screens must use only those.
+5. **A club administrator cannot be invited**, only chosen among existing accounts — while a
+   competition's can. A club's new treasurer has no account yet.
+6. **Two rules for the same e-mail.** `POST /users` refuses an invitation from an administrator
+   whose own address is unverified; `POST /leagues/:id/admins/invite` does not check. Most
+   organisers sign up and never verify (it does not affect signing in), so the first « Inviter » an
+   organiser clicks would come back 403 with no explanation.
+
+### Decisions for the owner
+
+**All four taken as recommended (the owner, 2026-10-11).**
+
+- **D1 — May an organisation administrator make another one?** Recommended: **yes**, within their
+  own organisation (a federation has a president and a secretary). With two guards: the
+  organisation's owner (`Tenant.ownerId`) can be demoted by nobody but a system administrator, and
+  the last organisation administrator cannot be removed.
+- **D2 — Several administrators per competition?** Recommended: **yes** — drop the `@unique`
+  (item 1). A migration run by hand on Neon.
+- **D3 — One person, several competitions?** Recommended: **not now.** Organisation administrator
+  covers it. The real fix is a `LeagueMembership` table like the clubs' one, and nothing asks for
+  it yet.
+- **D4 — Verified address to invite?** Recommended: **keep it, everywhere** — mail sent in our
+  name, to an address somebody typed — but say it on screen with « Vérifier mon adresse » (the
+  code is one click away) instead of a refusal.
+
+### The sprints
+
+**U1 — The rules (backend).** One place that grants and revokes each administrator role —
+organisation (per D1), competition, club — keeping role and scope together, refusing what items 3
+and 4 allow today, and writing « Nomination » / « Fin de fonction » for every one. `PUT /users/:id`
+stops accepting administrator roles: it edits a person, the access routes decide what they run.
+Club administrators can be invited by e-mail (item 5). One verified-address rule (D4). Per D2, the
+migration that lets a competition have several administrators.
+*Verify:* a test per rule (owner protected, last admin protected, no demotion from below, scope
+cleared on revoke), then every route through the real API on a throwaway database.
+
+*Built 2026-10-11:* `src/access` — `POST /access/invite`, `/access/grant`, `/access/revoke` — with
+the competition and club administrator routes rerouted through it, `POST /users` and
+`PUT /users/:id` refusing administrator roles and scopes, and migration
+`20261011090000_league_admins_several` (applied to dev; production waits for its manual
+`migrate deploy`). One more hole of item 3's kind turned up and is closed: an organisation
+administrator could change the organisation's `ownerId` (`PUT /tenants/:id`), which strips the
+previous owner of `TENANT_ADMIN`, and the same for a competition (`PUT /leagues/:id`). Changing an
+owner is now a system administrator's action; sending the current owner back, as the settings form
+does, still works. Checked: 19 rule tests, and 22 scenarios through the real API on a throwaway
+database. Still English: the generic « Insufficient permissions. » of the roles guard.
+
+**U2 — « Inviter quelqu'un » on the organisation's users screen.** One dialog: name, e-mail, and
+what they will do — « Administrateur de l'organisation », « Administrateur d'une compétition » (pick
+it), « Responsable d'un club » (pick it), or « Membre ». Invitation by e-mail by default, a password
+when the person is standing next to you. An unverified inviter is told why and offered the code.
+*Verify:* as LIBAGO's administrator, invite one person of each kind; each accepts from the e-mail
+link and lands on the right screen; the journal shows each invitation.
+
+**U3 — Rights on the record, and on the competition and the club.** On a person's record,
+« Rôles et responsabilités »: what they run, by name (« Administrateur de compétition — D1
+Messieurs »), « Confier une compétition / un club », and « Retirer », confirmed. In a competition's
+settings and on a club, an « Administrateurs » panel: who, add an existing person, invite, remove.
+*Verify:* grant and revoke from both places; the person's next request sees the change; the owner
+and the last organisation administrator cannot be removed; « Fin de fonction » in the journal.
+
+### Not in this plan
+
+Editing what each role may do (the roles are fixed and described, not configured), handing an
+organisation's ownership to someone else, and several competitions per person (D3).
+
+### Also open, found during the journal work
+
+`POST /posts` without a `slug` answers 500 (the field is optional in the DTO and required in the
+database). The app's form always sends one, so only a direct API caller meets it.

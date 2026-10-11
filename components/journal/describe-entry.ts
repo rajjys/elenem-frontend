@@ -104,18 +104,20 @@ export function describeJournalEntry(
   }
 
   // « Nomination », « Fin de fonction »: the role is named, the person's gender is not assumed.
-  if (action === 'LEAGUE_ADMIN_ASSIGNED' || action === 'TEAM_ADMIN_ASSIGNED') {
-    const person = str(after.person);
-    const role = roleLabel(action === 'LEAGUE_ADMIN_ASSIGNED' ? 'LEAGUE_ADMIN' : 'TEAM_ADMIN');
-    return {
-      icon: UserPlus,
-      title: 'Nomination',
-      detail: person ? `${role} : ${person}${after.invited ? ' (invitation envoyée)' : ''}.` : undefined,
-    };
-  }
-  if (action === 'LEAGUE_ADMIN_REMOVED' || action === 'TEAM_ADMIN_REMOVED') {
+  // `<ROLE>_ASSIGNED` / `<ROLE>_REMOVED`, for the organisation, a competition or a club.
+  const appointment = action.match(/^(TENANT_ADMIN|LEAGUE_ADMIN|TEAM_ADMIN)_(ASSIGNED|REMOVED)$/);
+  if (appointment) {
+    const [, adminRole, change] = appointment;
+    const role = roleLabel(adminRole);
+    if (change === 'ASSIGNED') {
+      const person = str(after.person);
+      return {
+        icon: UserPlus,
+        title: 'Nomination',
+        detail: person ? `${role} : ${person}${after.invited ? ' (invitation envoyée)' : ''}.` : undefined,
+      };
+    }
     const person = str((entry.before as Record<string, unknown> | null)?.person);
-    const role = roleLabel(action === 'LEAGUE_ADMIN_REMOVED' ? 'LEAGUE_ADMIN' : 'TEAM_ADMIN');
     return { icon: UserX, title: 'Fin de fonction', detail: person ? `${role} : ${person}.` : undefined };
   }
 
