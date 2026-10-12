@@ -828,4 +828,4 @@ game status commands and the game-date lists are not scoped to the caller's orga
 
 Decisions Q1–Q7 taken as recommended on 2026-10-12 (Q2: keep the results of a club that withdraws).
 Sprints R0–R4 (§8); R0 also refuses tied basketball scores and fixes the forfeit box. R0 built and verified
-2026-10-12 (not committed); R1 next.
+2026-10-12; R1 (the rules in one place) built the same day; R2 (one delete dialog) next.

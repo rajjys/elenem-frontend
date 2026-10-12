@@ -98,6 +98,7 @@ export function GameActionDialog({
   matchup,
   onClose,
   onDeleted,
+  played = false,
 }: {
   /** `null` closes it. */
   action: GameAction | null;
@@ -107,6 +108,11 @@ export function GameActionDialog({
   onClose: () => void;
   /** A deleted fixture has no page to return to. */
   onDeleted?: () => void;
+  /**
+   * The match has been played. Deleting it takes its result out of the table, so the API asks for
+   * a reason (RESOURCE_DELETION.md, the owner's Q3) and the dialog says what changes.
+   */
+  played?: boolean;
 }) {
   const [reason, setReason] = useState('');
 
@@ -119,7 +125,15 @@ export function GameActionDialog({
   }, [action]);
 
   if (!action) return null;
-  const spec = SPECS[action];
+  const spec =
+    action === 'delete' && played
+      ? {
+          ...SPECS.delete,
+          consequence:
+            'Son résultat quitte le classement, qui est recalculé, et sa feuille de match sort des statistiques. À n’utiliser que pour un résultat saisi sur le mauvais match ou en double — un score faux se corrige.',
+          reasonRequired: true,
+        }
+      : SPECS[action];
   const busy = stateMut.isPending || deleteMut.isPending || invertMut.isPending;
   const ready = !spec.reasonRequired || reason.trim().length > 0;
 

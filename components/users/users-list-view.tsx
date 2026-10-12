@@ -19,6 +19,7 @@ import { meaningfulRoles, roleLabel, ROLE_LABELS } from '@/utils/role-labels';
 import { cn, formatDateFr, toastApiError } from '@/utils';
 import { UserQuickView } from './user-quick-view';
 import { InviteDialog } from './invite-dialog';
+import { useIsSystemAdmin } from '@/hooks';
 import { currentSignInLock, lockUntilLabel } from './user-sign-in-access';
 
 const PAGE_SIZE = 20;
@@ -68,8 +69,11 @@ export function UsersListView({
   const [debounced] = useDebounce(search, 400);
   const [role, setRole] = useState('');
   const [viewing, setViewing] = useState<string | null>(null);
-  const [toDelete, setToDelete] = useState<{ id: string; name: string } | null>(null);
+  // `invitation`: an invitation never accepted is cancelled, not « deleted » — the one deletion an
+  // organisation makes; deleting an account in use is the platform's (RESOURCE_DELETION.md, Q4).
+  const [toDelete, setToDelete] = useState<{ id: string; name: string; invitation: boolean } | null>(null);
   const [inviting, setInviting] = useState(false);
+  const isSystemAdmin = useIsSystemAdmin();
 
   const filters: UserFilterParams = useMemo(
     () => ({
@@ -180,17 +184,21 @@ export function UsersListView({
           <ConfirmDialog
             open={!!toDelete}
             onOpenChange={(o) => !o && setToDelete(null)}
-            title="Supprimer ce compte ?"
+            title={toDelete?.invitation ? 'Annuler l’invitation ?' : 'Supprimer ce compte ?'}
             description={
-              toDelete
-                ? `${toDelete.name} perdra l’accès à DXScores. Ce qui a été saisi avec ce compte — scores, feuilles de match — reste enregistré. Pour couper l’accès de façon réversible, désactivez plutôt le compte depuis sa fiche.`
-                : undefined
+              !toDelete
+                ? undefined
+                : toDelete.invitation
+                  ? `Le lien et le code envoyés à ${toDelete.name} ne marcheront plus. L’adresse pourra être invitée de nouveau.`
+                  : `${toDelete.name} perdra l’accès à DXScores. Ce qui a été saisi avec ce compte — scores, feuilles de match — reste enregistré. Pour couper l’accès de façon réversible, désactivez plutôt le compte depuis sa fiche.`
             }
-            confirmLabel="Supprimer"
+            confirmLabel={toDelete?.invitation ? 'Annuler l’invitation' : 'Supprimer'}
+            cancelLabel={toDelete?.invitation ? 'Garder' : 'Annuler'}
             onConfirm={() => {
               if (!toDelete) return;
               del.mutate(toDelete.id, {
-                onSuccess: () => toast.success(`${toDelete.name} supprimé.`),
+                onSuccess: () =>
+                  toast.success(toDelete.invitation ? 'Invitation annulée.' : `${toDelete.name} supprimé.`),
                 onError: (e) => toastApiError(e),
               });
               setToDelete(null);
@@ -213,6 +221,7 @@ export function UsersListView({
             <tbody className="divide-y divide-line">
               {users.map((u) => {
                 const name = `${u.firstName} ${u.lastName}`.trim() || u.username;
+                const pendingInvite = !!u.invitation && u.invitation.status !== 'ACCEPTED';
                 const lock = currentSignInLock(u.signInLock);
                 return (
                   <tr key={u.id} className="hover:bg-surface-sunk">
@@ -284,13 +293,16 @@ export function UsersListView({
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex justify-end">
-                        <button
-                          onClick={() => setToDelete({ id: u.id, name })}
-                          className="rounded p-1.5 text-ink-subtle hover:bg-negative-soft hover:text-negative"
-                          aria-label={`Supprimer ${name}`}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
+                        {(pendingInvite || isSystemAdmin) && (
+                          <button
+                            onClick={() => setToDelete({ id: u.id, name, invitation: pendingInvite })}
+                            className="rounded p-1.5 text-ink-subtle hover:bg-negative-soft hover:text-negative"
+                            aria-label={pendingInvite ? `Annuler l’invitation de ${name}` : `Supprimer ${name}`}
+                            title={pendingInvite ? 'Annuler l’invitation' : 'Supprimer'}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>

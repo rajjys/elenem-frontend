@@ -72,7 +72,7 @@ is not:
 
 | Resource | « Supprimer » allowed when… | What goes with it | Otherwise offer |
 |---|---|---|---|
-| Organisation | System administrator only, and it holds no competition (archived ones count) | Every account deactivated and its roles revoked, logos deleted, business profile's money and ID fields erased, site answers 404 | — (contact DXScores) |
+| Organisation | System administrator only, and no game was ever played in it | Its competitions, through the same cascade as deleting one; its venues and posts; every role held in it — its people keep their own accounts, detached (as its administrators already were), so they can start again. The site answers 404; the address stays reserved (Q6). Logos and the business profile's money and ID fields: R4 | Archive its competitions; or ask DXScores |
 | Competition | No game in it was ever played | Its seasons, phases, unplayed games, planned fixtures, and its clubs and players (none has a history) | **Archiver** (exists: « Compétition active ») |
 | Season | No game in it was ever played | Its phases, pools, unplayed games and planned fixtures | **Annuler la saison** (exists) |
 | Phase | No game in it, deleted ones included, and not the last phase | Its pools, planned fixtures and table rows | Move the games first |
@@ -433,6 +433,29 @@ reason (Q3). Club and player reactivation (the one-way bug). Every refusal in Fr
 journaled as one sentence (« Club supprimé, avec 3 matchs à venir »).
 *Verify:* a rule test per resource; then each delete through the real API on a throwaway database
 as each role, with the rows checked afterwards.
+
+*Built 2026-10-12, not yet deployed.* Backend: `src/common/deletion/deletion-report.ts` (the report,
+`assertDeletable`, `PLAYED_STATUSES`) and an `assessDeletion` + `GET …/deletion` on tenants, leagues,
+seasons, stages, teams, players, games, users and posts, each DELETE taking `?reason=`. As decided:
+a club or player that has played is refused with « archive » offered (Q1), and archiving both is now
+reversible (their lookups no longer require `isActive`); a club that never played takes its unplayed
+games, its pools, its administrators' rights and its posts with it, its players stay in the
+competition, and it leaves every table (`StandingsService.dropTeamFromTables`); a competition or
+organisation never played goes with everything in it (`LeaguesService.cascadeDelete`, players'
+identity numbers erased so they can be registered again); a season never played takes its phases and
+fixtures, and rows left by deleted games no longer block it; a played game needs a reason (Q3) and
+says what changes, knockout included; accounts are the platform's to delete (Q4) — never your own,
+an owner's or the last organisation administrator's — and an organisation cancels an invitation never
+accepted through the same route; a deleted account's player stays on the roster, detached.
+`AccessService.endDutiesOver` ends administrators' rights inside the delete and journals
+« Fin de fonction » with why; every deletion journals its reason and `withIt`, the list of what went
+with it. Frontend (so nothing breaks before R2): a played match asks for the reason on its page and in
+the calendar; the users screens show « Supprimer » to the platform only and « Annuler l'invitation »
+on invitations never accepted. Checked: 395 tests (a rule test per resource); 41 scenarios through the
+real API on a throwaway database, rows checked after each (a played club refused then archived and
+reactivated, a club that never played deleted with its game, player and administrator handled, a
+competition deleted with everything in it, IDs re-registrable, the invitation cancelled and the
+address free again); the two screens in a browser.
 
 **R2 — One delete dialog (frontend).** A `DeleteDialog` that loads the assessment when opened: when
 blocked, says why and shows the alternative as the main button (« Archiver le club »); when allowed,

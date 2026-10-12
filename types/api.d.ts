@@ -292,7 +292,7 @@ export interface paths {
         /** Update a user by ID (Admin access with scoping) */
         put: operations["UsersController_updateUser"];
         post?: never;
-        /** Soft-delete or deactivate a user by ID (admin-scoped) */
+        /** Delete an account (system admins), or cancel an invitation never accepted (organisation admins) */
         delete: operations["UsersController_deleteUser"];
         options?: never;
         head?: never;
@@ -326,6 +326,23 @@ export interface paths {
         get?: never;
         /** Promote/Demote a user by ID (admin-scoped) */
         put: operations["UsersController_promoteUser"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/users/{id}/deletion": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** What deleting this account would do — or why it is refused (deactivate instead) */
+        get: operations["UsersController_userDeletion"];
+        put?: never;
         post?: never;
         delete?: never;
         options?: never;
@@ -396,8 +413,25 @@ export interface paths {
         /** Update league by ID (scope checked) */
         put: operations["LeaguesController_updateLeague"];
         post?: never;
-        /** Delete (soft-delete) league by ID (scope checked) */
+        /** Delete a competition in which nothing was played, with everything in it (see GET :leagueId/deletion) */
         delete: operations["LeaguesController_deleteLeague"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/leagues/{leagueId}/deletion": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** What deleting this competition would do — or why it is refused, and what to do instead */
+        get: operations["LeaguesController_leagueDeletion"];
+        put?: never;
+        post?: never;
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -604,8 +638,25 @@ export interface paths {
         /** Update team by ID (scope checked, fields depend on role) */
         put: operations["TeamsController_updateTeam"];
         post?: never;
-        /** Delete (soft-delete) team by ID (scope checked) */
+        /** Delete a club that never played, with what was built on it (see GET :teamId/deletion) */
         delete: operations["TeamsController_deleteTeam"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/teams/{teamId}/deletion": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** What deleting this club would do — or why it is refused, and what to do instead */
+        get: operations["TeamsController_teamDeletion"];
+        put?: never;
+        post?: never;
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -640,507 +691,6 @@ export interface paths {
         post?: never;
         /** Unassign a team admin from a team (scope checked) */
         delete: operations["TeamsController_unassignTeamAdmin"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/players/stats/leaderboard": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Players ranked over a season or one of its phases */
-        get: operations["PlayersController_leaderboard"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/players": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List players (scope depends on role, with filters & pagination) */
-        get: operations["PlayersController_listPlayers"];
-        put?: never;
-        /** Create a new player record (scope checked) */
-        post: operations["PlayersController_createPlayer"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/players/{playerId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get player details by ID (scope checked) */
-        get: operations["PlayersController_getPlayerById"];
-        /** Update player by ID (scope checked, fields depend on role) */
-        put: operations["PlayersController_updatePlayer"];
-        post?: never;
-        /** Delete (soft-delete) player by ID (scope checked) */
-        delete: operations["PlayersController_deletePlayer"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/players/{playerId}/stats": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** One player’s season line and the games behind it */
-        get: operations["PlayersController_getPlayerStats"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/players/assign-to-team": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Assign a player to a team or unassign them (scope checked) */
-        post: operations["PlayersController_assignPlayerToTeam"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/players/me/profile": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        /** [Player] Update own player profile */
-        put: operations["PlayersController_updateMyPlayerProfile"];
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/seasons/{seasonId}/stages": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** The phases of a season, in order, with what each holds */
-        get: operations["StagesController_list"];
-        put?: never;
-        /** Add a phase to the end of a season */
-        post: operations["StagesController_create"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/seasons/{seasonId}/stages/template": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Compose a season from a template */
-        post: operations["StagesController_applyTemplate"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/seasons/{seasonId}/stages/order": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        /** Put a season’s phases in a new order */
-        put: operations["StagesController_reorder"];
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/stages/{stageId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        /** Rename a phase, or change its format, legs or qualification */
-        put: operations["StagesController_update"];
-        post?: never;
-        /** Remove a phase */
-        delete: operations["StagesController_remove"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/stage-groups/{groupId}/members": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        /** Set which clubs are in a pool */
-        put: operations["StagesController_setMembers"];
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/seasons": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List seasons (scope depends on role, with filters & pagination) */
-        get: operations["SeasonsController_listSeasons"];
-        put?: never;
-        /** Create a new season (scope checked) */
-        post: operations["SeasonsController_createSeason"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/seasons/{seasonId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get season details by ID (scope checked) */
-        get: operations["SeasonsController_getSeasonById"];
-        /** Update season by ID (scope checked) */
-        put: operations["SeasonsController_updateSeason"];
-        post?: never;
-        /** Delete (soft-delete) season by ID (scope checked) */
-        delete: operations["SeasonsController_deleteSeason"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/seasons/{seasonId}/transitions": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Move a season to another state (open, close, cancel, reopen) */
-        post: operations["SeasonsController_transitionSeason"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/dashboard/organiser": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Everything an organiser owes their competitions right now */
-        get: operations["DashboardController_organiser"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/dashboard/platform": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** What exists on the platform, and what happened this week */
-        get: operations["DashboardController_platform"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/dashboard/club": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Where a club stands, when it plays next, and how the last ones went */
-        get: operations["DashboardController_club"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/public/sites/{slug}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** The site frame: organisation, competitions, what sections exist. 404 when not served. */
-        get: operations["PublicSiteController_frame"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/public/sites/{slug}/standings": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** A competition’s table — the same one the admin screen and the signed export show. */
-        get: operations["PublicSiteController_standings"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/public/sites/{slug}/games": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Games between two local dates (at most 42 days), this week by default. */
-        get: operations["PublicSiteController_games"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/public/sites/{slug}/games/{c}/{game}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** One game, with its scoresheet when there is one. */
-        get: operations["PublicSiteController_game"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/public/sites/{slug}/teams": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Clubs with a page, by competition. */
-        get: operations["PublicSiteController_clubs"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/public/sites/{slug}/teams/{c}/{team}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** A club: its table row, its season’s games, and its roster when the competition publishes one. */
-        get: operations["PublicSiteController_club"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/public/sites/{slug}/scorers": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** The scorers’ table. 404 for a competition that does not publish its players. */
-        get: operations["PublicSiteController_scorers"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/public/sites/{slug}/players/{player}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** A player: identity and every game of the season. 404 unless the player may be named (§4.9). */
-        get: operations["PublicSiteController_player"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/public/sites/{slug}/knockout": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Knockout phases, round by round: games played and fixtures still to come. */
-        get: operations["PublicSiteController_knockout"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/public/sites/{slug}/posts": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Published articles and communiqués, newest first. */
-        get: operations["PublicSiteController_posts"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/public/sites/{slug}/posts/{post}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** One published article or communiqué, in Markdown. */
-        get: operations["PublicSiteController_post"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/public/sites/{slug}/sitemap": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Every public path, for the site’s sitemap.xml. Empty for a PRIVATE organisation. */
-        get: operations["PublicSiteController_sitemap"];
-        put?: never;
-        post?: never;
-        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -1306,6 +856,23 @@ export interface paths {
         put: operations["GamesController_updateGame"];
         post?: never;
         delete: operations["GamesController_deleteGame"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/games/{id}/deletion": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** What deleting this match would do — a played one needs a reason */
+        get: operations["GamesController_gameDeletion"];
+        put?: never;
+        post?: never;
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -1655,6 +1222,558 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/players/stats/leaderboard": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Players ranked over a season or one of its phases */
+        get: operations["PlayersController_leaderboard"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/players": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List players (scope depends on role, with filters & pagination) */
+        get: operations["PlayersController_listPlayers"];
+        put?: never;
+        /** Create a new player record (scope checked) */
+        post: operations["PlayersController_createPlayer"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/players/{playerId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get player details by ID (scope checked) */
+        get: operations["PlayersController_getPlayerById"];
+        /** Update player by ID (scope checked, fields depend on role) */
+        put: operations["PlayersController_updatePlayer"];
+        post?: never;
+        /** Delete a player who never played (see GET :playerId/deletion) */
+        delete: operations["PlayersController_deletePlayer"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/players/{playerId}/stats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One player’s season line and the games behind it */
+        get: operations["PlayersController_getPlayerStats"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/players/{playerId}/deletion": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** What deleting this player would do — or why it is refused, and what to do instead */
+        get: operations["PlayersController_playerDeletion"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/players/assign-to-team": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Assign a player to a team or unassign them (scope checked) */
+        post: operations["PlayersController_assignPlayerToTeam"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/players/me/profile": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** [Player] Update own player profile */
+        put: operations["PlayersController_updateMyPlayerProfile"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/seasons/{seasonId}/stages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The phases of a season, in order, with what each holds */
+        get: operations["StagesController_list"];
+        put?: never;
+        /** Add a phase to the end of a season */
+        post: operations["StagesController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/seasons/{seasonId}/stages/template": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Compose a season from a template */
+        post: operations["StagesController_applyTemplate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/seasons/{seasonId}/stages/order": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Put a season’s phases in a new order */
+        put: operations["StagesController_reorder"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/stages/{stageId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Rename a phase, or change its format, legs or qualification */
+        put: operations["StagesController_update"];
+        post?: never;
+        /** Remove a phase */
+        delete: operations["StagesController_remove"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/stages/{stageId}/deletion": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** What deleting this phase would do — or why it is refused */
+        get: operations["StagesController_stageDeletion"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/stage-groups/{groupId}/members": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Set which clubs are in a pool */
+        put: operations["StagesController_setMembers"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/seasons": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List seasons (scope depends on role, with filters & pagination) */
+        get: operations["SeasonsController_listSeasons"];
+        put?: never;
+        /** Create a new season (scope checked) */
+        post: operations["SeasonsController_createSeason"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/seasons/{seasonId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get season details by ID (scope checked) */
+        get: operations["SeasonsController_getSeasonById"];
+        /** Update season by ID (scope checked) */
+        put: operations["SeasonsController_updateSeason"];
+        post?: never;
+        /** Delete (soft-delete) season by ID (scope checked) */
+        delete: operations["SeasonsController_deleteSeason"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/seasons/{seasonId}/transitions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Move a season to another state (open, close, cancel, reopen) */
+        post: operations["SeasonsController_transitionSeason"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/seasons/{seasonId}/deletion": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** What deleting this season would do — or why it is refused, and what to do instead */
+        get: operations["SeasonsController_seasonDeletion"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/dashboard/organiser": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Everything an organiser owes their competitions right now */
+        get: operations["DashboardController_organiser"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/dashboard/platform": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** What exists on the platform, and what happened this week */
+        get: operations["DashboardController_platform"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/dashboard/club": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Where a club stands, when it plays next, and how the last ones went */
+        get: operations["DashboardController_club"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public/sites/{slug}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The site frame: organisation, competitions, what sections exist. 404 when not served. */
+        get: operations["PublicSiteController_frame"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public/sites/{slug}/standings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A competition’s table — the same one the admin screen and the signed export show. */
+        get: operations["PublicSiteController_standings"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public/sites/{slug}/games": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Games between two local dates (at most 42 days), this week by default. */
+        get: operations["PublicSiteController_games"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public/sites/{slug}/games/{c}/{game}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One game, with its scoresheet when there is one. */
+        get: operations["PublicSiteController_game"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public/sites/{slug}/teams": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Clubs with a page, by competition. */
+        get: operations["PublicSiteController_clubs"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public/sites/{slug}/teams/{c}/{team}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A club: its table row, its season’s games, and its roster when the competition publishes one. */
+        get: operations["PublicSiteController_club"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public/sites/{slug}/scorers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The scorers’ table. 404 for a competition that does not publish its players. */
+        get: operations["PublicSiteController_scorers"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public/sites/{slug}/players/{player}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A player: identity and every game of the season. 404 unless the player may be named (§4.9). */
+        get: operations["PublicSiteController_player"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public/sites/{slug}/knockout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Knockout phases, round by round: games played and fixtures still to come. */
+        get: operations["PublicSiteController_knockout"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public/sites/{slug}/posts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Published articles and communiqués, newest first. */
+        get: operations["PublicSiteController_posts"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public/sites/{slug}/posts/{post}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One published article or communiqué, in Markdown. */
+        get: operations["PublicSiteController_post"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public/sites/{slug}/sitemap": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Every public path, for the site’s sitemap.xml. Empty for a PRIVATE organisation. */
+        get: operations["PublicSiteController_sitemap"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/planned-fixtures": {
         parameters: {
             query?: never;
@@ -1754,8 +1873,25 @@ export interface paths {
         /** Update tenant organization details */
         put: operations["TenantsController_updateTenant"];
         post?: never;
-        /** Soft-delete or archive a tenant */
+        /** Delete an organisation in which nothing was played (system admins; see GET :id/deletion) */
         delete: operations["TenantsController_deleteTenant"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/tenants/{id}/deletion": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** What deleting this organisation would do — or why it is refused */
+        get: operations["TenantsController_tenantDeletion"];
+        put?: never;
+        post?: never;
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -1793,6 +1929,23 @@ export interface paths {
         post?: never;
         /** Soft delete a post (scope checked) */
         delete: operations["PostsController_deletePost"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/posts/{id}/deletion": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** What deleting this post would do */
+        get: operations["PostsController_postDeletion"];
+        put?: never;
+        post?: never;
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -2547,6 +2700,33 @@ export interface components {
             /** @description If user is TEAM_ADMIN, the ID of the team they manage (optional). Set to null to un-assign. */
             managingTeamId?: Record<string, never>;
         };
+        DeletionBlockerDto: {
+            /** @description Stable code, e.g. HAS_RESULTS. */
+            code: string;
+            /** @description Why, in French, for the person who asked. */
+            message: string;
+        };
+        DeletionConsequenceDto: {
+            /** @description What goes with it, in French. */
+            message: string;
+            count?: number;
+        };
+        DeletionRequirementsDto: {
+            /** @description A reason must be given; it is kept in the journal. */
+            reason: boolean;
+            /** @description The screen asks for the name to be typed. A safeguard against the wrong click, enforced by the screen, not the API. */
+            typedName: boolean;
+        };
+        DeletionReportDto: {
+            allowed: boolean;
+            /** @description What it is called — what to type when typedName is required. */
+            name: string;
+            blockers: components["schemas"]["DeletionBlockerDto"][];
+            consequences: components["schemas"]["DeletionConsequenceDto"][];
+            /** @enum {string|null} */
+            alternative?: "archive" | "cancel" | "deactivate" | "move" | null;
+            requires: components["schemas"]["DeletionRequirementsDto"];
+        };
         TenantLiteResponseDto: {
             id: string;
             name: string;
@@ -3122,6 +3302,346 @@ export interface components {
              * @example user-uuid-123
              */
             userId: string;
+        };
+        StandingsGroupDto: {
+            id: string;
+            name: string;
+        };
+        StandingsStageDto: {
+            id: string;
+            name: string;
+            /** @enum {string} */
+            format: "LEAGUE" | "GROUPS" | "KNOCKOUT";
+        };
+        StandingsColumnDto: {
+            /**
+             * @description The row field the column reads.
+             * @enum {string}
+             */
+            key: "gamesPlayed" | "wins" | "draws" | "losses" | "forfeits" | "goalsFor" | "goalsAgainst" | "goalDifference" | "points";
+            abbr: string;
+            label: string;
+        };
+        BandDto: {
+            /** @description How many clubs the band covers. */
+            count: number;
+            /** @description What it means, for the legend under the table. */
+            label: string;
+        };
+        StandingsBandsDto: {
+            /** @description The clubs at the top. */
+            qualification?: components["schemas"]["BandDto"] | null;
+            /** @description The clubs at the bottom. */
+            relegation?: components["schemas"]["BandDto"] | null;
+        };
+        StandingsRulesDto: {
+            /** @description What the table is primarily ordered on. */
+            rankingMetric: string;
+            winPoints: number;
+            drawPoints: number;
+            lossPoints: number;
+            /** @description What a forfeited loss is worth. Zero at LIPROBAKIN, where an ordinary loss is worth one. */
+            forfeitPoints: number;
+            /** @description Tie-breakers in the order they are applied, already in French. */
+            tieBreakers: string[];
+            /** @description The points rule written out, in the table’s own column names — "PTS = 2 × MG + 1 × MP". Built from the same numbers the engine uses, so it cannot describe a rule that is not in force. */
+            formula: string;
+            bands: components["schemas"]["StandingsBandsDto"];
+        };
+        StandingsRowDto: {
+            rank: number;
+            /**
+             * @description Which coloured band this row falls in, if the competition has declared any.
+             * @enum {string|null}
+             */
+            band?: "QUALIFICATION" | "RELEGATION" | null;
+            teamId: string;
+            teamName: string;
+            /** @description Unique within the competition; the public site links the club by it. */
+            teamSlug: string;
+            shortCode?: Record<string, never> | null;
+            logoUrl?: Record<string, never> | null;
+            gamesPlayed: number;
+            wins: number;
+            draws: number;
+            losses: number;
+            forfeits: number;
+            goalsFor: number;
+            goalsAgainst: number;
+            goalDifference: number;
+            points: number;
+        };
+        StandingsViewDto: {
+            leagueId: string;
+            leagueName: string;
+            /** @description The organisation running the competition. The published bulletin signs off "Pour la LIPROBAKIN" — the federation, not the division. */
+            organisationName: string;
+            /** @description Its crest, for the document header. */
+            organisationLogoUrl?: Record<string, never> | null;
+            /** @description Where the sheet is signed. */
+            organisationCity?: Record<string, never> | null;
+            seasonId: string;
+            seasonName: string;
+            stageId: string;
+            stageName: string;
+            /** @enum {string} */
+            stageFormat: "LEAGUE" | "GROUPS" | "KNOCKOUT";
+            groupId: Record<string, never> | null;
+            groupName: Record<string, never> | null;
+            groups: components["schemas"]["StandingsGroupDto"][];
+            /** @description The season’s phases that have a table (LEAGUE and GROUPS), in the order they run. */
+            tableStages: components["schemas"]["StandingsStageDto"][];
+            /** @description ISO instant of the last recomputation. */
+            lastCalculated?: Record<string, never> | null;
+            /** @description Completed games this table is derived from. A table nobody has played into is not a table that is wrong — it is a table that is empty, and the two read very differently. */
+            gamesCounted: number;
+            /** @description Fixtures played but not yet reflected, if any. */
+            pendingResults: number;
+            /** @description Column heads, in this sport’s vocabulary. */
+            columns: components["schemas"]["StandingsColumnDto"][];
+            rules: components["schemas"]["StandingsRulesDto"];
+            rows: components["schemas"]["StandingsRowDto"][];
+        };
+        UpdateStandingsRulesDto: {
+            leagueId: string;
+            rankingMetric?: string;
+            winPoints?: number;
+            drawPoints?: number;
+            lossPoints?: number;
+            /** @description What a forfeited loss is worth. Zero at LIPROBAKIN, where an ordinary loss earns one. */
+            forfeitPoints?: number;
+            /** @description In the order they are applied. An empty list means alphabetical after points. */
+            tieBreakerOrder?: ("POINTS" | "GOAL_DIFFERENCE" | "GOALS_FOR" | "GOALS_AGAINST" | "WINS" | "AWAY_WINS" | "AWAY_GOALS" | "HEAD_TO_HEAD_POINTS" | "HEAD_TO_HEAD_GOAL_DIFFERENCE" | "HEAD_TO_HEAD_GOALS_FOR" | "HEAD_TO_HEAD_WIN_PERCENTAGE" | "FAIR_PLAY_POINTS" | "WIN_PERCENTAGE" | "DIVISION_WIN_PERCENTAGE" | "CONFERENCE_WIN_PERCENTAGE" | "STRENGTH_OF_SCHEDULE" | "STRENGTH_OF_VICTORY" | "RANDOM_DRAW")[];
+            /** @description Clubs qualifying from the top. 0 turns the band off. */
+            qualificationCount?: number;
+            qualificationLabel?: string;
+            /** @description Clubs relegated from the bottom. 0 turns the band off. */
+            relegationCount?: number;
+            relegationLabel?: string;
+        };
+        RecalculateStandingsDto: {
+            leagueId: string;
+            seasonId: string;
+        };
+        CreateGameDto: {
+            /** @description The ID of the home team. */
+            homeTeamId: string;
+            /** @description The ID of the away team. */
+            awayTeamId: string;
+            /**
+             * Format: date-time
+             * @description The scheduled date and time of the game in ISO 8601 format.
+             */
+            dateTime: string;
+            /** @description The ID of the league this game belongs to. */
+            leagueId: string;
+            /** @description The tenant ID for multi-tenancy support. */
+            tenantId: string;
+            /** @description Season to place the fixture in. Defaults to the competition’s current season. */
+            seasonId?: string;
+            /** @description Phase to place the fixture in. Defaults to the current one. */
+            stageId?: string;
+            /** @description Pool, inside a GROUPS phase. */
+            groupId?: string;
+            /** @description The ID of the venue where the game was played. */
+            homeVenueId?: Record<string, never>;
+            courtId?: string;
+            /**
+             * @description The final score of the home team. If provided, awayScore must also be provided.
+             * @example 2
+             */
+            homeScore?: number;
+            /**
+             * @description The final score of the away team. If provided, homeScore must also be provided.
+             * @example 1
+             */
+            awayScore?: number;
+            /** @description The loser did not field a team. Only meaningful with a score; scored with the league’s forfeit rule rather than its loss rule, as on `PUT /games/:id/final-score`. */
+            isForfeit?: boolean;
+            /**
+             * @description Flexible JSON object for sport-specific stats (e.g., period scores, innings). Only applicable if scores are provided.
+             * @example {
+             *       "period1": {
+             *         "home": 1,
+             *         "away": 0
+             *       },
+             *       "period2": {
+             *         "home": 1,
+             *         "away": 1
+             *       }
+             *     }
+             */
+            customStats?: Record<string, never>;
+            /** @description Notes about the game, such as "Overtime win". */
+            notes?: string;
+            /** @description Knockout round: 1 = quarter-final, 2 = semi-final… */
+            round?: number;
+            /** @description Which journée this fixture belongs to. */
+            matchday?: number;
+            /**
+             * @description (Optional) The URL of the highlights video for the game.
+             * @example https://example.com/highlights.mp4
+             */
+            highlightsUrl?: string;
+        };
+        UpdateGameDto: {
+            /** @description Why the fixture changed, in the organiser’s own words. Not stored on the game — it is written to the audit trail, because "moved to the 22nd" settles nothing without "the hall was double-booked". Strongly encouraged whenever a date or a venue changes. */
+            reason?: string;
+            /**
+             * Format: date-time
+             * @description The new scheduled date and time of the game.
+             */
+            dateTime?: string;
+            /** @description The new venue ID for the game. */
+            homeVenueId?: Record<string, never>;
+            /** @description The new court ID for the game. */
+            courtId?: string;
+            /** @description Points required to win a set. */
+            pointsToWin?: number;
+            /** @description Number of sets required to win the game. */
+            setsToWin?: number;
+            /**
+             * @description Update the game status (e.g., to POSTPONED or CANCELLED). Cannot be set to COMPLETED here.
+             * @enum {string}
+             */
+            status?: "SCHEDULED" | "POSTPONED" | "CANCELLED" | "LIVE";
+            /**
+             * @description Flexible JSON object for IN-GAME stats updates (e.g., live period scores).
+             * @example {
+             *       "period1": {
+             *         "home": 1,
+             *         "away": 0
+             *       }
+             *     }
+             */
+            customStats?: Record<string, never>;
+            /** @description Updated notes about the game. */
+            notes?: string;
+            /** @description Knockout round: 1 = quarter-final, 2 = semi-final… */
+            round?: number;
+            /** @description Which journée this fixture belongs to. */
+            matchday?: number;
+        };
+        UpdateGameScoreDto: {
+            /**
+             * @description The final score of the home team.
+             * @example 3
+             */
+            homeScore: number;
+            /**
+             * @description The final score of the away team.
+             * @example 1
+             */
+            awayScore: number;
+            /** @description Why the score changed. Recorded on a correction, where it is the difference between a fixed typo and a rewritten result. */
+            reason?: string;
+            /** @description The loser did not field a team. Scored with the league’s forfeit rule rather than its loss rule — LIPROBAKIN give a point for a loss and nothing for a forfeit. */
+            isForfeit?: boolean;
+        };
+        ScoreDto: Record<string, never>;
+        EndGameDto: {
+            /** @description Final scores */
+            finalScore: components["schemas"]["ScoreDto"];
+        };
+        CancelGameDto: {
+            /**
+             * @description Reason for cancellation
+             * @example Inclement weather
+             */
+            reason: string;
+        };
+        PostponeGameDto: {
+            /**
+             * @description Reason for postponement
+             * @example Stadium maintenance
+             */
+            reason: string;
+        };
+        CreateGameEventDto: {
+            /** @enum {string} */
+            eventType: "GOAL" | "YELLOW_CARD" | "RED_CARD" | "SUBSTITUTION" | "PERIOD_START" | "PERIOD_END" | "COMMENTARY" | "PENALTY_SHOOTOUT" | "VAR_CHECK";
+        };
+        SaveBoxScoreLineDto: {
+            playerId: string;
+            /** @description Whether this player appeared. A squad of twenty turns up eight strong, and a player who took the floor without scoring or fouling was previously indistinguishable from one who stayed at home — both produced no row. Presence of the row is now the answer, so a line with nothing but zeroes is still written when this is true. */
+            played: boolean;
+            /**
+             * @description The player’s line, keyed by the sport’s column codes (basketball: FG3, FG2, FT, PF). Unknown codes are dropped and values are clamped to each column’s maximum, so what is stored is always something the sport can describe.
+             * @example {
+             *       "FG3": 2,
+             *       "FG2": 5,
+             *       "FT": 3,
+             *       "PF": 4
+             *     }
+             */
+            stats: {
+                [key: string]: number;
+            };
+        };
+        SaveBoxScoreDto: {
+            /** @description Every player with something to record. A player left out — or sent with nothing but zeroes — has no row rather than an empty one. */
+            lines: components["schemas"]["SaveBoxScoreLineDto"][];
+            /** @description Why, when a sheet that was already entered is being changed. Recorded on the audit trail like every other correction. */
+            reason?: string;
+        };
+        AddBoxScorePlayerDto: {
+            /** @description One of the two teams in this match. */
+            teamId: string;
+            /** @description Family name — the one written on the sheet. */
+            lastName: string;
+            /** @description Given name, when the sheet carries one. */
+            firstName?: string;
+            /** @description Shirt number. */
+            jerseyNumber?: number;
+            /** @description Position, free text — the vocabulary differs by sport. */
+            position?: string;
+            /** @description Create the player even though somebody of the same name already exists in this organisation. Without it the request is refused with the matches, so the operator can transfer the existing player instead of forking them into two records — which is how a roster quietly acquires the same person twice. */
+            force?: boolean;
+        };
+        PointRuleDto: {
+            /** @description Identifier for the outcome (e.g., WIN, DRAW, LOSS, SCORED_3_GOALS) */
+            outcome: string;
+            /** @description Points awarded for this outcome */
+            points: number;
+            /** @description Optional: Additional condition for this rule (e.g., CLEAN_SHEET) */
+            condition?: string;
+        };
+        PointSystemConfigDto: {
+            /** @description Array of rules for awarding points based on outcomes */
+            rules: components["schemas"]["PointRuleDto"][];
+            /** @description Optional: Array of rules for awarding bonus points */
+            bonusPoints?: components["schemas"]["PointRuleDto"][];
+            /** @description Optional: Common metric labels for display (e.g., Goals For, Points Differential) */
+            commonMetrics?: {
+                [key: string]: string;
+            };
+        };
+        TieBreakerRuleDto: {
+            /** @description Order of precedence for this tie-breaker (1 is highest) */
+            order: number;
+            /**
+             * @description Identifier for the tie-breaker metric (e.g., HEAD_TO_HEAD_POINTS, GOAL_DIFFERENCE)
+             * @enum {string}
+             */
+            rule: "HEAD_TO_HEAD_POINTS" | "HEAD_TO_HEAD_GOAL_DIFFERENCE" | "HEAD_TO_HEAD_GOALS_FOR" | "HEAD_TO_HEAD_WIN_PERCENTAGE" | "GOALS_SCORED" | "GOALS_DIFFERENCE" | "GOALS_AGAINST" | "WINS" | "MOST_WINS" | "AWAY_WINS" | "AWAY_GOALS" | "FAIR_PLAY_POINTS" | "WIN_PERCENTAGE" | "DISCIPLINE" | "NET_RUN_RATE";
+            /** @description Human-readable description of the tie-breaker rule */
+            description: string;
+            /**
+             * @description Sort order for the metric (Ascending, Descending, Random)
+             * @enum {string}
+             */
+            sort: "ASC" | "DESC" | "RANDOM";
+        };
+        SportRulesResponseDto: {
+            /**
+             * @description The sport type these rules apply to
+             * @enum {string}
+             */
+            sportType: "SOCCER" | "BASKETBALL" | "FOOTBALL" | "BASEBALL" | "TENNIS" | "HOCKEY" | "GOLF" | "CRICKET" | "RUGBY" | "VOLLEYBALL" | "OTHER";
+            /** @description Configuration for the point system */
+            pointSystem: components["schemas"]["PointSystemConfigDto"];
+            /** @description Ordered list of tie-breaker rules */
+            tieBreakers: components["schemas"]["TieBreakerRuleDto"][];
         };
         UpdatePlayerByAdminDto: {
             /** @description Player first name */
@@ -3823,25 +4343,6 @@ export interface components {
             slug: string;
             name: string;
         };
-        StandingsStageDto: {
-            id: string;
-            name: string;
-            /** @enum {string} */
-            format: "LEAGUE" | "GROUPS" | "KNOCKOUT";
-        };
-        StandingsGroupDto: {
-            id: string;
-            name: string;
-        };
-        StandingsColumnDto: {
-            /**
-             * @description The row field the column reads.
-             * @enum {string}
-             */
-            key: "gamesPlayed" | "wins" | "draws" | "losses" | "forfeits" | "goalsFor" | "goalsAgainst" | "goalDifference" | "points";
-            abbr: string;
-            label: string;
-        };
         PublicBandDto: {
             count: number;
             label: string;
@@ -4175,327 +4676,6 @@ export interface components {
             /** @description False for a PRIVATE organisation, whose sitemap is then empty. */
             indexable: boolean;
             entries: components["schemas"]["PublicSitemapEntryDto"][];
-        };
-        BandDto: {
-            /** @description How many clubs the band covers. */
-            count: number;
-            /** @description What it means, for the legend under the table. */
-            label: string;
-        };
-        StandingsBandsDto: {
-            /** @description The clubs at the top. */
-            qualification?: components["schemas"]["BandDto"] | null;
-            /** @description The clubs at the bottom. */
-            relegation?: components["schemas"]["BandDto"] | null;
-        };
-        StandingsRulesDto: {
-            /** @description What the table is primarily ordered on. */
-            rankingMetric: string;
-            winPoints: number;
-            drawPoints: number;
-            lossPoints: number;
-            /** @description What a forfeited loss is worth. Zero at LIPROBAKIN, where an ordinary loss is worth one. */
-            forfeitPoints: number;
-            /** @description Tie-breakers in the order they are applied, already in French. */
-            tieBreakers: string[];
-            /** @description The points rule written out, in the table’s own column names — "PTS = 2 × MG + 1 × MP". Built from the same numbers the engine uses, so it cannot describe a rule that is not in force. */
-            formula: string;
-            bands: components["schemas"]["StandingsBandsDto"];
-        };
-        StandingsRowDto: {
-            rank: number;
-            /**
-             * @description Which coloured band this row falls in, if the competition has declared any.
-             * @enum {string|null}
-             */
-            band?: "QUALIFICATION" | "RELEGATION" | null;
-            teamId: string;
-            teamName: string;
-            /** @description Unique within the competition; the public site links the club by it. */
-            teamSlug: string;
-            shortCode?: Record<string, never> | null;
-            logoUrl?: Record<string, never> | null;
-            gamesPlayed: number;
-            wins: number;
-            draws: number;
-            losses: number;
-            forfeits: number;
-            goalsFor: number;
-            goalsAgainst: number;
-            goalDifference: number;
-            points: number;
-        };
-        StandingsViewDto: {
-            leagueId: string;
-            leagueName: string;
-            /** @description The organisation running the competition. The published bulletin signs off "Pour la LIPROBAKIN" — the federation, not the division. */
-            organisationName: string;
-            /** @description Its crest, for the document header. */
-            organisationLogoUrl?: Record<string, never> | null;
-            /** @description Where the sheet is signed. */
-            organisationCity?: Record<string, never> | null;
-            seasonId: string;
-            seasonName: string;
-            stageId: string;
-            stageName: string;
-            /** @enum {string} */
-            stageFormat: "LEAGUE" | "GROUPS" | "KNOCKOUT";
-            groupId: Record<string, never> | null;
-            groupName: Record<string, never> | null;
-            groups: components["schemas"]["StandingsGroupDto"][];
-            /** @description The season’s phases that have a table (LEAGUE and GROUPS), in the order they run. */
-            tableStages: components["schemas"]["StandingsStageDto"][];
-            /** @description ISO instant of the last recomputation. */
-            lastCalculated?: Record<string, never> | null;
-            /** @description Completed games this table is derived from. A table nobody has played into is not a table that is wrong — it is a table that is empty, and the two read very differently. */
-            gamesCounted: number;
-            /** @description Fixtures played but not yet reflected, if any. */
-            pendingResults: number;
-            /** @description Column heads, in this sport’s vocabulary. */
-            columns: components["schemas"]["StandingsColumnDto"][];
-            rules: components["schemas"]["StandingsRulesDto"];
-            rows: components["schemas"]["StandingsRowDto"][];
-        };
-        UpdateStandingsRulesDto: {
-            leagueId: string;
-            rankingMetric?: string;
-            winPoints?: number;
-            drawPoints?: number;
-            lossPoints?: number;
-            /** @description What a forfeited loss is worth. Zero at LIPROBAKIN, where an ordinary loss earns one. */
-            forfeitPoints?: number;
-            /** @description In the order they are applied. An empty list means alphabetical after points. */
-            tieBreakerOrder?: ("POINTS" | "GOAL_DIFFERENCE" | "GOALS_FOR" | "GOALS_AGAINST" | "WINS" | "AWAY_WINS" | "AWAY_GOALS" | "HEAD_TO_HEAD_POINTS" | "HEAD_TO_HEAD_GOAL_DIFFERENCE" | "HEAD_TO_HEAD_GOALS_FOR" | "HEAD_TO_HEAD_WIN_PERCENTAGE" | "FAIR_PLAY_POINTS" | "WIN_PERCENTAGE" | "DIVISION_WIN_PERCENTAGE" | "CONFERENCE_WIN_PERCENTAGE" | "STRENGTH_OF_SCHEDULE" | "STRENGTH_OF_VICTORY" | "RANDOM_DRAW")[];
-            /** @description Clubs qualifying from the top. 0 turns the band off. */
-            qualificationCount?: number;
-            qualificationLabel?: string;
-            /** @description Clubs relegated from the bottom. 0 turns the band off. */
-            relegationCount?: number;
-            relegationLabel?: string;
-        };
-        RecalculateStandingsDto: {
-            leagueId: string;
-            seasonId: string;
-        };
-        CreateGameDto: {
-            /** @description The ID of the home team. */
-            homeTeamId: string;
-            /** @description The ID of the away team. */
-            awayTeamId: string;
-            /**
-             * Format: date-time
-             * @description The scheduled date and time of the game in ISO 8601 format.
-             */
-            dateTime: string;
-            /** @description The ID of the league this game belongs to. */
-            leagueId: string;
-            /** @description The tenant ID for multi-tenancy support. */
-            tenantId: string;
-            /** @description Season to place the fixture in. Defaults to the competition’s current season. */
-            seasonId?: string;
-            /** @description Phase to place the fixture in. Defaults to the current one. */
-            stageId?: string;
-            /** @description Pool, inside a GROUPS phase. */
-            groupId?: string;
-            /** @description The ID of the venue where the game was played. */
-            homeVenueId?: Record<string, never>;
-            courtId?: string;
-            /**
-             * @description The final score of the home team. If provided, awayScore must also be provided.
-             * @example 2
-             */
-            homeScore?: number;
-            /**
-             * @description The final score of the away team. If provided, homeScore must also be provided.
-             * @example 1
-             */
-            awayScore?: number;
-            /** @description The loser did not field a team. Only meaningful with a score; scored with the league’s forfeit rule rather than its loss rule, as on `PUT /games/:id/final-score`. */
-            isForfeit?: boolean;
-            /**
-             * @description Flexible JSON object for sport-specific stats (e.g., period scores, innings). Only applicable if scores are provided.
-             * @example {
-             *       "period1": {
-             *         "home": 1,
-             *         "away": 0
-             *       },
-             *       "period2": {
-             *         "home": 1,
-             *         "away": 1
-             *       }
-             *     }
-             */
-            customStats?: Record<string, never>;
-            /** @description Notes about the game, such as "Overtime win". */
-            notes?: string;
-            /** @description Knockout round: 1 = quarter-final, 2 = semi-final… */
-            round?: number;
-            /** @description Which journée this fixture belongs to. */
-            matchday?: number;
-            /**
-             * @description (Optional) The URL of the highlights video for the game.
-             * @example https://example.com/highlights.mp4
-             */
-            highlightsUrl?: string;
-        };
-        UpdateGameDto: {
-            /** @description Why the fixture changed, in the organiser’s own words. Not stored on the game — it is written to the audit trail, because "moved to the 22nd" settles nothing without "the hall was double-booked". Strongly encouraged whenever a date or a venue changes. */
-            reason?: string;
-            /**
-             * Format: date-time
-             * @description The new scheduled date and time of the game.
-             */
-            dateTime?: string;
-            /** @description The new venue ID for the game. */
-            homeVenueId?: Record<string, never>;
-            /** @description The new court ID for the game. */
-            courtId?: string;
-            /** @description Points required to win a set. */
-            pointsToWin?: number;
-            /** @description Number of sets required to win the game. */
-            setsToWin?: number;
-            /**
-             * @description Update the game status (e.g., to POSTPONED or CANCELLED). Cannot be set to COMPLETED here.
-             * @enum {string}
-             */
-            status?: "SCHEDULED" | "POSTPONED" | "CANCELLED" | "LIVE";
-            /**
-             * @description Flexible JSON object for IN-GAME stats updates (e.g., live period scores).
-             * @example {
-             *       "period1": {
-             *         "home": 1,
-             *         "away": 0
-             *       }
-             *     }
-             */
-            customStats?: Record<string, never>;
-            /** @description Updated notes about the game. */
-            notes?: string;
-            /** @description Knockout round: 1 = quarter-final, 2 = semi-final… */
-            round?: number;
-            /** @description Which journée this fixture belongs to. */
-            matchday?: number;
-        };
-        UpdateGameScoreDto: {
-            /**
-             * @description The final score of the home team.
-             * @example 3
-             */
-            homeScore: number;
-            /**
-             * @description The final score of the away team.
-             * @example 1
-             */
-            awayScore: number;
-            /** @description Why the score changed. Recorded on a correction, where it is the difference between a fixed typo and a rewritten result. */
-            reason?: string;
-            /** @description The loser did not field a team. Scored with the league’s forfeit rule rather than its loss rule — LIPROBAKIN give a point for a loss and nothing for a forfeit. */
-            isForfeit?: boolean;
-        };
-        ScoreDto: Record<string, never>;
-        EndGameDto: {
-            /** @description Final scores */
-            finalScore: components["schemas"]["ScoreDto"];
-        };
-        CancelGameDto: {
-            /**
-             * @description Reason for cancellation
-             * @example Inclement weather
-             */
-            reason: string;
-        };
-        PostponeGameDto: {
-            /**
-             * @description Reason for postponement
-             * @example Stadium maintenance
-             */
-            reason: string;
-        };
-        CreateGameEventDto: {
-            /** @enum {string} */
-            eventType: "GOAL" | "YELLOW_CARD" | "RED_CARD" | "SUBSTITUTION" | "PERIOD_START" | "PERIOD_END" | "COMMENTARY" | "PENALTY_SHOOTOUT" | "VAR_CHECK";
-        };
-        SaveBoxScoreLineDto: {
-            playerId: string;
-            /** @description Whether this player appeared. A squad of twenty turns up eight strong, and a player who took the floor without scoring or fouling was previously indistinguishable from one who stayed at home — both produced no row. Presence of the row is now the answer, so a line with nothing but zeroes is still written when this is true. */
-            played: boolean;
-            /**
-             * @description The player’s line, keyed by the sport’s column codes (basketball: FG3, FG2, FT, PF). Unknown codes are dropped and values are clamped to each column’s maximum, so what is stored is always something the sport can describe.
-             * @example {
-             *       "FG3": 2,
-             *       "FG2": 5,
-             *       "FT": 3,
-             *       "PF": 4
-             *     }
-             */
-            stats: {
-                [key: string]: number;
-            };
-        };
-        SaveBoxScoreDto: {
-            /** @description Every player with something to record. A player left out — or sent with nothing but zeroes — has no row rather than an empty one. */
-            lines: components["schemas"]["SaveBoxScoreLineDto"][];
-            /** @description Why, when a sheet that was already entered is being changed. Recorded on the audit trail like every other correction. */
-            reason?: string;
-        };
-        AddBoxScorePlayerDto: {
-            /** @description One of the two teams in this match. */
-            teamId: string;
-            /** @description Family name — the one written on the sheet. */
-            lastName: string;
-            /** @description Given name, when the sheet carries one. */
-            firstName?: string;
-            /** @description Shirt number. */
-            jerseyNumber?: number;
-            /** @description Position, free text — the vocabulary differs by sport. */
-            position?: string;
-            /** @description Create the player even though somebody of the same name already exists in this organisation. Without it the request is refused with the matches, so the operator can transfer the existing player instead of forking them into two records — which is how a roster quietly acquires the same person twice. */
-            force?: boolean;
-        };
-        PointRuleDto: {
-            /** @description Identifier for the outcome (e.g., WIN, DRAW, LOSS, SCORED_3_GOALS) */
-            outcome: string;
-            /** @description Points awarded for this outcome */
-            points: number;
-            /** @description Optional: Additional condition for this rule (e.g., CLEAN_SHEET) */
-            condition?: string;
-        };
-        PointSystemConfigDto: {
-            /** @description Array of rules for awarding points based on outcomes */
-            rules: components["schemas"]["PointRuleDto"][];
-            /** @description Optional: Array of rules for awarding bonus points */
-            bonusPoints?: components["schemas"]["PointRuleDto"][];
-            /** @description Optional: Common metric labels for display (e.g., Goals For, Points Differential) */
-            commonMetrics?: {
-                [key: string]: string;
-            };
-        };
-        TieBreakerRuleDto: {
-            /** @description Order of precedence for this tie-breaker (1 is highest) */
-            order: number;
-            /**
-             * @description Identifier for the tie-breaker metric (e.g., HEAD_TO_HEAD_POINTS, GOAL_DIFFERENCE)
-             * @enum {string}
-             */
-            rule: "HEAD_TO_HEAD_POINTS" | "HEAD_TO_HEAD_GOAL_DIFFERENCE" | "HEAD_TO_HEAD_GOALS_FOR" | "HEAD_TO_HEAD_WIN_PERCENTAGE" | "GOALS_SCORED" | "GOALS_DIFFERENCE" | "GOALS_AGAINST" | "WINS" | "MOST_WINS" | "AWAY_WINS" | "AWAY_GOALS" | "FAIR_PLAY_POINTS" | "WIN_PERCENTAGE" | "DISCIPLINE" | "NET_RUN_RATE";
-            /** @description Human-readable description of the tie-breaker rule */
-            description: string;
-            /**
-             * @description Sort order for the metric (Ascending, Descending, Random)
-             * @enum {string}
-             */
-            sort: "ASC" | "DESC" | "RANDOM";
-        };
-        SportRulesResponseDto: {
-            /**
-             * @description The sport type these rules apply to
-             * @enum {string}
-             */
-            sportType: "SOCCER" | "BASKETBALL" | "FOOTBALL" | "BASEBALL" | "TENNIS" | "HOCKEY" | "GOLF" | "CRICKET" | "RUGBY" | "VOLLEYBALL" | "OTHER";
-            /** @description Configuration for the point system */
-            pointSystem: components["schemas"]["PointSystemConfigDto"];
-            /** @description Ordered list of tie-breaker rules */
-            tieBreakers: components["schemas"]["TieBreakerRuleDto"][];
         };
         CreatePlannedFixtureDto: {
             /** @description Phase this belongs to. Must be a KNOCKOUT. */
@@ -5735,7 +5915,10 @@ export interface operations {
     };
     UsersController_deleteUser: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Kept in the journal. */
+                reason?: string;
+            };
             header?: never;
             path: {
                 /** @description User ID */
@@ -5754,14 +5937,7 @@ export interface operations {
                     "application/json": components["schemas"]["UserResponseDto"];
                 };
             };
-            /** @description Bad request (e.g., cannot delete last SYSTEM_ADMIN). */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Forbidden (e.g., cannot delete a SYSTEM_ADMIN if not one, or user outside scope). */
+            /** @description Forbidden: not your organisation. */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -5770,6 +5946,13 @@ export interface operations {
             };
             /** @description User not found. */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Refused: yourself, an owner, the last organisation administrator, or not an invitation. */
+            409: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -5850,6 +6033,28 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    UsersController_userDeletion: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description User ID */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeletionReportDto"];
+                };
             };
         };
     };
@@ -6093,7 +6298,10 @@ export interface operations {
     };
     LeaguesController_deleteLeague: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Kept in the journal. */
+                reason?: string;
+            };
             header?: never;
             path: {
                 /** @description League ID */
@@ -6123,6 +6331,35 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Refused: games were played. Archive it instead. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    LeaguesController_leagueDeletion: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description League ID */
+                leagueId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeletionReportDto"];
+                };
             };
         };
     };
@@ -6694,7 +6931,10 @@ export interface operations {
     };
     TeamsController_deleteTeam: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Kept in the journal. */
+                reason?: string;
+            };
             header?: never;
             path: {
                 /** @description Team ID */
@@ -6706,13 +6946,6 @@ export interface operations {
         responses: {
             /** @description Team deleted successfully. */
             204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Bad request (e.g., team has active players/games). */
-            400: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -6731,6 +6964,35 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Refused: the club has played. Archive it instead. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    TeamsController_teamDeletion: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Team ID */
+                teamId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeletionReportDto"];
+                };
             };
         };
     };
@@ -6829,1253 +7091,6 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
-            };
-        };
-    };
-    PlayersController_leaderboard: {
-        parameters: {
-            query: {
-                leagueId: string;
-                /** @description Defaults to the competition’s current season. */
-                seasonId?: string;
-                /** @description Restrict to one phase. Empty means the whole season. */
-                stageId?: string;
-                /** @description Restrict to one club’s players. */
-                teamId?: string;
-                /** @description Appearances a player needs to be listed. Sorting by the per-game column with no floor puts whoever played once at the top, so the qualifier is visible rather than implicit. */
-                minGames?: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PlayerLeaderboardDto"];
-                };
-            };
-            /** @description Not this reader’s competition. */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Competition, season or phase not found. */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    PlayersController_listPlayers: {
-        parameters: {
-            query?: {
-                /** @description Search term for player name, email, bio, or position. */
-                q?: string;
-                /** @description Filter by league ID. */
-                leagueId?: string;
-                /** @description Filter by team ID. */
-                teamId?: string;
-                /** @description Filter by tenant ID. */
-                tenantId?: string;
-                /** @description Records to skip (pagination). */
-                skip?: number;
-                /** @description Records to take (pagination). */
-                take?: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description A list of players. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PlayerDetailsDto"][];
-                };
-            };
-            /** @description Bad request (e.g., invalid filter for user scope). */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Forbidden. */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Associated entity not found when filtering. */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    PlayersController_createPlayer: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** @description Player details, including initial user information. */
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["CreatePlayerDto"];
-            };
-        };
-        responses: {
-            /** @description Player created successfully. */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PlayerDetailsDto"];
-                };
-            };
-            /** @description Bad request. */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Forbidden. */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Associated tenant, league, or team not found. */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Conflict (e.g., duplicate email/username, player profile already exists). */
-            409: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    PlayersController_getPlayerById: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description Player ID */
-                playerId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Player details. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PlayerDetailsDto"];
-                };
-            };
-            /** @description Forbidden. */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Player not found. */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    PlayersController_updatePlayer: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description Player ID */
-                playerId: string;
-            };
-            cookie?: never;
-        };
-        /** @description Update data. Fields permitted depend on the authenticated user's role (Admin, Team Admin, or Player themselves). */
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UpdatePlayerByAdminDto"] | components["schemas"]["UpdatePlayerByTeamAdminDto"] | components["schemas"]["UpdatePlayerSelfDto"];
-            };
-        };
-        responses: {
-            /** @description Player updated successfully. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PlayerDetailsDto"];
-                };
-            };
-            /** @description Bad request. */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Forbidden. */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Player not found. */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Conflict (e.g., duplicate email/username/nationalId/leagueRegistrationId). */
-            409: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    PlayersController_deletePlayer: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description Player ID */
-                playerId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Player deleted successfully. */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Bad request (e.g., player has active stats/games). */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Forbidden. */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Player not found. */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    PlayersController_getPlayerStats: {
-        parameters: {
-            query?: {
-                /** @description Defaults to the competition’s current season. */
-                seasonId?: string;
-                /** @description Restrict to one phase. Empty means the whole season. */
-                stageId?: string;
-            };
-            header?: never;
-            path: {
-                /** @description Player ID */
-                playerId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PlayerStatsDto"];
-                };
-            };
-            /** @description Not this reader’s competition. */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Player, season or phase not found. */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    PlayersController_assignPlayerToTeam: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** @description Player ID and target team ID (or null to unassign). */
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["AssignPlayerToTeamDto"];
-            };
-        };
-        responses: {
-            /** @description Player assigned/unassigned successfully. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PlayerDetailsDto"];
-                };
-            };
-            /** @description Bad request. */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Forbidden. */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Player or Team not found. */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    PlayersController_updateMyPlayerProfile: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** @description Fields a player can update about themselves. */
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UpdatePlayerSelfDto"];
-            };
-        };
-        responses: {
-            /** @description Player profile updated successfully. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PlayerDetailsDto"];
-                };
-            };
-            /** @description Bad request. */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Forbidden. */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Player profile not found. */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Conflict (e.g., duplicate username). */
-            409: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    StagesController_list: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                seasonId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["StageResponseDto"][];
-                };
-            };
-        };
-    };
-    StagesController_create: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                seasonId: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["CreateStageDto"];
-            };
-        };
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    StagesController_applyTemplate: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                seasonId: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ApplyTemplateDto"];
-            };
-        };
-        responses: {
-            /** @description The season already has fixtures or results. */
-            409: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    StagesController_reorder: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                seasonId: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ReorderStagesDto"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    StagesController_update: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                stageId: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UpdateStageDto"];
-            };
-        };
-        responses: {
-            /** @description Its format cannot change once it has results. */
-            409: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    StagesController_remove: {
-        parameters: {
-            query: {
-                reason: string;
-            };
-            header?: never;
-            path: {
-                stageId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description It holds fixtures, or it is the last one. */
-            409: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    StagesController_setMembers: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                groupId: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["SetGroupMembersDto"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    SeasonsController_listSeasons: {
-        parameters: {
-            query?: {
-                /** @description Number of items to skip (offset) */
-                skip?: number;
-                /** @description Number of items to take (limit) */
-                take?: number;
-                /** @description Current page number */
-                page?: number;
-                /** @description Page size */
-                pageSize?: number;
-                /** @description Field to sort by */
-                sortBy?: string;
-                /** @description Sort order (asc/desc) */
-                sortOrder?: "asc" | "desc";
-                /** @description Search term for season name or description. */
-                q?: string;
-                /** @description Filter by league ID. */
-                leagueId?: components["schemas"]["Object"];
-                /** @description Filter by tenant ID. */
-                tenantId?: components["schemas"]["Object"];
-                /** @description Optional: Filter seasons by status */
-                status?: "PLANNING" | "ACTIVE" | "COMPLETED" | "CANCELED";
-                /** @description Filter seasons starting after this date (ISO 8601 format). */
-                startDateAfter?: string;
-                /** @description Filter seasons starting before this date (ISO 8601 format). */
-                startDateBefore?: string;
-                /** @description Filter seasons ending after this date (ISO 8601 format). */
-                endDateAfter?: string;
-                /** @description Filter seasons ending before this date (ISO 8601 format). */
-                endDateBefore?: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description A paginated list of seasons. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PaginatedResponseDto"];
-                };
-            };
-            /** @description Bad request (e.g., invalid filter for user scope). */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Forbidden. */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    SeasonsController_createSeason: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** @description Season details. */
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["CreateSeasonDto"];
-            };
-        };
-        responses: {
-            /** @description Season created successfully. */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SeasonDetailsDto"];
-                };
-            };
-            /** @description Bad request. */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Forbidden. */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Associated tenant or league not found. */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Conflict (e.g., duplicate season name/slug). */
-            409: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    SeasonsController_getSeasonById: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description Season ID */
-                seasonId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Season details. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SeasonDetailsDto"];
-                };
-            };
-            /** @description Forbidden. */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Season not found. */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    SeasonsController_updateSeason: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description Season ID */
-                seasonId: string;
-            };
-            cookie?: never;
-        };
-        /** @description Season update data. */
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UpdateSeasonDto"];
-            };
-        };
-        responses: {
-            /** @description Season updated successfully. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SeasonDetailsDto"];
-                };
-            };
-            /** @description Bad request. */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Forbidden. */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Season not found. */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Conflict (e.g., duplicate season name/slug). */
-            409: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    SeasonsController_deleteSeason: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description Season ID */
-                seasonId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Season deleted successfully. */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Bad request (e.g., season has active games/stats). */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Forbidden. */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Season not found. */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    SeasonsController_transitionSeason: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description Season ID */
-                seasonId: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["TransitionSeasonDto"];
-            };
-        };
-        responses: {
-            /** @description Season moved. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SeasonDetailsDto"];
-                };
-            };
-            /** @description A reason is required for this move. */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Forbidden. */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Season not found. */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description That move is not legal from this state. */
-            409: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    DashboardController_organiser: {
-        parameters: {
-            query?: {
-                /** @description Organisation to read (system admins only). */
-                tenantId?: string;
-                /** @description Narrow to one competition. Omit for the whole organisation — which is the tenant scope of this screen: the community manager publishes men’s, women’s and D2 together. */
-                leagueId?: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["OrganiserDashboardDto"];
-                };
-            };
-        };
-    };
-    DashboardController_platform: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PlatformDashboardDto"];
-                };
-            };
-        };
-    };
-    DashboardController_club: {
-        parameters: {
-            query?: {
-                /** @description Club to read. Defaults to the one the caller administers. */
-                teamId?: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ClubDashboardDto"];
-                };
-            };
-        };
-    };
-    PublicSiteController_frame: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                slug: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PublicSiteDto"];
-                };
-            };
-        };
-    };
-    PublicSiteController_standings: {
-        parameters: {
-            query?: {
-                /** @description Competition slug. Defaults to every competition, or the first for a single table. */
-                c?: string;
-                /** @description Season slug. Defaults to the season the competition is playing. */
-                season?: string;
-                /** @description Phase id. Defaults to the furthest table phase with a result. */
-                stage?: string;
-                /** @description Pool id, in a GROUPS phase. Defaults to the first pool. */
-                group?: string;
-            };
-            header?: never;
-            path: {
-                slug: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PublicStandingsDto"];
-                };
-            };
-        };
-    };
-    PublicSiteController_games: {
-        parameters: {
-            query?: {
-                /** @description Competition slug. Defaults to every competition, or the first for a single table. */
-                c?: string;
-                /** @description First day, yyyy-mm-dd on the league’s clock. Defaults to this week’s Monday. */
-                from?: string;
-                /** @description Last day, inclusive, on the league’s clock. At most 42 days after `from`. */
-                to?: string;
-                /** @description A club’s slug, within the competition named by `c`. */
-                team?: string;
-            };
-            header?: never;
-            path: {
-                slug: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PublicGamesDto"];
-                };
-            };
-        };
-    };
-    PublicSiteController_game: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                slug: string;
-                c: string;
-                game: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PublicGameDto"];
-                };
-            };
-        };
-    };
-    PublicSiteController_clubs: {
-        parameters: {
-            query?: {
-                /** @description Competition slug. Defaults to every competition, or the first for a single table. */
-                c?: string;
-            };
-            header?: never;
-            path: {
-                slug: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PublicClubListItemDto"][];
-                };
-            };
-        };
-    };
-    PublicSiteController_club: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                slug: string;
-                c: string;
-                team: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PublicClubDto"];
-                };
-            };
-        };
-    };
-    PublicSiteController_scorers: {
-        parameters: {
-            query?: {
-                /** @description Competition slug. Defaults to every competition, or the first for a single table. */
-                c?: string;
-                /** @description Season slug. Defaults to the season the table shows. */
-                season?: string;
-                /** @description Phase id. Empty means the whole season. */
-                stage?: string;
-                /** @description Page of 25, from 1. */
-                page?: string;
-            };
-            header?: never;
-            path: {
-                slug: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PublicScorersDto"];
-                };
-            };
-        };
-    };
-    PublicSiteController_player: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                slug: string;
-                player: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PublicPlayerDto"];
-                };
-            };
-        };
-    };
-    PublicSiteController_knockout: {
-        parameters: {
-            query?: {
-                /** @description Competition slug. Defaults to every competition, or the first for a single table. */
-                c?: string;
-            };
-            header?: never;
-            path: {
-                slug: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PublicKnockoutDto"];
-                };
-            };
-        };
-    };
-    PublicSiteController_posts: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                slug: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PublicPostSummaryDto"][];
-                };
-            };
-        };
-    };
-    PublicSiteController_post: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                slug: string;
-                post: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PublicPostDto"];
-                };
-            };
-        };
-    };
-    PublicSiteController_sitemap: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                slug: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PublicSitemapDto"];
-                };
             };
         };
     };
@@ -8449,6 +7464,27 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    GamesController_gameDeletion: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeletionReportDto"];
+                };
             };
         };
     };
@@ -8923,6 +7959,1323 @@ export interface operations {
             };
         };
     };
+    PlayersController_leaderboard: {
+        parameters: {
+            query: {
+                leagueId: string;
+                /** @description Defaults to the competition’s current season. */
+                seasonId?: string;
+                /** @description Restrict to one phase. Empty means the whole season. */
+                stageId?: string;
+                /** @description Restrict to one club’s players. */
+                teamId?: string;
+                /** @description Appearances a player needs to be listed. Sorting by the per-game column with no floor puts whoever played once at the top, so the qualifier is visible rather than implicit. */
+                minGames?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlayerLeaderboardDto"];
+                };
+            };
+            /** @description Not this reader’s competition. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Competition, season or phase not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    PlayersController_listPlayers: {
+        parameters: {
+            query?: {
+                /** @description Search term for player name, email, bio, or position. */
+                q?: string;
+                /** @description Filter by league ID. */
+                leagueId?: string;
+                /** @description Filter by team ID. */
+                teamId?: string;
+                /** @description Filter by tenant ID. */
+                tenantId?: string;
+                /** @description Records to skip (pagination). */
+                skip?: number;
+                /** @description Records to take (pagination). */
+                take?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description A list of players. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlayerDetailsDto"][];
+                };
+            };
+            /** @description Bad request (e.g., invalid filter for user scope). */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Forbidden. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Associated entity not found when filtering. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    PlayersController_createPlayer: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Player details, including initial user information. */
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreatePlayerDto"];
+            };
+        };
+        responses: {
+            /** @description Player created successfully. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlayerDetailsDto"];
+                };
+            };
+            /** @description Bad request. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Forbidden. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Associated tenant, league, or team not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Conflict (e.g., duplicate email/username, player profile already exists). */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    PlayersController_getPlayerById: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Player ID */
+                playerId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Player details. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlayerDetailsDto"];
+                };
+            };
+            /** @description Forbidden. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Player not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    PlayersController_updatePlayer: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Player ID */
+                playerId: string;
+            };
+            cookie?: never;
+        };
+        /** @description Update data. Fields permitted depend on the authenticated user's role (Admin, Team Admin, or Player themselves). */
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdatePlayerByAdminDto"] | components["schemas"]["UpdatePlayerByTeamAdminDto"] | components["schemas"]["UpdatePlayerSelfDto"];
+            };
+        };
+        responses: {
+            /** @description Player updated successfully. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlayerDetailsDto"];
+                };
+            };
+            /** @description Bad request. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Forbidden. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Player not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Conflict (e.g., duplicate email/username/nationalId/leagueRegistrationId). */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    PlayersController_deletePlayer: {
+        parameters: {
+            query?: {
+                /** @description Kept in the journal. */
+                reason?: string;
+            };
+            header?: never;
+            path: {
+                /** @description Player ID */
+                playerId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Player deleted successfully. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Forbidden. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Player not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Refused: the player is on a match sheet. Archive instead. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    PlayersController_getPlayerStats: {
+        parameters: {
+            query?: {
+                /** @description Defaults to the competition’s current season. */
+                seasonId?: string;
+                /** @description Restrict to one phase. Empty means the whole season. */
+                stageId?: string;
+            };
+            header?: never;
+            path: {
+                /** @description Player ID */
+                playerId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlayerStatsDto"];
+                };
+            };
+            /** @description Not this reader’s competition. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Player, season or phase not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    PlayersController_playerDeletion: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Player ID */
+                playerId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeletionReportDto"];
+                };
+            };
+        };
+    };
+    PlayersController_assignPlayerToTeam: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Player ID and target team ID (or null to unassign). */
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AssignPlayerToTeamDto"];
+            };
+        };
+        responses: {
+            /** @description Player assigned/unassigned successfully. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlayerDetailsDto"];
+                };
+            };
+            /** @description Bad request. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Forbidden. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Player or Team not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    PlayersController_updateMyPlayerProfile: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Fields a player can update about themselves. */
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdatePlayerSelfDto"];
+            };
+        };
+        responses: {
+            /** @description Player profile updated successfully. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlayerDetailsDto"];
+                };
+            };
+            /** @description Bad request. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Forbidden. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Player profile not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Conflict (e.g., duplicate username). */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    StagesController_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                seasonId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StageResponseDto"][];
+                };
+            };
+        };
+    };
+    StagesController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                seasonId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateStageDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    StagesController_applyTemplate: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                seasonId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ApplyTemplateDto"];
+            };
+        };
+        responses: {
+            /** @description The season already has fixtures or results. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    StagesController_reorder: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                seasonId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReorderStagesDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    StagesController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                stageId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateStageDto"];
+            };
+        };
+        responses: {
+            /** @description Its format cannot change once it has results. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    StagesController_remove: {
+        parameters: {
+            query: {
+                reason: string;
+            };
+            header?: never;
+            path: {
+                stageId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description It holds fixtures, or it is the last one. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    StagesController_stageDeletion: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                stageId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeletionReportDto"];
+                };
+            };
+        };
+    };
+    StagesController_setMembers: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                groupId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SetGroupMembersDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    SeasonsController_listSeasons: {
+        parameters: {
+            query?: {
+                /** @description Number of items to skip (offset) */
+                skip?: number;
+                /** @description Number of items to take (limit) */
+                take?: number;
+                /** @description Current page number */
+                page?: number;
+                /** @description Page size */
+                pageSize?: number;
+                /** @description Field to sort by */
+                sortBy?: string;
+                /** @description Sort order (asc/desc) */
+                sortOrder?: "asc" | "desc";
+                /** @description Search term for season name or description. */
+                q?: string;
+                /** @description Filter by league ID. */
+                leagueId?: components["schemas"]["Object"];
+                /** @description Filter by tenant ID. */
+                tenantId?: components["schemas"]["Object"];
+                /** @description Optional: Filter seasons by status */
+                status?: "PLANNING" | "ACTIVE" | "COMPLETED" | "CANCELED";
+                /** @description Filter seasons starting after this date (ISO 8601 format). */
+                startDateAfter?: string;
+                /** @description Filter seasons starting before this date (ISO 8601 format). */
+                startDateBefore?: string;
+                /** @description Filter seasons ending after this date (ISO 8601 format). */
+                endDateAfter?: string;
+                /** @description Filter seasons ending before this date (ISO 8601 format). */
+                endDateBefore?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description A paginated list of seasons. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedResponseDto"];
+                };
+            };
+            /** @description Bad request (e.g., invalid filter for user scope). */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Forbidden. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    SeasonsController_createSeason: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Season details. */
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateSeasonDto"];
+            };
+        };
+        responses: {
+            /** @description Season created successfully. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SeasonDetailsDto"];
+                };
+            };
+            /** @description Bad request. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Forbidden. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Associated tenant or league not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Conflict (e.g., duplicate season name/slug). */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    SeasonsController_getSeasonById: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Season ID */
+                seasonId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Season details. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SeasonDetailsDto"];
+                };
+            };
+            /** @description Forbidden. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Season not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    SeasonsController_updateSeason: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Season ID */
+                seasonId: string;
+            };
+            cookie?: never;
+        };
+        /** @description Season update data. */
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateSeasonDto"];
+            };
+        };
+        responses: {
+            /** @description Season updated successfully. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SeasonDetailsDto"];
+                };
+            };
+            /** @description Bad request. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Forbidden. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Season not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Conflict (e.g., duplicate season name/slug). */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    SeasonsController_deleteSeason: {
+        parameters: {
+            query: {
+                reason: string;
+            };
+            header?: never;
+            path: {
+                /** @description Season ID */
+                seasonId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Season deleted successfully. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bad request (e.g., season has active games/stats). */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Forbidden. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Season not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    SeasonsController_transitionSeason: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Season ID */
+                seasonId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TransitionSeasonDto"];
+            };
+        };
+        responses: {
+            /** @description Season moved. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SeasonDetailsDto"];
+                };
+            };
+            /** @description A reason is required for this move. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Forbidden. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Season not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description That move is not legal from this state. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    SeasonsController_seasonDeletion: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Season ID */
+                seasonId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeletionReportDto"];
+                };
+            };
+        };
+    };
+    DashboardController_organiser: {
+        parameters: {
+            query?: {
+                /** @description Organisation to read (system admins only). */
+                tenantId?: string;
+                /** @description Narrow to one competition. Omit for the whole organisation — which is the tenant scope of this screen: the community manager publishes men’s, women’s and D2 together. */
+                leagueId?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrganiserDashboardDto"];
+                };
+            };
+        };
+    };
+    DashboardController_platform: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlatformDashboardDto"];
+                };
+            };
+        };
+    };
+    DashboardController_club: {
+        parameters: {
+            query?: {
+                /** @description Club to read. Defaults to the one the caller administers. */
+                teamId?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClubDashboardDto"];
+                };
+            };
+        };
+    };
+    PublicSiteController_frame: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublicSiteDto"];
+                };
+            };
+        };
+    };
+    PublicSiteController_standings: {
+        parameters: {
+            query?: {
+                /** @description Competition slug. Defaults to every competition, or the first for a single table. */
+                c?: string;
+                /** @description Season slug. Defaults to the season the competition is playing. */
+                season?: string;
+                /** @description Phase id. Defaults to the furthest table phase with a result. */
+                stage?: string;
+                /** @description Pool id, in a GROUPS phase. Defaults to the first pool. */
+                group?: string;
+            };
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublicStandingsDto"];
+                };
+            };
+        };
+    };
+    PublicSiteController_games: {
+        parameters: {
+            query?: {
+                /** @description Competition slug. Defaults to every competition, or the first for a single table. */
+                c?: string;
+                /** @description First day, yyyy-mm-dd on the league’s clock. Defaults to this week’s Monday. */
+                from?: string;
+                /** @description Last day, inclusive, on the league’s clock. At most 42 days after `from`. */
+                to?: string;
+                /** @description A club’s slug, within the competition named by `c`. */
+                team?: string;
+            };
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublicGamesDto"];
+                };
+            };
+        };
+    };
+    PublicSiteController_game: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+                c: string;
+                game: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublicGameDto"];
+                };
+            };
+        };
+    };
+    PublicSiteController_clubs: {
+        parameters: {
+            query?: {
+                /** @description Competition slug. Defaults to every competition, or the first for a single table. */
+                c?: string;
+            };
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublicClubListItemDto"][];
+                };
+            };
+        };
+    };
+    PublicSiteController_club: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+                c: string;
+                team: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublicClubDto"];
+                };
+            };
+        };
+    };
+    PublicSiteController_scorers: {
+        parameters: {
+            query?: {
+                /** @description Competition slug. Defaults to every competition, or the first for a single table. */
+                c?: string;
+                /** @description Season slug. Defaults to the season the table shows. */
+                season?: string;
+                /** @description Phase id. Empty means the whole season. */
+                stage?: string;
+                /** @description Page of 25, from 1. */
+                page?: string;
+            };
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublicScorersDto"];
+                };
+            };
+        };
+    };
+    PublicSiteController_player: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+                player: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublicPlayerDto"];
+                };
+            };
+        };
+    };
+    PublicSiteController_knockout: {
+        parameters: {
+            query?: {
+                /** @description Competition slug. Defaults to every competition, or the first for a single table. */
+                c?: string;
+            };
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublicKnockoutDto"];
+                };
+            };
+        };
+    };
+    PublicSiteController_posts: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublicPostSummaryDto"][];
+                };
+            };
+        };
+    };
+    PublicSiteController_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+                post: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublicPostDto"];
+                };
+            };
+        };
+    };
+    PublicSiteController_sitemap: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublicSitemapDto"];
+                };
+            };
+        };
+    };
     PlannedFixturesController_list: {
         parameters: {
             query: {
@@ -9261,7 +9614,10 @@ export interface operations {
     };
     TenantsController_deleteTenant: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Kept in the journal. */
+                reason?: string;
+            };
             header?: never;
             path: {
                 /** @description Internal Tenant UUID */
@@ -9273,20 +9629,6 @@ export interface operations {
         responses: {
             /** @description Tenant soft-deleted successfully. */
             204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Bad Request - Tenant has active resources and cannot be deleted. */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Unauthorized. */
-            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -9305,6 +9647,35 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Refused: not a system admin, or games were played. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    TenantsController_tenantDeletion: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Internal Tenant UUID */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeletionReportDto"];
+                };
             };
         };
     };
@@ -9487,7 +9858,10 @@ export interface operations {
     };
     PostsController_deletePost: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Kept in the journal. */
+                reason?: string;
+            };
             header?: never;
             path: {
                 /** @description Post ID */
@@ -9517,6 +9891,28 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    PostsController_postDeletion: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Post ID */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeletionReportDto"];
+                };
             };
         };
     };

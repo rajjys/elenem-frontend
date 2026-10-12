@@ -431,6 +431,7 @@ export default function GamePage() {
         action={action}
         gameId={gameId}
         matchup={`${g.homeTeam.name} – ${g.awayTeam.name}`}
+        played={['COMPLETED', 'LIVE', 'PAUSED'].includes(g.status)}
         onClose={() => setAction(null)}
         onDeleted={() => router.push(backHref)}
       />

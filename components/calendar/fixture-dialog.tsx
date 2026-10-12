@@ -431,6 +431,7 @@ export function FixtureDialog({
 
   const verbs = entry ? verbsFor(entry.status) : [];
   const hasScore = !!entry && entry.homeScore != null;
+  const playedDelete = hasScore || ['COMPLETED', 'LIVE', 'PAUSED'].includes(entry?.status ?? '');
 
   return (
     <Modal
@@ -893,9 +894,15 @@ export function FixtureDialog({
               <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-negative" aria-hidden />
               <span>
                 Supprimer {entry.home.shortCode} — {entry.away.shortCode} ?
-                {hasScore && ' Son résultat sera retiré du classement.'}
+                {playedDelete && ' Son résultat sera retiré du classement.'}
               </span>
             </p>
+            {/* A played match leaves the table with it: the API asks why (the owner's Q3). */}
+            {playedDelete && !reason.trim() && (
+              <p className="mt-1.5 pl-6 text-xs text-negative">
+                Indiquez la raison ci-dessus : elle reste dans le journal du match.
+              </p>
+            )}
             <div className="mt-2.5 flex justify-end gap-2">
               <Button variant="outline" onClick={() => setConfirmingDelete(false)} disabled={busy}>
                 Non
@@ -903,6 +910,7 @@ export function FixtureDialog({
               <Button
                 variant="primary"
                 isLoading={deleteMut.isPending}
+                disabled={playedDelete && !reason.trim()}
                 onClick={() =>
                   deleteMut.mutate(
                     { gameId: entry.id, reason: reason.trim() || undefined },

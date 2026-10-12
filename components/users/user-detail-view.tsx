@@ -57,6 +57,7 @@ export function UserDetailView({
   // Never yourself: the API refuses it, and the button would lock the reader out of the screen
   // they are looking at.
   const canDeactivate = !!user && user.isActive && canManageAccess && user.id !== me?.id;
+  const pendingInvite = !!user?.invitation && user.invitation.status !== 'ACCEPTED';
 
   return (
     <div className="container mx-auto max-w-2xl p-6">
@@ -86,9 +87,19 @@ export function UserDetailView({
                   <UserX size={16} className="mr-1" /> Désactiver
                 </Button>
               )}
-              <Button variant="danger" onClick={() => setConfirmDelete(true)}>
-                <Trash2 size={16} className="mr-1" /> Supprimer
-              </Button>
+              {/* An organisation cancels invitations; deleting an account in use is the
+                  platform's (RESOURCE_DELETION.md, Q4) — « Désactiver » is the organisation's tool. */}
+              {pendingInvite ? (
+                <Button variant="danger" onClick={() => setConfirmDelete(true)}>
+                  <Trash2 size={16} className="mr-1" /> Annuler l&apos;invitation
+                </Button>
+              ) : (
+                isSystemAdmin && user.id !== me?.id && (
+                  <Button variant="danger" onClick={() => setConfirmDelete(true)}>
+                    <Trash2 size={16} className="mr-1" /> Supprimer
+                  </Button>
+                )
+              )}
             </div>
           </div>
           <UserSummary user={user} />
@@ -151,17 +162,20 @@ export function UserDetailView({
       <ConfirmDialog
         open={confirmDelete}
         onOpenChange={setConfirmDelete}
-        title="Supprimer cet utilisateur ?"
+        title={pendingInvite ? 'Annuler l’invitation ?' : 'Supprimer cet utilisateur ?'}
         description={
-          canDeactivate
-            ? 'Cette action est irréversible. Pour couper l’accès sans rien supprimer, désactivez plutôt le compte.'
-            : 'Cette action est irréversible.'
+          pendingInvite
+            ? `Le lien et le code envoyés à ${name} ne marcheront plus. L’adresse pourra être invitée de nouveau.`
+            : canDeactivate
+              ? 'Cette action est irréversible. Pour couper l’accès sans rien supprimer, désactivez plutôt le compte.'
+              : 'Cette action est irréversible.'
         }
-        confirmLabel="Supprimer"
+        confirmLabel={pendingInvite ? 'Annuler l’invitation' : 'Supprimer'}
+        cancelLabel={pendingInvite ? 'Garder' : 'Annuler'}
         onConfirm={() =>
           del.mutate(userId, {
             onSuccess: () => {
-              toast.success('Utilisateur supprimé.');
+              toast.success(pendingInvite ? 'Invitation annulée.' : 'Utilisateur supprimé.');
               router.push(backHref);
             },
             onError: (e) => toastApiError(e),
