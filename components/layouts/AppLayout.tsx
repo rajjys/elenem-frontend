@@ -178,11 +178,8 @@ export default function AppLayout({ children, navItems }: AppLayoutProps) {
                   ))}
                 </nav>
                 <SidebarUserMenu
-                  name={[userAuth?.firstName, userAuth?.lastName].filter(Boolean).join(' ')}
-                  email={userAuth?.email}
                   isSidebarOpen={isSidebarOpen}
                   onLogout={handleLogout}
-                  buildLink={buildLink}
                   publicSiteHref={publicSiteHref}
                 />
               </aside>
@@ -219,11 +216,8 @@ export default function AppLayout({ children, navItems }: AppLayoutProps) {
                 ))}
               </nav>
               <SidebarUserMenu
-                name={[userAuth?.firstName, userAuth?.lastName].filter(Boolean).join(' ')}
-                email={userAuth?.email}
                 isSidebarOpen
                 onLogout={handleLogout}
-                buildLink={buildLink}
                 publicSiteHref={publicSiteHref}
                 onNavigate={closeMobileMenu}
               />
@@ -234,7 +228,7 @@ export default function AppLayout({ children, navItems }: AppLayoutProps) {
         {/* Main column: the navbar belongs to the content, not to the whole shell, so it can be
             removed later without the app losing its frame. */}
         <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
-          <AppLayoutHeader onMobileMenuToggle={toggleMobileMenu} handleLogout={handleLogout} />
+          <AppLayoutHeader onMobileMenuToggle={toggleMobileMenu} />
           <main className="flex-1 overflow-y-auto bg-canvas p-6">
             {/* Renders nothing once the address is verified, and nothing outside a dashboard.
                 It stays mounted here so no dashboard has to remember it, but it decides for

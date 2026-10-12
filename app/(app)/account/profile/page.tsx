@@ -11,7 +11,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 /**
  * The reader's own account.
  *
- * Linked from the sidebar menu **and** the navbar avatar — on every page, for every role — and it
+ * Linked from the account menu — on every page, for every role — and it
  * rendered the words "User Profile Page". It is the most-linked dead end in the product, which is
  * why it is one of the five routes item 16 builds rather than deletes
  * (`docs/PLAYERS_AND_STATS.md` §3.2).
