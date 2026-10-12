@@ -12,7 +12,8 @@ import {
   Trash2,
 } from 'lucide-react';
 import { Button, DatePicker, Label, Modal, SelectField } from '@/components/ui';
-import { toastApiError } from '@/utils';
+import { levelScoreRefusal, toastApiError } from '@/utils';
+import { useAuthStore } from '@/store/auth.store';
 import { useScopeContext } from '@/hooks';
 import {
   useCalendar,
@@ -178,6 +179,7 @@ export function FixtureDialog({
   const [awayScore, setAwayScore] = useState('');
   const [forfeit, setForfeit] = useState(false);
   const [reason, setReason] = useState('');
+  const sport = useAuthStore((s) => s.user?.tenant?.sportType);
   const [showHistory, setShowHistory] = useState(false);
   const [showAllThatDay, setShowAllThatDay] = useState(false);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
@@ -322,8 +324,11 @@ export function FixtureDialog({
   const scoreTyped = homeScore !== '' || awayScore !== '';
   const scoreComplete =
     homeScore !== '' && awayScore !== '' && Number(homeScore) >= 0 && Number(awayScore) >= 0;
+  /** No 68–68 in basketball: said here, before the API refuses it. */
+  const levelRefusal =
+    alreadyPlayed && scoreComplete ? levelScoreRefusal(sport, Number(homeScore), Number(awayScore)) : null;
   /** Both or neither: one number is a typo waiting to become a result. */
-  const scoreValid = !alreadyPlayed || !scoreTyped || scoreComplete;
+  const scoreValid = (!alreadyPlayed || !scoreTyped || scoreComplete) && !levelRefusal;
   const recordsResult = alreadyPlayed && scoreComplete;
 
   const slotChanged =
@@ -677,9 +682,11 @@ export function FixtureDialog({
               </label>
             )}
             <p className={cn('mt-2 text-xs', scoreValid ? 'text-ink-subtle' : 'text-negative')}>
-              {scoreValid
-                ? 'Laissez vide si le score n’est pas encore connu : le match restera en attente de résultat.'
-                : 'Saisissez les deux scores, ou aucun.'}
+              {levelRefusal
+                ? levelRefusal
+                : scoreValid
+                  ? 'Laissez vide si le score n’est pas encore connu : le match restera en attente de résultat.'
+                  : 'Saisissez les deux scores, ou aucun.'}
             </p>
           </div>
         )}

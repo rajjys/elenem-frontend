@@ -4929,6 +4929,7 @@ export interface components {
             away: components["schemas"]["CalendarSideDto"];
             homeScore?: Record<string, never>;
             awayScore?: Record<string, never>;
+            isForfeit?: boolean;
             conditional?: boolean;
         };
         CalendarBlackoutDto: {

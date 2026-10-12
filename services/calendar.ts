@@ -37,6 +37,8 @@ const CalendarEntrySchema = z.object({
   away: CalendarSideSchema,
   homeScore: z.number().nullable().optional(),
   awayScore: z.number().nullable().optional(),
+  /** The result was a forfeit: the loser did not turn up. */
+  isForfeit: z.boolean().optional(),
   /** « SI NECESSITE » — a fixture that exists only if the results require it. */
   conditional: z.boolean().optional(),
 });

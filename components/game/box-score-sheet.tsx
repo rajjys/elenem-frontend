@@ -5,7 +5,8 @@ import { toast } from 'sonner';
 import { AlertTriangle, ArrowRightLeft, Check, Info, Loader2, Lock, Plus, X } from 'lucide-react';
 import { Button, Label } from '@/components/ui';
 import { PlayerQuickView } from '@/components/players/player-quick-view';
-import { toastApiError, cn } from '@/utils';
+import { levelScoreRefusal, toastApiError, cn } from '@/utils';
+import { useAuthStore } from '@/store/auth.store';
 import {
   existingPlayersFrom,
   totalOf,
@@ -95,6 +96,7 @@ export function BoxScoreSheet({
   const box = useBoxScore(gameId, active);
   const saveMut = useSaveBoxScore();
   const scoreMut = useReportScore();
+  const sport = useAuthStore((st) => st.user?.tenant?.sportType);
   const addMut = useAddBoxScorePlayer();
   const transferMut = useTransferPlayer();
 
@@ -286,6 +288,7 @@ export function BoxScoreSheet({
   const anyRecorded = totals.home > 0 || totals.away > 0;
   const reconciles = data.reconcilesWithFinalScore;
   const matches = hasFinal && totals.home === finalHome && totals.away === finalAway;
+  const totalsRefusal = levelScoreRefusal(sport, totals.home, totals.away);
 
   function set(playerId: string, column: StatColumn, raw: string) {
     // Digits only, capped by the column's own ceiling: five fouls, not ninety-nine, and a slipped
@@ -743,14 +746,20 @@ export function BoxScoreSheet({
           {!hasFinal && anyRecorded && !readOnly && (
             <div className="mt-2 flex flex-wrap items-center gap-2">
               <p className="text-xs text-ink-muted">Aucun score final n&apos;est enregistré.</p>
-              <button
-                type="button"
-                onClick={adoptAsFinalScore}
-                disabled={busy}
-                className="rounded-md bg-accent px-2.5 py-1 text-xs font-medium text-accent-ink transition-colors hover:bg-accent/90 disabled:opacity-50"
-              >
-                Utiliser {totals.home} – {totals.away} comme score final
-              </button>
+              {/* A level sheet cannot become the result in basketball: it is a sheet still being
+                  typed, or one missing the overtime. Said instead of offered. */}
+              {totalsRefusal ? (
+                <p className="text-xs text-caution">{totalsRefusal}</p>
+              ) : (
+                <button
+                  type="button"
+                  onClick={adoptAsFinalScore}
+                  disabled={busy}
+                  className="rounded-md bg-accent px-2.5 py-1 text-xs font-medium text-accent-ink transition-colors hover:bg-accent/90 disabled:opacity-50"
+                >
+                  Utiliser {totals.home} – {totals.away} comme score final
+                </button>
+              )}
             </div>
           )}
         </div>

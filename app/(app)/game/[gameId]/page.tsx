@@ -157,6 +157,7 @@ export default function GamePage() {
       away: { id: g.awayTeam.id, name: g.awayTeam.name, shortCode: g.awayTeam.shortCode ?? '' },
       homeScore: g.homeScore ?? null,
       awayScore: g.awayScore ?? null,
+      isForfeit: g.isForfeit ?? false,
     };
   }, [entriesThatDay, gameId, game.data]);
 

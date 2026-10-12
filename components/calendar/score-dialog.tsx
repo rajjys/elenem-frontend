@@ -4,9 +4,10 @@ import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { Flag, Info } from 'lucide-react';
 import { Button, Label, Modal } from '@/components/ui';
-import { toastApiError } from '@/utils';
+import { levelScoreRefusal, toastApiError } from '@/utils';
 import type { CalendarEntry } from '@/services/calendar';
 import { useReportScore } from '@/services/games';
+import { useAuthStore } from '@/store/auth.store';
 import { cn } from '@/utils';
 
 /**
@@ -41,13 +42,17 @@ export function ScoreDialog({
   const homeRef = useRef<HTMLInputElement>(null);
 
   const scoreMut = useReportScore();
+  const sport = useAuthStore((s) => s.user?.tenant?.sportType);
   const correcting = !!entry && entry.homeScore != null;
 
   useEffect(() => {
     if (!open || !entry) return;
     setHome(entry.homeScore != null ? String(entry.homeScore) : '');
     setAway(entry.awayScore != null ? String(entry.awayScore) : '');
-    setForfeit(false);
+    // What is on record, forfeit included. It always opened unchecked, so a forfeit being
+    // corrected looked like an ordinary result — and unticking it to undo one did nothing, because
+    // only a ticked box was ever sent.
+    setForfeit(!!entry.isForfeit);
     setReason('');
     // Focused on open: the whole point is that the next thing the operator does is type a number.
     const t = setTimeout(() => homeRef.current?.select(), 60);
@@ -56,7 +61,10 @@ export function ScoreDialog({
 
   if (!entry) return null;
 
-  const valid = home !== '' && away !== '' && Number(home) >= 0 && Number(away) >= 0;
+  const complete = home !== '' && away !== '' && Number(home) >= 0 && Number(away) >= 0;
+  // A system administrator has no organisation and so no sport here; the API still refuses.
+  const levelRefusal = complete ? levelScoreRefusal(sport, Number(home), Number(away)) : null;
+  const valid = complete && !levelRefusal;
 
   /**
    * Whether anything actually differs from what is on record.
@@ -70,7 +78,7 @@ export function ScoreDialog({
     !correcting ||
     Number(home) !== entry.homeScore ||
     Number(away) !== entry.awayScore ||
-    forfeit;
+    forfeit !== !!entry.isForfeit;
 
   function submit() {
     if (!valid || !changed || !entry) return;
@@ -79,7 +87,8 @@ export function ScoreDialog({
         gameId: entry.id,
         homeScore: Number(home),
         awayScore: Number(away),
-        ...(forfeit ? { isForfeit: true } : {}),
+        // Always sent, so unticking it is a change the server hears.
+        isForfeit: forfeit,
         ...(correcting && reason.trim() ? { reason: reason.trim() } : {}),
       },
       {
@@ -147,6 +156,12 @@ export function ScoreDialog({
             <p className="text-xs text-ink-subtle">visiteur</p>
           </div>
         </div>
+
+        {levelRefusal && (
+          <p role="alert" className="-mt-2 text-center text-sm text-negative">
+            {levelRefusal}
+          </p>
+        )}
 
         {/* A forfeit is not a heavy loss, it is a different outcome — LIPROBAKIN give a point for
             a loss and nothing for a forfeit, so this checkbox is worth a point in the table. */}
