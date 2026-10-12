@@ -813,3 +813,19 @@ organisation's ownership to someone else, and several competitions per person (D
 
 `POST /posts` without a `slug` answers 500 (the field is optional in the DTO and required in the
 database). The app's form always sends one, so only a direct API caller meets it.
+
+## 16. Deleting things — one rule, four verbs (2026-10-12)
+
+The owner found the competitions list freezing on « Supprimer » → « Annuler » (fixed the same day:
+three copies of Radix's layer code; the packages are pinned to one release) and asked for deletion
+to be mapped and made uniform. The analysis and the plan are in **`docs/RESOURCE_DELETION.md`**.
+
+In short: a club that has played can be deleted and then shows as `deleted_<ts>_Name` on the
+public table and the export; administrators outlive the competition or club they ran; photos and
+personal identifiers are never erased; the screens confirm deletes in six different ways and
+promise cascades the server refuses. Two access holes found on the way come first (sprint R0):
+game status commands and the game-date lists are not scoped to the caller's organisation.
+
+Decisions Q1–Q7 taken as recommended on 2026-10-12 (Q2: keep the results of a club that withdraws).
+Sprints R0–R4 (§8); R0 also refuses tied basketball scores and fixes the forfeit box. R0 built and verified
+2026-10-12 (not committed); R1 next.
