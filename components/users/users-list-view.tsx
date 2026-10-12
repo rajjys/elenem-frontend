@@ -18,6 +18,7 @@ import type { UserFilterParams } from '@/schemas/user-schemas';
 import { meaningfulRoles, roleLabel, ROLE_LABELS } from '@/utils/role-labels';
 import { cn, formatDateFr, toastApiError } from '@/utils';
 import { UserQuickView } from './user-quick-view';
+import { InviteDialog } from './invite-dialog';
 import { currentSignInLock, lockUntilLabel } from './user-sign-in-access';
 
 const PAGE_SIZE = 20;
@@ -44,11 +45,17 @@ const PAGE_SIZE = 20;
 export function UsersListView({
   basePath,
   createHref,
+  inviteTenantId,
   scope,
 }: {
   /** Where a user's full record lives on this surface. */
   basePath: string;
   createHref?: string;
+  /**
+   * The organisation an « Inviter quelqu'un » adds people to. Given on the organisation's own
+   * screen (ROADMAP_V2 §15, U2); without it the list has no invitation.
+   */
+  inviteTenantId?: string;
   /**
    * Pinned by the host page from the current context. Without it every surface showed the same
    * list: a club's `/team/users` returned every account in the organisation, because the only
@@ -62,6 +69,7 @@ export function UsersListView({
   const [role, setRole] = useState('');
   const [viewing, setViewing] = useState<string | null>(null);
   const [toDelete, setToDelete] = useState<{ id: string; name: string } | null>(null);
+  const [inviting, setInviting] = useState(false);
 
   const filters: UserFilterParams = useMemo(
     () => ({
@@ -103,7 +111,13 @@ export function UsersListView({
     <ListPage
       title="Utilisateurs"
       description={`${totalItems} ${totalItems === 1 ? 'compte' : 'comptes'}`}
-      action={createHref ? { label: 'Nouvel utilisateur', href: createHref, icon: UserPlus } : undefined}
+      action={
+        inviteTenantId
+          ? { label: 'Inviter quelqu’un', onClick: () => setInviting(true), icon: UserPlus }
+          : createHref
+            ? { label: 'Nouvel utilisateur', href: createHref, icon: UserPlus }
+            : undefined
+      }
       filters={
         <ListToolbar
           search={search}
@@ -135,10 +149,16 @@ export function UsersListView({
               ? 'Essayez un autre nom, ou retirez le filtre par rôle.'
               : 'Invitez les personnes qui vous aident à tenir la compétition : saisie des scores, publication des résultats.'}
           </p>
-          {createHref && !debounced && !role && (
-            <Button variant="primary" className="mt-4" asChild>
-              <Link href={createHref}>Inviter quelqu’un</Link>
+          {inviteTenantId && !debounced && !role ? (
+            <Button variant="primary" className="mt-4" onClick={() => setInviting(true)}>
+              Inviter quelqu’un
             </Button>
+          ) : (
+            createHref && !debounced && !role && (
+              <Button variant="primary" className="mt-4" asChild>
+                <Link href={createHref}>Inviter quelqu’un</Link>
+              </Button>
+            )
           )}
         </div>
       }
@@ -147,6 +167,9 @@ export function UsersListView({
       onPageChange={setPage}
       overlays={
         <>
+          {inviteTenantId && (
+            <InviteDialog open={inviting} onOpenChange={setInviting} tenantId={inviteTenantId} />
+          )}
           {viewing && (
             <UserQuickView
               userId={viewing}
@@ -247,8 +270,14 @@ export function UsersListView({
                       </div>
                     </td>
                     <td className="hidden px-4 py-3 text-ink-muted lg:table-cell">
+                      {/* Never signed in: an invitation still open says why, an expired one needs a
+                          new one (from the person's record). */}
                       {u.lastLoginAt ? (
                         formatDateFr(u.lastLoginAt)
+                      ) : u.invitation?.status === 'PENDING' ? (
+                        <span className="text-ink-subtle">Invitation en attente</span>
+                      ) : u.invitation?.status === 'EXPIRED' ? (
+                        <span className="text-caution">Invitation expirée</span>
                       ) : (
                         <span className="text-ink-subtle">Jamais</span>
                       )}

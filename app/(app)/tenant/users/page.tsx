@@ -4,5 +4,5 @@ import { useScopeContext } from '@/hooks/useScopeContext';
 
 export default function Page() {
   const { tenantId } = useScopeContext();
-  return <UsersListView basePath="/tenant/users" scope={{ tenantId }} />;
+  return <UsersListView basePath="/tenant/users" scope={{ tenantId }} inviteTenantId={tenantId ?? undefined} />;
 }

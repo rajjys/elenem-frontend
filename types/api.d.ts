@@ -523,6 +523,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/access/resend-invitation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Send a fresh three-day invitation code to someone who has not yet chosen their password */
+        post: operations["AccessController_resendInvitation"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/access/grant": {
         parameters: {
             query?: never;
@@ -2277,6 +2294,22 @@ export interface components {
              */
             until: string | null;
         };
+        InvitationStatusDto: {
+            /** @enum {string} */
+            status: "PENDING" | "EXPIRED" | "ACCEPTED";
+            /**
+             * Format: date-time
+             * @description When the (last) invitation was sent.
+             */
+            sentAt: string;
+            /**
+             * Format: date-time
+             * @description When a pending code runs out.
+             */
+            expiresAt: string | null;
+            /** Format: date-time */
+            acceptedAt: string | null;
+        };
         UserTenantLiteDto: {
             id: string;
             name: string;
@@ -2319,6 +2352,7 @@ export interface components {
             /** Format: date-time */
             lastLoginAt?: string | null;
             signInLock?: components["schemas"]["SignInLockDto"] | null;
+            invitation?: components["schemas"]["InvitationStatusDto"] | null;
             tenant?: components["schemas"]["UserTenantLiteDto"] | null;
             managingLeague?: components["schemas"]["ManagingLeagueResponseDto"] | null;
             managingTeam?: components["schemas"]["ManagingTeamResponseDto"] | null;
@@ -2955,6 +2989,9 @@ export interface components {
             person: components["schemas"]["AccessPersonDto"];
             created: boolean;
             invited: boolean;
+        };
+        ResendInvitationDto: {
+            userId: string;
         };
         GrantAccessDto: {
             userId: string;
@@ -6377,6 +6414,35 @@ export interface operations {
             };
             /** @description code EMAIL_NOT_VERIFIED: the inviter's own address must be verified to send an invitation. */
             403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AccessController_resendInvitation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ResendInvitationDto"];
+            };
+        };
+        responses: {
+            /** @description Sent. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description The e-mail could not be sent. */
+            503: {
                 headers: {
                     [name: string]: unknown;
                 };

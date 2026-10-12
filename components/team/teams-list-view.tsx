@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useDebounce } from 'use-debounce';
 import { toast } from 'sonner';
-import { ListPlus, Pencil, Shield, Trash2 } from 'lucide-react';
+import { ListPlus, Pencil, Shield, Trash2, UserCog } from 'lucide-react';
 import { Button, ConfirmDialog, ListPage, ListToolbar, SelectField } from '@/components/ui';
 import { useScopeContext } from '@/hooks/useScopeContext';
 import { useAuthStore } from '@/store/auth.store';
@@ -14,6 +14,7 @@ import { useStandingsLeagues } from '@/services/standings';
 import { toastApiError } from '@/utils';
 import { TeamFormDialog } from './team-form-dialog';
 import { BulkTeamsDialog } from './bulk-teams-dialog';
+import { TeamAdminsDialog } from './team-admins-dialog';
 
 const PAGE_SIZE = 20;
 
@@ -58,6 +59,7 @@ export function TeamsListView({
   const [creating, setCreating] = useState(false);
   const [bulkOpen, setBulkOpen] = useState(false);
   const [editing, setEditing] = useState<TeamListItem | null>(null);
+  const [staffing, setStaffing] = useState<TeamListItem | null>(null);
 
   // The organisation's list may narrow to one competition; a competition's list is already one and
   // offers no picker. A club belongs to exactly one, so this is the only filter either page needs —
@@ -158,6 +160,14 @@ export function TeamsListView({
       onPageChange={setPage}
       overlays={
         <>
+          <TeamAdminsDialog
+            team={staffing}
+            onOpenChange={(o) => !o && setStaffing(null)}
+            canManage={canManage}
+            // Listing the organisation's people is its administrators' (a competition's lists only
+            // its own); they pick, the others invite.
+            canPickExisting={isSystemAdmin || roles.includes(Roles.TENANT_ADMIN)}
+          />
         <TeamFormDialog
           open={creating}
           onOpenChange={setCreating}
@@ -231,6 +241,14 @@ export function TeamsListView({
                         {/* The name and the abbreviation, in place. A club's *details* — ville,
                             année de fondation, logo — are its own screen, reached by opening the
                             club, because that is a different act from correcting a typo in a list. */}
+                        <button
+                          onClick={() => setStaffing(team)}
+                          className="rounded p-1.5 text-ink-subtle hover:bg-surface-sunk hover:text-ink"
+                          aria-label={`Responsables de ${team.name}`}
+                          title="Responsables du club"
+                        >
+                          <UserCog className="h-4 w-4" />
+                        </button>
                         <button
                           onClick={() => setEditing(team)}
                           className="rounded p-1.5 text-ink-subtle hover:bg-surface-sunk hover:text-ink"

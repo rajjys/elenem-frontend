@@ -9,6 +9,7 @@ import { ArrowLeft, Pencil, Trash2, MailCheck, UserX } from 'lucide-react';
 import { Button, LoadingSpinner, Modal, ConfirmDialog } from '@/components/ui';
 import { UserSummary } from './user-summary';
 import { UserSignInAccess, useCanManageAccess } from './user-sign-in-access';
+import { UserResponsibilities } from './user-responsibilities';
 import { UserActivity } from '@/components/journal/user-activity';
 import { UserForm } from '@/components/forms/user-form';
 import {
@@ -94,6 +95,11 @@ export function UserDetailView({
           <div className="mt-6">
             <UserSignInAccess user={user} />
           </div>
+          {canManageAccess && (
+            <div className="mt-8">
+              <UserResponsibilities user={user} />
+            </div>
+          )}
           {journalHref && (
             <div className="mt-8">
               <UserActivity userId={user.id} journalHref={journalHref} />

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { KeyRound, Lock, LockOpen, UserCheck, UserX } from 'lucide-react';
+import { KeyRound, Lock, LockOpen, MailCheck, Clock, Send, UserCheck, UserX } from 'lucide-react';
 import { Button, ConfirmDialog } from '@/components/ui';
 import {
   useSendPasswordResetCode,
@@ -10,6 +10,7 @@ import {
   useUnblockUserSignIn,
   type UserResponse,
 } from '@/services/users';
+import { useResendInvitation } from '@/services/access';
 import { useCurrentUser, useHasRole } from '@/hooks';
 import { Roles } from '@/schemas';
 import { toastApiError } from '@/utils';
@@ -23,6 +24,14 @@ export function currentSignInLock(
 ): SignInLock | null {
   if (!lock) return null;
   return !lock.until || new Date(lock.until) > now ? lock : null;
+}
+
+/** « 11 oct. » — or « 11 oct. à 10:00 » when the hour matters. */
+function day(iso: string | null | undefined, withTime = false): string {
+  if (!iso) return '';
+  const d = new Date(iso);
+  const date = d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+  return withTime ? `${date} à ${d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}` : date;
 }
 
 /** « jusqu’à 13:41 » today, « jusqu’au 8 octobre à 00:10 » another day. */
@@ -65,14 +74,18 @@ export function UserSignInAccess({ user }: { user: UserResponse }) {
   const unblock = useUnblockUserSignIn();
   const setActive = useSetUserActive();
   const sendCode = useSendPasswordResetCode();
+  const resend = useResendInvitation();
   const [confirmCode, setConfirmCode] = useState(false);
+  // An invitation not yet accepted: the remedy is a new invitation, not a reset code.
+  const invitation = user.invitation;
+  const awaitingInvitation = invitation?.status === 'PENDING' || invitation?.status === 'EXPIRED';
 
   const lock = currentSignInLock(user.signInLock);
   const canUnblock = useCanManageAccess(user);
   // The API sends nothing to a deactivated account, so offering it would be a button that lies;
   // and a new password does not open an administrator's lock, so it would be one there too. Who
   // may send one is who may decide access (the API's rule).
-  const canSendCode = canUnblock && user.isActive && lock?.reason !== 'ADMIN';
+  const canSendCode = canUnblock && user.isActive && lock?.reason !== 'ADMIN' && !awaitingInvitation;
 
   const onUnblock = () =>
     unblock.mutate(user.id, {
@@ -134,8 +147,55 @@ export function UserSignInAccess({ user }: { user: UserResponse }) {
     );
   }
 
+  const invitationBlock = invitation && (
+    awaitingInvitation ? (
+      <section
+        className={
+          invitation.status === 'EXPIRED'
+            ? 'rounded-lg border border-caution/40 bg-caution-soft px-3.5 py-3'
+            : 'rounded-lg border border-line px-3.5 py-3'
+        }
+      >
+        <p className="flex items-center gap-1.5 text-sm font-medium text-ink">
+          <Clock className={invitation.status === 'EXPIRED' ? 'h-3.5 w-3.5 text-caution' : 'h-3.5 w-3.5 text-ink-muted'} aria-hidden />
+          {invitation.status === 'EXPIRED'
+            ? `Invitation expirée${invitation.expiresAt ? ` le ${day(invitation.expiresAt)}` : ''}`
+            : `Invitation envoyée le ${day(invitation.sentAt)}, en attente`}
+        </p>
+        <p className="mt-1 text-sm text-ink-muted">
+          {invitation.status === 'EXPIRED'
+            ? 'Cette personne n’a pas choisi son mot de passe à temps. Une nouvelle invitation lui donne trois jours de plus.'
+            : `Cette personne n’a pas encore choisi son mot de passe. Le code expire le ${day(invitation.expiresAt, true)}.`}
+        </p>
+        {canUnblock && user.isActive && (
+          <Button
+            size="sm"
+            variant={invitation.status === 'EXPIRED' ? 'primary' : 'outline'}
+            className="mt-3"
+            disabled={resend.isPending}
+            onClick={() =>
+              resend.mutate(user.id, {
+                onSuccess: (r) => toast.success(r.message),
+                onError: (e) => toastApiError(e, 'L’invitation n’a pas pu être renvoyée.'),
+              })
+            }
+          >
+            <Send className="mr-1.5 h-3.5 w-3.5" aria-hidden />
+            Renvoyer l’invitation
+          </Button>
+        )}
+      </section>
+    ) : (
+      <p className="flex items-center gap-1.5 text-sm text-ink-muted">
+        <MailCheck className="h-3.5 w-3.5 text-positive" aria-hidden />
+        Invitation acceptée le {day(invitation.acceptedAt)}
+      </p>
+    )
+  );
+
   return (
     <>
+      {invitationBlock}
       {lock ? (
         <section className="rounded-lg border border-caution/40 bg-caution-soft px-3.5 py-3">
           <p className="flex items-center gap-1.5 text-sm font-medium text-ink">

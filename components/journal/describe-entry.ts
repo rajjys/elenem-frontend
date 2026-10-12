@@ -17,6 +17,7 @@ import {
   UserX,
   Users,
   ArrowRightLeft,
+  Send,
 } from 'lucide-react';
 import {
   Building2,
@@ -204,6 +205,10 @@ function describeAccount(entry: JournalEntry, after: Record<string, unknown>): R
       return { icon: KeyRound, title: 'Mot de passe défini par un administrateur', tone: 'caution' };
     case 'PASSWORD_RESET_SENT':
       return { icon: KeyRound, title: 'Code de réinitialisation envoyé' };
+    case 'INVITATION_ACCEPTED':
+      return { icon: MailCheck, title: 'Invitation acceptée', detail: 'Mot de passe choisi, adresse vérifiée.', tone: 'positive' };
+    case 'INVITATION_RESENT':
+      return { icon: Send, title: 'Invitation renvoyée', detail: 'Un nouveau code, valable trois jours.' };
     case 'EMAIL_VERIFIED':
       return { icon: MailCheck, title: 'Adresse e-mail vérifiée' };
     case 'USER_REGISTERED':
@@ -262,7 +267,11 @@ function describeLifecycle(
             ? 'Salle ajoutée'
             : `${kind.noun} créé${e}`;
     const details = [
-      type === 'USER' && Array.isArray(after.roles) ? describeValue('roles', after.roles) : null,
+      // Only when it says something: an invited administrator is created as a member and given
+      // the role on the next line, and « Rôle : Membre » above « Nomination » reads as a mistake.
+      type === 'USER' && Array.isArray(after.roles) && after.roles.some((r) => r !== 'GENERAL_USER')
+        ? describeValue('roles', after.roles)
+        : null,
       type === 'PLAYER' && after.team ? describeValue('team', after.team) : null,
       type === 'POST' && after.status ? describeValue('status', after.status) : null,
     ].filter(Boolean);

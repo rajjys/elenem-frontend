@@ -32,6 +32,16 @@ export const UserBasicSchema = z.object({
     .object({ reason: z.enum(['FAILED_ATTEMPTS', 'ADMIN']), until: z.string().nullable() })
     .nullable()
     .optional(),
+  /** Whether an invited person has chosen their password yet. Null when not invited. */
+  invitation: z
+    .object({
+      status: z.enum(['PENDING', 'EXPIRED', 'ACCEPTED']),
+      sentAt: z.string(),
+      expiresAt: z.string().nullable(),
+      acceptedAt: z.string().nullable(),
+    })
+    .nullable()
+    .optional(),
   // `z.coerce.date()` rather than a hand-rolled `preprocess`: it parses the ISO text the API sends
   // and infers `Date` cleanly, where the preprocess form infers an empty object under zod 4 and
   // every read of it becomes a type error.

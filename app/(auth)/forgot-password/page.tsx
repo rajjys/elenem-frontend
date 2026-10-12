@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useState } from 'react';
+import { Suspense, useEffect, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
 import { ArrowLeft, CheckCircle2 } from 'lucide-react';
@@ -14,6 +14,8 @@ import { PasswordChecklist, passwordMeetsRules } from '@/components/ui/password-
 import { toastApiError } from '@/utils';
 import { useForgotPassword, useVerifyResetOtp, useResetPassword } from '@/services/auth';
 import { useCooldown } from '@/hooks/useCooldown';
+import { useAuthStore } from '@/store/auth.store';
+import { getPostAuthRedirect } from '@/utils/post-auth-redirect';
 
 type Step = 'email' | 'otp' | 'password';
 const STEPS: Step[] = ['email', 'otp', 'password'];
@@ -28,7 +30,11 @@ const STEPS: Step[] = ['email', 'otp', 'password'];
  */
 function ForgotPasswordInner() {
   const router = useRouter();
-  const emailFromLink = useSearchParams().get('email') ?? '';
+  const params = useSearchParams();
+  const emailFromLink = params.get('email') ?? '';
+  // `send=1`: arrived asking for a code (« Recevoir un nouveau code » on an invitation), not
+  // holding one from an e-mail — send it on arrival, once.
+  const sendOnArrival = params.get('send') === '1' && !!emailFromLink;
   const [step, setStep] = useState<Step>(emailFromLink ? 'otp' : 'email');
   const [email, setEmail] = useState(emailFromLink);
   const [otp, setOtp] = useState('');
@@ -37,9 +43,27 @@ function ForgotPasswordInner() {
   const [tried, setTried] = useState(false);
 
   const forgot = useForgotPassword();
+  const sentOnArrival = useRef(false);
   const verifyOtp = useVerifyResetOtp();
   const reset = useResetPassword();
   const cooldown = useCooldown();
+  const login = useAuthStore((s) => s.login);
+  const [signingIn, setSigningIn] = useState(false);
+
+  useEffect(() => {
+    if (!sendOnArrival || sentOnArrival.current) return;
+    sentOnArrival.current = true;
+    // The promise, not mutate()'s callbacks: those belong to the render that called them, and in
+    // development React mounts twice — the guard above keeps the second from sending again, so
+    // the first's callbacks would be the only ones, and they are dropped with it.
+    forgot
+      .mutateAsync(emailFromLink)
+      .then(() => {
+        toast.success('Nouveau code envoyé.');
+        cooldown.start();
+      })
+      .catch((e: unknown) => toastApiError(e, "Impossible d'envoyer le code."));
+  }, [sendOnArrival, emailFromLink, forgot, cooldown]);
 
   // Step 1 — request a code.
   const requestCode = (e: React.FormEvent) => {
@@ -89,9 +113,19 @@ function ForgotPasswordInner() {
     reset.mutate(
       { email, otp, newPassword },
       {
-        onSuccess: () => {
-          toast.success('Mot de passe réinitialisé. Connectez-vous.');
-          router.push('/login');
+        // Signed in on the way out, as after an invitation: the address and the new password were
+        // both just typed here, and the sign-in form would only ask for them again.
+        onSuccess: async () => {
+          setSigningIn(true);
+          try {
+            await login(email, newPassword);
+            toast.success('Mot de passe réinitialisé. Bienvenue !');
+            const user = useAuthStore.getState().user;
+            router.replace(user ? getPostAuthRedirect(user) : '/');
+          } catch {
+            toast.success('Mot de passe réinitialisé. Connectez-vous.');
+            router.push('/login');
+          }
         },
         onError: (err) => toastApiError(err, 'Réinitialisation impossible.'),
       },
@@ -108,7 +142,7 @@ function ForgotPasswordInner() {
           ? 'Entrez votre adresse email : vous recevrez un code à 6 chiffres.'
           : step === 'otp'
             ? `Entrez le code envoyé à ${email}.`
-            : 'Choisissez un nouveau mot de passe.'
+            : `Choisissez le nouveau mot de passe de ${email}.`
       }
       crossLink={{ prompt: 'Vous vous en souvenez ?', label: 'Connectez-vous', href: '/login' }}
     >
@@ -198,8 +232,8 @@ function ForgotPasswordInner() {
               required
             />
           </div>
-          <Button type="submit" variant="primary" className="h-11 w-full" disabled={reset.isPending}>
-            {reset.isPending ? 'Réinitialisation…' : 'Réinitialiser le mot de passe'}
+          <Button type="submit" variant="primary" className="h-11 w-full" disabled={reset.isPending || signingIn}>
+            {reset.isPending ? 'Réinitialisation…' : signingIn ? 'Connexion…' : 'Réinitialiser le mot de passe'}
           </Button>
         </form>
       )}

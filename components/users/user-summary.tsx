@@ -3,6 +3,7 @@
 import * as React from 'react';
 import { CheckCircle2, XCircle } from 'lucide-react';
 import type { UserResponse } from '@/services/users';
+import { meaningfulRoles, roleLabel } from '@/utils/role-labels';
 
 function fmt(d?: unknown): string {
   if (!d || typeof d === 'object') return '—';
@@ -49,12 +50,19 @@ export function UserSummary({ user }: { user: UserResponse }) {
         </div>
       </div>
 
+      {/* What the person does, as on the list — a job, and what it is over — not the stored enum
+          (« GENERAL_USER », « TEAM_ADMIN »). */}
       <div className="flex flex-wrap gap-2">
-        {(user.roles ?? []).map((r) => (
-          <span key={r} className="rounded-full bg-surface-sunk px-2.5 py-1 text-xs font-medium text-ink">
-            {r}
-          </span>
-        ))}
+        {meaningfulRoles(user.roles ?? []).map((r) => {
+          const over =
+            r === 'LEAGUE_ADMIN' ? user.managingLeague?.name : r === 'TEAM_ADMIN' ? user.managingTeam?.name : null;
+          return (
+            <span key={r} className="rounded-full bg-surface-sunk px-2.5 py-1 text-xs font-medium text-ink">
+              {roleLabel(r)}
+              {over && <span className="font-normal text-ink-muted"> · {over}</span>}
+            </span>
+          );
+        })}
       </div>
 
       <div className="flex flex-wrap gap-3">

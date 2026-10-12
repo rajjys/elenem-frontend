@@ -791,6 +791,19 @@ settings and on a club, an « Administrateurs » panel: who, add an existing per
 *Verify:* grant and revoke from both places; the person's next request sees the change; the owner
 and the last organisation administrator cannot be removed; « Fin de fonction » in the journal.
 
+*Built 2026-10-11/12, not yet deployed:* **U2** — « Inviter quelqu'un » on `/tenant/users`
+(`components/users/invite-dialog.tsx`). After the owner's first real invitation, five fixes: the
+invitation page shows the account's address at every step and **ends signed in** on the person's
+home (« Mot de passe oublié » too); e-mail links never fall back to `localhost` in production
+(`FRONTEND_URL`, else `https://dxscores.com`); **five wrong codes void a reset or invitation code**
+(an invitation's lives three days, and per-IP limits alone let tens of thousands of guesses
+through); a record says whether its invitation is **pending, expired or accepted**, with
+« Renvoyer l'invitation »; and roles read as jobs (« Responsable de club · AS Goma »), not
+`TEAM_ADMIN`. Migration `20261012090000_invitation_status_and_code_attempts` (applied to dev).
+**U3** — « Rôles et responsabilités » on the record; « Administrateurs » in a competition's
+settings; « Responsables » on each club from the clubs list. Checked in a browser against a
+throwaway database with a local mail catcher (real e-mails, real codes).
+
 ### Not in this plan
 
 Editing what each role may do (the roles are fixed and described, not configured), handing an

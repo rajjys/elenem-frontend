@@ -45,11 +45,12 @@ export async function fetchUsers(params: UserFilterParams): Promise<UsersPage> {
   return res.data as UsersPage;
 }
 
-export function useUsers(params: UserFilterParams) {
+export function useUsers(params: UserFilterParams, enabled = true) {
   return useQuery({
     queryKey: userKeys.list(params),
     queryFn: () => fetchUsers(params),
     placeholderData: keepPreviousData,
+    enabled,
   });
 }
 
