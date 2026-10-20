@@ -1,6 +1,8 @@
 // src/schemas/league-schemas.ts (or a similar location for your Zod schemas)
 import * as z from 'zod';
-import { SportType, VisibilityLevel, Gender, SportTypeSchema, VisibilityLevelSchema, SeasonStatus } from '@/schemas'; // Assuming these enums are available or you'll mock them
+// From `./enums`, never the index: a schema file importing the index that re-exports it is a cycle,
+// and a page that reaches this file first reads an enum before it exists (the 2026-10-20 build).
+import { SportType, VisibilityLevel, Gender, SportTypeSchema, VisibilityLevelSchema, SeasonStatus } from './enums';
 import { BusinessProfileSchema, CreateBusinessProfileSchema } from './common-schemas'
 // Helper schemas for nested objects (similar to your DTOs)
 export const TenantLiteResponseSchema = z.object({

@@ -1,7 +1,7 @@
 /// User Model frontend DTO
 
 import z from "zod";
-import { Gender, Roles, SportType } from ".";
+import { Gender, Roles, SportType } from './enums';
 
 // Basic Tenant type for nested relations in User
 interface BasicTenant {

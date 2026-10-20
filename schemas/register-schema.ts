@@ -1,5 +1,5 @@
 import z from "zod";
-import { Gender, SupportedLanguages } from "./";
+import { Gender, SupportedLanguages } from './enums';
 
 export const RegisterFormSchema = z.object({
   username: z.string().min(1, { message: "Username is required" }),

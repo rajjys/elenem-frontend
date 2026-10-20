@@ -1,6 +1,8 @@
 // src/prisma/tenant-schemas.ts
 import * as z from 'zod';
-import { SportType, Roles, SportTypeSchema, TenantTypes, TenantTypeSchema, GameStatus, VisibilityLevelSchema } from './index'; // Assuming SportType and Role are defined in src/prisma/index.ts
+// From `./enums`, not `./index`: importing the index that re-exports this file is a cycle, and the
+// 2026-10-20 production build read `VisibilityLevelSchema` here before the index had loaded it.
+import { SportType, Roles, SportTypeSchema, TenantTypes, TenantTypeSchema, GameStatus, VisibilityLevelSchema } from './enums';
 import { BusinessProfileDto, CreateBusinessProfileSchema } from './common-schemas';
 
 export interface TenantFilterParams {
