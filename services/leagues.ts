@@ -116,16 +116,6 @@ export function useUpdateLeague() {
   });
 }
 
-export function useDeleteLeague() {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: async (leagueId: string) => {
-      await api.delete(`/leagues/${leagueId}`);
-    },
-    onSuccess: () => qc.invalidateQueries({ queryKey: leagueKeys.all }),
-  });
-}
-
 /**
  * What a competition's public site shows (PHASE5B_LEAGUE_SITES §4.9): for now, whether it names
  * the players. Read from and written to the competition's settings, which the API merges.

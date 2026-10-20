@@ -75,14 +75,6 @@ export function useUser(id: string | undefined) {
   });
 }
 
-export function useDeleteUser() {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: deleteUser,
-    onSuccess: () => qc.invalidateQueries({ queryKey: userKeys.lists() }),
-  });
-}
-
 /** Lift a cool-down or an administrator's lock. The API forgets the wrong passwords with it. */
 export async function unblockUserSignIn(id: string): Promise<void> {
   await api.put(`/users/${id}`, { accountLocked: false });

@@ -1,4 +1,4 @@
-import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { api } from './api';
 import type { PostFilterParams, PostResponseDto } from '@/schemas';
 
@@ -60,12 +60,3 @@ export function usePosts(params: PostFilterParams, enabled = true) {
   });
 }
 
-export function useDeletePost() {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: async (postId: string) => {
-      await api.delete(`/posts/${postId}`);
-    },
-    onSuccess: () => qc.invalidateQueries({ queryKey: postKeys.lists() }),
-  });
-}

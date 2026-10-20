@@ -10,8 +10,10 @@ import {
   DialogHeader,
   DialogTitle,
   SelectField,
+  ConfirmDialog,
+  Label,
 } from '@/components/ui';
-import { usePromotePlannedFixture } from '@/services/planned-fixtures';
+import { useDeletePlannedFixture, usePromotePlannedFixture } from '@/services/planned-fixtures';
 import { useLeagueTeams } from '@/services/teams-lite';
 import type { CalendarEntry } from '@/services/calendar';
 import { toastApiError } from '@/utils';
@@ -39,6 +41,9 @@ export function PromoteDialog({
   leagueId?: string;
 }) {
   const promote = usePromotePlannedFixture();
+  const drop = useDeletePlannedFixture();
+  const [dropping, setDropping] = useState(false);
+  const [dropReason, setDropReason] = useState('');
   const teams = useLeagueTeams(leagueId);
   const [homeTeamId, setHomeTeamId] = useState('');
   const [awayTeamId, setAwayTeamId] = useState('');
@@ -47,6 +52,7 @@ export function PromoteDialog({
     if (open) {
       setHomeTeamId('');
       setAwayTeamId('');
+      setDropReason('');
     }
   }, [open, entry?.id]);
 
@@ -94,6 +100,15 @@ export function PromoteDialog({
         </div>
 
         <DialogFooter>
+          {/* The one way to drop a placeholder: the API had the route, nothing called it. */}
+          <Button
+            variant="ghost"
+            className="mr-auto text-negative"
+            onClick={() => setDropping(true)}
+            disabled={promote.isPending}
+          >
+            Supprimer
+          </Button>
           <Button variant="secondary" onClick={onClose} disabled={promote.isPending}>
             Annuler
           </Button>
@@ -102,6 +117,34 @@ export function PromoteDialog({
           </Button>
         </DialogFooter>
       </DialogContent>
+
+      <ConfirmDialog
+        open={dropping}
+        onOpenChange={setDropping}
+        tone="danger"
+        title="Supprimer cette rencontre à définir ?"
+        description={`« ${entry.home.name} — ${entry.away.name} » quitte le calendrier, et sa salle est libérée. Aucun match n’est touché.`}
+        confirmLabel="Supprimer"
+        onConfirm={() =>
+          drop.mutateAsync({ id: entry.id, reason: dropReason }).then(() => {
+            toast.success('Rencontre à définir supprimée.');
+            onClose();
+          })
+        }
+      >
+        <div>
+          <Label htmlFor="drop-reason">Raison (facultative)</Label>
+          <input
+            id="drop-reason"
+            type="text"
+            value={dropReason}
+            onChange={(e) => setDropReason(e.target.value)}
+            maxLength={300}
+            placeholder="Barrage inutile, le classement a tranché…"
+            className="mt-1 h-9 w-full rounded-lg border border-line bg-surface px-3 text-sm text-ink transition-colors hover:border-line-strong focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+          />
+        </div>
+      </ConfirmDialog>
     </Dialog>
   );
 }

@@ -3,14 +3,13 @@
 import { useCallback, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { Plus } from 'lucide-react';
-import { toast } from 'sonner';
-import { ConfirmDialog, ListPage } from '@/components/ui';
+import { ListPage } from '@/components/ui';
+import { DeleteDialog } from '@/components/deletion';
 import { useContextualLink } from '@/hooks';
 import { useScopeContext } from '@/hooks/useScopeContext';
 import { useAuthStore } from '@/store/auth.store';
 import { PostTargetType, Roles, type PostFilterParams, type PostResponseDto } from '@/schemas';
-import { usePosts, useDeletePost } from '@/services/posts';
-import { toastApiError } from '@/utils';
+import { usePosts } from '@/services/posts';
 import { PostsFilters } from './posts-filters';
 import { PostsTable } from './posts-table';
 
@@ -70,7 +69,6 @@ export function PostsListView({
   // asking for every publication in the organisation.
   const ready = scope === 'platform' || (!!tenantId && (scope === 'tenant' || !!targetId));
   const { data, isLoading, isError, refetch } = usePosts(query, ready);
-  const del = useDeletePost();
 
   const posts = data?.data ?? [];
   const totalItems = data?.totalItems ?? 0;
@@ -91,14 +89,6 @@ export function PostsListView({
     [],
   );
 
-  const confirmDelete = () => {
-    if (!toDelete) return;
-    del.mutate(toDelete.id, {
-      onSuccess: () => toast.success(`« ${toDelete.title} » supprimée.`),
-      onError: (e) => toastApiError(e),
-    });
-    setToDelete(null);
-  };
 
   const canPublish = roles.some(
     (r) =>
@@ -160,15 +150,11 @@ export function PostsListView({
 
         {/* The old page asked with `window.confirm`, which is the browser's dialog rather than the
             product's and cannot say what is being deleted in the product's own words. */}
-        <ConfirmDialog
+        <DeleteDialog
+          resource="post"
+          id={toDelete?.id}
           open={!!toDelete}
           onOpenChange={(o) => !o && setToDelete(null)}
-          title="Supprimer cette publication ?"
-          description={
-            toDelete ? `« ${toDelete.title} » sera définitivement supprimée.` : undefined
-          }
-          confirmLabel="Supprimer"
-          onConfirm={confirmDelete}
         />
       </>
     </ListPage>

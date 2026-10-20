@@ -3,20 +3,19 @@
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useDebounce } from 'use-debounce';
-import { toast } from 'sonner';
 import { Lock, Trash2, UserPlus, Users as UsersIcon } from 'lucide-react';
 import {
   Button,
-  ConfirmDialog,
   ListPage,
   ListToolbar,
   SelectField,
 } from '@/components/ui';
-import { useUsers, useDeleteUser } from '@/services/users';
+import { useUsers } from '@/services/users';
+import { DeleteDialog } from '@/components/deletion';
 import { Roles } from '@/schemas/enums';
 import type { UserFilterParams } from '@/schemas/user-schemas';
 import { meaningfulRoles, roleLabel, ROLE_LABELS } from '@/utils/role-labels';
-import { cn, formatDateFr, toastApiError } from '@/utils';
+import { cn, formatDateFr } from '@/utils';
 import { UserQuickView } from './user-quick-view';
 import { InviteDialog } from './invite-dialog';
 import { useIsSystemAdmin } from '@/hooks';
@@ -90,7 +89,6 @@ export function UsersListView({
   // Scope is not user-editable: someone looking at a club's users should not be able to filter
   // their way out of that club.
   const { data, isLoading, isError, refetch } = useUsers({ ...filters, ...scope });
-  const del = useDeleteUser();
 
   const users = data?.data ?? [];
   const totalItems = data?.totalItems ?? users.length;
@@ -181,28 +179,16 @@ export function UsersListView({
               onOpenChange={(o) => !o && setViewing(null)}
             />
           )}
-          <ConfirmDialog
+          {/* Deleting an account is the platform's; an organisation cancels invitations never
+              accepted (RESOURCE_DELETION.md, Q4). The rules and the words are the API's. */}
+          <DeleteDialog
+            resource="user"
+            id={toDelete?.id}
             open={!!toDelete}
             onOpenChange={(o) => !o && setToDelete(null)}
-            title={toDelete?.invitation ? 'Annuler l’invitation ?' : 'Supprimer ce compte ?'}
-            description={
-              !toDelete
-                ? undefined
-                : toDelete.invitation
-                  ? `Le lien et le code envoyés à ${toDelete.name} ne marcheront plus. L’adresse pourra être invitée de nouveau.`
-                  : `${toDelete.name} perdra l’accès à DXScores. Ce qui a été saisi avec ce compte — scores, feuilles de match — reste enregistré. Pour couper l’accès de façon réversible, désactivez plutôt le compte depuis sa fiche.`
-            }
-            confirmLabel={toDelete?.invitation ? 'Annuler l’invitation' : 'Supprimer'}
-            cancelLabel={toDelete?.invitation ? 'Garder' : 'Annuler'}
-            onConfirm={() => {
-              if (!toDelete) return;
-              del.mutate(toDelete.id, {
-                onSuccess: () =>
-                  toast.success(toDelete.invitation ? 'Invitation annulée.' : `${toDelete.name} supprimé.`),
-                onError: (e) => toastApiError(e),
-              });
-              setToDelete(null);
-            }}
+            confirmLabel={toDelete?.invitation ? 'Annuler l’invitation' : undefined}
+            cancelLabel={toDelete?.invitation ? 'Garder' : undefined}
+            successMessage={toDelete?.invitation ? 'Invitation annulée.' : undefined}
           />
         </>
       }

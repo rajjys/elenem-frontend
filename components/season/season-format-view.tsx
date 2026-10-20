@@ -3,6 +3,7 @@
 import React, { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { ArrowDown, ArrowUp, ChevronLeft, Trash2 } from 'lucide-react';
+import { DeleteDialog } from '@/components/deletion';
 import {
   Button,
   Input,
@@ -20,7 +21,6 @@ import {
   STAGE_FORMAT_LABEL,
   useApplyTemplate,
   useCreateStage,
-  useDeleteStage,
   useReorderStages,
   useSetGroupMembers,
   useStages,
@@ -176,7 +176,9 @@ function StageCard({
   teams: { id: string; name: string; shortCode: string | null }[];
 }) {
   const update = useUpdateStage();
-  const remove = useDeleteStage();
+  // A confirmation, at last: the bin deleted on one click, was offered on phases the server would
+  // refuse, and could fire twice. The dialog says why when it is refused (games still in it).
+  const [deleting, setDeleting] = useState(false);
   const reorder = useReorderStages(seasonId);
   const stages = useStages(seasonId);
   const [name, setName] = useState(stage.name);
@@ -293,20 +295,14 @@ function StageCard({
             variant="ghost"
             size="sm"
             aria-label={`Supprimer ${stage.name}`}
-            onClick={async () => {
-              try {
-                await remove.mutateAsync(stage.id);
-                toast.success(`« ${stage.name} » supprimée.`);
-              } catch (err) {
-                // Refused in French when it holds fixtures, or when it is the last one.
-                toastApiError(err, 'Cette phase n’a pas pu être supprimée.');
-              }
-            }}
+            onClick={() => setDeleting(true)}
           >
             <Trash2 className="h-4 w-4 text-negative" />
           </Button>
         </div>
       </div>
+
+      <DeleteDialog resource="stage" id={stage.id} open={deleting} onOpenChange={setDeleting} />
 
       {stage.fixtureCount > 0 && (
         <p className="mt-3 border-t border-line pt-2 text-xs text-ink-muted">

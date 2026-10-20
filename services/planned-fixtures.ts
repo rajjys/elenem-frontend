@@ -77,8 +77,12 @@ export function useUpdatePlannedFixture() {
   );
 }
 
+/** A barrage that turned out unnecessary. The reason is kept in the journal. */
 export function useDeletePlannedFixture() {
-  return usePlannedMutation(async (id: string) => (await api.delete(`/planned-fixtures/${id}`)).data);
+  return usePlannedMutation(
+    async ({ id, reason }: { id: string; reason?: string }) =>
+      (await api.delete(`/planned-fixtures/${id}`, { params: reason?.trim() ? { reason: reason.trim() } : undefined })).data,
+  );
 }
 
 /**

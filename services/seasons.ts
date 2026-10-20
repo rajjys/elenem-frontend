@@ -155,16 +155,6 @@ export function useTransitionSeason() {
   });
 }
 
-export function useDeleteSeason() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: async (id: string) => {
-      await api.delete(`/seasons/${id}`);
-    },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['seasons'] }),
-  });
-}
-
 /** "Saison 2026-2027" for a season starting in the second half of the year, else "Saison 2026". */
 export function suggestSeasonName(start: Date): string {
   const year = start.getFullYear();

@@ -16,14 +16,9 @@ import {
 import { SeasonStatus, Roles } from '@/schemas';
 import { useScopeContext, useContextualLink } from '@/hooks';
 import { useCurrentUser } from '@/hooks/useAuth';
-import {
-  useSeasons,
-  useDeleteSeason,
-  type SeasonRow,
-} from '@/services/seasons';
+import { useSeasons, type SeasonRow } from '@/services/seasons';
 import { describeShape, useStages } from '@/services/stages';
-import { toastApiError } from '@/utils';
-import { toast } from 'sonner';
+import { DeleteDialog } from '@/components/deletion';
 import { SeasonFormDialog } from './season-form-dialog';
 import { SeasonMoveDialog, type SeasonMove } from './season-move-dialog';
 
@@ -53,30 +48,16 @@ export function SeasonsView({ scope }: { scope: 'league' | 'admin' }) {
   const [creating, setCreating] = useState(false);
   const [editing, setEditing] = useState<SeasonRow | null>(null);
   const [moving, setMoving] = useState<{ season: SeasonRow; move: SeasonMove } | null>(null);
-  const [deleting, setDeleting] = useState<string | null>(null);
+  // One click used to delete a season — while cancelling one asked for a reason.
+  const [deleting, setDeleting] = useState<SeasonRow | null>(null);
 
   // A competition's own screen waits for its context rather than listing the whole organisation:
   // `/league/seasons` with no `ctxLeagueId` yet resolved would flash every season the reader can
   // see and then narrow, which reads as data changing under them.
   const enabled = scope === 'admin' || !!leagueId;
   const seasons = useSeasons({ leagueId, page }, enabled);
-  const remove = useDeleteSeason();
 
   const rows = useMemo(() => seasons.data?.data ?? [], [seasons.data]);
-
-  async function onDelete(season: SeasonRow) {
-    setDeleting(season.id);
-    try {
-      await remove.mutateAsync(season.id);
-      toast.success(`« ${season.name} » supprimée.`);
-    } catch (err) {
-      // The server refuses in French and says what to do instead — a season with fixtures should
-      // be cancelled, not deleted, because cancelling keeps the record of what was arranged.
-      toastApiError(err, 'Cette saison n’a pas pu être supprimée.');
-    } finally {
-      setDeleting(null);
-    }
-  }
 
   if (!enabled) {
     return (
@@ -137,8 +118,8 @@ export function SeasonsView({ scope }: { scope: 'league' | 'admin' }) {
             formatHref={buildLink(`/league/seasons/${season.id}/format`, { ctxLeagueId: season.leagueId })}
             onEdit={() => setEditing(season)}
             onMove={(move) => setMoving({ season, move })}
-            onDelete={() => onDelete(season)}
-            deleting={deleting === season.id}
+            onDelete={() => setDeleting(season)}
+            deleting={false}
             canDelete={isSystemAdmin || season.fixtureCount === 0}
           />
         ))}
@@ -153,6 +134,24 @@ export function SeasonsView({ scope }: { scope: 'league' | 'admin' }) {
           />
         </div>
       )}
+
+      {/* A season with a result is cancelled, never deleted: the dialog offers « Annuler la
+          saison », the same move as the card's, with its reason (RESOURCE_DELETION.md §1). */}
+      <DeleteDialog
+        resource="season"
+        id={deleting?.id}
+        open={!!deleting}
+        onOpenChange={(o) => !o && setDeleting(null)}
+        alternatives={(() => {
+          const season = deleting;
+          const cancel = season
+            ? (MOVES[season.status] ?? []).find((m) => m.to === SeasonStatus.CANCELED)
+            : undefined;
+          return season && cancel
+            ? { cancel: { label: cancel.label, onSelect: () => setMoving({ season, move: cancel }) } }
+            : undefined;
+        })()}
+      />
 
       <SeasonFormDialog
         open={creating}

@@ -470,6 +470,25 @@ users list loses its bin (Q4), posts become deletable, planned fixtures can be d
 explains itself and offers the alternative; an allowed one lists what goes; lists, counts, the
 dashboard and the table refresh without a reload.
 
+*Built 2026-10-20, not yet committed.* `components/deletion/delete-dialog.tsx` on
+`services/deletion.ts` (the nine previews, one delete call, every query refetched after it) replaces
+every delete in the app: competitions (card menu, « Zone de danger », now hidden from a competition's
+own administrators), clubs, players, seasons and phases (both deleted on one click before), matches
+(the match page, and the calendar's fixture dialog — deleting from « Déplacer » now leaves the
+deleted match's page), accounts and invitations, posts (deletable at last: the actions column had
+been hidden since it was written), and the three /admin lists (no more `window.confirm`). The old
+per-resource delete hooks are gone, so a screen cannot go around the rules. Refused: why, in the
+API's words, and the other door where it already exists — « Archiver la compétition », « Annuler la
+saison », « Désactiver le compte »; clubs and players get theirs with R3. Allowed: what goes with it,
+a reason (required for a played match), the name typed for a competition or an organisation, a red
+button disabled until then, open while it runs, a refusal shown inside it, « supprimé » / « supprimée »
+by the noun. `ConfirmDialog` lost its green button, gained `tone="danger"`, and stays open until its
+request answers (« Désactiver », « Retirer » a role or a logo now use it). A planned fixture can be
+dropped from its dialog. The journal lists what went with each deletion. Checked: 23 scenarios in a
+browser against a throwaway database, as the organisation's administrator, a competition's
+administrator and the platform. Left: the /admin competitions and clubs pages still load by hand
+(`useState`/`useEffect`), only their delete moved.
+
 **R3 — Archive, the other door.** « Archiver » / « Réactiver » for clubs and players (competitions
 have it), an « Archivés » filter on their lists, archived clubs and players out of pickers, new
 games and rosters, and still under their real names on every past result, table and box score,

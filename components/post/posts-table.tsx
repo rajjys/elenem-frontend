@@ -3,16 +3,9 @@
 import React from 'react';
 import Link from 'next/link';
 import { useContextualLink } from '@/hooks/useContextualLink';
-import {
-  Button,
-  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui';
+import { Button, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui';
 import { PostResponseDto, PostStatus, Roles } from '@/schemas'; // Assuming PostResponseDto and Roles are imported
-import { ArrowUpDown, MoreVertical, Pencil, Trash } from 'lucide-react';
+import { ArrowUpDown, Trash2 } from 'lucide-react';
 import Image from 'next/image';
 import { format } from 'date-fns'; // Utility for date formatting
 
@@ -99,9 +92,9 @@ export function PostsTable({ posts, onSort, sortBy, sortOrder, onDelete, current
                 <ArrowUpDown className="ml-2 h-4 w-4" />
               </Button>
             </TableHead>
-            {/* 9. Actions */}
-            <TableHead className="px-6 py-3 text-left text-xs font-medium text-ink-muted uppercase tracking-wider hidden">
-              Actions
+            {/* 9. Actions — hidden since the table was written, so a post could never be deleted. */}
+            <TableHead className="px-6 py-3">
+              <span className="sr-only">Actions</span>
             </TableHead>
           </TableRow>
         </TableHeader>
@@ -167,29 +160,18 @@ export function PostsTable({ posts, onSort, sortBy, sortOrder, onDelete, current
                 {post.publishedAt ? format(new Date(post.publishedAt), 'MMM dd, yyyy') : '-'}
               </TableCell>
 
-              {/* Actions */}
-              <TableCell className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium hidden">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="default">
-                      <span className="sr-only">Open menu</span>
-                      <MoreVertical className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem asChild>
-                      <Link href={buildPostLink(post)} className="flex items-center">
-                        <Pencil className="mr-2 h-4 w-4" /> View/Edit
-                      </Link>
-                    </DropdownMenuItem>
-                    {/* Allow deletion for higher-level admins or the author (if logic allows) */}
-                    {(isSystemAdmin || isTenantAdmin || isLeagueAdmin) && (
-                      <DropdownMenuItem onClick={() => onDelete(post.id)} className="flex items-center text-negative cursor-pointer">
-                        <Trash className="mr-2 h-4 w-4" /> Delete Post
-                      </DropdownMenuItem>
-                    )}
-                  </DropdownMenuContent>
-                </DropdownMenu>
+              {/* Actions: a bin, as on every other list; the title above opens the post. */}
+              <TableCell className="px-6 py-4 whitespace-nowrap text-right">
+                {(isSystemAdmin || isTenantAdmin || isLeagueAdmin) && (
+                  <button
+                    type="button"
+                    onClick={() => onDelete(post.id)}
+                    aria-label={`Supprimer ${post.title}`}
+                    className="rounded p-1.5 text-ink-subtle hover:bg-negative-soft hover:text-negative"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                )}
               </TableCell>
             </TableRow>
           ))}

@@ -5,6 +5,8 @@ import { Globe, ListOrdered, ShieldAlert, Trophy, Users } from 'lucide-react';
 import { ContextRequired, PageHeader, PageShell } from '@/components/ui';
 import { useScopeContext } from '@/hooks/useScopeContext';
 import { useLeague } from '@/services/leagues';
+import { useAuthStore } from '@/store/auth.store';
+import { Roles } from '@/schemas';
 import { IdentityPanel } from '@/components/league/settings/identity-panel';
 import { RankingPanel } from '@/components/league/settings/ranking-panel';
 import { DangerPanel } from '@/components/league/settings/danger-panel';
@@ -49,9 +51,15 @@ export default function LeagueSettingsPage() {
   const leagueId = ctx.leagueId;
 
   const raw = params.get('tab');
-  const tab: TabKey = TABS.some((t) => t.key === raw) ? (raw as TabKey) : 'identite';
 
   const { data: league } = useLeague(leagueId);
+  // Deleting a competition is the organisation's (backend `assessDeletion`): a competition's own
+  // administrator used to see this tab and get a 403 for pressing its button.
+  const roles = useAuthStore((s) => s.user?.roles ?? []);
+  const mayDelete = roles.includes(Roles.SYSTEM_ADMIN) || roles.includes(Roles.TENANT_ADMIN);
+  const tabs = TABS.filter((t) => t.key !== 'danger' || mayDelete);
+
+  const tab: TabKey = tabs.some((t) => t.key === raw) ? (raw as TabKey) : 'identite';
 
   const go = (next: TabKey) => {
     const q = new URLSearchParams(params.toString());
@@ -71,7 +79,7 @@ export default function LeagueSettingsPage() {
         {/* Same tab strip as the match page: a quiet row of labels with an underline on the one you
             are reading, not buttons in boxes. */}
         <nav className="-mb-px flex flex-wrap gap-1 border-b border-line" aria-label="Sections">
-          {TABS.map((t) => {
+          {tabs.map((t) => {
             const active = tab === t.key;
             return (
               <button

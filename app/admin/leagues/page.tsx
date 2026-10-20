@@ -2,6 +2,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from 'react';
+import { DeleteDialog } from '@/components/deletion';
 import { api } from '@/services/api'; // Your actual API instance
 import { LeagueDetails, PaginatedLeaguesResponseSchema, LeagueFilterParams } from '@/schemas/league-schemas'; // Your actual League types and schemas
 import { LeagueFilters } from '@/components/league/league-filters'; // Your new LeagueFilters component
@@ -99,24 +100,10 @@ export default function AdminLeaguesPage() {
     }));
   }, []);
 
-  const handleDeleteLeague = useCallback(async (leagueId: string) => {
-    // Replacing window.confirm with a toast for non-blocking confirmation.
-    // In a production app, use a dedicated custom modal for user confirmation.
-    const confirmed = window.confirm('Are you sure you want to delete this league? This action cannot be undone.'); // Using window.confirm temporarily for demonstration
-    if (!confirmed) {
-      return;
-    }
-
-    try {
-      await api.delete(`/leagues/${leagueId}`); // Your actual DELETE API call
-      toast.success('League deleted successfully.');
-      fetchLeagues(); // Re-fetch leagues to update the list
-    } catch (error) {
-      const errorMessage = 'Failed to delete league.';
-      toast.error('Error deleting league', { description: errorMessage });
-      console.error('Delete league error:', error);
-    }
-  }, [fetchLeagues]); // fetchLeagues is a dependency because it's called inside
+  // The product's dialog, not the browser's: it says what the delete would take with it, or why
+  // it is refused, from the API (RESOURCE_DELETION.md §8, R2).
+  const [toDelete, setToDelete] = useState<string | null>(null);
+  const handleDeleteLeague = (id: string) => setToDelete(id);
 
   return (
     <div className="container mx-auto p-6">
@@ -157,6 +144,13 @@ export default function AdminLeaguesPage() {
           />
         </>
       )}
+      <DeleteDialog
+        resource="league"
+        id={toDelete}
+        open={!!toDelete}
+        onOpenChange={(o) => !o && setToDelete(null)}
+        onDeleted={fetchLeagues}
+      />
     </div>
   );
 }

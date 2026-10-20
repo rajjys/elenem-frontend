@@ -3,8 +3,9 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import { Button, Input, Label } from '@/components/ui';
-import { useLeague, useDeleteLeague } from '@/services/leagues';
+import { Button } from '@/components/ui';
+import { DeleteDialog } from '@/components/deletion';
+import { useLeague, useUpdateLeague } from '@/services/leagues';
 import { toastApiError } from '@/utils';
 import { SettingsSection } from './settings-section';
 
@@ -13,85 +14,63 @@ import { SettingsSection } from './settings-section';
  *
  * Its own tab, at the end, because that is where an irreversible action belongs: a reader who came
  * to rename something should not have to scroll past it, and a reader who came to delete knows to
- * look for it. The competitions list has a bin too — this is the same action, reachable from inside
- * the thing being deleted, which is where somebody who has just been through its settings is.
+ * look for it. The competitions list has the same action in its card menu.
  *
- * **Typing the name is the confirmation**, not a checkbox. A dialog with an Annuler and a Supprimer
- * is dismissed by reflex; writing « Championnat Goma D1 Messieurs » cannot be done by reflex, and
- * it makes the reader read the name of the thing they are about to remove. Everything a season has
- * produced goes with it, and the button says so.
+ * What it does is the API's to say (`DeleteDialog`, backend `LeaguesService.assessDeletion`): a
+ * competition in which a game was played is archived, never deleted, and one in which nothing was
+ * played goes with everything in it — after its name is typed. This panel used to promise that
+ * cascade to every competition, and the server refused every competition that had a season.
  */
 export function DangerPanel({ leagueId }: { leagueId: string }) {
   const router = useRouter();
   const { data: league } = useLeague(leagueId);
-  const del = useDeleteLeague();
-  const [typed, setTyped] = useState('');
-
-  const name = league?.name ?? '';
-  const confirmed = typed.trim() === name && !!name;
-
-  const teamCount = league?.teams?.length ?? 0;
-  const playerCount = league?.players?.length ?? 0;
+  const update = useUpdateLeague();
+  const [deleting, setDeleting] = useState(false);
 
   return (
-    <SettingsSection
-      tone="danger"
-      title="Supprimer cette compétition"
-      description="Ses saisons, ses phases, son calendrier, son classement et ses feuilles de match sont supprimés avec elle. C’est définitif."
-      footer={
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <p className="text-xs text-ink-muted">
-            {confirmed
-              ? 'Le nom correspond.'
-              : 'Saisissez le nom exact de la compétition pour confirmer.'}
-          </p>
-          <Button
-            variant="danger"
-            disabled={!confirmed}
-            isLoading={del.isPending}
-            onClick={() =>
-              del.mutate(leagueId, {
-                onSuccess: () => {
-                  toast.success(`${name} supprimée.`);
-                  router.push('/tenant/leagues');
-                },
-                onError: (e) => toastApiError(e),
-              })
-            }
-          >
-            Supprimer définitivement
-          </Button>
-        </div>
-      }
-    >
-      <div className="space-y-4">
-        {(teamCount > 0 || playerCount > 0) && (
-          <p className="rounded-lg border border-negative/30 bg-negative-soft/40 px-3.5 py-2.5 text-sm text-ink">
-            Cette compétition compte {teamCount} club{teamCount > 1 ? 's' : ''}
-            {playerCount > 0 && (
-              <>
-                {' '}
-                et {playerCount} joueur{playerCount > 1 ? 's' : ''}
-              </>
-            )}
-            . Ils perdent leur compétition.
-          </p>
-        )}
+    <>
+      <SettingsSection
+        tone="danger"
+        title="Supprimer cette compétition"
+        description="Pour une compétition créée par erreur ou pour essayer. Une compétition dont un match a été joué ne se supprime pas : ses résultats sont publiés. Elle s’archive."
+        footer={
+          <div className="flex justify-end">
+            <Button
+              variant="primary"
+              onClick={() => setDeleting(true)}
+              className="bg-negative text-ink-inverted hover:bg-negative/90"
+            >
+              Supprimer la compétition…
+            </Button>
+          </div>
+        }
+      >
+        <p className="text-sm text-ink-muted">
+          Avant de supprimer, la liste de ce qui partirait avec elle s’affiche — saisons, matchs,
+          clubs, joueurs — et son nom vous est demandé.
+        </p>
+      </SettingsSection>
 
-        <div className="max-w-md">
-          <Label htmlFor="confirm-name">
-            Tapez <span className="font-normal text-ink-muted">{name}</span> pour confirmer
-          </Label>
-          <Input
-            id="confirm-name"
-            name="confirm-name"
-            value={typed}
-            onChange={(e) => setTyped(e.target.value)}
-            placeholder={name}
-            autoComplete="off"
-          />
-        </div>
-      </div>
-    </SettingsSection>
+      <DeleteDialog
+        resource="league"
+        id={leagueId}
+        open={deleting}
+        onOpenChange={setDeleting}
+        onDeleted={() => router.push('/tenant/leagues')}
+        alternatives={{
+          archive: {
+            label: 'Archiver la compétition',
+            onSelect: () =>
+              update.mutate(
+                { id: leagueId, isActive: false },
+                {
+                  onSuccess: () => toast.success(`${league?.name ?? 'La compétition'} est archivée.`),
+                  onError: (e) => toastApiError(e),
+                },
+              ),
+          },
+        }}
+      />
+    </>
   );
 }

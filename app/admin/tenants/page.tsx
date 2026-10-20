@@ -2,14 +2,13 @@
 "use client";
 
 import React, { useState } from 'react';
-import { useTenants, useDeleteTenant } from '@/services/tenants';
-import { toastApiError } from '@/utils';
+import { useTenants } from '@/services/tenants';
 import { TenantFilterParams } from '@/schemas';
 import { TenantFilters } from '@/components/tenant/tenant-filters';
 import { TenantsTable } from '@/components/tenant/tenants-table';
 import { Pagination } from '@/components/ui/';
 import { LoadingSpinner } from '@/components/ui/';
-import { toast } from 'sonner';
+import { DeleteDialog } from '@/components/deletion';
 
 export default function AdminTenantsPage() {
   const [filters, setFilters] = useState<TenantFilterParams>({
@@ -22,7 +21,6 @@ export default function AdminTenantsPage() {
   // Server state is owned by React Query: caching, dedup, loading/error, and
   // keepPreviousData for smooth pagination — no useEffect/useState fetch triad.
   const { data, isLoading, isError } = useTenants(filters);
-  const deleteTenant = useDeleteTenant();
 
   const tenants = data?.data ?? [];
   const totalItems = data?.totalItems ?? 0;
@@ -50,15 +48,10 @@ export default function AdminTenantsPage() {
     }));
   };
 
-  const handleDeleteTenant = (tenantId: string) => {
-    const confirmed = window.confirm('Are you sure you want to delete this tenant? This action cannot be undone.');
-    if (!confirmed) return;
-
-    deleteTenant.mutate(tenantId, {
-      onSuccess: () => toast.success('Organisation supprimee avec success.'),
-      onError: (error) => toastApiError(error, "Erreur lors de la suppression de l'organisation."),
-    });
-  };
+  // The product's dialog, not the browser's: it says what the delete would take with it, or why
+  // it is refused, from the API (RESOURCE_DELETION.md §8, R2).
+  const [toDelete, setToDelete] = useState<string | null>(null);
+  const handleDeleteTenant = (id: string) => setToDelete(id);
 
   return (
     <div className="container mx-auto p-6">
@@ -92,6 +85,12 @@ export default function AdminTenantsPage() {
           />
         </>
       )}
+      <DeleteDialog
+        resource="tenant"
+        id={toDelete}
+        open={!!toDelete}
+        onOpenChange={(o) => !o && setToDelete(null)}
+      />
     </div>
   );
 }

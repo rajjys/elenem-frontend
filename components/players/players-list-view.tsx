@@ -1,14 +1,13 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { toast } from 'sonner';
 import { Trash2, Pencil, Users } from 'lucide-react';
-import { Button, ConfirmDialog, ListPage, ListToolbar } from '@/components/ui';
-import { usePlayers, useDeletePlayer } from '@/services/players';
+import { Button, ListPage, ListToolbar } from '@/components/ui';
+import { DeleteDialog } from '@/components/deletion';
+import { usePlayers } from '@/services/players';
 import { useCurrentUser } from '@/hooks/useAuth';
 import { Roles } from '@/schemas/enums';
 import { useDebounce } from 'use-debounce';
-import { toastApiError } from '@/utils';
 import type { Player, PlayerFilterParams } from '@/schemas/player-schemas';
 import { PlayerFormDialog } from './player-form-dialog';
 import { BulkRosterDialog } from './bulk-roster-dialog';
@@ -77,20 +76,10 @@ export function PlayersListView({
   );
 
   const { data, isLoading, isError, refetch } = usePlayers(filters);
-  const del = useDeletePlayer();
 
   const players = data?.items ?? [];
   const total = data?.total ?? 0;
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
-
-  const confirmDelete = () => {
-    if (!toDelete) return;
-    del.mutate(toDelete.id, {
-      onSuccess: () => toast.success(`${toDelete.firstName} ${toDelete.lastName} retiré de l'effectif.`),
-      onError: (e) => toastApiError(e),
-    });
-    setToDelete(null);
-  };
 
   return (
     <ListPage
@@ -159,17 +148,13 @@ export function PlayersListView({
           />
         )}
 
-        <ConfirmDialog
+        {/* A player on a match sheet is archived, not deleted (RESOURCE_DELETION.md §1). The copy
+            here used to say « statistiques conservées » about the very thing that blocked it. */}
+        <DeleteDialog
+          resource="player"
+          id={toDelete?.id}
           open={!!toDelete}
           onOpenChange={(o) => !o && setToDelete(null)}
-          title="Retirer ce joueur ?"
-          description={
-            toDelete
-              ? `${toDelete.firstName} ${toDelete.lastName} sera retiré de l'effectif. Ses statistiques déjà enregistrées sont conservées.`
-              : undefined
-          }
-          confirmLabel="Retirer"
-          onConfirm={confirmDelete}
         />
         </>
       }
@@ -229,7 +214,7 @@ export function PlayersListView({
                           <button
                             onClick={() => setToDelete(p)}
                             className="rounded p-1.5 text-ink-subtle hover:bg-negative-soft hover:text-negative"
-                            aria-label={`Retirer ${p.firstName} ${p.lastName}`}
+                            aria-label={`Supprimer ${p.firstName} ${p.lastName}`}
                           >
                             <Trash2 className="h-4 w-4" />
                           </button>

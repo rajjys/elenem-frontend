@@ -99,14 +99,6 @@ export function useUpdatePlayer() {
   });
 }
 
-export function useDeletePlayer() {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: deletePlayer,
-    onSuccess: () => qc.invalidateQueries({ queryKey: playerKeys.lists() }),
-  });
-}
-
 /**
  * Creates a whole team sheet in one action.
  *

@@ -4,12 +4,13 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { toast } from 'sonner';
 import { Trophy } from 'lucide-react';
-import { Button, ConfirmDialog, ListPage } from '@/components/ui';
+import { Button, ListPage } from '@/components/ui';
+import { DeleteDialog } from '@/components/deletion';
 import { LeagueCard } from './league-card';
 import { useScopeContext } from '@/hooks/useScopeContext';
 import { useAuthStore } from '@/store/auth.store';
 import { Roles, type LeagueDetails } from '@/schemas';
-import { useLeagues, useDeleteLeague } from '@/services/leagues';
+import { useLeagues, useUpdateLeague } from '@/services/leagues';
 import { toastApiError } from '@/utils';
 
 /**
@@ -38,18 +39,9 @@ export function LeaguesListView() {
   const [toDelete, setToDelete] = useState<LeagueDetails | null>(null);
 
   const { data, isLoading, isError, refetch } = useLeagues(tenantId, !!tenantId);
-  const del = useDeleteLeague();
+  const update = useUpdateLeague();
 
   const leagues = data?.data ?? [];
-
-  const confirmDelete = () => {
-    if (!toDelete) return;
-    del.mutate(toDelete.id, {
-      onSuccess: () => toast.success(`${toDelete.name} supprimée.`),
-      onError: (e) => toastApiError(e),
-    });
-    setToDelete(null);
-  };
 
   return (
     <ListPage
@@ -104,17 +96,28 @@ export function LeaguesListView() {
           ))}
         </div>
 
-        <ConfirmDialog
+        {/* What deleting would take with it is the API's to say: one with results is archived. */}
+        <DeleteDialog
+          resource="league"
+          id={toDelete?.id}
           open={!!toDelete}
           onOpenChange={(o) => !o && setToDelete(null)}
-          title="Supprimer cette compétition ?"
-          description={
-            toDelete
-              ? `${toDelete.name}, ses saisons, ses phases et son calendrier seront supprimés. Cette action est irréversible.`
-              : undefined
-          }
-          confirmLabel="Supprimer"
-          onConfirm={confirmDelete}
+          alternatives={{
+            archive: {
+              label: 'Archiver la compétition',
+              onSelect: () => {
+                const league = toDelete;
+                if (!league) return;
+                update.mutate(
+                  { id: league.id, isActive: false },
+                  {
+                    onSuccess: () => toast.success(`${league.name} est archivée.`),
+                    onError: (e) => toastApiError(e),
+                  },
+                );
+              },
+            },
+          }}
         />
       </>
     </ListPage>

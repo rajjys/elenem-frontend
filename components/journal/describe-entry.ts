@@ -253,7 +253,18 @@ function describeLifecycle(
   const e = kind.feminine ? 'e' : '';
 
   if (event === 'DELETED') {
-    return { icon: Trash2, title: `${kind.noun} supprimé${e}`, tone: 'negative' };
+    // What went with it, as the delete reported it (backend `withIt`, RESOURCE_DELETION.md R1):
+    // « 3 matchs à venir ou annulés sont supprimés avec lui », not just « Club supprimé ».
+    const withIt = Array.isArray(before.withIt)
+      ? before.withIt.filter((l): l is string => typeof l === 'string')
+      : [];
+    // The subject is named beside the title already; this says only what went with it.
+    return {
+      icon: Trash2,
+      title: `${kind.noun} supprimé${e}`,
+      detail: withIt.length ? withIt.map((l) => `– ${l}`).join('\n') : undefined,
+      tone: 'negative',
+    };
   }
 
   if (event === 'CREATED') {

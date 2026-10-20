@@ -94,10 +94,7 @@ export function UserSignInAccess({ user }: { user: UserResponse }) {
     });
 
   const onSendCode = () =>
-    sendCode.mutate(user.id, {
-      onSuccess: () => toast.success(`Code envoyé à ${user.email}.`),
-      onError: (e) => toastApiError(e, 'Impossible d’envoyer le code.'),
-    });
+    sendCode.mutateAsync(user.id).then(() => toast.success(`Code envoyé à ${user.email}.`));
 
   const sendCodeButton = canSendCode && (
     <Button size="sm" variant="outline" onClick={() => setConfirmCode(true)} disabled={sendCode.isPending}>

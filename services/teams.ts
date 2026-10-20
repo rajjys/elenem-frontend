@@ -149,12 +149,3 @@ export function suggestShortCode(name: string): string {
   return source[0].slice(0, 3);
 }
 
-export function useDeleteTeam() {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: async (teamId: string) => {
-      await api.delete(`/teams/${teamId}`);
-    },
-    onSuccess: () => qc.invalidateQueries({ queryKey: teamKeys.lists() }),
-  });
-}

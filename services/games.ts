@@ -301,16 +301,6 @@ export function useInvertGame() {
   });
 }
 
-export function useDeleteGame() {
-  const invalidate = useFixtureInvalidation();
-  return useMutation({
-    mutationFn: async ({ gameId, reason }: { gameId: string; reason?: string }) => {
-      await api.delete(`/games/${gameId}`, { params: reason ? { reason } : {} });
-    },
-    onSuccess: invalidate,
-  });
-}
-
 // --- dragging ------------------------------------------------------------------------------------
 
 /**

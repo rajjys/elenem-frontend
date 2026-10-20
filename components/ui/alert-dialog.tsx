@@ -82,7 +82,8 @@ const AlertDialogAction = React.forwardRef<
   <AlertDialogPrimitive.Action
     ref={ref}
     className={cn(
-      "mt-2 inline-flex h-10 items-center justify-center rounded-md border border-line bg-positive-soft px-4 py-2 text-sm font-medium text-ink hover:bg-positive-soft sm:mt-0 cursor-pointer",
+      // The accent, not green: a confirmation is not good news, and the delete it confirmed was green.
+      "mt-2 inline-flex h-10 items-center justify-center rounded-md bg-accent px-4 py-2 text-sm font-medium text-accent-ink hover:bg-accent-hover sm:mt-0 cursor-pointer",
       className
     )}
     {...props}

@@ -169,17 +169,14 @@ export function UserResponsibilities({ user }: { user: UserResponse }) {
         title={removing ? `Retirer « ${removing.label}${removing.over ? ` · ${removing.over}` : ''} » ?` : ''}
         description={`${name} perd ce rôle et ce qu’il permettait de gérer. Son compte reste actif.`}
         confirmLabel="Retirer"
-        onConfirm={() => {
-          if (!removing) return;
-          revoke.mutate(
-            { userId: user.id, role: removing.role },
-            {
-              onSuccess: () => toast.success(`Rôle retiré à ${name}.`),
-              onError: (e) => toastApiError(e),
-            },
-          );
-          setRemoving(null);
-        }}
+        tone="danger"
+        onConfirm={() =>
+          removing
+            ? revoke
+                .mutateAsync({ userId: user.id, role: removing.role })
+                .then(() => toast.success(`Rôle retiré à ${name}.`))
+            : undefined
+        }
       />
     </section>
   );

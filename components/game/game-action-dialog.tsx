@@ -6,7 +6,6 @@ import { AlertTriangle } from 'lucide-react';
 import { Button, Label, Modal } from '@/components/ui';
 import { toastApiError, cn } from '@/utils';
 import {
-  useDeleteGame,
   useGameStateChange,
   useInvertGame,
   type StateVerb,
@@ -27,7 +26,12 @@ import {
  * the reason, which is what the club turning up on the wrong day is actually owed.
  */
 
+/**
+ * `delete` is listed for the page's menu, but it opens `DeleteDialog`, not this: deleting is the one
+ * action every resource does the same way (RESOURCE_DELETION.md §8, R2).
+ */
 export type GameAction = 'postpone' | 'cancel' | 'delete' | 'invert' | 'confirm' | 'schedule';
+type DialogAction = Exclude<GameAction, 'delete'>;
 
 interface Spec {
   title: string;
@@ -40,7 +44,7 @@ interface Spec {
   danger?: boolean;
 }
 
-const SPECS: Record<GameAction, Spec> = {
+const SPECS: Record<DialogAction, Spec> = {
   postpone: {
     title: 'Reporter le match',
     consequence:
@@ -56,15 +60,6 @@ const SPECS: Record<GameAction, Spec> = {
     confirm: 'Annuler le match',
     reasonRequired: true,
     placeholder: 'Forfait des deux équipes, compétition interrompue…',
-    danger: true,
-  },
-  delete: {
-    title: 'Supprimer le match',
-    consequence:
-      'Le match disparaît du calendrier et de la saison. À n’utiliser que pour un match saisi par erreur — un match qui n’a pas été joué se reporte ou s’annule.',
-    confirm: 'Supprimer',
-    reasonRequired: false,
-    placeholder: 'Saisi deux fois, mauvaise compétition…',
     danger: true,
   },
   invert: {
@@ -97,27 +92,17 @@ export function GameActionDialog({
   gameId,
   matchup,
   onClose,
-  onDeleted,
-  played = false,
 }: {
   /** `null` closes it. */
-  action: GameAction | null;
+  action: DialogAction | null;
   gameId: string;
   /** "VIR – MUU", so the dialog names what it is about. */
   matchup: string;
   onClose: () => void;
-  /** A deleted fixture has no page to return to. */
-  onDeleted?: () => void;
-  /**
-   * The match has been played. Deleting it takes its result out of the table, so the API asks for
-   * a reason (RESOURCE_DELETION.md, the owner's Q3) and the dialog says what changes.
-   */
-  played?: boolean;
 }) {
   const [reason, setReason] = useState('');
 
   const stateMut = useGameStateChange();
-  const deleteMut = useDeleteGame();
   const invertMut = useInvertGame();
 
   useEffect(() => {
@@ -125,16 +110,8 @@ export function GameActionDialog({
   }, [action]);
 
   if (!action) return null;
-  const spec =
-    action === 'delete' && played
-      ? {
-          ...SPECS.delete,
-          consequence:
-            'Son résultat quitte le classement, qui est recalculé, et sa feuille de match sort des statistiques. À n’utiliser que pour un résultat saisi sur le mauvais match ou en double — un score faux se corrige.',
-          reasonRequired: true,
-        }
-      : SPECS[action];
-  const busy = stateMut.isPending || deleteMut.isPending || invertMut.isPending;
+  const spec = SPECS[action];
+  const busy = stateMut.isPending || invertMut.isPending;
   const ready = !spec.reasonRequired || reason.trim().length > 0;
 
   function run() {
@@ -145,21 +122,6 @@ export function GameActionDialog({
       onClose();
     };
     const fail = (e: unknown) => toastApiError(e);
-
-    if (action === 'delete') {
-      deleteMut.mutate(
-        { gameId, ...(trimmed ? { reason: trimmed } : {}) },
-        {
-          onSuccess: () => {
-            toast.success('Match supprimé.');
-            onClose();
-            onDeleted?.();
-          },
-          onError: fail,
-        },
-      );
-      return;
-    }
 
     if (action === 'invert') {
       invertMut.mutate(

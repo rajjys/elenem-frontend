@@ -98,10 +98,6 @@ export function useUpdateStage() {
   );
 }
 
-export function useDeleteStage() {
-  return useStageMutation(async (id: string) => (await api.delete(`/stages/${id}`)).data);
-}
-
 export function useReorderStages(seasonId: string) {
   return useStageMutation(
     async (stageIds: string[]) => (await api.put(`/seasons/${seasonId}/stages/order`, { stageIds })).data,

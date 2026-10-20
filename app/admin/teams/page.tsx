@@ -9,6 +9,7 @@ import { TeamsFilters, TeamsTable } from '@/components/team/'; // Your new Teams
 import { Pagination, LoadingSpinner } from '@/components/ui/'; // Your Pagination component
 import { toast } from 'sonner'; // Your toast notification library (e.g., Sonner)
 import { Roles } from '@/schemas';
+import { DeleteDialog } from '@/components/deletion';
 import { useAuthStore } from '@/store/auth.store'; // Auth store to get user roles
 
 export default function AdminTeamsPage() {
@@ -102,22 +103,10 @@ export default function AdminTeamsPage() {
     }));
   }, []);
 
-  const handleDeleteTeam = useCallback(async (teamId: string) => {
-    const confirmed = window.confirm('Are you sure you want to delete this team? This action cannot be undone.');
-    if (!confirmed) {
-      return;
-    }
-
-    try {
-      await api.delete(`/teams/${teamId}`);
-      toast.success('Team deleted successfully.');
-      fetchTeams(); // Re-fetch teams to update the list
-    } catch (error) {
-      const errorMessage = 'Failed to delete team.';
-      toast.error('Error deleting team', { description: errorMessage });
-      console.error('Delete team error:', error);
-    }
-  }, [fetchTeams]);
+  // The product's dialog, not the browser's: it says what the delete would take with it, or why
+  // it is refused, from the API (RESOURCE_DELETION.md §8, R2).
+  const [toDelete, setToDelete] = useState<string | null>(null);
+  const handleDeleteTeam = (id: string) => setToDelete(id);
 
   if (loading && !teams.length) { // Show loading spinner only if no teams are loaded yet
     return <LoadingSpinner />;
@@ -159,6 +148,13 @@ export default function AdminTeamsPage() {
         currentPage={filters.page || 1}
         totalPages={totalPages}
         onPageChange={handlePageChange}
+      />
+      <DeleteDialog
+        resource="team"
+        id={toDelete}
+        open={!!toDelete}
+        onOpenChange={(o) => !o && setToDelete(null)}
+        onDeleted={fetchTeams}
       />
     </div>
   );

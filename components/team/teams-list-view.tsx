@@ -3,15 +3,14 @@
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useDebounce } from 'use-debounce';
-import { toast } from 'sonner';
 import { ListPlus, Pencil, Shield, Trash2, UserCog } from 'lucide-react';
-import { Button, ConfirmDialog, ListPage, ListToolbar, SelectField } from '@/components/ui';
+import { Button, ListPage, ListToolbar, SelectField } from '@/components/ui';
+import { DeleteDialog } from '@/components/deletion';
 import { useScopeContext } from '@/hooks/useScopeContext';
 import { useAuthStore } from '@/store/auth.store';
 import { Roles, type TeamFilterParams } from '@/schemas';
-import { useTeams, useDeleteTeam, type TeamListItem } from '@/services/teams';
+import { useTeams, type TeamListItem } from '@/services/teams';
 import { useStandingsLeagues } from '@/services/standings';
-import { toastApiError } from '@/utils';
 import { TeamFormDialog } from './team-form-dialog';
 import { BulkTeamsDialog } from './bulk-teams-dialog';
 import { TeamAdminsDialog } from './team-admins-dialog';
@@ -86,22 +85,12 @@ export function TeamsListView({
 
   const ready = scope === 'platform' || !!pinnedTenantId || !!pinnedLeagueId;
   const { data, isLoading, isError, refetch } = useTeams(filters, ready);
-  const del = useDeleteTeam();
 
   const teams = data?.data ?? [];
   const totalItems = data?.totalItems ?? 0;
 
   // Narrowing to one competition shortens the list; staying on page 4 of it strands the reader.
   useEffect(() => setPage(1), [debounced, leagueId]);
-
-  const confirmDelete = () => {
-    if (!toDelete) return;
-    del.mutate(toDelete.id, {
-      onSuccess: () => toast.success(`${toDelete.name} supprimé.`),
-      onError: (e) => toastApiError(e),
-    });
-    setToDelete(null);
-  };
 
   /** Where a club's own surface is, with whatever context the reader needs to get in. */
   const dashboardHref = (team: TeamListItem) => {
@@ -183,19 +172,13 @@ export function TeamsListView({
           onOpenChange={setBulkOpen}
           leagueId={scope === 'league' ? (ctx.leagueId ?? undefined) : undefined}
         />
-        {/* `window.confirm` is the browser's dialog, not the product's, and it cannot name what is
-            about to be lost in the product's own words. */}
-        <ConfirmDialog
+        {/* A club that has played is archived, not deleted; one that never played goes with its
+            unplayed games. The dialog says which, from the API (RESOURCE_DELETION.md §1). */}
+        <DeleteDialog
+          resource="team"
+          id={toDelete?.id}
           open={!!toDelete}
           onOpenChange={(o) => !o && setToDelete(null)}
-          title="Supprimer ce club ?"
-          description={
-            toDelete
-              ? `${toDelete.name} sera retiré de la compétition. Ses matchs déjà joués restent au classement.`
-              : undefined
-          }
-          confirmLabel="Supprimer"
-          onConfirm={confirmDelete}
         />
         </>
       }

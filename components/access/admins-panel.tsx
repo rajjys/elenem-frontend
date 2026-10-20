@@ -165,17 +165,13 @@ export function AdminsPanel({
         title={`Retirer ${removing ? nameOf(removing) : ''} ?`}
         description={`Cette personne ne pourra plus gérer ${scopeName}. Son compte reste actif ; vous pourrez lui confier à nouveau ce rôle.`}
         confirmLabel="Retirer"
+        tone="danger"
         onConfirm={() => {
           if (!removing) return;
           const who = nameOf(removing);
-          revoke.mutate(
-            { userId: removing.id, role },
-            {
-              onSuccess: () => toast.success(`${who} ne gère plus ${scopeName}.`),
-              onError: (e) => toastApiError(e),
-            },
-          );
-          setRemoving(null);
+          return revoke
+            .mutateAsync({ userId: removing.id, role })
+            .then(() => toast.success(`${who} ne gère plus ${scopeName}.`));
         }}
       />
     </div>

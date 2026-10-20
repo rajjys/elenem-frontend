@@ -7,6 +7,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { ArrowLeft, Pencil, Trash2, MailCheck, UserX } from 'lucide-react';
 import { Button, LoadingSpinner, Modal, ConfirmDialog } from '@/components/ui';
+import { DeleteDialog } from '@/components/deletion';
 import { UserSummary } from './user-summary';
 import { UserSignInAccess, useCanManageAccess } from './user-sign-in-access';
 import { UserResponsibilities } from './user-responsibilities';
@@ -14,13 +15,11 @@ import { UserActivity } from '@/components/journal/user-activity';
 import { UserForm } from '@/components/forms/user-form';
 import {
   useUser,
-  useDeleteUser,
   useSetUserActive,
   useSetUserEmailVerified,
   userKeys,
 } from '@/services/users';
 import { useCurrentUser, useIsSystemAdmin } from '@/hooks';
-import { toastApiError } from '@/utils';
 
 // Reusable read-first user detail. Same component for every scope
 // (admin/tenant/league/team) — only backHref differs. View is the hub; edit is
@@ -42,7 +41,6 @@ export function UserDetailView({
   const qc = useQueryClient();
   const me = useCurrentUser();
   const { data: user, isLoading, isError } = useUser(userId);
-  const del = useDeleteUser();
   const verify = useSetUserEmailVerified();
   const setActive = useSetUserActive();
   const isSystemAdmin = useIsSystemAdmin();
@@ -138,10 +136,7 @@ export function UserDetailView({
         description="L'utilisateur pourra créer une organisation sans confirmer son email lui-même."
         confirmLabel="Vérifier"
         onConfirm={() =>
-          verify.mutate(
-            { id: userId, value: true },
-            { onSuccess: () => toast.success('Email marqué comme vérifié.'), onError: (e) => toastApiError(e) },
-          )
+          verify.mutateAsync({ id: userId, value: true }).then(() => toast.success('Email marqué comme vérifié.'))
         }
       />
 
@@ -151,35 +146,27 @@ export function UserDetailView({
         title="Désactiver ce compte ?"
         description={`${name} ne pourra plus se connecter, et ses sessions ouvertes prennent fin. Rien n’est supprimé : vous pourrez réactiver le compte à tout moment depuis cette fiche.`}
         confirmLabel="Désactiver"
+        tone="danger"
         onConfirm={() =>
-          setActive.mutate(
-            { id: userId, isActive: false },
-            { onSuccess: () => toast.success('Compte désactivé.'), onError: (e) => toastApiError(e) },
-          )
+          setActive.mutateAsync({ id: userId, isActive: false }).then(() => toast.success('Compte désactivé.'))
         }
       />
 
-      <ConfirmDialog
+      {/* The platform deletes accounts; an organisation cancels invitations never accepted and
+          deactivates the rest (RESOURCE_DELETION.md, Q4). The rules and the words are the API's. */}
+      <DeleteDialog
+        resource="user"
+        id={userId}
         open={confirmDelete}
         onOpenChange={setConfirmDelete}
-        title={pendingInvite ? 'Annuler l’invitation ?' : 'Supprimer cet utilisateur ?'}
-        description={
-          pendingInvite
-            ? `Le lien et le code envoyés à ${name} ne marcheront plus. L’adresse pourra être invitée de nouveau.`
-            : canDeactivate
-              ? 'Cette action est irréversible. Pour couper l’accès sans rien supprimer, désactivez plutôt le compte.'
-              : 'Cette action est irréversible.'
-        }
-        confirmLabel={pendingInvite ? 'Annuler l’invitation' : 'Supprimer'}
-        cancelLabel={pendingInvite ? 'Garder' : 'Annuler'}
-        onConfirm={() =>
-          del.mutate(userId, {
-            onSuccess: () => {
-              toast.success(pendingInvite ? 'Invitation annulée.' : 'Utilisateur supprimé.');
-              router.push(backHref);
-            },
-            onError: (e) => toastApiError(e),
-          })
+        onDeleted={() => router.push(backHref)}
+        confirmLabel={pendingInvite ? 'Annuler l’invitation' : undefined}
+        cancelLabel={pendingInvite ? 'Garder' : undefined}
+        successMessage={pendingInvite ? 'Invitation annulée.' : undefined}
+        alternatives={
+          canDeactivate
+            ? { deactivate: { label: 'Désactiver le compte', onSelect: () => setConfirmDeactivate(true) } }
+            : undefined
         }
       />
     </div>

@@ -196,16 +196,13 @@ export function ImageField({
       },
     );
 
+  // Returns the request, so the confirmation stays open until it is done and says so if it fails.
   const doRemove = () =>
-    remove.mutate(entityId, {
-      onSuccess: () => {
-        setSent(null);
-        setCurrent(null);
-        onChange?.(null);
-        setConfirmRemove(false);
-        toast.success(copy.removed);
-      },
-      onError: (e) => toastApiError(e, 'L’image n’a pas pu être retirée.'),
+    remove.mutateAsync(entityId).then(() => {
+      setSent(null);
+      setCurrent(null);
+      onChange?.(null);
+      toast.success(copy.removed);
     });
 
   const shape = round ? 'rounded-full' : 'rounded-xl';
@@ -286,6 +283,7 @@ export function ImageField({
         title={copy.removeTitle}
         description={copy.removeBody}
         confirmLabel="Retirer"
+        tone="danger"
         onConfirm={doRemove}
       />
     </div>

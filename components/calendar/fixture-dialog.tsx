@@ -3,9 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import {
-  AlertTriangle,
   ArrowLeftRight,
-  Check,
   Flag,
   History,
   Loader2,
@@ -23,7 +21,6 @@ import {
 } from '@/services/calendar';
 import {
   useCreateGame,
-  useDeleteGame,
   useGameAudit,
   useGameStateChange,
   useInvertGame,
@@ -33,6 +30,7 @@ import {
 } from '@/services/games';
 import { cn } from '@/utils';
 import { auditTitle } from '@/components/game/game-timeline';
+import { DeleteDialog } from '@/components/deletion';
 
 /**
  * Adding and changing a fixture without leaving the calendar.
@@ -152,6 +150,8 @@ export interface FixtureDialogProps {
   venues: CalendarVenue[];
   /** Slot length for the organisation's sport — how long a game holds the hall. */
   durationMinutes: number;
+  /** After the match is deleted from here: a page that showed it has to leave it. */
+  onDeleted?: () => void;
 }
 
 export function FixtureDialog({
@@ -163,6 +163,7 @@ export function FixtureDialog({
   competitions,
   venues,
   durationMinutes,
+  onDeleted,
 }: FixtureDialogProps) {
   const scope = useScopeContext();
   const editing = !!entry;
@@ -188,7 +189,6 @@ export function FixtureDialog({
   const moveMut = useMoveGame();
   const stateMut = useGameStateChange();
   const invertMut = useInvertGame();
-  const deleteMut = useDeleteGame();
 
   const teams = useTeamOptions(leagueId || undefined);
   const audit = useGameAudit(entry?.id, showHistory && !!entry);
@@ -341,8 +341,7 @@ export function FixtureDialog({
     createMut.isPending ||
     moveMut.isPending ||
     stateMut.isPending ||
-    invertMut.isPending ||
-    deleteMut.isPending;
+    invertMut.isPending;
 
   const canSubmit = editing
     ? slotChanged
@@ -431,7 +430,6 @@ export function FixtureDialog({
 
   const verbs = entry ? verbsFor(entry.status) : [];
   const hasScore = !!entry && entry.homeScore != null;
-  const playedDelete = hasScore || ['COMPLETED', 'LIVE', 'PAUSED'].includes(entry?.status ?? '');
 
   return (
     <Modal
@@ -886,51 +884,18 @@ export function FixtureDialog({
           </p>
         )}
 
-        {/* Deleting a played fixture takes its points out of the table with it, which is worth
-            saying out loud rather than discovering afterwards in the standings. */}
-        {confirmingDelete && entry && (
-          <div className="rounded-lg border border-negative/40 bg-negative-soft px-3.5 py-3">
-            <p className="flex items-start gap-2 text-sm text-ink">
-              <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-negative" aria-hidden />
-              <span>
-                Supprimer {entry.home.shortCode} — {entry.away.shortCode} ?
-                {playedDelete && ' Son résultat sera retiré du classement.'}
-              </span>
-            </p>
-            {/* A played match leaves the table with it: the API asks why (the owner's Q3). */}
-            {playedDelete && !reason.trim() && (
-              <p className="mt-1.5 pl-6 text-xs text-negative">
-                Indiquez la raison ci-dessus : elle reste dans le journal du match.
-              </p>
-            )}
-            <div className="mt-2.5 flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setConfirmingDelete(false)} disabled={busy}>
-                Non
-              </Button>
-              <Button
-                variant="primary"
-                isLoading={deleteMut.isPending}
-                disabled={playedDelete && !reason.trim()}
-                onClick={() =>
-                  deleteMut.mutate(
-                    { gameId: entry.id, reason: reason.trim() || undefined },
-                    {
-                      onSuccess: () => {
-                        toast.success('Match supprimé.');
-                        onClose();
-                      },
-                      onError: (e) => toastApiError(e),
-                    },
-                  )
-                }
-                className="bg-negative hover:bg-negative/90"
-              >
-                <Check className="mr-1.5 h-4 w-4" aria-hidden />
-                Supprimer
-              </Button>
-            </div>
-          </div>
-        )}
+        {/* The same dialog as everywhere: a played match needs a reason and says what leaves the
+            table with it, from the API (RESOURCE_DELETION.md §8, R2). */}
+        <DeleteDialog
+          resource="game"
+          id={entry?.id}
+          open={confirmingDelete}
+          onOpenChange={setConfirmingDelete}
+          onDeleted={() => {
+            onClose();
+            onDeleted?.();
+          }}
+        />
       </div>
     </Modal>
   );

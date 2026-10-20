@@ -24,6 +24,7 @@ import { Roles } from '@/schemas';
 import { BoxScoreReport } from '@/components/game/box-score-report';
 import { GameTimeline } from '@/components/game/game-timeline';
 import { GameActionDialog, type GameAction } from '@/components/game/game-action-dialog';
+import { DeleteDialog } from '@/components/deletion';
 import { FixtureDialog, ScoreDialog } from '@/components/calendar';
 import { useCalendar, type CalendarEntry } from '@/services/calendar';
 import { useGame, useGameAudit, type GameDetail } from '@/services/games';
@@ -425,14 +426,22 @@ export default function GamePage() {
           competitions={dayCalendar.data?.competitions ?? []}
           venues={dayCalendar.data?.venues ?? []}
           durationMinutes={duration}
+          // Deleting from « Déplacer » left the reader on the deleted match, which then errored.
+          onDeleted={() => router.push(backHref)}
         />
       )}
       <GameActionDialog
-        action={action}
+        action={action === 'delete' ? null : action}
         gameId={gameId}
         matchup={`${g.homeTeam.name} – ${g.awayTeam.name}`}
-        played={['COMPLETED', 'LIVE', 'PAUSED'].includes(g.status)}
         onClose={() => setAction(null)}
+      />
+      {/* A deleted match has no page to come back to. */}
+      <DeleteDialog
+        resource="game"
+        id={gameId}
+        open={action === 'delete'}
+        onOpenChange={(o) => !o && setAction(null)}
         onDeleted={() => router.push(backHref)}
       />
     </div>
