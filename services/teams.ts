@@ -113,7 +113,7 @@ export function useUpdateTeam() {
       dto,
     }: {
       id: string;
-      dto: { name?: string; shortCode?: string | null };
+      dto: { name?: string; shortCode?: string | null; isActive?: boolean };
     }) => {
       // PUT, not PATCH: `TeamsController` exposes `@Put(':teamId')`, and a PATCH to it 404s with
       // « Cannot PATCH /teams/… » — which is what every rename from the clubs list did.

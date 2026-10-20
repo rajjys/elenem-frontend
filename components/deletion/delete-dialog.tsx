@@ -105,7 +105,7 @@ export function DeleteDialog({
       { id, reason },
       {
         onSuccess: () => {
-          toast.success(successMessage ?? `« ${name} » supprimé${e}.`);
+          toast.success(successMessage ?? `« ${name} » supprimé${e}.`);
           onOpenChange(false);
           onDeleted?.();
         },
@@ -115,12 +115,12 @@ export function DeleteDialog({
   }
 
   const title = !r
-    ? `Supprimer ce${feminine ? 'tte' : ''} ${noun}`
+    ? `Supprimer ce${feminine ? 'tte' : ''} ${noun}`
     : r.allowed
       ? confirmLabel
-        ? `${confirmLabel} ?`
-        : `Supprimer « ${name} » ?`
-      : `« ${name} » ne peut pas être supprimé${e}`;
+        ? `${confirmLabel} ?`
+        : `Supprimer « ${name} » ?`
+      : `« ${name} » ne peut pas être supprimé${e}`;
 
   const footer = (
     <div className="flex flex-wrap items-center justify-end gap-2">
@@ -161,7 +161,7 @@ export function DeleteDialog({
         </p>
       ) : report.isError ? (
         <p role="alert" className="rounded-md bg-negative-soft px-3 py-2 text-sm text-negative">
-          {getApiErrorMessage(report.error, `Impossible de vérifier ce${feminine ? 'tte' : ''} ${noun}.`)}
+          {getApiErrorMessage(report.error, `Impossible de vérifier ce${feminine ? 'tte' : ''} ${noun}.`)}
         </p>
       ) : r && !r.allowed ? (
         <div className="space-y-2">

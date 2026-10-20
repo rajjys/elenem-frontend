@@ -3,14 +3,15 @@
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useDebounce } from 'use-debounce';
-import { ListPlus, Pencil, Shield, Trash2, UserCog } from 'lucide-react';
-import { Button, ListPage, ListToolbar, SelectField } from '@/components/ui';
-import { DeleteDialog } from '@/components/deletion';
+import { Archive, ArchiveRestore, ListPlus, Pencil, Shield, Trash2, UserCog } from 'lucide-react';
+import { Button, ListPage, ListToolbar, RowMenu, SelectField } from '@/components/ui';
+import { ArchiveDialog, DeleteDialog, useReactivate } from '@/components/deletion';
 import { useScopeContext } from '@/hooks/useScopeContext';
 import { useAuthStore } from '@/store/auth.store';
 import { Roles, type TeamFilterParams } from '@/schemas';
 import { useTeams, type TeamListItem } from '@/services/teams';
 import { useStandingsLeagues } from '@/services/standings';
+import { toastApiError } from '@/utils';
 import { TeamFormDialog } from './team-form-dialog';
 import { BulkTeamsDialog } from './bulk-teams-dialog';
 import { TeamAdminsDialog } from './team-admins-dialog';
@@ -48,6 +49,11 @@ export function TeamsListView({
   const [debounced] = useDebounce(search, 400);
   const [leagueId, setLeagueId] = useState('');
   const [toDelete, setToDelete] = useState<TeamListItem | null>(null);
+  // Archived clubs keep their history and leave the present (RESOURCE_DELETION.md R3); they are
+  // found again here, and only here.
+  const [showArchived, setShowArchived] = useState(false);
+  const [archiving, setArchiving] = useState<TeamListItem | null>(null);
+  const { reactivate, isPending: reactivating } = useReactivate('team');
   /**
    * Both ways in, on the header, with equal weight.
    *
@@ -79,8 +85,9 @@ export function TeamsListView({
       sortOrder: 'asc',
       ...(pinnedTenantId ? { tenantId: pinnedTenantId } : {}),
       ...(pinnedLeagueId ? { leagueId: pinnedLeagueId } : {}),
+      ...(showArchived ? { isActive: false } : {}),
     }),
-    [page, debounced, pinnedTenantId, pinnedLeagueId],
+    [page, debounced, pinnedTenantId, pinnedLeagueId, showArchived],
   );
 
   const ready = scope === 'platform' || !!pinnedTenantId || !!pinnedLeagueId;
@@ -90,7 +97,7 @@ export function TeamsListView({
   const totalItems = data?.totalItems ?? 0;
 
   // Narrowing to one competition shortens the list; staying on page 4 of it strands the reader.
-  useEffect(() => setPage(1), [debounced, leagueId]);
+  useEffect(() => setPage(1), [debounced, leagueId, showArchived]);
 
   /** Where a club's own surface is, with whatever context the reader needs to get in. */
   const dashboardHref = (team: TeamListItem) => {
@@ -131,6 +138,17 @@ export function TeamsListView({
               options={leagueOptions.map((l) => ({ value: l.id, label: l.name }))}
             />
           )}
+          {canManage && (
+            <label className="inline-flex h-9 cursor-pointer select-none items-center gap-2 rounded-md border border-line bg-surface px-3 text-sm text-ink-muted hover:text-ink">
+              <input
+                type="checkbox"
+                className="h-4 w-4 accent-accent"
+                checked={showArchived}
+                onChange={(e) => setShowArchived(e.target.checked)}
+              />
+              Archivés
+            </label>
+          )}
         </ListToolbar>
       }
       isLoading={isLoading}
@@ -138,11 +156,17 @@ export function TeamsListView({
       onRetry={() => refetch()}
       isEmpty={teams.length === 0}
       empty={
+        showArchived ? (
+          <div className="rounded-lg border border-dashed border-line bg-surface py-12 text-center text-sm text-ink-muted">
+            {debounced ? 'Aucun club archivé ne correspond à cette recherche.' : 'Aucun club archivé.'}
+          </div>
+        ) : (
         <EmptyTeams
           canManage={canManage}
           searching={!!debounced}
           onAdd={() => setBulkOpen(true)}
         />
+        )
       }
       page={page}
       totalPages={data?.totalPages ?? 1}
@@ -179,6 +203,14 @@ export function TeamsListView({
           id={toDelete?.id}
           open={!!toDelete}
           onOpenChange={(o) => !o && setToDelete(null)}
+          alternatives={{
+            archive: { label: 'Archiver le club', onSelect: () => setArchiving(toDelete) },
+          }}
+        />
+        <ArchiveDialog
+          kind="team"
+          target={archiving ? { id: archiving.id, name: archiving.name } : null}
+          onOpenChange={(o) => !o && setArchiving(null)}
         />
         </>
       }
@@ -192,7 +224,7 @@ export function TeamsListView({
                 <th className="w-20 px-4 py-3">Code</th>
                 <th className="px-4 py-3">Compétition</th>
                 <th className="hidden px-4 py-3 sm:table-cell">Ville</th>
-                {canManage && <th className="w-24 px-4 py-3 text-right">Actions</th>}
+                {canManage && <th className="w-16 px-4 py-3 text-right">Actions</th>}
               </tr>
             </thead>
             <tbody className="divide-y divide-line">
@@ -207,7 +239,7 @@ export function TeamsListView({
                     </Link>
                     {team.isActive === false && (
                       <span className="ml-2 rounded bg-surface-sunk px-1.5 py-0.5 text-xs text-ink-subtle">
-                        Inactif
+                        Archivé
                       </span>
                     )}
                   </td>
@@ -220,32 +252,25 @@ export function TeamsListView({
                   </td>
                   {canManage && (
                     <td className="px-4 py-3">
-                      <div className="flex justify-end gap-1">
-                        {/* The name and the abbreviation, in place. A club's *details* — ville,
-                            année de fondation, logo — are its own screen, reached by opening the
-                            club, because that is a different act from correcting a typo in a list. */}
-                        <button
-                          onClick={() => setStaffing(team)}
-                          className="rounded p-1.5 text-ink-subtle hover:bg-surface-sunk hover:text-ink"
-                          aria-label={`Responsables de ${team.name}`}
-                          title="Responsables du club"
-                        >
-                          <UserCog className="h-4 w-4" />
-                        </button>
-                        <button
-                          onClick={() => setEditing(team)}
-                          className="rounded p-1.5 text-ink-subtle hover:bg-surface-sunk hover:text-ink"
-                          aria-label={`Modifier ${team.name}`}
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </button>
-                        <button
-                          onClick={() => setToDelete(team)}
-                          className="rounded p-1.5 text-ink-subtle hover:bg-negative-soft hover:text-negative"
-                          aria-label={`Supprimer ${team.name}`}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
+                      {/* One « ⋮ » rather than four icons: the names need the width, and each
+                          action reads as its word (the owner, 2026-10-20). */}
+                      <div className="flex justify-end">
+                        <RowMenu
+                          label={`Actions pour ${team.name}`}
+                          items={[
+                            { label: 'Responsables', icon: UserCog, onSelect: () => setStaffing(team) },
+                            { label: 'Modifier', icon: Pencil, onSelect: () => setEditing(team) },
+                            team.isActive === false
+                              ? {
+                                  label: 'Réactiver',
+                                  icon: ArchiveRestore,
+                                  disabled: reactivating,
+                                  onSelect: () => reactivate({ id: team.id, name: team.name }).catch(toastApiError),
+                                }
+                              : { label: 'Archiver', icon: Archive, onSelect: () => setArchiving(team) },
+                            { label: 'Supprimer', icon: Trash2, danger: true, onSelect: () => setToDelete(team) },
+                          ]}
+                        />
                       </div>
                     </td>
                   )}

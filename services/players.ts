@@ -30,6 +30,7 @@ function toQuery(params: PlayerFilterParams): string {
   if (params.leagueId) qs.append('leagueId', params.leagueId);
   if (params.teamId) qs.append('teamId', params.teamId);
   if (params.tenantId) qs.append('tenantId', params.tenantId);
+  if (params.isActive === false) qs.append('isActive', 'false');
   qs.append('skip', String((page - 1) * pageSize));
   qs.append('take', String(pageSize));
   return qs.toString();

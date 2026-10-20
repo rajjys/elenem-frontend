@@ -1,9 +1,10 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { Trash2, Pencil, Users } from 'lucide-react';
-import { Button, ListPage, ListToolbar } from '@/components/ui';
-import { DeleteDialog } from '@/components/deletion';
+import { Archive, ArchiveRestore, Trash2, Pencil, Users } from 'lucide-react';
+import { Button, ListPage, ListToolbar, RowMenu } from '@/components/ui';
+import { ArchiveDialog, DeleteDialog, useReactivate } from '@/components/deletion';
+import { toastApiError } from '@/utils';
 import { usePlayers } from '@/services/players';
 import { useCurrentUser } from '@/hooks/useAuth';
 import { Roles } from '@/schemas/enums';
@@ -59,6 +60,10 @@ export function PlayersListView({
   const [creating, setCreating] = useState(false);
   const [bulkOpen, setBulkOpen] = useState(false);
   const [toDelete, setToDelete] = useState<Player | null>(null);
+  // Archived players leave the roster and stay on every sheet they played (RESOURCE_DELETION.md R3).
+  const [showArchived, setShowArchived] = useState(false);
+  const [archiving, setArchiving] = useState<Player | null>(null);
+  const { reactivate, isPending: reactivating } = useReactivate('player');
   /**
    * Whose figures are open.
    *
@@ -71,8 +76,11 @@ export function PlayersListView({
 
   const pageSize = 20;
   const filters: PlayerFilterParams = useMemo(
-    () => ({ q: debouncedSearch || undefined, leagueId, teamId, tenantId, page, pageSize }),
-    [debouncedSearch, leagueId, teamId, tenantId, page],
+    () => ({
+      q: debouncedSearch || undefined, leagueId, teamId, tenantId, page, pageSize,
+      ...(showArchived ? { isActive: false } : {}),
+    }),
+    [debouncedSearch, leagueId, teamId, tenantId, page, showArchived],
   );
 
   const { data, isLoading, isError, refetch } = usePlayers(filters);
@@ -100,13 +108,36 @@ export function PlayersListView({
             setPage(1);
           }}
           placeholder="Rechercher un joueur…"
-        />
+        >
+          {canRegister && (
+            <label className="inline-flex h-9 cursor-pointer select-none items-center gap-2 rounded-md border border-line bg-surface px-3 text-sm text-ink-muted hover:text-ink">
+              <input
+                type="checkbox"
+                className="h-4 w-4 accent-accent"
+                checked={showArchived}
+                onChange={(e) => {
+                  setShowArchived(e.target.checked);
+                  setPage(1);
+                }}
+              />
+              Archivés
+            </label>
+          )}
+        </ListToolbar>
       }
       isLoading={isLoading}
       isError={isError}
       onRetry={() => refetch()}
       isEmpty={players.length === 0}
-      empty={<EmptyRoster canManage={canRegister} searching={!!debouncedSearch} onAdd={() => setBulkOpen(true)} />}
+      empty={
+        showArchived ? (
+          <div className="rounded-lg border border-dashed border-line bg-surface py-12 text-center text-sm text-ink-muted">
+            {debouncedSearch ? 'Aucune fiche archivée ne correspond à cette recherche.' : 'Aucune fiche archivée.'}
+          </div>
+        ) : (
+          <EmptyRoster canManage={canRegister} searching={!!debouncedSearch} onAdd={() => setBulkOpen(true)} />
+        )
+      }
       page={page}
       totalPages={totalPages}
       onPageChange={setPage}
@@ -155,6 +186,14 @@ export function PlayersListView({
           id={toDelete?.id}
           open={!!toDelete}
           onOpenChange={(o) => !o && setToDelete(null)}
+          alternatives={{
+            archive: { label: 'Archiver la fiche', onSelect: () => setArchiving(toDelete) },
+          }}
+        />
+        <ArchiveDialog
+          kind="player"
+          target={archiving ? { id: archiving.id, name: `${archiving.firstName} ${archiving.lastName}` } : null}
+          onOpenChange={(o) => !o && setArchiving(null)}
         />
         </>
       }
@@ -169,7 +208,7 @@ export function PlayersListView({
                 <th className="px-4 py-3">Poste</th>
                 <th className="px-4 py-3">Équipe</th>
                 <th className="px-4 py-3">Compte</th>
-                {canEdit && <th className="w-24 px-4 py-3 text-right">Actions</th>}
+                {canEdit && <th className="w-16 px-4 py-3 text-right">Actions</th>}
               </tr>
             </thead>
             <tbody className="divide-y divide-line">
@@ -200,25 +239,26 @@ export function PlayersListView({
                   </td>
                   {canEdit && (
                     <td className="px-4 py-3">
-                      <div className="flex justify-end gap-1">
-                        <button
-                          onClick={() => setEditing(p)}
-                          className="rounded p-1.5 text-ink-subtle hover:bg-surface-sunk hover:text-ink"
-                          aria-label={`Modifier ${p.firstName} ${p.lastName}`}
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </button>
-                        {/* Removing somebody from the register is the organiser's, so a club does
-                            not get a bin it would be refused. */}
-                        {canRegister && (
-                          <button
-                            onClick={() => setToDelete(p)}
-                            className="rounded p-1.5 text-ink-subtle hover:bg-negative-soft hover:text-negative"
-                            aria-label={`Supprimer ${p.firstName} ${p.lastName}`}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </button>
-                        )}
+                      <div className="flex justify-end">
+                        {/* One « ⋮ », as on the clubs table. Archiving and removing somebody from
+                            the register are the organiser's, so a club only gets « Modifier ». */}
+                        <RowMenu
+                          label={`Actions pour ${p.firstName} ${p.lastName}`}
+                          items={[
+                            { label: 'Modifier', icon: Pencil, onSelect: () => setEditing(p) },
+                            canRegister &&
+                              (p.isActive === false
+                                ? {
+                                    label: 'Réactiver',
+                                    icon: ArchiveRestore,
+                                    disabled: reactivating,
+                                    onSelect: () =>
+                                      reactivate({ id: p.id, name: `${p.firstName} ${p.lastName}` }).catch(toastApiError),
+                                  }
+                                : { label: 'Archiver', icon: Archive, onSelect: () => setArchiving(p) }),
+                            canRegister && { label: 'Supprimer', icon: Trash2, danger: true, onSelect: () => setToDelete(p) },
+                          ]}
+                        />
                       </div>
                     </td>
                   )}

@@ -58,6 +58,8 @@ export interface PlayerFilterParams {
   leagueId?: string;
   teamId?: string;
   tenantId?: string;
+  /** false: the archived ones. */
+  isActive?: boolean;
   page?: number;
   pageSize?: number;
 }

@@ -20,6 +20,8 @@ import {
   Send,
 } from 'lucide-react';
 import {
+  Archive,
+  ArchiveRestore,
   Building2,
   ImageMinus,
   ImagePlus,
@@ -299,6 +301,13 @@ function describeLifecycle(
       title: from && to ? 'Transfert' : to ? 'Arrivée dans un club' : 'Départ du club',
       detail: from && to ? `${de(from, true)} à ${to}.` : `${to ?? from}.`,
     };
+  }
+  // Archiving is its own act, not an edit of a field called « Actif » (RESOURCE_DELETION.md R3).
+  if ((type === 'TEAM' || type === 'PLAYER') && changed.length === 1 && changed[0] === 'isActive') {
+    const archived = after.isActive === false;
+    return archived
+      ? { icon: Archive, title: `${kind.noun} archivé${e}` }
+      : { icon: ArchiveRestore, title: `${kind.noun} réactivé${e}`, tone: 'positive' };
   }
   if (type === 'POST' && after.status === 'PUBLISHED' && before.status !== 'PUBLISHED') {
     return { icon: Newspaper, title: 'Actualité publiée', tone: 'positive', detail: describeChanges(withoutStatus(before), withoutStatus(after)) };

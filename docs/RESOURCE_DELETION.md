@@ -496,6 +496,19 @@ public site included.
 *Verify:* archive a club with played games: the public table and results still show its name and
 logo; it is gone from the fixture picker; « Réactiver » brings it back.
 
+*Built 2026-10-20, not yet committed.* « Archiver » / « Réactiver » on the clubs and players lists,
+an « Archivés » view on both (`ArchiveDialog`, `useReactivate` in `components/deletion`), and the
+delete dialog's refusal for a club or a player now opens it (« Archiver le club », « Archiver la
+fiche »). An archived club leaves the lists and the fixture pickers, and a new fixture is refused by
+name — « « Ballers » est archivé : réactivez-le pour lui programmer un match. » — from every way a
+fixture is born (the existing « introuvable ou inactive » check, made specific); it stays on the
+public table and results under its name. Its upcoming games stay on the calendar for the organiser
+to move or cancel: the confirmation says so. The journal says « Club archivé », « Fiche réactivée »
+instead of « Actif : Oui → Non ». Fixed on the way: the clubs list's `isActive` query parameter
+was read with `@Type(() => Boolean)`, so `isActive=false` returned the active clubs; the players
+list had no way to ask for archived ones. Checked: 17 scenarios in a browser and through the API on a
+throwaway database.
+
 **R4 — Nothing left behind.** Deleting a player, club, competition or organisation deletes its R2
 images; deleting a player erases national ID, registration number, birth date, phone and e-mail
 (instead of prefixing them); deleting an organisation erases its business profile's money and ID
