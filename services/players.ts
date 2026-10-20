@@ -89,6 +89,20 @@ export function useCreatePlayer() {
   });
 }
 
+/**
+ * « Anonymiser »: a player who has played, taken out at their family's request — the lines stay so
+ * every sheet adds up, the person goes (the owner's Q5). The platform's, with a reason.
+ */
+export function useAnonymisePlayer() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, reason }: { id: string; reason: string }) => {
+      await api.post(`/players/${id}/anonymise`, { reason });
+    },
+    onSuccess: () => qc.invalidateQueries(),
+  });
+}
+
 export function useUpdatePlayer() {
   const qc = useQueryClient();
   return useMutation({

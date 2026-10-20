@@ -519,6 +519,24 @@ response, beside the existing blocklist test.
 *Verify:* after each delete, the image URL answers 404 and the rows hold no personal field; the
 public-API test passes.
 
+*Built 2026-10-20, not yet committed.* `MediaService.forgetImages` marks a deleted owner's images
+removed and takes them out of the bucket after the delete commits — players, clubs, competitions,
+organisations. `src/common/deletion/erase.ts` says once what a delete erases: a player's e-mail,
+birth date, nationality, biography, photo, identity numbers and account link (`ERASED_PLAYER`); a
+business profile's legal name, identity, tax, bank, mobile-money, contact, address, coordinates and
+images (`ERASED_BUSINESS_PROFILE`); an account's address — replaced by `deleted_<id>@supprime.invalid`,
+not kept inside a renamed string — username, phone, birth date, biography, avatar (`erasedUser`). A
+deleted account's journal entry no longer carries its address. Deleted posts and venues free their
+title and address (`softDeletePosts`). Q5: `POST /players/:id/anonymise`, system administrators only
+and with a reason — « Joueur retiré » (« Joueuse retirée » in a women's competition), every
+personal field and the photo erased, the public page gone, every match-sheet line kept, and the
+journal's earlier entries about the player renamed; « Anonymiser » in the players menu, platform
+only. A test now fails if any league-site query on a soft-deletable model forgets `deletedAt: null`;
+it found and closed four (the current season by id, the linked clubs, the scorers' players and
+clubs). Checked: 402 tests; 20 scenarios on a throwaway database with real uploads — every photo
+and logo answered 404 once its owner was deleted, no personal field left on the rows, no
+`deleted_…` name on any league-site page.
+
 **Order:** R0 first, on its own — it is security. Then R1 and R2 (the rules, then their screen),
 R3, R4. R3 can come before R2 if archiving is wanted sooner, since R1's « instead » points at it.
 

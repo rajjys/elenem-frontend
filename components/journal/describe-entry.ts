@@ -86,6 +86,11 @@ export function describeJournalEntry(
     );
   }
 
+  // Q5: a player who has played, taken out of the product at their family's request.
+  if (action === 'PLAYER_ANONYMISED') {
+    return { icon: UserX, title: 'Fiche anonymisée', tone: 'negative' };
+  }
+
   if (entry.entityType === 'STAGE') {
     return (
       {

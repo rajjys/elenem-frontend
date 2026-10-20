@@ -1,11 +1,13 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { Archive, ArchiveRestore, Trash2, Pencil, Users } from 'lucide-react';
-import { Button, ListPage, ListToolbar, RowMenu } from '@/components/ui';
+import { Archive, ArchiveRestore, Trash2, Pencil, UserX, Users } from 'lucide-react';
+import { Button, ConfirmDialog, Label, ListPage, ListToolbar, RowMenu } from '@/components/ui';
 import { ArchiveDialog, DeleteDialog, useReactivate } from '@/components/deletion';
 import { toastApiError } from '@/utils';
-import { usePlayers } from '@/services/players';
+import { useAnonymisePlayer, usePlayers } from '@/services/players';
+import { useIsSystemAdmin } from '@/hooks';
+import { toast } from 'sonner';
 import { useCurrentUser } from '@/hooks/useAuth';
 import { Roles } from '@/schemas/enums';
 import { useDebounce } from 'use-debounce';
@@ -64,6 +66,11 @@ export function PlayersListView({
   const [showArchived, setShowArchived] = useState(false);
   const [archiving, setArchiving] = useState<Player | null>(null);
   const { reactivate, isPending: reactivating } = useReactivate('player');
+  // Q5, the platform's only: a player who has played, taken out at their family's request.
+  const isSystemAdmin = useIsSystemAdmin();
+  const anonymise = useAnonymisePlayer();
+  const [anonymising, setAnonymising] = useState<Player | null>(null);
+  const [anonymiseReason, setAnonymiseReason] = useState('');
   /**
    * Whose figures are open.
    *
@@ -190,6 +197,35 @@ export function PlayersListView({
             archive: { label: 'Archiver la fiche', onSelect: () => setArchiving(toDelete) },
           }}
         />
+        <ConfirmDialog
+          open={!!anonymising}
+          onOpenChange={(o) => !o && setAnonymising(null)}
+          tone="danger"
+          title={`Anonymiser « ${anonymising ? `${anonymising.firstName} ${anonymising.lastName}` : ''} » ?`}
+          description="À la demande du joueur ou de sa famille. Ses lignes restent sur les feuilles de match, pour que chaque total tombe juste, sous « Joueur retiré » ; son nom, sa photo, sa date de naissance, ses coordonnées et ses numéros d’identité sont effacés, ici et dans le journal. Ce n’est pas réversible."
+          confirmLabel="Anonymiser"
+          confirmDisabled={!anonymiseReason.trim()}
+          onConfirm={() =>
+            anonymising
+              ? anonymise
+                  .mutateAsync({ id: anonymising.id, reason: anonymiseReason })
+                  .then(() => toast.success('Fiche anonymisée.'))
+              : undefined
+          }
+        >
+          <div>
+            <Label htmlFor="anon-reason">Raison</Label>
+            <input
+              id="anon-reason"
+              type="text"
+              value={anonymiseReason}
+              onChange={(e) => setAnonymiseReason(e.target.value)}
+              maxLength={300}
+              placeholder="Demande de la famille, reçue le…"
+              className="mt-1 h-9 w-full rounded-lg border border-line bg-surface px-3 text-sm text-ink transition-colors hover:border-line-strong focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+            />
+          </div>
+        </ConfirmDialog>
         <ArchiveDialog
           kind="player"
           target={archiving ? { id: archiving.id, name: `${archiving.firstName} ${archiving.lastName}` } : null}
@@ -257,6 +293,15 @@ export function PlayersListView({
                                   }
                                 : { label: 'Archiver', icon: Archive, onSelect: () => setArchiving(p) }),
                             canRegister && { label: 'Supprimer', icon: Trash2, danger: true, onSelect: () => setToDelete(p) },
+                            isSystemAdmin && {
+                              label: 'Anonymiser',
+                              icon: UserX,
+                              danger: true,
+                              onSelect: () => {
+                                setAnonymiseReason('');
+                                setAnonymising(p);
+                              },
+                            },
                           ]}
                         />
                       </div>

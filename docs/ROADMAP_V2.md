@@ -829,8 +829,8 @@ game status commands and the game-date lists are not scoped to the caller's orga
 Decisions Q1–Q7 taken as recommended on 2026-10-12 (Q2: keep the results of a club that withdraws).
 Sprints R0–R4 (§8); R0 also refuses tied basketball scores and fixes the forfeit box. R0 built and verified
 2026-10-12; R1 (the rules in one place) built the same day; R2 (one delete dialog) and R3 (archive
-and reactivate clubs and players, on screen) built 2026-10-20; R4 (nothing left behind: images,
-personal data) next.
+and reactivate clubs and players, on screen) and R4 (nothing left behind: images, personal data,
+anonymising a player on request) built 2026-10-20. The deletion plan is done.
 
 **Found during R2, fixed the same day:** the players list's search read the *linked account's* name
 (`user.firstName`), not the player's own — and players are roster entries without accounts — so a
